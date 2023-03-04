@@ -7,10 +7,6 @@ pub struct Token {
     pub number: i32,
     pub symbol: Symbols,
 }
-// impl Copy for Token {}
-// impl Clone for Token {
-//     // 
-// }
 
 const NUM_ASCII_START: u8 = 48;
 const NUM_ASCII_END  : u8 = 57;
@@ -22,7 +18,8 @@ fn is_numeric(char: u8) -> bool {
     }
 }
 
-pub fn tokenizer(source: String) -> Vec<Token> {
+const NOT_A_NUMBER: i32 = -1;
+pub fn tokenizer(source: String) -> Result<Vec<Token>, ()> {
     let mut index = 0;
     let mut last_type = -1;
     let mut is_num_minus = false;
@@ -30,11 +27,8 @@ pub fn tokenizer(source: String) -> Vec<Token> {
     let chars = source.as_bytes();
     let source_len = source.len();
 
-    // println!("{} {}", source, source_len);
-
     while index < source_len {
         let mut current = chars[index];
-        // println!("{} {}", index, current);
 
         if is_numeric(current) {
             let mut value: i32 = (current - NUM_ASCII_START) as i32;
@@ -72,6 +66,7 @@ pub fn tokenizer(source: String) -> Vec<Token> {
         const MINUS_ASCII    : u8 = 45;
         const MULTIPLY_ASCII : u8 = 42;
         const DIVIDE_ASCII   : u8 = 47;
+        const POWER_ASCII    : u8 = 94;
         
         const SPACE_ASCII  : u8 = 32;
         const RETURN_ASCII : u8 = 13;
@@ -81,7 +76,7 @@ pub fn tokenizer(source: String) -> Vec<Token> {
                 last_type = Types::Paren as i8;
                 tokens.push(Token {
                     type__: Types::Paren,
-                    number: -1,
+                    number: NOT_A_NUMBER,
                     symbol: Symbols::LeftParen,
                 });
             },
@@ -89,7 +84,7 @@ pub fn tokenizer(source: String) -> Vec<Token> {
                 last_type = Types::Paren as i8;
                 tokens.push(Token {
                     type__: Types::Paren,
-                    number: -1,
+                    number: NOT_A_NUMBER,
                     symbol: Symbols::RightParen,
                 });
             },
@@ -98,7 +93,7 @@ pub fn tokenizer(source: String) -> Vec<Token> {
                 last_type = Types::Symbol as i8;
                 tokens.push(Token {
                     type__: Types::Symbol,
-                    number: -1, 
+                    number: NOT_A_NUMBER, 
                     symbol: Symbols::Plus,
                 });
             },
@@ -109,7 +104,7 @@ pub fn tokenizer(source: String) -> Vec<Token> {
                     last_type = Types::Symbol as i8;
                     tokens.push(Token {
                         type__: Types::Symbol,
-                        number: -1, 
+                        number: NOT_A_NUMBER, 
                         symbol: Symbols::Minus,
                     });
                 }
@@ -118,7 +113,7 @@ pub fn tokenizer(source: String) -> Vec<Token> {
                 last_type = Types::Symbol as i8;
                 tokens.push(Token {
                     type__: Types::Symbol,
-                    number: -1, 
+                    number: NOT_A_NUMBER, 
                     symbol: Symbols::Multiply,
                 });
             },
@@ -126,18 +121,28 @@ pub fn tokenizer(source: String) -> Vec<Token> {
                 last_type = Types::Symbol as i8;
                 tokens.push(Token {
                     type__: Types::Symbol,
-                    number: -1, 
+                    number: NOT_A_NUMBER, 
                     symbol: Symbols::Divide,
                 });
             },
-            SPACE_ASCII => {},
+            POWER_ASCII  => {
+                last_type = Types::Symbol as i8;
+                tokens.push(Token {
+                    type__: Types::Symbol,
+                    number: NOT_A_NUMBER,
+                    symbol: Symbols::Power,
+                });
+            },
+
+            SPACE_ASCII  => {},
             RETURN_ASCII => { break; },
             _ => {
-                panic!("Unknown token: {}", current);
+                println!("Unknown token: `{}` at index {}.", current as char, index);
+                return Err(());
             }
         }
 
         index += 1;
     }
-    return tokens;
+    return Ok(tokens);
 }

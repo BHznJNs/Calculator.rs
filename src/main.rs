@@ -1,7 +1,7 @@
 mod compiler;
 mod compute;
 
-use std::io::{self, Write};
+use std::{io::{self, Write}};
 use compiler::compile::compile;
 use compute::compute;
 
@@ -16,7 +16,13 @@ fn main() {
             .unwrap();
 
         let tokens = compile(input);
-        let result = compute(tokens);
-        println!(" {}", result);
+        if tokens.is_err() {
+            continue;
+        }
+        let result = compute(tokens.unwrap());
+        if result.is_err() {
+            continue;
+        }
+        println!(" {}", result.unwrap());
     }
 }
