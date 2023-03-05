@@ -1,11 +1,31 @@
+mod public;
 mod compiler;
-mod compute;
+mod computer;
 
-use std::{io::{self, Write}};
+use std::collections::HashMap;
+use std::io::{self, Write};
+
+use public::number::Number;
+use public::build_in::BuildIn;
 use compiler::compile::compile;
-use compute::compute;
+use computer::compute::compute;
+use computer::pre_compute::pre_compute;
 
-fn main() {
+fn attempt(input: String, build_in_funcs: &HashMap<&str, fn(f64) -> f64>) -> Result<Number, ()> {
+    let tokens = compile(input)?;
+    let resolved_tokens = pre_compute(tokens, build_in_funcs)?;
+    let result = compute(resolved_tokens, build_in_funcs)?;
+    Ok(result)
+}
+
+fn main() -> ! {
+    let build_in_inst = BuildIn::init();
+    let build_in_funcs = HashMap::from([
+        ("sin", build_in_inst.sin),
+        ("cos", build_in_inst.cos),
+        ("tan", build_in_inst.tan)
+    ]);
+
     loop {
         print!("> ");
         io::stdout().flush().unwrap();
@@ -15,14 +35,9 @@ fn main() {
             .read_line(&mut input)
             .unwrap();
 
-        let tokens = compile(input);
-        if tokens.is_err() {
-            continue;
+        let result = attempt(input, &build_in_funcs);
+        if result.is_ok() {
+            println!(" {}", result.unwrap());
         }
-        let result = compute(tokens.unwrap());
-        if result.is_err() {
-            continue;
-        }
-        println!(" {}", result.unwrap());
     }
 }

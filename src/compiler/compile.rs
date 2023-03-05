@@ -1,11 +1,11 @@
 use super::tokenizer::tokenizer;
-use super::tokenizer::Token;
+use crate::public::token::TokenVec;
 
-pub fn compile(source: String) -> Result<Vec<Token>, ()> {
+pub fn compile(source: String) -> Result<TokenVec, ()> {
     let tokens = tokenizer(source)?;
     // for item in &tokens {
     //     // Check tokens
-    //     println!("type: {} | number: {} | symbol: {}", item.type__, item.number, item.symbol);
+    //     println!("type: {} | value: {}", item.type__, item);
     // }
     Ok(tokens)
 }

@@ -14,6 +14,12 @@ pub enum Symbols {
     RightParen,
 }
 
+impl Default for Symbols {
+    fn default() -> Self {
+        return Symbols::NotASymbol
+    }
+}
+
 impl fmt::Display for Symbols {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {

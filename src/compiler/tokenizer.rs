@@ -1,59 +1,94 @@
-use super::types::Types;
-use super::symbols::Symbols;
-
-#[derive(Clone, Copy)]
-pub struct Token {
-    pub type__: Types,
-    pub number: i32,
-    pub symbol: Symbols,
-}
+use crate::public::number::Number;
+use crate::public::token::Overloaded;
+use crate::public::token::Token;
+use crate::public::token::TokenVec;
+use crate::public::types::Types;
+use crate::public::symbols::Symbols;
 
 const NUM_ASCII_START: u8 = 48;
-const NUM_ASCII_END  : u8 = 57;
-fn is_numeric(char: u8) -> bool {
-    if NUM_ASCII_START <= char && char <= NUM_ASCII_END {
-        return true;
-    } else {
-        return false;
-    }
+const POINT_ASCII: u8 = 46;
+
+enum State {
+    Int, Float
 }
 
-const NOT_A_NUMBER: i32 = -1;
-pub fn tokenizer(source: String) -> Result<Vec<Token>, ()> {
+fn ascii_to_num(ascii: u8) -> u8 {
+    return ascii - NUM_ASCII_START
+}
+
+pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
     let mut index = 0;
     let mut last_type = -1;
     let mut is_num_minus = false;
-    let mut tokens = Vec::<Token>::new();
+    let mut tokens = TokenVec::new();
     let chars = source.as_bytes();
     let source_len = source.len();
 
     while index < source_len {
         let mut current = chars[index];
 
-        if is_numeric(current) {
-            let mut value: i32 = (current - NUM_ASCII_START) as i32;
-            last_type = Types::Number as i8;
+        if current.is_ascii_digit() {
+            let mut state = State::Int;
+            let mut float_para: f64 = 10.0;
+            let mut value = Number::Int(ascii_to_num(current) as i64);
 
             index += 1;
             current = chars[index];
 
-            while is_numeric(current) {
-                value *= 10;
-                value += (current - NUM_ASCII_START) as i32;
-                index += 1;
-                current = chars[index];
+            while index < source_len {
+                if current.is_ascii_digit() {
+                    let num_ascii = ascii_to_num(current);
+                    match state {
+                        State::Int => {
+                            value = value * Number::Int(10);
+                            value = value + Number::Int(num_ascii as i64);
+                        },
+                        State::Float => {
+                            value = value + Number::Float((num_ascii as f64) / float_para);
+                            float_para /= 10.0;
+                        }
+                    }
+                    index += 1;
+                    current = chars[index];
+                    continue;
+                }
+                if current == POINT_ASCII {
+                    state = State::Float;
+                    value = value.float();
+                    index += 1;
+                    current = chars[index];
+                    continue;
+                }
+                break;
             }
 
             if is_num_minus {
-                value = -value;
-                is_num_minus = false;
+                value = Number::Int(0) - value;
             }
 
-            tokens.push(Token {
-                type__: Types::Number,
-                number: value,
-                symbol: Symbols::NotASymbol,
-            });
+            last_type = Types::Number as i8;
+            tokens.push(Token::create(
+                Types::Number,
+                value,
+            ));
+            continue;
+        }
+
+        if current.is_ascii_alphabetic() {
+            let mut value = String::from(current as char);
+            last_type = Types::Identifier as i8;
+
+            index += 1;
+            current = chars[index];
+            while current.is_ascii_alphabetic() {
+                value.push(current as char);
+                index += 1;
+                current = chars[index];
+            }
+            tokens.push(Token::create(
+                Types::Identifier,
+                value
+            ));
             continue;
         }
 
@@ -74,64 +109,61 @@ pub fn tokenizer(source: String) -> Result<Vec<Token>, ()> {
         match current {
             LEFT_PAREN_ASCII => {
                 last_type = Types::Paren as i8;
-                tokens.push(Token {
-                    type__: Types::Paren,
-                    number: NOT_A_NUMBER,
-                    symbol: Symbols::LeftParen,
-                });
+                tokens.push(Token::create(
+                    Types::Paren, 
+                    Symbols::LeftParen
+                ));
             },
             RIGHT_PAREN_ASCII => {
                 last_type = Types::Paren as i8;
-                tokens.push(Token {
-                    type__: Types::Paren,
-                    number: NOT_A_NUMBER,
-                    symbol: Symbols::RightParen,
-                });
+                tokens.push(Token::create(
+                    Types::Paren, 
+                    Symbols::RightParen
+                ));
             },
 
             PLUS_ASCII => {
-                last_type = Types::Symbol as i8;
-                tokens.push(Token {
-                    type__: Types::Symbol,
-                    number: NOT_A_NUMBER, 
-                    symbol: Symbols::Plus,
-                });
+                if last_type < 0 || last_type == Types::Symbol as i8 {
+                    is_num_minus = false;
+                } else {
+                    last_type = Types::Symbol as i8;
+                    tokens.push(Token::create(
+                        Types::Symbol,
+                        Symbols::Plus,
+                    ));
+                }
             },
             MINUS_ASCII => {
                 if last_type < 0 || last_type == Types::Symbol as i8 {
                     is_num_minus = true;
                 } else {
                     last_type = Types::Symbol as i8;
-                    tokens.push(Token {
-                        type__: Types::Symbol,
-                        number: NOT_A_NUMBER, 
-                        symbol: Symbols::Minus,
-                    });
+                    tokens.push(Token::create(
+                        Types::Symbol,
+                        Symbols::Minus,
+                    ));
                 }
             },
             MULTIPLY_ASCII => {
                 last_type = Types::Symbol as i8;
-                tokens.push(Token {
-                    type__: Types::Symbol,
-                    number: NOT_A_NUMBER, 
-                    symbol: Symbols::Multiply,
-                });
+                tokens.push(Token::create(
+                    Types::Symbol,
+                    Symbols::Multiply,
+                ));
             },
             DIVIDE_ASCII => {
                 last_type = Types::Symbol as i8;
-                tokens.push(Token {
-                    type__: Types::Symbol,
-                    number: NOT_A_NUMBER, 
-                    symbol: Symbols::Divide,
-                });
+                tokens.push(Token::create(
+                    Types::Symbol,
+                    Symbols::Divide,
+                ));
             },
             POWER_ASCII  => {
                 last_type = Types::Symbol as i8;
-                tokens.push(Token {
-                    type__: Types::Symbol,
-                    number: NOT_A_NUMBER,
-                    symbol: Symbols::Power,
-                });
+                tokens.push(Token::create(
+                    Types::Symbol,
+                    Symbols::Power,
+                ));
             },
 
             SPACE_ASCII  => {},
@@ -144,5 +176,5 @@ pub fn tokenizer(source: String) -> Result<Vec<Token>, ()> {
 
         index += 1;
     }
-    return Ok(tokens);
+    Ok(tokens)
 }
