@@ -13,7 +13,11 @@ impl Number {
             Number::Int(num1) => {
                 match target {
                     Number::Int(num2) => {
-                        Number::Int(num1.pow(num2 as u32))
+                        if num2 >= 0 {
+                            Number::Int(num1.pow(num2 as u32))
+                        } else {
+                            Number::Float((num1 as f64).powi(num2 as i32))
+                        }
                     },
                     Number::Float(num2) => {
                         Number::Float((num1 as f64).powf(num2))
@@ -50,7 +54,7 @@ impl fmt::Display for Number {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Number::Int(num) => write!(f, "{}", num),
-            Number::Float(num) => write!(f, "{:.6}", num),
+            Number::Float(num) => write!(f, "{:.8}", num),
         }
     }
 }
