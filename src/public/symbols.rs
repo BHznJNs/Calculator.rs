@@ -9,6 +9,7 @@ pub enum Symbols {
     Multiply,
     Divide,
     Power,
+    Equal,
 
     LeftParen,
     RightParen,
@@ -30,6 +31,7 @@ impl fmt::Display for Symbols {
             Symbols::Multiply => write!(f, "Multiply"),
             Symbols::Divide   => write!(f, "Divide"),
             Symbols::Power    => write!(f, "Power"),
+            Symbols::Equal    => write!(f, "Equal"),
         
             Symbols::LeftParen  => write!(f, "LeftParen"),
             Symbols::RightParen => write!(f, "RightParen"),

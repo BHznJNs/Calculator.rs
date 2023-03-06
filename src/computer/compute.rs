@@ -17,7 +17,11 @@ pub fn operate(num1: Number, num2: Number, operator: Symbols) -> Number {
     }
 }
 
-pub fn compute(mut tokens: TokenVec, build_in_funcs: &HashMap<&str, fn(f64) -> f64>) -> Result<Number, ()> {
+pub fn compute(
+    mut tokens: TokenVec,
+    variables : &mut HashMap<String, Number>,
+    build_in_funcs: &HashMap<&str, fn(f64) -> f64>,
+) -> Result<Number, ()> {
     let mut number_stack = Vec::<Number>::new();
     let mut symbol_stack = Vec::<Symbols>::new();
 
@@ -61,8 +65,8 @@ pub fn compute(mut tokens: TokenVec, build_in_funcs: &HashMap<&str, fn(f64) -> f
                 sub_tokens.push(tokens.remove(index));
                 token_count = tokens.len();
 
-                let sub_tokens_resolved = pre_compute(sub_tokens, build_in_funcs)?;
-                let sub_token_value = compute(sub_tokens_resolved, build_in_funcs)?;
+                let sub_tokens_resolved = pre_compute(sub_tokens, variables, build_in_funcs)?;
+                let sub_token_value = compute(sub_tokens_resolved, variables, build_in_funcs)?;
                 number_stack.push(sub_token_value);
                 tokens.insert(index, Token::create(
                     Types::Number,
@@ -123,7 +127,7 @@ pub fn compute(mut tokens: TokenVec, build_in_funcs: &HashMap<&str, fn(f64) -> f
                         current = &tokens[index];
                     }
 
-                    let sub_result = compute(sub_tokens, build_in_funcs)?;
+                    let sub_result = compute(sub_tokens, variables, build_in_funcs)?;
 
                     match waiting_num {
                         Some(num1) => {

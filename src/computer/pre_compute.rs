@@ -8,38 +8,87 @@ use super::compute::compute;
 
 // pre-process tokens and convert identifier-expression
 // to Number values.
-pub fn pre_compute(mut tokens: TokenVec, build_in_funcs: &HashMap<&str, fn(f64) -> f64>) -> Result<TokenVec, ()> {
+pub fn pre_compute(
+    mut tokens: TokenVec,
+    variables : &mut HashMap<String, Number>,
+    build_in_funcs: &HashMap<&str, fn(f64) -> f64>,
+) -> Result<TokenVec, ()> {
     let mut index = 0;
-    let mut token_count = tokens.len();
 
-    while index < token_count {
+    while index < tokens.len() {
         let mut current = &tokens[index];
 
         if current.type__ == Types::Identifier {
-            let identi = &tokens
+            let identi = tokens
                 .remove(index)
                 .identi
                 .unwrap();
+
+            let next_token: Token = if index < tokens.len() {
+                tokens.remove(index)
+            } else {
+                // if current is the last token
+                Token::create(
+                    Types::Symbol,
+                    Symbols::NotASymbol
+                )
+            };
+
+            if next_token.type__ != Types::Paren && next_token.symbol != Symbols::LeftParen {
+                // token as a variable
+                if next_token.type__ != Types::Symbol {
+                    println!("Unknown token: `{}`.", next_token);
+                    return Err(())
+                }
+                // Next token must be Symbol
+                if next_token.symbol == Symbols::Equal {
+                    // assignment operation
+                    let mut sub_tokens = TokenVec::new();
+                    while index < tokens.len() {
+                        sub_tokens.push(tokens.remove(index));
+                    }
+                    if sub_tokens.len() == 0 {
+                        println!("Variable assignment error.");
+                        return Err(())
+                    }
+                    let resolved_tokens = pre_compute(sub_tokens, variables, build_in_funcs)?;
+                    let value = compute(resolved_tokens, variables, build_in_funcs)?;
+
+                    variables.insert(identi, value);
+                    continue;
+                }
+                // read variable value
+                let optional_var = variables.get(&identi);
+
+                match optional_var {
+                    Some(val) => {
+                        tokens.insert(index, next_token);
+                        tokens.insert(index, Token::create(
+                            Types::Number, *val
+                        ));
+                    },
+                    None => {
+                        println!("Undefined variable: `{}`.", identi);
+                        return Err(())
+                    },
+                }
+                continue;
+            }
+
+            // token as build-in function
             let optional_func = build_in_funcs.get(identi.as_str());
-            if optional_func == None {
+            if optional_func.is_none() {
                 println!("Unknown function name: `{}`.", identi);
                 return Err(())
             }
             let func = optional_func.unwrap();
 
-            let next_token = &tokens[index];
-
-            if next_token.type__ != Types::Paren && next_token.symbol != Symbols::LeftParen {
-                println!("Unknown token: `{}` at index {}.", next_token, index);
-                return Err(())
-            }
-
             index += 1;
             current = &tokens[index];
             let mut sub_tokens = TokenVec::new();
             let mut paren_pair_count = 1;
-            while index < token_count {
-                if index == (token_count - 1) && current.symbol != Symbols::RightParen {
+            while index < tokens.len() {
+                if index == (tokens.len() - 1) && current.symbol != Symbols::RightParen {
                     println!("Unmatched parentheses at index {}.", index - 1);
                     return Err(())
                 }
@@ -49,10 +98,9 @@ pub fn pre_compute(mut tokens: TokenVec, build_in_funcs: &HashMap<&str, fn(f64) 
                 if paren_pair_count == 0 {break}
     
                 sub_tokens.push(tokens.remove(index));
-                token_count = tokens.len();
                 current = &tokens[index];
             }
-            let sub_result = compute(sub_tokens, build_in_funcs)?;
+            let sub_result = compute(sub_tokens, variables, build_in_funcs)?;
             let value: Number;
 
             match sub_result {

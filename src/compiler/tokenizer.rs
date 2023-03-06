@@ -7,9 +7,14 @@ use crate::public::symbols::Symbols;
 
 const NUM_ASCII_START: u8 = 48;
 const POINT_ASCII: u8 = 46;
+const UNDERLINE_ASCII: u8 = 95;
 
 enum State {
     Int, Float
+}
+
+fn is_identi_ascii(ascii: u8) -> bool {
+    return ascii.is_ascii_alphabetic() || ascii == UNDERLINE_ASCII;
 }
 
 fn ascii_to_num(ascii: u8) -> u8 {
@@ -18,8 +23,11 @@ fn ascii_to_num(ascii: u8) -> u8 {
 
 pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
     let mut index = 0;
-    let mut last_type = -1;
+
+    // use to control if number is minus
+    let mut last_type = Types::Unknown;
     let mut is_num_minus = false;
+
     let mut tokens = TokenVec::new();
     let chars = source.as_bytes();
     let source_len = source.len();
@@ -66,7 +74,7 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
                 value = Number::Int(0) - value;
             }
 
-            last_type = Types::Number as i8;
+            last_type = Types::Number;
             tokens.push(Token::create(
                 Types::Number,
                 value,
@@ -74,13 +82,13 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
             continue;
         }
 
-        if current.is_ascii_alphabetic() {
+        if is_identi_ascii(current) {
             let mut value = String::from(current as char);
-            last_type = Types::Identifier as i8;
+            last_type = Types::Identifier;
 
             index += 1;
             current = chars[index];
-            while current.is_ascii_alphabetic() {
+            while is_identi_ascii(current) || current.is_ascii_digit() {
                 value.push(current as char);
                 index += 1;
                 current = chars[index];
@@ -102,20 +110,21 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
         const MULTIPLY_ASCII : u8 = 42;
         const DIVIDE_ASCII   : u8 = 47;
         const POWER_ASCII    : u8 = 94;
+        const EQUAL_ASCII    : u8 = 61;
         
         const SPACE_ASCII  : u8 = 32;
         const RETURN_ASCII : u8 = 13;
 
         match current {
             LEFT_PAREN_ASCII => {
-                last_type = Types::Paren as i8;
+                last_type = Types::Paren;
                 tokens.push(Token::create(
                     Types::Paren, 
                     Symbols::LeftParen
                 ));
             },
             RIGHT_PAREN_ASCII => {
-                last_type = Types::Paren as i8;
+                last_type = Types::Paren;
                 tokens.push(Token::create(
                     Types::Paren, 
                     Symbols::RightParen
@@ -123,10 +132,10 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
             },
 
             PLUS_ASCII => {
-                if last_type < 0 || last_type == Types::Symbol as i8 {
+                if last_type == Types::Unknown || last_type == Types::Symbol {
                     is_num_minus = false;
                 } else {
-                    last_type = Types::Symbol as i8;
+                    last_type = Types::Symbol;
                     tokens.push(Token::create(
                         Types::Symbol,
                         Symbols::Plus,
@@ -134,10 +143,13 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
                 }
             },
             MINUS_ASCII => {
-                if last_type < 0 || last_type == Types::Symbol as i8 {
+                if last_type == Types::Unknown ||
+                   last_type == Types::Symbol  ||
+                   last_type == Types::Paren 
+                {
                     is_num_minus = true;
                 } else {
-                    last_type = Types::Symbol as i8;
+                    last_type = Types::Symbol;
                     tokens.push(Token::create(
                         Types::Symbol,
                         Symbols::Minus,
@@ -145,24 +157,31 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
                 }
             },
             MULTIPLY_ASCII => {
-                last_type = Types::Symbol as i8;
+                last_type = Types::Symbol;
                 tokens.push(Token::create(
                     Types::Symbol,
                     Symbols::Multiply,
                 ));
             },
             DIVIDE_ASCII => {
-                last_type = Types::Symbol as i8;
+                last_type = Types::Symbol;
                 tokens.push(Token::create(
                     Types::Symbol,
                     Symbols::Divide,
                 ));
             },
             POWER_ASCII  => {
-                last_type = Types::Symbol as i8;
+                last_type = Types::Symbol;
                 tokens.push(Token::create(
                     Types::Symbol,
                     Symbols::Power,
+                ));
+            },
+            EQUAL_ASCII  => {
+                last_type = Types::Symbol;
+                tokens.push(Token::create(
+                    Types::Symbol,
+                    Symbols::Equal,
                 ));
             },
 
