@@ -27,11 +27,10 @@ pub fn compute(
 
     let mut index = 0;
     let mut waiting_num: Option<Number> = None;
-    let mut token_count = tokens.len();
 
-    if token_count == 0 {return Err(())}
+    if tokens.len() == 0 {return Err(())}
 
-    while index < token_count {
+    while index < tokens.len() {
         let mut current = &tokens[index];
 
         match current.type__ {
@@ -50,7 +49,7 @@ pub fn compute(
                     return Err(())
                 }
                 while index < tokens.len() {
-                    if index == (token_count - 1) && current.symbol != Symbols::RightParen  {
+                    if index == (tokens.len() - 1) && current.symbol != Symbols::RightParen  {
                         println!("Unmatched parentheses at index {}.", index - 1);
                         return Err(())
                     }
@@ -63,7 +62,6 @@ pub fn compute(
                     current = &tokens[index];
                 }
                 sub_tokens.push(tokens.remove(index));
-                token_count = tokens.len();
 
                 let sub_tokens_resolved = pre_compute(sub_tokens, variables, build_in_funcs)?;
                 let sub_token_value = compute(sub_tokens_resolved, variables, build_in_funcs)?;
@@ -113,8 +111,8 @@ pub fn compute(
                     current = &tokens[index];
                     let mut sub_tokens = Vec::<Token>::new();
 
-                    while index < token_count {
-                        if index == (token_count - 1) && current.symbol != Symbols::RightParen {
+                    while index < tokens.len() {
+                        if index == (tokens.len() - 1) && current.symbol != Symbols::RightParen {
                             println!("Unmatched parentheses at index {}.", index - 1);
                             return Err(())
                         }
@@ -123,7 +121,6 @@ pub fn compute(
                         if paren_pair_count == 0 {break}
 
                         sub_tokens.push(tokens.remove(index));
-                        token_count = tokens.len();
                         current = &tokens[index];
                     }
 
@@ -144,12 +141,19 @@ pub fn compute(
         index += 1;
     }
     for symbol in symbol_stack {
-        let num2 = number_stack.pop().unwrap();
-        let num1 = number_stack.pop().unwrap();
+        let options_num2 = number_stack.pop();
+        let options_num1 = number_stack.pop();
 
-        number_stack.push(
-            operate(num1, num2, symbol)
-        );
+        if options_num2.is_none() || options_num1.is_none() {
+            println!("Computing number missing.");
+            return Err(())
+        }
+
+        number_stack.push(operate(
+            options_num1.unwrap(),
+            options_num2.unwrap(),
+            symbol
+        ));
     }
     return Ok(number_stack[0])
 }
