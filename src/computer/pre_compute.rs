@@ -24,6 +24,7 @@ pub fn pre_compute(
                 .identi
                 .unwrap();
 
+            // is Symbols::LeftParen || Symbols::Equal
             let next_token: Token = if index < tokens.len() {
                 tokens.remove(index)
             } else {
@@ -83,7 +84,6 @@ pub fn pre_compute(
             }
             let func = optional_func.unwrap();
 
-            index += 1;
             current = &tokens[index];
             let mut sub_tokens = TokenVec::new();
             let mut paren_pair_count = 1;

@@ -53,7 +53,7 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
                         },
                         State::Float => {
                             value = value + Number::Float((num_ascii as f64) / float_para);
-                            float_para /= 10.0;
+                            float_para *= 10.0;
                         }
                     }
                     index += 1;
