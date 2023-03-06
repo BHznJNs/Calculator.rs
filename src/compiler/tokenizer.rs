@@ -71,6 +71,7 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
             }
 
             if is_num_minus {
+                is_num_minus = false;
                 value = Number::Int(0) - value;
             }
 

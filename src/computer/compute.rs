@@ -140,19 +140,23 @@ pub fn compute(
         }
         index += 1;
     }
-    for symbol in symbol_stack {
-        let options_num2 = number_stack.pop();
-        let options_num1 = number_stack.pop();
-
-        if options_num2.is_none() || options_num1.is_none() {
+    // clear remain elements in number_stack and symbol_stack
+    while !symbol_stack.is_empty() {
+        if symbol_stack.len() < 1 {
+            println!("Computing symbol missing.");
+            return Err(())
+        }
+        if number_stack.len() < 2 {
             println!("Computing number missing.");
             return Err(())
         }
 
-        number_stack.push(operate(
-            options_num1.unwrap(),
-            options_num2.unwrap(),
-            symbol
+        let symbol = symbol_stack.remove(0);
+        let num1 = number_stack.remove(0);
+        let num2 = number_stack.remove(0);
+
+        number_stack.insert(0, operate(
+            num1, num2, symbol,
         ));
     }
     return Ok(number_stack[0])
