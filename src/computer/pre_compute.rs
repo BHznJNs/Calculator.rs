@@ -100,7 +100,8 @@ pub fn pre_compute(
                 sub_tokens.push(tokens.remove(index));
                 current = &tokens[index];
             }
-            let sub_result = compute(sub_tokens, variables, build_in_funcs)?;
+            let resolved_tokens = pre_compute(sub_tokens, variables, build_in_funcs)?;
+            let sub_result = compute(resolved_tokens, variables, build_in_funcs)?;
             let value: Number;
 
             match sub_result {
