@@ -12,12 +12,18 @@ pub struct BuildIn {
     pub cosh: fn(f64) -> f64,
     pub tanh: fn(f64) -> f64,
 
+    pub rad: fn(f64) -> f64,
+    pub deg: fn(f64) -> f64,
+
     pub log10: fn(f64) -> f64,
     pub log2 : fn(f64) -> f64,
     pub ln   : fn(f64) -> f64,
     pub exp  : fn(f64) -> f64,
 
     pub abs  : fn(f64) -> f64,
+    pub sqrt : fn(f64) -> f64,
+    pub floor: fn(f64) -> f64,
+    pub round: fn(f64) -> f64,
 
     pub pi: f64,
     pub e : f64,
@@ -35,12 +41,18 @@ impl BuildIn {
             cosh: |num: f64| num.cosh(),
             tanh: |num: f64| num.tanh(),
 
+            rad: |num: f64| num.to_radians(),
+            deg: |num: f64| num.to_degrees(),
+
             log10: |num: f64| num.log10(),
             log2 : |num: f64| num.log2(),
             ln   : |num: f64| num.ln(),
             exp  : |num: f64| num.exp(),
 
             abs  : |num: f64| num.abs(),
+            sqrt : |num: f64| num.sqrt(),
+            floor: |num: f64| num.floor(),
+            round: |num: f64| num.round(),
 
             pi: PI,
             e : E,
