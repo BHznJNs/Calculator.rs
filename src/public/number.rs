@@ -155,7 +155,12 @@ impl Div for Number {
                 match num2 {
                     Number::Int(_) => other,
                     Number::Float(num2__) => {
-                        Number::Float(num1__ / num2__)
+                        let result = num1__ / num2__;
+                        if result == result.floor() {
+                            Number::Int(result as i64)
+                        } else {
+                            Number::Float(result)
+                        }
                     }
                 }
             }
