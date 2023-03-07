@@ -77,7 +77,7 @@ fn main() -> ! {
             &build_in_funcs,
         );
         if result.is_ok() {
-            println!(" {}", result.unwrap());
+            println!("= {}", result.unwrap());
         }
     }
 }
