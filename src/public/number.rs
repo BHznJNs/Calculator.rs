@@ -1,3 +1,4 @@
+use std::f64::INFINITY;
 use std::ops::{Add, Sub, Mul, Div};
 use std::fmt;
 
@@ -155,6 +156,15 @@ impl Div for Number {
                 match num2 {
                     Number::Int(_) => other,
                     Number::Float(num2__) => {
+                        if num2__ == 0.0 {
+                            println!("The dividend should not to be ZERO!");
+                            let inf = if num1__ >= 0.0 {
+                                INFINITY
+                            } else {
+                                -INFINITY
+                            };
+                            return Number::Float(inf)
+                        }
                         let result = num1__ / num2__;
                         if result == result.floor() {
                             Number::Int(result as i64)
