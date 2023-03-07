@@ -9,14 +9,14 @@ An simple command-line calculator program writen with Rust.
 ```text
 > a = 1
 > a
- 1
+= 1
 ```
 
 - Math function support
 
 ```text
 > sin(1) 
- 0.84147098
+= 0.84147098
 ```
 
 ## Build-ins
