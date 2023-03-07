@@ -14,6 +14,7 @@ pub fn pre_compute(
     build_in_funcs: &HashMap<&str, fn(f64) -> f64>,
 ) -> Result<TokenVec, ()> {
     let mut index = 0;
+    let mut current_token_index = 0;
 
     while index < tokens.len() {
         let mut current = &tokens[index];
@@ -23,9 +24,11 @@ pub fn pre_compute(
                 .remove(index)
                 .identi
                 .unwrap();
+            current_token_index += 1;
 
             // is Symbols::LeftParen || Symbols::Equal
             let next_token: Token = if index < tokens.len() {
+                current_token_index += 1;
                 tokens.remove(index)
             } else {
                 // if current is the last token
@@ -38,7 +41,7 @@ pub fn pre_compute(
             if next_token.type__ != Types::Paren && next_token.symbol != Symbols::LeftParen {
                 // token as a variable
                 if next_token.type__ != Types::Symbol {
-                    println!("Unknown token: `{}`.", next_token);
+                    println!("Invalid token: `{}` at token {}.", next_token, current_token_index);
                     return Err(())
                 }
                 // Next token must be Symbol
@@ -47,6 +50,7 @@ pub fn pre_compute(
                     let mut sub_tokens = TokenVec::new();
                     while index < tokens.len() {
                         sub_tokens.push(tokens.remove(index));
+                        current_token_index += 1;
                     }
                     if sub_tokens.len() == 0 {
                         println!("Variable assignment error.");
@@ -69,7 +73,7 @@ pub fn pre_compute(
                         ));
                     },
                     None => {
-                        println!("Undefined variable: `{}`.", identi);
+                        println!("Unknown variable: `{}` at token {}.", identi, current_token_index);
                         return Err(())
                     },
                 }
@@ -79,7 +83,7 @@ pub fn pre_compute(
             // token as build-in function
             let optional_func = build_in_funcs.get(identi.as_str());
             if optional_func.is_none() {
-                println!("Unknown function name: `{}`.", identi);
+                println!("Unknown function: `{}` at token {}.", identi, current_token_index);
                 return Err(())
             }
             let func = optional_func.unwrap();
@@ -89,7 +93,7 @@ pub fn pre_compute(
             let mut paren_pair_count = 1;
             while index < tokens.len() {
                 if index == (tokens.len() - 1) && current.symbol != Symbols::RightParen {
-                    println!("Unmatched parentheses at index {}.", index - 1);
+                    println!("Unmatched parentheses at token {}.", current_token_index);
                     return Err(())
                 }
 
@@ -116,6 +120,7 @@ pub fn pre_compute(
             ));
         } else {
             index += 1;
+            current_token_index += 1;
         }
     }
     Ok(tokens)

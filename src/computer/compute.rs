@@ -26,6 +26,7 @@ pub fn compute(
     let mut symbol_stack = Vec::<Symbols>::new();
 
     let mut index = 0;
+    let mut current_token_index = 0;
     let mut waiting_num: Option<Number> = None;
 
     if tokens.len() == 0 {return Err(())}
@@ -42,15 +43,16 @@ pub fn compute(
                 let mut sub_tokens = TokenVec::new();
                 let mut paren_pair_count = 0;
                 sub_tokens.push(tokens.remove(index));
+                current_token_index += 1;
 
                 current = &tokens[index]; // next
                 if current.symbol != Symbols::LeftParen {
-                    println!("Unknown token: `{}` at index {}.", current, index);
+                    println!("Invalid token: `{}` at token {}.", current, current_token_index);
                     return Err(())
                 }
                 while index < tokens.len() {
                     if index == (tokens.len() - 1) && current.symbol != Symbols::RightParen  {
-                        println!("Unmatched parentheses at index {}.", index - 1);
+                        println!("Unmatched parentheses at token {}.", current_token_index);
                         return Err(())
                     }
 
@@ -59,9 +61,11 @@ pub fn compute(
                     if paren_pair_count == 0 {break}
 
                     sub_tokens.push(tokens.remove(index));
+                    current_token_index += 1;
                     current = &tokens[index];
                 }
                 sub_tokens.push(tokens.remove(index));
+                current_token_index += 1;
 
                 let sub_tokens_resolved = pre_compute(sub_tokens, variables, build_in_funcs)?;
                 let sub_token_value = compute(sub_tokens_resolved, variables, build_in_funcs)?;
@@ -87,12 +91,12 @@ pub fn compute(
                                 symbol_stack.push(current.symbol);
                                 continue;
                             } else {
-                                println!("Unknown symbol: `)` at index {}.", index);
+                                println!("Invalid symbol: `)` at token {}.", current_token_index);
                                 return Err(())
                             }
                         },
                         Types::Symbol => {
-                            println!("Unknown symbol: `{}` at index {}.", next_token.symbol, index);
+                            println!("Invalid symbol: `{}` at token {}.", next_token, current_token_index);
                             return Err(())
                         },
                         _ => {}
@@ -113,7 +117,7 @@ pub fn compute(
 
                     while index < tokens.len() {
                         if index == (tokens.len() - 1) && current.symbol != Symbols::RightParen {
-                            println!("Unmatched parentheses at index {}.", index - 1);
+                            println!("Unmatched parentheses at token {}.", current_token_index);
                             return Err(())
                         }
                         if current.symbol == Symbols::LeftParen  {paren_pair_count += 1}
