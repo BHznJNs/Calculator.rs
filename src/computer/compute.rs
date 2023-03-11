@@ -88,17 +88,15 @@ fn expression_compute(
                         return Err(())
                     };
 
-                    // pop the last elements
+                    // pop the last two elements
                     // [..., num1, num2]
                     // [...] num1 num2
-                    // push the next number
-                    // [..., next_number]
-                    // push the poped elements
-                    // [..., next_number, num2, num1]
+                    // push the next number and the poped elements
+                    // [..., num1, next_number, num2]
                     let num2 = number_stack.pop().unwrap();
                     let num1 = number_stack.pop().unwrap();
-                    number_stack.push(next_number);
                     number_stack.push(num2);
+                    number_stack.push(next_number);
                     number_stack.push(num1);
                 }
             },
@@ -194,6 +192,14 @@ fn expression_compute(
         }
         index += 1;
     }
+
+    // LOG
+    // for n in &number_stack {
+    //     println!("num: {}", n);
+    // }
+    // for s in &symbol_stack {
+    //     println!("sym: {}", s);
+    // }
 
     let first_index = 0;
     while first_index < symbol_stack.len() {
