@@ -210,7 +210,7 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
             SPACE_ASCII  => {},
             RETURN_ASCII => { break; },
             _ => {
-                println!("Unknown token: `{}` at index {}.", current as char, index);
+                println!("Unknown token: '{}' at index {}.", current as char, index);
                 return Err(());
             }
         }

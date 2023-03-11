@@ -2,19 +2,21 @@ use std::fmt;
 
 #[derive(PartialEq, Clone, Copy)]
 pub enum Symbols {
-    NotASymbol,
-
-    Plus,
+    // math symbols
+    Plus,  // low  priority
     Minus,
     Multiply,
     Divide,
-    Power,
+    Power, // high priority
+
     Equal,
 
     LeftParen,
     RightParen,
     LeftBrace,
     RightBrace,
+
+    NotASymbol,
 }
 
 impl Default for Symbols {

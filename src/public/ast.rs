@@ -17,7 +17,6 @@ pub enum ASTNodeTypes {
 
 impl fmt::Display for ASTNodeTypes {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        print!("ASTNode: ");
         match self {
             ASTNodeTypes::Root => write!(f, "AST Root"),
             ASTNodeTypes::Variable(name) => write!(f, "type: Variable, name {}", name),
@@ -42,7 +41,7 @@ pub type ASTNodeVec = Vec<ASTNode>;
 
 impl fmt::Display for ASTNode {
     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        println!("{}", self.type__);
+        println!("ASTNode: {}", self.type__);
         match &self.params {
             Some(params) => {
                 print!("params: {{\n");

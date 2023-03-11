@@ -4,14 +4,17 @@ use crate::public::ast::{ASTNode, ASTNodeTypes, ASTNodeVec};
 use crate::public::number::Number;
 use crate::public::symbols::Symbols;
 
-fn operate(num1: Number, num2: Number, operator: Symbols) -> Number {
+fn operate(num1: Number, num2: Number, operator: Symbols) -> Result<Number, ()> {
     match operator {
-        Symbols::Plus     => {num1 + num2},
-        Symbols::Minus    => {num1 - num2},
-        Symbols::Multiply => {num1 * num2},
-        Symbols::Divide   => {num1 / num2},
-        Symbols::Power    => {num1.pow(num2)},
-        _                 => {panic!("Unknown symbol: `{}` at function `operate`.", operator)},
+        Symbols::Plus     => {Ok(num1 + num2)},
+        Symbols::Minus    => {Ok(num1 - num2)},
+        Symbols::Multiply => {Ok(num1 * num2)},
+        Symbols::Divide   => {Ok(num1 / num2)},
+        Symbols::Power    => {Ok(num1.pow(num2))},
+        _                 => {
+            println!("Unexpected symbol: '{}' at function `operate`.", operator);
+            return Err(())
+        },
     }
 }
 
@@ -27,8 +30,11 @@ fn expression_compute(
         .unwrap();
     let mut number_stack = Vec::<Number>::new();
     let mut symbol_stack = Vec::<Symbols>::new();
+    let mut index = 0;
 
-    for node in params {
+    while index < params.len() {
+        let node = &params[index];
+
         match &node.type__ {
             ASTNodeTypes::Variable(name) => {
                 let optional_var = variables.get(name.as_str());
@@ -39,7 +45,63 @@ fn expression_compute(
                 number_stack.push(*optional_var.unwrap());
             },
             ASTNodeTypes::NumberLiteral(number) => number_stack.push(*number),
-            ASTNodeTypes::SymbolLiteral(symbol) => symbol_stack.push(*symbol),
+            ASTNodeTypes::SymbolLiteral(symbol) => {
+                let symbol_self = *symbol;
+                let last_symbol = if let Some(symbol) = symbol_stack.last() {
+                    *symbol
+                } else {
+                    Symbols::NotASymbol
+                };
+
+                if (symbol_self as i8) <= (last_symbol as i8) {
+                    // e.g.
+                    // last   : +
+                    // current: -
+                    // --- --- --- ---
+                    // last   : ^
+                    // current: *
+                    
+                    symbol_stack.push(*symbol);
+                } else {
+                    // e.g.
+                    // last   : +
+                    // current: *
+
+                    // put the higher_priority symbol to the last
+                    let higher_priority = symbol_stack.pop().unwrap();
+                    symbol_stack.push(symbol_self);
+                    symbol_stack.push(higher_priority);
+
+                    // --- --- --- --- --- ---
+
+                    index += 1;
+                    if index == params.len() {
+                        println!("Invalid expression.");
+                        return Err(())
+                    }
+                    // next node should be a Number
+                    let next_node_type = &params[index].type__;
+                    let next_number = if
+                        let ASTNodeTypes::NumberLiteral(num) = next_node_type
+                    { *num } else {
+                        println!("Expected NumberLiteral, found {}.", next_node_type);
+                        return Err(())
+                    };
+
+                    // pop the last elements
+                    // [..., num1, num2]
+                    // [...] num1 num2
+                    // push the next number
+                    // [..., next_number]
+                    // push the poped elements
+                    // [..., next_number, num2, num1]
+                    let num2 = number_stack.pop().unwrap();
+                    let num1 = number_stack.pop().unwrap();
+                    number_stack.push(next_number);
+                    number_stack.push(num2);
+                    number_stack.push(num1);
+                }
+            },
             ASTNodeTypes::Expression => {
                 let express_res = expression_compute(
                     node,
@@ -125,56 +187,29 @@ fn expression_compute(
                 return Err(())
             }
         }
-    }
-
-    // calc power
-    let mut index = 0;
-    while index < symbol_stack.len() {
-        let symbol = symbol_stack[index];
-
-        if symbol == Symbols::Power {
-            let num1 = number_stack.remove(index);
-            let num2 = number_stack.remove(index);
-            number_stack.insert(index,
-                operate(
-                    num1, num2,
-                    symbol_stack.remove(index)
-            ));
-            continue;
-        }
         index += 1;
     }
-    // calc mutiply & divide
-    let mut index = 0;
-    while index < symbol_stack.len() {
-        let symbol = symbol_stack[index];
 
-        if symbol == Symbols::Multiply || symbol == Symbols::Divide {
-            let num1 = number_stack.remove(index);
-            let num2 = number_stack.remove(index);
-            number_stack.insert(index,
-                operate(
-                    num1, num2,
-                    symbol_stack.remove(index)
-            ));
-            continue;
-        }
-        index += 1;
+    // LOG
+    for s in &symbol_stack {
+        println!("symbol: {}", s);
     }
-    // calc plus & minus
+    for n in &number_stack {
+        println!("number: {}", n);
+    }
+
     let first_index = 0;
     while first_index < symbol_stack.len() {
-        let symbol = symbol_stack[first_index];
-
-        if symbol == Symbols::Plus || symbol == Symbols::Minus {
-            let num1 = number_stack.remove(first_index);
-            let num2 = number_stack.remove(first_index);
-            number_stack.insert(first_index,
-            operate(
-                num1, num2,
-                symbol_stack.remove(first_index)
-            ));
+        if number_stack.len() < 2 {
+            println!("Invalid expression.");
+            return Err(())
         }
+
+        let symbol = symbol_stack.remove(first_index);
+        let num1 = number_stack.remove(first_index);
+        let num2 = number_stack.remove(first_index);
+        let value = operate(num1, num2, symbol)?;
+        number_stack.push(value);
     }
 
     Ok(number_stack[0])
