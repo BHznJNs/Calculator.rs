@@ -15,6 +15,7 @@ An simple command-line calculator program writen with Rust.
 
 ```text
 > a = 1
+= 1
 > a
 = 1
 ```
