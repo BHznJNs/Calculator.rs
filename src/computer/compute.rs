@@ -133,6 +133,11 @@ fn expression_compute(
                     Some(func) => {
                         // build-in function
                         if let Some(params) = &node.params {
+                            if params.len() == 0 {
+                                println!("Parameter for function '{}' is missing.", name);
+                                return Err(())
+                            }
+
                             let expression_node = ASTNode {
                                 type__: ASTNodeTypes::Expression,
                                 params: Some(params.to_vec()),
