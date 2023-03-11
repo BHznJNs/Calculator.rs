@@ -190,14 +190,6 @@ fn expression_compute(
         index += 1;
     }
 
-    // LOG
-    for s in &symbol_stack {
-        println!("symbol: {}", s);
-    }
-    for n in &number_stack {
-        println!("number: {}", n);
-    }
-
     let first_index = 0;
     while first_index < symbol_stack.len() {
         if number_stack.len() < 2 {
