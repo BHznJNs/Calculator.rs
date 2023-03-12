@@ -20,7 +20,7 @@ An simple command-line calculator program writen with Rust.
 = 1
 ```
 
-- Goto supported
+- Goto support
 
 ```text
 > a = 10
@@ -31,6 +31,19 @@ An simple command-line calculator program writen with Rust.
 > a = a + 1
 > sum()
 = 31
+```
+
+- Comment support
+
+```text
+> 1 + 1 # plus
+= 2
+```
+
+- Script execute support
+
+```text
+calculator.exe script
 ```
 
 ## Build-ins

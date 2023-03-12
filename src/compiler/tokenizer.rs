@@ -120,6 +120,7 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
         const POWER_ASCII    : u8 = 94;
         const EQUAL_ASCII    : u8 = 61;
         
+        const NUMBER_SIGN_ASCII : u8 = 35;
         const SPACE_ASCII  : u8 = 32;
         const RETURN_ASCII : u8 = 13;
 
@@ -208,7 +209,9 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
             },
 
             SPACE_ASCII  => {},
-            RETURN_ASCII => { break; },
+            // comment symbol
+            NUMBER_SIGN_ASCII => { break },
+            RETURN_ASCII => { break },
             _ => {
                 println!("Unknown token: '{}' at index {}.", current as char, index);
                 return Err(());
