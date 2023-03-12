@@ -2,6 +2,15 @@ use crate::public::token::{TokenTypes, TokenVec};
 use crate::public::ast::{ASTNode, ASTNodeVec, ASTNodeTypes};
 use crate::public::symbols::Symbols;
 
+fn is_equal_symbol(symbol: Symbols) -> bool {
+    return symbol == Symbols::Equal ||
+           symbol == Symbols::PlusEqual ||
+           symbol == Symbols::MinusEqual ||
+           symbol == Symbols::MultiplyEqual ||
+           symbol == Symbols::DivideEqual ||
+           symbol == Symbols::PowerEqual
+}
+
 // input default with paired-paren
 fn expression_resolve(
     tokens: &mut TokenVec,
@@ -143,8 +152,9 @@ pub fn analyzer(mut tokens: TokenVec) -> Result<ASTNode, ()> {
     // identi + Equal
     if first_token.type__ == TokenTypes::Identifier
        && 1 < tokens.len() &&
-       tokens[1].symbol == Symbols::Equal {
+       is_equal_symbol(tokens[1].symbol) {
         // assignment statement
+        let equal_symbol = tokens[1].symbol;
 
         // get the identifier and remove
         // the two element at the first.
@@ -156,15 +166,37 @@ pub fn analyzer(mut tokens: TokenVec) -> Result<ASTNode, ()> {
 
         // examples for right-hand expression:
         // 1 + 1     |  from: var = 1 + 1
+        // a + 1     |  from: a += 1
         // {var + 1} |  from: func = {var + 1}
         let right_hand_nodes = expression_resolve(&mut tokens, false)?;
 
-        let right_hand_expression = if right_hand_nodes[0].type__ == ASTNodeTypes::GotoStatement {
+        let right_hand_expression =
+        if right_hand_nodes[0].type__ == ASTNodeTypes::GotoStatement {
+            // goto statement assignment
             right_hand_nodes[0].to_owned()
         } else {
-            ASTNode {
+            let original = ASTNode {
                 type__: ASTNodeTypes::Expression,
                 params: Some(right_hand_nodes)
+            };
+            // variable assignment
+            if equal_symbol != Symbols::Equal {
+                // resolve: += | -= | *= | /=
+                let separated = equal_symbol.separate();
+                let variable_node = ASTNode {
+                    type__: ASTNodeTypes::Variable(identi.clone()),
+                    params: None,
+                };
+                let symbol_node = ASTNode {
+                    type__: ASTNodeTypes::SymbolLiteral(separated),
+                    params: None,
+                };
+                ASTNode {
+                    type__: ASTNodeTypes::Expression,
+                    params: Some(vec![variable_node, symbol_node, original])
+                }
+            } else {
+                original
             }
         };
 

@@ -201,11 +201,22 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
                 ));
             },
             EQUAL_ASCII  => {
-                last_type = TokenTypes::Symbol;
-                tokens.push(Token::create(
-                    TokenTypes::Symbol,
-                    Symbols::Equal,
-                ));
+                let last_item = chars[index - 1];
+                // last char is: + - * /
+                if last_type == TokenTypes::Symbol && last_item != EQUAL_ASCII {
+                    let last_token = tokens.pop().unwrap();
+                    let target_symbol = Symbols::Equal.combine(last_token.symbol)?;
+                    tokens.push(Token::create(
+                        TokenTypes::Symbol,
+                        target_symbol,
+                    ));
+                } else {
+                    last_type = TokenTypes::Symbol;
+                    tokens.push(Token::create(
+                        TokenTypes::Symbol,
+                        Symbols::Equal,
+                    ));
+                }
             },
 
             SPACE_ASCII  => {},

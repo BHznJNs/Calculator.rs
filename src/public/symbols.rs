@@ -11,12 +11,65 @@ pub enum Symbols {
 
     Equal,
 
+    PlusEqual,
+    MinusEqual,
+    MultiplyEqual,
+    DivideEqual,
+    PowerEqual,
+
     LeftParen,
     RightParen,
     LeftBrace,
     RightBrace,
 
     NotASymbol,
+}
+
+impl Symbols {
+    pub fn combine(&self, other: Symbols) -> Result<Symbols, ()> {
+        // let equal_symbol = Symbols::Equal;
+        // equal_symbol.combine(Symbols::Plus);
+        // -> Symbols::PlusEqual
+
+        if *self != Symbols::Equal {
+            println!("Parameter for Symbols::combine must be Symbole::Equal.");
+            return Err(())
+        }
+
+        let result_symbol =
+        match other {
+            Symbols::Plus => {
+                Symbols::PlusEqual
+            },
+            Symbols::Minus => {
+                Symbols::MinusEqual
+            },
+            Symbols::Multiply => {
+                Symbols::MultiplyEqual
+            },
+            Symbols::Divide => {
+                Symbols::DivideEqual
+            },
+            Symbols::Power => {
+                Symbols::PowerEqual
+            },
+            _ => {
+                println!("Invalid symbol.");
+                return Err(())
+            }
+        };
+        Ok(result_symbol)
+    }
+    pub fn separate(self) -> Symbols {
+        match self {
+            Symbols::PlusEqual => Symbols::Plus,
+            Symbols::MinusEqual => Symbols::Minus,
+            Symbols::MultiplyEqual => Symbols::Multiply,
+            Symbols::DivideEqual => Symbols::Divide,
+            Symbols::PowerEqual => Symbols::Power,
+            _ => self
+        }
+    }
 }
 
 impl Default for Symbols {
@@ -36,6 +89,12 @@ impl fmt::Display for Symbols {
             Symbols::Divide   => write!(f, "Divide"),
             Symbols::Power    => write!(f, "Power"),
             Symbols::Equal    => write!(f, "Equal"),
+
+            Symbols::PlusEqual => write!(f, "PlusEqual"),
+            Symbols::MinusEqual => write!(f, "MinusEqual"),
+            Symbols::MultiplyEqual => write!(f, "MultiplyEqual"),
+            Symbols::DivideEqual => write!(f, "DivideEqual"),
+            Symbols::PowerEqual => write!(f, "PowerEqual"),
         
             Symbols::LeftParen  => write!(f, "LeftParen"),
             Symbols::RightParen => write!(f, "RightParen"),
