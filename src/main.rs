@@ -35,7 +35,7 @@ fn main() -> ! {
     let mut goto_statements = HashMap::<String, ASTNode>::new();
 
     // print program name and version
-    println!("Calculator.rs v1.1.0");
+    println!("Calculator.rs v1.1.1");
 
     loop {
         print!("> ");
