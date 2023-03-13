@@ -11,7 +11,7 @@ pub fn repl(
     goto_statements: &mut HashMap<String, ASTNode>,
 ) -> ! {
     // print program name and version
-    println!("Calculator.rs v1.2.0");
+    println!("Calculator.rs v1.2.1");
 
     loop {
         print!("> ");
