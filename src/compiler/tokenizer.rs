@@ -1,8 +1,5 @@
 use crate::public::number::Number;
-use crate::public::token::Overloaded;
-use crate::public::token::Token;
-use crate::public::token::TokenTypes;
-use crate::public::token::TokenVec;
+use crate::public::token::{Token, TokenTypes, TokenVec};
 use crate::public::symbols::Symbols;
 
 const NUM_ASCII_START: u8 = 48;
@@ -41,6 +38,8 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
         }
 
         if current.is_ascii_digit() {
+            last_type = TokenTypes::Number;
+
             let mut state = State::Int;
             let mut float_para: f64 = 10.0;
             let mut value = Number::Int(ascii_to_num(current) as i64);
@@ -80,17 +79,14 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
                 value = Number::Int(0) - value;
             }
 
-            last_type = TokenTypes::Number;
-            tokens.push(Token::create(
-                TokenTypes::Number,
-                value,
-            ));
+            let current_token = Token::Number(value);
+            tokens.push(current_token);
             continue;
         }
 
         if is_identi_ascii(current) {
-            let mut value = String::from(current as char);
             last_type = TokenTypes::Identifier;
+            let mut value = String::from(current as char);
 
             index += 1;
             current = chars[index];
@@ -99,10 +95,9 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
                 index += 1;
                 current = chars[index];
             }
-            tokens.push(Token::create(
-                TokenTypes::Identifier,
-                value
-            ));
+
+            let current_token = Token::Identi(value);
+            tokens.push(current_token);
             continue;
         }
 
@@ -127,100 +122,80 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
         match current {
             LEFT_PAREN_ASCII => {
                 last_type = TokenTypes::Paren;
-                tokens.push(Token::create(
-                    TokenTypes::Paren, 
-                    Symbols::LeftParen
-                ));
+                let current_token = Token::Paren(Symbols::LeftParen);
+                tokens.push(current_token);
             },
             RIGHT_PAREN_ASCII => {
                 last_type = TokenTypes::Paren;
-                tokens.push(Token::create(
-                    TokenTypes::Paren, 
-                    Symbols::RightParen
-                ));
+                let current_token = Token::Paren(Symbols::RightParen);
+                tokens.push(current_token);
             },
             LEFT_BRACE_ASCII => {
                 last_type = TokenTypes::Paren;
-                tokens.push(Token::create(
-                    TokenTypes::Paren, 
-                    Symbols::LeftBrace
-                ));
+                let current_token = Token::Paren(Symbols::LeftBrace);
+                tokens.push(current_token);
             },
             RIGHT_BRACE_ASCII => {
                 last_type = TokenTypes::Paren;
-                tokens.push(Token::create(
-                    TokenTypes::Paren, 
-                    Symbols::RightBrace
-                ));
+                let current_token = Token::Paren(Symbols::RightBrace);
+                tokens.push(current_token);
             },
 
             PLUS_ASCII => {
-                if last_type == TokenTypes::Unknown || last_type == TokenTypes::Symbol {
+                if last_type == TokenTypes::Symbol || last_type == TokenTypes::Unknown {
                     is_num_minus = false;
                 } else {
                     last_type = TokenTypes::Symbol;
-                    tokens.push(Token::create(
-                        TokenTypes::Symbol,
-                        Symbols::Plus,
-                    ));
+                    let current_token = Token::Symbol(Symbols::Plus);
+                    tokens.push(current_token);
                 }
             },
             MINUS_ASCII => {
                 if last_type == TokenTypes::Unknown ||
-                   last_type == TokenTypes::Symbol  ||
-                   last_type == TokenTypes::Paren 
+                   last_type == TokenTypes::Symbol
                 {
                     is_num_minus = true;
                 } else {
                     last_type = TokenTypes::Symbol;
-                    tokens.push(Token::create(
-                        TokenTypes::Symbol,
-                        Symbols::Minus,
-                    ));
+                    let current_token = Token::Symbol(Symbols::Minus);
+                    tokens.push(current_token);
                 }
             },
             MULTIPLY_ASCII => {
                 last_type = TokenTypes::Symbol;
-                tokens.push(Token::create(
-                    TokenTypes::Symbol,
-                    Symbols::Multiply,
-                ));
+                let current_token = Token::Symbol(Symbols::Multiply);
+                tokens.push(current_token);
             },
             DIVIDE_ASCII => {
                 last_type = TokenTypes::Symbol;
-                tokens.push(Token::create(
-                    TokenTypes::Symbol,
-                    Symbols::Divide,
-                ));
+                let current_token = Token::Symbol(Symbols::Divide);
+                tokens.push(current_token);
             },
             POWER_ASCII  => {
                 last_type = TokenTypes::Symbol;
-                tokens.push(Token::create(
-                    TokenTypes::Symbol,
-                    Symbols::Power,
-                ));
+                let current_token = Token::Symbol(Symbols::Power);
+                tokens.push(current_token);
             },
             EQUAL_ASCII  => {
                 let last_item = chars[index - 1];
                 // last char is: + - * /
                 if last_type == TokenTypes::Symbol && last_item != EQUAL_ASCII {
+                // last_type =  TokenTypes::Symbol;
                     let last_token = tokens.pop().unwrap();
-                    let target_symbol = Symbols::Equal.combine(last_token.symbol)?;
-                    tokens.push(Token::create(
-                        TokenTypes::Symbol,
-                        target_symbol,
-                    ));
+                    if let Token::Symbol(last_symbol) = last_token {
+                        let target_symbol = Symbols::Equal.combine(last_symbol)?;
+                        tokens.push(Token::Symbol(target_symbol));
+                        continue;
+                    }
                 } else {
                     last_type = TokenTypes::Symbol;
-                    tokens.push(Token::create(
-                        TokenTypes::Symbol,
-                        Symbols::Equal,
-                    ));
+                    let current_token = Token::Symbol(Symbols::Equal);
+                    tokens.push(current_token);
                 }
             },
 
             SPACE_ASCII  => {},
-            // comment symbol
+            // comment symbol: #
             NUMBER_SIGN_ASCII => { break },
             RETURN_ASCII => { break },
             _ => {

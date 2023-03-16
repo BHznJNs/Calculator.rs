@@ -20,7 +20,7 @@ An simple command-line calculator program writen with Rust.
 = 1
 ```
 
-- Goto support
+- Lazy-Expression support
 
 ```text
 > a = 10

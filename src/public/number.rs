@@ -4,6 +4,10 @@ use std::fmt;
 
 #[derive(PartialEq, Clone, Copy)]
 pub enum Number {
+    // is used when comment line
+    // or blank line or statement.
+    Empty,
+
     NotANumber,
 
     Int(i64),
@@ -23,17 +27,17 @@ impl Number {
                         }
                     },
                     Number::Float(num2) => Number::Float((num1 as f64).powf(num2)),
-                    Number::NotANumber => Number::NotANumber,
+                    _ => Number::NotANumber,
                 }
             },
             Number::Float(num1) => {
                 match target {
                     Number::Int(num2) => Number::Float(num1.powi(num2 as i32)),
                     Number::Float(num2) => Number::Float(num1.powf(num2)),
-                    Number::NotANumber => Number::NotANumber,
+                    _ => Number::NotANumber,
                 }
-            }
-            Number::NotANumber => Number::NotANumber,
+            },
+            _ => Number::NotANumber,
         }
     }
     pub fn float(self) -> Number {
@@ -54,6 +58,7 @@ impl fmt::Display for Number {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Number::NotANumber => write!(f, "Not a Number"),
+            Number::Empty => write!(f, "Empty Number"),
             Number::Int(num) => write!(f, "{}", num),
             Number::Float(num) => {
                 if *num == num.floor() {
@@ -74,17 +79,17 @@ impl Add for Number {
                 match other {
                     Number::Int(num2) => Number::Int(num1 + num2),
                     Number::Float(num2) => Number::Float((num1 as f64) + num2),
-                    Number::NotANumber => Number::NotANumber,
+                    _ => Number::NotANumber,
                 }
             },
             Number::Float(num1) => {
                 match other {
                     Number::Int(num2) => Number::Float(num1 + (num2 as f64)),
                     Number::Float(num2) => Number::Float(num1 + num2),
-                    Number::NotANumber => Number::NotANumber,
+                    _ => Number::NotANumber,
                 }
             },
-            Number::NotANumber => Number::NotANumber,
+            _ => Number::NotANumber,
         }
     }
 }
@@ -97,17 +102,17 @@ impl Sub for Number {
                 match other {
                     Number::Int(num2) => Number::Int(num1 - num2),
                     Number::Float(num2) => Number::Float((num1 as f64) - num2),
-                    Number::NotANumber => Number::NotANumber,
+                    _ => Number::NotANumber,
                 }
             },
             Number::Float(num1) => {
                 match other {
                     Number::Int(num2) => Number::Float(num1 - (num2 as f64)),
                     Number::Float(num2) => Number::Float(num1 - num2),
-                    Number::NotANumber => Number::NotANumber,
+                    _ => Number::NotANumber,
                 }
             },
-            Number::NotANumber => Number::NotANumber,
+            _ => Number::NotANumber,
         }
     }
 }
@@ -120,17 +125,17 @@ impl Mul for Number {
                 match other {
                     Number::Int(num2) => Number::Int(num1 * num2),
                     Number::Float(num2) => Number::Float((num1 as f64) * num2),
-                    Number::NotANumber => Number::NotANumber,
+                    _ => Number::NotANumber,
                 }
             },
             Number::Float(num1) => {
                 match other {
                     Number::Int(num2) => Number::Float(num1 * (num2 as f64)),
                     Number::Float(num2) => Number::Float(num1 * num2),
-                    Number::NotANumber => Number::NotANumber,
+                    _ => Number::NotANumber,
                 }
             },
-            Number::NotANumber => Number::NotANumber,
+            _ => Number::NotANumber,
         }
     }
 }

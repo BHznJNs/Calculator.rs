@@ -1,35 +1,47 @@
-use std::collections::HashMap;
-
 use crate::public::ast::{ASTNode, ASTNodeTypes, ASTNodeVec};
+use crate::public::global::Global;
 use crate::public::number::Number;
-use crate::public::symbols::Symbols;
+use super::operate::operate;
 
-fn operate(num1: Number, num2: Number, operator: Symbols) -> Result<Number, ()> {
-    match operator {
-        Symbols::Plus     => {Ok(num1 + num2)},
-        Symbols::Minus    => {Ok(num1 - num2)},
-        Symbols::Multiply => {Ok(num1 * num2)},
-        Symbols::Divide   => {Ok(num1 / num2)},
-        Symbols::Power    => {Ok(num1.pow(num2))},
-        _                 => {
-            println!("Unexpected symbol: '{}' at function `operate`.", operator);
-            return Err(())
-        },
+fn assignment_resolve(
+    name: &String,
+    right_hand: &ASTNode,
+    global: &mut Global
+) -> Result<Number, ()> {
+    if let ASTNodeTypes::Expression = right_hand.type__ {
+        // variable assignment
+        let expression_value = expression_compute(
+            right_hand, global
+        )?;
+        global.variables.insert(name.clone(), expression_value);
+        return Ok(expression_value)
+    } else if let ASTNodeTypes::LazyExpression = right_hand.type__ {
+        // goto-statement assignment
+        let sub_expression = &right_hand
+            .params
+            .as_ref()
+            .unwrap()[0];
+
+        global.lazy_expressions.insert(
+            name.clone(),
+            sub_expression.to_owned()
+        );
+        return Ok(Number::Empty)
+    } else {
+        println!("Analyzer error.");
+        return Err(())
     }
 }
 
 fn expression_compute(
     expression_node: &ASTNode,
-    build_in_funcs:  &HashMap<&str, fn(f64) -> f64>,
-    variables:       &mut HashMap<String, Number>,
-    goto_statements: &mut HashMap<String, ASTNode>
+    global: &mut Global,
 ) -> Result<Number, ()> {
     let params = expression_node
         .params
         .as_ref()
         .unwrap();
     let mut number_stack = Vec::<Number>::new();
-    let mut symbol_stack = Vec::<Symbols>::new();
     let mut index = 0;
 
     while index < params.len() {
@@ -37,7 +49,8 @@ fn expression_compute(
 
         match &node.type__ {
             ASTNodeTypes::Variable(name) => {
-                let optional_var = variables.get(name.as_str());
+                let optional_var =
+                    global.variables.get(name.as_str());
                 if optional_var.is_none() {
                     println!("Undefined variable: '{}'.", name);
                     return Err(())
@@ -46,89 +59,43 @@ fn expression_compute(
             },
             ASTNodeTypes::NumberLiteral(number) => number_stack.push(*number),
             ASTNodeTypes::SymbolLiteral(symbol) => {
-                let symbol_self = *symbol;
-                let last_symbol = if let Some(symbol) = symbol_stack.last() {
-                    *symbol
-                } else {
-                    Symbols::NotASymbol
-                };
-
-                if (symbol_self as i8) <= (last_symbol as i8) {
-                    // e.g.
-                    // last   : +
-                    // current: -
-                    // --- --- --- ---
-                    // last   : ^
-                    // current: *
-                    
-                    symbol_stack.push(*symbol);
-                } else {
-                    // e.g.
-                    // last   : +
-                    // current: *
-
-                    // put the higher_priority symbol to the last
-                    let higher_priority = symbol_stack.pop().unwrap();
-                    symbol_stack.push(symbol_self);
-                    symbol_stack.push(higher_priority);
-
-                    // --- --- --- --- --- ---
-
-                    index += 1;
-                    if index == params.len() {
-                        println!("Invalid expression.");
-                        return Err(())
-                    }
-                    // next node should be a Number
-                    let next_node_type = &params[index].type__;
-                    let next_number = if
-                        let ASTNodeTypes::NumberLiteral(num) = next_node_type
-                    { *num } else {
-                        println!("Expected NumberLiteral, found {}.", next_node_type);
-                        return Err(())
-                    };
-
-                    // pop the last two elements
-                    // [..., num1, num2]
-                    // [...] num1 num2
-                    // push the next number and the poped elements
-                    // [..., num1, next_number, num2]
-                    let num2 = number_stack.pop().unwrap();
-                    let num1 = number_stack.pop().unwrap();
-                    number_stack.push(num2);
-                    number_stack.push(next_number);
-                    number_stack.push(num1);
+                if number_stack.len() < 2 {
+                    println!("Invalid expression.");
+                    return Err(())
                 }
+                let num2 = number_stack.pop().unwrap();
+                let num1 = number_stack.pop().unwrap();
+                let current_symbol = *symbol;
+                let value = operate(num1, num2, current_symbol)?;
+
+                number_stack.push(value);
             },
             ASTNodeTypes::Expression => {
                 let express_res = expression_compute(
-                    node,
-                    build_in_funcs,
-                    variables,
-                    goto_statements,
+                    node, global
                 )?;
                 number_stack.push(express_res);
             },
-            ASTNodeTypes::GotoStatement => {
-                let expression_node = &node
+            ASTNodeTypes::Assignment(name) => {
+                let right_hand = &node
                     .params
                     .as_ref()
                     .unwrap()[0];
 
-                let expression_value = expression_compute(
-                    expression_node,
-                    build_in_funcs,
-                    variables,
-                    goto_statements
+                let assignment_res = assignment_resolve(
+                    name, right_hand, global
                 )?;
-                number_stack.push(expression_value);
+                number_stack.push(assignment_res);
             },
-            ASTNodeTypes::InvokeExpression(name) => {
+            ASTNodeTypes::Invocation(name) => {
                 let func_res: Number;
 
+                let optional_func =
+                    global.build_in_funcs.get(name.as_str());
                 // prioritize using build-in function
-                match build_in_funcs.get(name.as_str()) {
-                    Some(func) => {
+                match optional_func {
+                    Some(f) => {
+                        let func = f.clone();
                         // build-in function
                         if let Some(params) = &node.params {
                             if params.len() == 0 {
@@ -142,18 +109,15 @@ fn expression_compute(
                             };
 
                             let expression_value = expression_compute(
-                                &expression_node,
-                                build_in_funcs,
-                                variables,
-                                goto_statements,
+                                &expression_node, global
                             )?;
                             let func_result_f = match expression_value {
-                                Number::NotANumber => {
+                                Number::Int(i) => func(i as f64),
+                                Number::Float(f) => func(f),
+                                _ => {
                                     println!("Not A Number Error.");
                                     return Err(())
                                 },
-                                Number::Int(i) => func(i as f64),
-                                Number::Float(f) => func(f),
                             };
                             func_res = Number::Float(func_result_f);
                         } else {
@@ -161,7 +125,7 @@ fn expression_compute(
                             return Err(())
                         }
                     },
-                    None => match goto_statements.get(name) {
+                    None => match global.lazy_expressions.get(name) {
                         // user defined goto-statement
                         Some(func) => {
                             let mut ast_vec = ASTNodeVec::new();
@@ -171,10 +135,7 @@ fn expression_compute(
                                 params: Some(ast_vec),
                             };
                             func_res = compute(
-                                root_node,
-                                build_in_funcs,
-                                variables,
-                                goto_statements
+                                root_node, global
                             )?;
                         },
                         None => {
@@ -193,54 +154,22 @@ fn expression_compute(
         index += 1;
     }
 
-    // LOG
-    // for n in &number_stack {
-    //     println!("num: {}", n);
-    // }
-    // for s in &symbol_stack {
-    //     println!("sym: {}", s);
-    // }
-
-    let first_index = 0;
-    while first_index < symbol_stack.len() {
-        if number_stack.len() < 2 {
-            println!("Invalid expression.");
-            return Err(())
-        }
-
-        let symbol = symbol_stack.remove(first_index);
-        let num1 = number_stack.remove(first_index);
-        let num2 = number_stack.remove(first_index);
-        let value = operate(num1, num2, symbol)?;
-        number_stack.push(value);
-    }
-
     Ok(number_stack[0])
 }
 
 pub fn compute(
     root_node: ASTNode,
-    build_in_funcs:  &HashMap<&str, fn(f64) -> f64>,
-    variables:       &mut HashMap<String, Number>,
-    goto_statements: &mut HashMap<String, ASTNode>
+    global: &mut Global,
 ) -> Result<Number, ()> {
     /*
         Root {
           Expression {
-             Number,
-             Symbol,
-             Expression,
-             ...
-          }
-        }
-     */
-    /*
-        Root {
-          Expression {
-             Number,
-             Symbol,
-             Expression,
-             ...
+            Assignment,
+            Symbol,
+            Number,
+            Symbol,
+            Expression,
+            ...
           }
         }
      */
@@ -253,54 +182,15 @@ pub fn compute(
 
     let param_element = &params[0];
 
-    if param_element.type__ == ASTNodeTypes::Expression {
+    if let ASTNodeTypes::Expression = param_element.type__ {
         let expression_res = expression_compute(
             &param_element,
-            build_in_funcs,
-            variables,
-            goto_statements,
+            global,
         )?;
-
-        return Ok(expression_res);
-    } else if let ASTNodeTypes::Assignment(name) = &param_element.type__ {
-        let right_hand = &param_element
-            .params
-            .as_ref()
-            .unwrap()[0];
-
-        if right_hand.type__ == ASTNodeTypes::Expression {
-            let expression_value = expression_compute(
-                right_hand,
-                build_in_funcs,
-                variables,
-                goto_statements
-            )?;
-            variables.insert(name.clone(), expression_value);
-            Ok(expression_value)
-        } else if right_hand.type__ == ASTNodeTypes::GotoStatement {
-            let sub_expression = &right_hand
-                .params
-                .as_ref()
-                .unwrap()[0];
-
-            goto_statements.insert(
-                name.clone(),
-                sub_expression.clone()
-            );
-            let expression_value = expression_compute(
-                sub_expression,
-                build_in_funcs,
-                variables,
-                goto_statements,
-            )?;
-
-            Ok(expression_value)
-        } else {
-            println!("Analyzer error.");
-            return Err(())
-        }
+        Ok(expression_res)
+    } else if let ASTNodeTypes::Comment = param_element.type__ {
+        Ok(Number::Empty)
     } else {
-        println!("Analyzer error.");
-        return Err(())
+        Err(())
     }
 }

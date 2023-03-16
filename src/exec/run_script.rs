@@ -1,10 +1,9 @@
-use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufRead};
 
 use crate::exec::attempt::attempt;
+use crate::public::global::Global;
 use crate::public::number::Number;
-use crate::public::ast::ASTNode;
 
 type FileBuf = io::BufReader<File>;
 fn read_lines(path: String) -> io::Result<io::Lines<FileBuf>> {
@@ -14,9 +13,7 @@ fn read_lines(path: String) -> io::Result<io::Lines<FileBuf>> {
 
 pub fn run_script(
     path: String,
-    build_in_funcs:  &HashMap<&str, fn(f64) -> f64>,
-    variables:       &mut HashMap<String, Number>,
-    goto_statements: &mut HashMap<String, ASTNode>,
+    mut global: Global
 ) {
     let mut script_lines =
     if let Ok(lines) = read_lines(path) {
@@ -43,14 +40,18 @@ pub fn run_script(
 
                 last_result =
                 if let Ok(res_number) = attempt(
-                    script_line,
-                    build_in_funcs,
-                    variables,
-                    goto_statements
+                    script_line, &mut global
                 ) {
-                    res_number
+                    // if line execuse successfully:
+
+                    if res_number != Number::Empty {
+                        res_number
+                    } else {
+                        // if script line is a comment line
+                        last_result
+                    }
                 } else {
-                    Number::NotANumber
+                    break;
                 };
             },
             None => {

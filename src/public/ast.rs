@@ -5,27 +5,30 @@ use super::symbols::Symbols;
 #[derive(PartialEq, Clone)]
 pub enum ASTNodeTypes {
     Root,
+    Comment,
 
     Variable(String),
     Assignment(String),
     NumberLiteral(Number),
     SymbolLiteral(Symbols),
     Expression,
-    GotoStatement,
-    InvokeExpression(String),
+    LazyExpression,
+    Invocation(String),
 }
 
 impl fmt::Display for ASTNodeTypes {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             ASTNodeTypes::Root => write!(f, "AST Root"),
-            ASTNodeTypes::Variable(name) => write!(f, "type: Variable, name {}", name),
-            ASTNodeTypes::Assignment(name) => write!(f, "type: Assignment, name {}", name),
+            ASTNodeTypes::Comment => write!(f, "type: Comment"),
+
+            ASTNodeTypes::Variable(name) => write!(f, "type: Variable, name: {}", name),
+            ASTNodeTypes::Assignment(name) => write!(f, "type: Assignment, name: {}", name),
             ASTNodeTypes::NumberLiteral(num) => write!(f, "type: NumberLiteral, value: {}", num),
             ASTNodeTypes::SymbolLiteral(symbol) => write!(f, "type: SymbolLiteral, value: {}", symbol),
             ASTNodeTypes::Expression => write!(f, "type: Expression"),
-            ASTNodeTypes::GotoStatement => write!(f, "type: GotoStatement"),
-            ASTNodeTypes::InvokeExpression(name) => write!(f, "type: InvokeExpression, name: {}", name),
+            ASTNodeTypes::LazyExpression => write!(f, "type: LazyExpression"),
+            ASTNodeTypes::Invocation(name) => write!(f, "type: Invocation, name: {}", name),
         }
     }
 }

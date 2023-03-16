@@ -1,17 +1,12 @@
-use std::collections::HashMap;
 use std::io::{self, Write};
 
 use super::attempt::attempt;
+use crate::public::global::Global;
 use crate::public::number::Number;
-use crate::public::ast::ASTNode;
 
-pub fn repl(
-    build_in_funcs:  &HashMap<&str, fn(f64) -> f64>,
-    variables:       &mut HashMap<String, Number>,
-    goto_statements: &mut HashMap<String, ASTNode>,
-) -> ! {
+pub fn repl(mut global: Global) -> ! {
     // print program name and version
-    println!("Calculator.rs v1.2.1");
+    println!("Calculator.rs v1.2.2");
 
     loop {
         print!("> ");
@@ -22,14 +17,12 @@ pub fn repl(
             .read_line(&mut input)
             .unwrap();
 
-        let result = attempt(
-            input,
-            build_in_funcs,
-            variables,
-            goto_statements,
-        );
+        let result = attempt(input, &mut global);
 
         if let Ok(num) = result {
+            if num == Number::Empty {
+                continue;
+            }
             println!("= {}", num);
         }
     }
