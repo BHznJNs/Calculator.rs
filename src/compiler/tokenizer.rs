@@ -1,6 +1,7 @@
 use crate::public::number::Number;
 use crate::public::token::{Token, TokenTypes, TokenVec};
 use crate::public::symbols::Symbols;
+use crate::public::keywords;
 
 const NUM_ASCII_START: u8 = 48;
 const POINT_ASCII: u8 = 46;
@@ -37,6 +38,7 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
             return Err(())
         }
 
+        // Number
         if current.is_ascii_digit() {
             last_type = TokenTypes::Number;
 
@@ -84,6 +86,7 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
             continue;
         }
 
+        // Identifier
         if is_identi_ascii(current) {
             last_type = TokenTypes::Identifier;
             let mut value = String::from(current as char);
@@ -96,8 +99,28 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
                 current = chars[index];
             }
 
-            let current_token = Token::Identi(value);
-            tokens.push(current_token);
+            // check is keyword
+            let mut is_keyword = false;
+            let mut current_token: Token;
+            let keyword: keywords::Keyword;
+
+            let mut index = 0;
+            while index < keywords::KEYWORDS.len() {
+                let current = keywords::KEYWORDS[index];
+                if value.eq(current) {
+                    is_keyword = true;
+                    keyword = keywords::KEYWORDS_ENUM[index];
+                    current_token = Token::Keyword(keyword);
+                    tokens.push(current_token);
+                    break;
+                }
+                index += 1;
+            }
+
+            if !is_keyword {
+                current_token = Token::Identi(value);
+                tokens.push(current_token);
+            }
             continue;
         }
 

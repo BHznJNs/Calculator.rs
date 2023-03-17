@@ -14,6 +14,7 @@ pub enum ASTNodeTypes {
     Expression,
     LazyExpression,
     Invocation(String),
+    Statement,
 }
 
 impl fmt::Display for ASTNodeTypes {
@@ -29,6 +30,7 @@ impl fmt::Display for ASTNodeTypes {
             ASTNodeTypes::Expression => write!(f, "type: Expression"),
             ASTNodeTypes::LazyExpression => write!(f, "type: LazyExpression"),
             ASTNodeTypes::Invocation(name) => write!(f, "type: Invocation, name: {}", name),
+            ASTNodeTypes::Statement => write!(f, "type: Statement"),
         }
     }
 }

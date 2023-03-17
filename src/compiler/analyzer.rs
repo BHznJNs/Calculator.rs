@@ -75,6 +75,7 @@ fn expression_resolve(
                         };
 
                         // function params
+                        tokens.insert(first_index, next_token);
                         let expression_ast = expression_resolve(tokens, true)?;
                         current_node.params = Some(expression_ast);
                         params.push(current_node);
@@ -121,9 +122,16 @@ fn expression_resolve(
                             };
 
                             params.push(current_node);
+                            continue;
                         }
                     }
                 }
+
+                // variable reading
+                params.push(ASTNode {
+                    type__: ASTNodeTypes::Variable(name),
+                    params: None,
+                });
             },
             Token::Paren(paren) => {
                 if paren == Symbols::LeftBrace {
@@ -245,10 +253,17 @@ pub fn analyzer(mut tokens: TokenVec) -> Result<ASTNode, ()> {
             type__: ASTNodeTypes::Comment,
             params: None,
         });
-        root.params = Some(params);
-        Ok(root)
+        
+    } else
+    if let Token::Keyword(_) = tokens[0] {
+        // regard the whole line as a statement
+        let current_node = ASTNode {
+            type__: ASTNodeTypes::Statement,
+            params: None,
+        };
+        params.push(current_node);
     } else {
-        // regard the whole statement as a expression
+        // regard the whole line as a expression
         let expression_nodes = expression_resolve(
             &mut tokens, false
         )?;
@@ -259,8 +274,7 @@ pub fn analyzer(mut tokens: TokenVec) -> Result<ASTNode, ()> {
         };
 
         params.push(current_node);
-        root.params = Some(params);
-
-        Ok(root)
     }
+    root.params = Some(params);
+    Ok(root)
 }
