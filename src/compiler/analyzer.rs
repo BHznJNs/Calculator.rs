@@ -50,7 +50,7 @@ fn expression_resolve(
             },
             Token::Symbol(symbol) => {
                 if symbol == Symbols::Equal {
-                    println!("Invalid variable / goto-statement assignment.");
+                    println!("Invalid variable / LazyExpression assignment.");
                     return Err(())
                 }
                 params.push(ASTNode {
@@ -123,6 +123,9 @@ fn expression_resolve(
 
                             params.push(current_node);
                             continue;
+                        } else {
+                            // next_token is symbol: + - * /
+                            tokens.insert(first_index, next_token);
                         }
                     }
                 }

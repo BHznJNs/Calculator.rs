@@ -16,7 +16,7 @@ fn assignment_resolve(
         global.variables.insert(name.clone(), expression_value);
         return Ok(expression_value)
     } else if let ASTNodeTypes::LazyExpression = right_hand.type__ {
-        // goto-statement assignment
+        // LazyExpression assignment
         let sub_expression = &right_hand
             .params
             .as_ref()
@@ -126,7 +126,7 @@ fn expression_compute(
                         }
                     },
                     None => match global.lazy_expressions.get(name) {
-                        // user defined goto-statement
+                        // user defined LazyExpression
                         Some(func) => {
                             let mut ast_vec = ASTNodeVec::new();
                             ast_vec.push(func.clone());
