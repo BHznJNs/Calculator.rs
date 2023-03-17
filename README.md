@@ -46,6 +46,12 @@ An simple command-line calculator program writen with Rust.
 calculator.exe script
 ```
 
+## Installation
+
+Go to the [release page](https://github.com/BHznJNs/Calculator.rs/releases) and download the latest released .exe file
+
+Then just execuse it.
+
 ## Build-ins
 
 - Functions
