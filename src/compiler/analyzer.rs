@@ -3,15 +3,6 @@ use crate::public::ast::{ASTNode, ASTNodeVec, ASTNodeTypes};
 use crate::public::symbols::Symbols;
 use super::symbol_priority::compare;
 
-fn is_equal_symbol(symbol: Symbols) -> bool {
-    return symbol == Symbols::Equal ||
-           symbol == Symbols::PlusEqual ||
-           symbol == Symbols::MinusEqual ||
-           symbol == Symbols::MultiplyEqual ||
-           symbol == Symbols::DivideEqual ||
-           symbol == Symbols::PowerEqual
-}
-
 // input default with paired-paren
 fn expression_resolve(
     tokens: &mut TokenVec,
@@ -82,7 +73,7 @@ fn expression_resolve(
                         continue;
                     } else
                     if let Token::Symbol(symbol) = next_token {
-                        if is_equal_symbol(symbol) {
+                        if Symbols::is_equal_symbol(symbol) {
                             let equal_symbol = symbol;
                             let right_hand_nodes = expression_resolve(tokens, false)?;
 

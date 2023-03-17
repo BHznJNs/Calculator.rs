@@ -27,12 +27,13 @@ pub enum Symbols {
 
 impl Symbols {
     pub fn combine(&self, other: Symbols) -> Result<Symbols, ()> {
-        // let equal_symbol = Symbols::Equal;
-        // equal_symbol.combine(Symbols::Plus);
-        // -> Symbols::PlusEqual
+        // example:
+        //    let equal_symbol = Symbols::Equal;
+        //    equal_symbol.combine(Symbols::Plus);
+        //    -> Symbols::PlusEqual
 
         if *self != Symbols::Equal {
-            println!("Parameter for Symbols::combine must be Symbole::Equal.");
+            println!("Only Symbole::Equal can call the Symbols::combine.");
             return Err(())
         }
 
@@ -54,7 +55,7 @@ impl Symbols {
                 Symbols::PowerEqual
             },
             _ => {
-                println!("Invalid symbol.");
+                println!("Invalid symbol: {}", other);
                 return Err(())
             }
         };
@@ -69,6 +70,15 @@ impl Symbols {
             Symbols::PowerEqual => Symbols::Power,
             _ => self
         }
+    }
+
+    pub fn is_equal_symbol(symbol: Symbols) -> bool {
+        return symbol == Symbols::Equal ||
+               symbol == Symbols::PlusEqual ||
+               symbol == Symbols::MinusEqual ||
+               symbol == Symbols::MultiplyEqual ||
+               symbol == Symbols::DivideEqual ||
+               symbol == Symbols::PowerEqual
     }
 }
 

@@ -200,24 +200,31 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
                 tokens.push(current_token);
             },
             EQUAL_ASCII  => {
-                let last_item = chars[index - 1];
-                // last char is: + - * /
-                if last_type == TokenTypes::Symbol && last_item != EQUAL_ASCII {
-                // last_type =  TokenTypes::Symbol;
-                    let last_token = tokens.pop().unwrap();
-                    if let Token::Symbol(last_symbol) = last_token {
+                if tokens.len() == 0 {
+                    println!("Invalid expression.");
+                    return Err(())
+                }
+                last_type = TokenTypes::Symbol;
+                let last_token = tokens.pop().unwrap();
+
+                if let Token::Symbol(last_symbol) = last_token {
+                    if !Symbols::is_equal_symbol(last_symbol) {
+                        // if last char is: + - * /
                         let target_symbol = Symbols::Equal.combine(last_symbol)?;
                         tokens.push(Token::Symbol(target_symbol));
+                        index += 1;
                         continue;
                     }
-                } else {
-                    last_type = TokenTypes::Symbol;
-                    let current_token = Token::Symbol(Symbols::Equal);
-                    tokens.push(current_token);
                 }
+                
+                let current_token = Token::Symbol(Symbols::Equal);
+                tokens.push(last_token);
+                tokens.push(current_token);
             },
 
+            // skip space
             SPACE_ASCII  => {},
+
             // comment symbol: #
             NUMBER_SIGN_ASCII => { break },
             RETURN_ASCII => { break },
