@@ -9,7 +9,6 @@ fn get_priority(symbol_node: &ASTNode) -> Result<i8, ()> {
             Symbols::Multiply   => Ok(2),
             Symbols::Divide     => Ok(2),
             Symbols::Power      => Ok(3),
-            Symbols::NotASymbol => Ok(4),
             _ => {
                 println!("Invalid symbol: '{}'.", symbol);
                 return Err(())

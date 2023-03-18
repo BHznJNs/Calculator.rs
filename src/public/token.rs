@@ -18,25 +18,25 @@ pub enum TokenTypes {
 
 #[derive(PartialEq)]
 pub enum Token {
-    Unknown,
-
     Number(Number),
     Symbol(Symbols),
     Paren(Symbols),
     Identi(String),
     Keyword(Keyword),
+
+    Divider,
 }
 pub type TokenVec = Vec<Token>;
 
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Token::Unknown => write!(f, "token: Unknown"),
-            Token::Number(_) => write!(f, "token: Number"),
-            Token::Symbol(_) => write!(f, "token: Symbol"),
-            Token::Paren(_) => write!(f, "token: Paren"),
-            Token::Identi(_) => write!(f, "token: Identifier"),
+            Token::Number(_)  => write!(f, "token: Number"),
+            Token::Symbol(_)  => write!(f, "token: Symbol"),
+            Token::Paren(_)   => write!(f, "token: Paren"),
+            Token::Identi(_)  => write!(f, "token: Identifier"),
             Token::Keyword(_) => write!(f, "token: Keyword"),
+            Token::Divider => write!(f, "token: Divider"),
         }
     }
 }

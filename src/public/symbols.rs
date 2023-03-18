@@ -21,8 +21,6 @@ pub enum Symbols {
     RightParen,
     LeftBrace,
     RightBrace,
-
-    NotASymbol,
 }
 
 impl Symbols {
@@ -82,17 +80,9 @@ impl Symbols {
     }
 }
 
-impl Default for Symbols {
-    fn default() -> Self {
-        return Symbols::NotASymbol
-    }
-}
-
 impl fmt::Display for Symbols {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Symbols::NotASymbol => write!(f, "Not A Symbol"),
-
             Symbols::Plus     => write!(f, "Plus"),
             Symbols::Minus    => write!(f, "Minus"),
             Symbols::Multiply => write!(f, "Multiply"),
@@ -100,11 +90,11 @@ impl fmt::Display for Symbols {
             Symbols::Power    => write!(f, "Power"),
             Symbols::Equal    => write!(f, "Equal"),
 
-            Symbols::PlusEqual => write!(f, "PlusEqual"),
-            Symbols::MinusEqual => write!(f, "MinusEqual"),
+            Symbols::PlusEqual     => write!(f, "PlusEqual"),
+            Symbols::MinusEqual    => write!(f, "MinusEqual"),
             Symbols::MultiplyEqual => write!(f, "MultiplyEqual"),
-            Symbols::DivideEqual => write!(f, "DivideEqual"),
-            Symbols::PowerEqual => write!(f, "PowerEqual"),
+            Symbols::DivideEqual   => write!(f, "DivideEqual"),
+            Symbols::PowerEqual    => write!(f, "PowerEqual"),
         
             Symbols::LeftParen  => write!(f, "LeftParen"),
             Symbols::RightParen => write!(f, "RightParen"),

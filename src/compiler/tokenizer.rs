@@ -19,7 +19,7 @@ fn ascii_to_num(ascii: u8) -> u8 {
     return ascii - NUM_ASCII_START
 }
 
-pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
+pub fn tokenize(source: String) -> Result<TokenVec, ()> {
     let mut index = 0;
 
     // use to control if number is minus
@@ -88,7 +88,6 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
 
         // Identifier
         if is_identi_ascii(current) {
-            last_type = TokenTypes::Identifier;
             let mut value = String::from(current as char);
 
             index += 1;
@@ -109,6 +108,8 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
                 let current = keywords::KEYWORDS[index];
                 if value.eq(current) {
                     is_keyword = true;
+                    last_type = TokenTypes::Keyword;
+
                     keyword = keywords::KEYWORDS_ENUM[index];
                     current_token = Token::Keyword(keyword);
                     tokens.push(current_token);
@@ -118,6 +119,7 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
             }
 
             if !is_keyword {
+                last_type = TokenTypes::Identifier;
                 current_token = Token::Identi(value);
                 tokens.push(current_token);
             }
@@ -138,6 +140,7 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
         const POWER_ASCII    : u8 = 94;
         const EQUAL_ASCII    : u8 = 61;
         
+        const SEMICOLON_ASCII: u8 = 59;
         const NUMBER_SIGN_ASCII : u8 = 35;
         const SPACE_ASCII  : u8 = 32;
         const RETURN_ASCII : u8 = 13;
@@ -222,12 +225,16 @@ pub fn tokenizer(source: String) -> Result<TokenVec, ()> {
                 tokens.push(current_token);
             },
 
+            SEMICOLON_ASCII => {
+                last_type = TokenTypes::Symbol;
+                tokens.push(Token::Divider);
+            },
             // skip space
-            SPACE_ASCII  => {},
+            SPACE_ASCII => {},
 
             // comment symbol: #
-            NUMBER_SIGN_ASCII => { break },
-            RETURN_ASCII => { break },
+            NUMBER_SIGN_ASCII => break,
+            RETURN_ASCII => break,
             _ => {
                 println!("Unknown token: '{}' at index {}.", current as char, index);
                 return Err(());

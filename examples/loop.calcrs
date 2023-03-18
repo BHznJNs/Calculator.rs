@@ -1,0 +1,4 @@
+a = 0
+b = 1
+loop 10 {c = a + b; a = b; b = c}
+c

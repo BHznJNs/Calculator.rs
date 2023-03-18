@@ -1,4 +1,5 @@
 use std::fmt;
+use super::keywords::Keyword;
 use super::number::Number;
 use super::symbols::Symbols;
 
@@ -14,7 +15,7 @@ pub enum ASTNodeTypes {
     Expression,
     LazyExpression,
     Invocation(String),
-    Statement,
+    Statement(Keyword),
 }
 
 impl fmt::Display for ASTNodeTypes {
@@ -30,7 +31,7 @@ impl fmt::Display for ASTNodeTypes {
             ASTNodeTypes::Expression => write!(f, "type: Expression"),
             ASTNodeTypes::LazyExpression => write!(f, "type: LazyExpression"),
             ASTNodeTypes::Invocation(name) => write!(f, "type: Invocation, name: {}", name),
-            ASTNodeTypes::Statement => write!(f, "type: Statement"),
+            ASTNodeTypes::Statement(keyword) => write!(f, "type: Statement, keyword: {}", keyword),
         }
     }
 }

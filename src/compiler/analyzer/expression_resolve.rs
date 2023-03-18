@@ -1,18 +1,15 @@
-use crate::public::token::{Token, TokenVec};
-use crate::public::ast::{ASTNode, ASTNodeVec, ASTNodeTypes};
 use crate::public::symbols::Symbols;
+use crate::public::token::{Token, TokenVec};
+use crate::public::ast::{ASTNode, ASTNodeTypes, ASTNodeVec};
+
 use super::symbol_priority::compare;
+use super::sequence_resolve::sequence_resolve;
 
 // input default with paired-paren
-fn expression_resolve(
+pub fn expression_resolve(
     tokens: &mut TokenVec,
     within_paren: bool,
 ) -> Result<ASTNodeVec, ()> {
-    if tokens.len() == 0 {
-        println!("Empty expression.");
-        return Err(())
-    }
-
     let mut params = ASTNodeVec::new();
     let first_index = 0;
 
@@ -29,10 +26,6 @@ fn expression_resolve(
         let current = tokens.remove(first_index);
 
         match current {
-            Token::Unknown => {
-                println!("Analyzer error.");
-                return Err(())
-            },
             Token::Number(number) => {
                 params.push(ASTNode {
                     type__: ASTNodeTypes::NumberLiteral(number),
@@ -41,7 +34,7 @@ fn expression_resolve(
             },
             Token::Symbol(symbol) => {
                 if symbol == Symbols::Equal {
-                    println!("Invalid variable / LazyExpression assignment.");
+                    println!("Invalid variable / lazy-expression assignment.");
                     return Err(())
                 }
                 params.push(ASTNode {
@@ -79,7 +72,7 @@ fn expression_resolve(
 
                             let right_hand_expression =
                             if right_hand_nodes[0].type__ == ASTNodeTypes::LazyExpression {
-                                // goto statement assignment
+                                // lazy-expression assignment
                                 right_hand_nodes[0].to_owned()
                             } else {
                                 let original = ASTNode {
@@ -140,21 +133,17 @@ fn expression_resolve(
                         }
 
                         let current = &tokens[first_index];
-                        if let Token::Symbol(Symbols::RightBrace) = current {
+                        if *current == Token::Paren(Symbols::RightBrace) {
                             tokens.remove(first_index);
                             break;
                         }
                         sub_tokens.push(tokens.remove(first_index));
                     }
-                    let expression_params =
-                        expression_resolve(&mut sub_tokens, false)?;
-                    let expression_node = ASTNode {
-                        type__: ASTNodeTypes::Expression,
-                        params: Some(expression_params),
-                    };
+
+                    let sub_sequence = sequence_resolve(&mut sub_tokens)?;
                     let current_node = ASTNode {
                         type__: ASTNodeTypes::LazyExpression,
-                        params: Some(vec![expression_node]),
+                        params: Some(vec![sub_sequence]),
                     };
 
                     params.push(current_node);
@@ -172,7 +161,10 @@ fn expression_resolve(
                 } else
                 if paren == Symbols::RightParen { break }
             },
-            Token::Keyword(_) => todo!(),
+            _ => {
+                println!("Unexpected token: '{}'.", current);
+                return Err(())
+            }
         }
     }
 
@@ -232,43 +224,4 @@ fn expression_resolve(
     }
 
     Ok(result_stack)
-}
-
-pub fn analyzer(mut tokens: TokenVec) -> Result<ASTNode, ()> {
-    let mut root = ASTNode {
-        type__: ASTNodeTypes::Root,
-        params: None,
-    };
-    let mut params = ASTNodeVec::new();
-
-    if tokens.len() == 0 {
-        // blank line || line comment
-        params.push(ASTNode {
-            type__: ASTNodeTypes::Comment,
-            params: None,
-        });
-        
-    } else
-    if let Token::Keyword(_) = tokens[0] {
-        // regard the whole line as a statement
-        let current_node = ASTNode {
-            type__: ASTNodeTypes::Statement,
-            params: None,
-        };
-        params.push(current_node);
-    } else {
-        // regard the whole line as a expression
-        let expression_nodes = expression_resolve(
-            &mut tokens, false
-        )?;
-
-        let current_node = ASTNode {
-            type__: ASTNodeTypes::Expression,
-            params: Some(expression_nodes),
-        };
-
-        params.push(current_node);
-    }
-    root.params = Some(params);
-    Ok(root)
 }
