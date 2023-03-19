@@ -6,7 +6,7 @@ use crate::public::number::Number;
 
 pub fn repl(mut global: Global) -> ! {
     // print program name and version
-    println!("Calculator.rs v1.3.0");
+    println!("Calculator.rs v1.3.1");
 
     loop {
         print!("> ");
