@@ -3,7 +3,6 @@ use std::io::{self, BufRead};
 
 use crate::exec::attempt::attempt;
 use crate::public::global::Global;
-use crate::public::number::Number;
 
 type FileBuf = io::BufReader<File>;
 fn read_lines(path: String) -> io::Result<io::Lines<FileBuf>> {
@@ -23,10 +22,6 @@ pub fn run_script(
         return
     };
 
-    // cache last compute result,
-    // when the loop ends,
-    // print the final result.
-    let mut last_result = Number::NotANumber;
     loop {
         match script_lines.next() {
             Some(item) => {
@@ -38,26 +33,14 @@ pub fn run_script(
                 };
                 script_line.push('\r');
 
-                last_result =
-                if let Ok(res_number) = attempt(
-                    script_line, &mut global
-                ) {
-                    // if line execuse successfully:
-
-                    if res_number != Number::Empty {
-                        res_number
-                    } else {
-                        // if script line is a comment line
-                        last_result
-                    }
-                } else {
+                let line_result =
+                    attempt(script_line, &mut global);
+                if line_result.is_err() {
                     break;
-                };
+                }
             },
-            None => {
-                println!("{}", last_result);
-                break;
-            },
+            // if is the last line
+            None => break,
         }
     }
 }

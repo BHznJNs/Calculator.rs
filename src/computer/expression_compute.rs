@@ -1,8 +1,8 @@
-use crate::public::ast::{ASTNode, ASTNodeTypes, ASTNodeVec};
+use crate::public::ast::{ASTNode, ASTNodeTypes};
 use crate::public::global::Global;
 use crate::public::number::Number;
 
-use super::compute::compute;
+use super::sequence_resolve::sequence_resolve;
 use super::assignment_resolve::assignment_resolve;
 use super::operate::operate;
 
@@ -61,7 +61,7 @@ pub fn expression_compute(
                 number_stack.push(assignment_res);
             },
             ASTNodeTypes::Invocation(name) => {
-                let func_res: Number;
+                let func_result: Number;
 
                 let optional_func =
                     global.build_in_funcs.get(name.as_str());
@@ -92,7 +92,7 @@ pub fn expression_compute(
                                     return Err(())
                                 },
                             };
-                            func_res = Number::Float(func_result_f);
+                            func_result = Number::Float(func_result_f);
                         } else {
                             println!("Analyzer error.");
                             return Err(())
@@ -101,15 +101,8 @@ pub fn expression_compute(
                     None => match global.lazy_expressions.get(name) {
                         // user defined LazyExpression
                         Some(func) => {
-                            let mut ast_vec = ASTNodeVec::new();
-                            ast_vec.push(func.clone());
-                            let root_node = ASTNode {
-                                type__: ASTNodeTypes::Root,
-                                params: Some(ast_vec),
-                            };
-                            func_res = compute(
-                                root_node, global
-                            )?;
+                            func_result =
+                                sequence_resolve(&func.clone(), global)?;
                         },
                         None => {
                             println!("Undefined function OR lazy-expression: '{}'.", name);
@@ -117,7 +110,7 @@ pub fn expression_compute(
                         },
                     },
                 }
-                number_stack.push(func_res);
+                number_stack.push(func_result);
             },
             _ => {
                 println!("Unexpected node type: '{}'.", node.type__);

@@ -2,11 +2,13 @@ use std::f64::INFINITY;
 use std::ops::{Add, Sub, Mul, Div};
 use std::fmt;
 
-#[derive(PartialEq, Clone, Copy)]
+use super::keywords::Keyword;
+
+#[derive(PartialEq, PartialOrd, Clone, Copy)]
 pub enum Number {
     // is used when comment line
     // or blank line or statement.
-    Empty,
+    Empty(Option<Keyword>),
 
     NotANumber,
 
@@ -46,6 +48,13 @@ impl Number {
             _ => self,
         }
     }
+    pub fn int_value(self) -> i64 {
+        match self {
+            Number::Int(i) => i,
+            Number::Float(f) => f as i64,
+            _ => 0,
+        }
+    }
 }
 
 impl Default for Number {
@@ -58,7 +67,7 @@ impl fmt::Display for Number {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Number::NotANumber => write!(f, "Not a Number"),
-            Number::Empty => write!(f, "Empty Number"),
+            Number::Empty(keyword) => write!(f, "Empty Number, keyword: {:?}", keyword),
             Number::Int(num) => write!(f, "{}", num),
             Number::Float(num) => {
                 if *num == num.floor() {

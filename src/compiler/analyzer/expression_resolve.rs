@@ -68,7 +68,13 @@ pub fn expression_resolve(
                     if let Token::Symbol(symbol) = next_token {
                         if Symbols::is_equal_symbol(symbol) {
                             let equal_symbol = symbol;
-                            let right_hand_nodes = expression_resolve(tokens, false)?;
+                            let right_hand_nodes =
+                                expression_resolve(tokens, false)?;
+                            
+                            if right_hand_nodes.len() == 0 {
+                                println!("Invalid assignment.");
+                                return Err(())
+                            }
 
                             let right_hand_expression =
                             if right_hand_nodes[0].type__ == ASTNodeTypes::LazyExpression {
@@ -83,8 +89,8 @@ pub fn expression_resolve(
                                 if equal_symbol == Symbols::Equal {
                                     original
                                 } else {
-                                    // resolve: += | -= | *= | /=
-                                    // separated: + | - | * | /
+                                    // resolve: += | -= | *= | /= | ^=
+                                    // separated: + | - | * | / | ^
                                     let separated = equal_symbol.separate();
                                     let variable_node = ASTNode {
                                         type__: ASTNodeTypes::Variable(name.clone()),
@@ -126,18 +132,24 @@ pub fn expression_resolve(
                     // vec[expression-node]
 
                     let mut sub_tokens = TokenVec::new();
+                    let mut brace_count = 1;
                     while first_index < tokens.len() {
                         if first_index == tokens.len() {
                             println!("Unmatched brace");
                             return Err(())
                         }
 
-                        let current = &tokens[first_index];
-                        if *current == Token::Paren(Symbols::RightBrace) {
-                            tokens.remove(first_index);
-                            break;
+                        let current = tokens.remove(first_index);
+                        if current == Token::Paren(Symbols::LeftBrace) {
+                            brace_count += 1;
                         }
-                        sub_tokens.push(tokens.remove(first_index));
+                        if current == Token::Paren(Symbols::RightBrace) {
+                            brace_count -= 1;
+                            if brace_count == 0 {
+                                break;
+                            }
+                        }
+                        sub_tokens.push(current);
                     }
 
                     let sub_sequence = sequence_resolve(&mut sub_tokens)?;

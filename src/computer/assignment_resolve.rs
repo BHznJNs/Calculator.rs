@@ -27,7 +27,7 @@ pub fn assignment_resolve(
             name.clone(),
             sub_expression.to_owned()
         );
-        return Ok(Number::Empty)
+        return Ok(Number::Empty(None))
     } else {
         println!("Analyzer error.");
         return Err(())

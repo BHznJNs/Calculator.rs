@@ -4,11 +4,17 @@ use crate::public::ast::{ASTNode, ASTNodeTypes};
 fn get_priority(symbol_node: &ASTNode) -> Result<i8, ()> {
     if let ASTNodeTypes::SymbolLiteral(symbol) = symbol_node.type__ {
         match symbol {
-            Symbols::Plus       => Ok(1),
-            Symbols::Minus      => Ok(1),
-            Symbols::Multiply   => Ok(2),
-            Symbols::Divide     => Ok(2),
-            Symbols::Power      => Ok(3),
+            Symbols::Plus     => Ok(1),
+            Symbols::Minus    => Ok(1),
+            Symbols::Multiply => Ok(2),
+            Symbols::Divide   => Ok(2),
+            Symbols::Power    => Ok(3),
+
+            Symbols::LessThan      => Ok(4),
+            Symbols::MoreThan      => Ok(4),
+            Symbols::LessThanEqual => Ok(4),
+            Symbols::MoreThanEqual => Ok(4),
+            Symbols::CompareEqual  => Ok(4),
             _ => {
                 println!("Invalid symbol: '{}'.", symbol);
                 return Err(())

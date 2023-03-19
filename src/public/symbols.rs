@@ -9,6 +9,11 @@ pub enum Symbols {
     Divide,
     Power, // high priority
 
+    LessThan,
+    MoreThan,
+    LessThanEqual,
+    MoreThanEqual,
+    CompareEqual,
     Equal,
 
     PlusEqual,
@@ -37,21 +42,14 @@ impl Symbols {
 
         let result_symbol =
         match other {
-            Symbols::Plus => {
-                Symbols::PlusEqual
-            },
-            Symbols::Minus => {
-                Symbols::MinusEqual
-            },
-            Symbols::Multiply => {
-                Symbols::MultiplyEqual
-            },
-            Symbols::Divide => {
-                Symbols::DivideEqual
-            },
-            Symbols::Power => {
-                Symbols::PowerEqual
-            },
+            Symbols::Plus     => Symbols::PlusEqual,
+            Symbols::Minus    => Symbols::MinusEqual,
+            Symbols::Multiply => Symbols::MultiplyEqual,
+            Symbols::Divide   => Symbols::DivideEqual,
+            Symbols::Power    => Symbols::PowerEqual,
+            Symbols::LessThan => Symbols::LessThanEqual,
+            Symbols::MoreThan => Symbols::MoreThanEqual,
+            Symbols::Equal    => Symbols::CompareEqual,
             _ => {
                 println!("Invalid symbol: {}", other);
                 return Err(())
@@ -68,6 +66,17 @@ impl Symbols {
             Symbols::PowerEqual => Symbols::Power,
             _ => self
         }
+    }
+
+    pub fn is_basic_symbol(symbol: Symbols) -> bool {
+        return symbol == Symbols::Plus  ||
+               symbol == Symbols::Minus ||
+               symbol == Symbols::Multiply ||
+               symbol == Symbols::Divide ||
+               symbol == Symbols::Power  ||
+               symbol == Symbols::LessThan ||
+               symbol == Symbols::MoreThan ||
+               symbol == Symbols::Equal
     }
 
     pub fn is_equal_symbol(symbol: Symbols) -> bool {
@@ -88,6 +97,11 @@ impl fmt::Display for Symbols {
             Symbols::Multiply => write!(f, "Multiply"),
             Symbols::Divide   => write!(f, "Divide"),
             Symbols::Power    => write!(f, "Power"),
+            Symbols::LessThan => write!(f, "LessThan"),
+            Symbols::MoreThan => write!(f, "MoreThan"),
+            Symbols::LessThanEqual => write!(f, "LessThanEqual"),
+            Symbols::MoreThanEqual => write!(f, "MoreThanEqual"),
+            Symbols::CompareEqual  => write!(f, "CompareEqual"),
             Symbols::Equal    => write!(f, "Equal"),
 
             Symbols::PlusEqual     => write!(f, "PlusEqual"),

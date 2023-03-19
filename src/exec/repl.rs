@@ -20,7 +20,7 @@ pub fn repl(mut global: Global) -> ! {
         let result = attempt(input, &mut global);
 
         if let Ok(num) = result {
-            if num == Number::Empty {
+            if let Number::Empty(_) = num {
                 continue;
             }
             println!("= {}", num);
