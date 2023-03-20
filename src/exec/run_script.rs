@@ -22,21 +22,47 @@ pub fn run_script(
         return
     };
 
+    let mut cached_multiline = String::new();
+    let mut line_count = 0;
     loop {
         match script_lines.next() {
             Some(item) => {
+                line_count += 1;
+
                 let mut script_line =
                 if let Ok(line) = item {
                     line
                 } else {
                     String::new()
                 };
-                script_line.push('\r');
 
-                let line_result =
-                    attempt(script_line, &mut global);
-                if line_result.is_err() {
-                    break;
+                // multi-line symbol: `:`
+                if script_line.ends_with(":") {
+                    script_line.pop();
+                    cached_multiline += &script_line;
+                } else {
+                    // out of multi-line statement
+                    // or last line of multi-line statement
+                    let current_line: String;
+
+                    if cached_multiline.is_empty() {
+                        // out of multi-line statement
+                        script_line.push('\r');
+                        current_line = script_line;
+                    } else {
+                        // the last line of multi-line statement
+                        cached_multiline += &script_line;
+                        current_line = cached_multiline.clone();
+                        cached_multiline.clear();
+                    }
+
+                    // execuse the line
+                    let line_result =
+                        attempt(current_line, &mut global);
+                    if line_result.is_err() {
+                        println!("Error occured at line {}", line_count);
+                        break;
+                    }
                 }
             },
             // if is the last line

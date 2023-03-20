@@ -2,12 +2,13 @@ use std::f64::INFINITY;
 use std::ops::{Add, Sub, Mul, Div};
 use std::fmt;
 
-use super::keywords::Keyword;
+use crate::public::keywords::Keyword;
 
 #[derive(PartialEq, PartialOrd, Clone, Copy)]
 pub enum Number {
     // is used when comment line
-    // or blank line or statement.
+    // or blank line or
+    // or return state for statement.
     Empty(Option<Keyword>),
 
     NotANumber,

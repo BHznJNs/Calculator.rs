@@ -1,6 +1,7 @@
-use crate::public::token::TokenVec;
+use crate::compiler::tokenizer::token::TokenVec;
 use crate::public::ast::{ASTNode, ASTNodeTypes};
-use crate::public::token::Token;
+use crate::compiler::tokenizer::token::Token;
+
 
 use super::statement_resolve::statement_resolve;
 use super::expression_resolve::expression_resolve;

@@ -1,4 +1,4 @@
-use crate::public::symbols::Symbols;
+use crate::public::value::symbols::Symbols;
 use crate::public::ast::{ASTNode, ASTNodeTypes};
 
 fn get_priority(symbol_node: &ASTNode) -> Result<i8, ()> {

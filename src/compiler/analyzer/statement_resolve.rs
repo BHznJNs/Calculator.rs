@@ -1,7 +1,7 @@
-use crate::public::symbols::Symbols;
-use crate::public::token::{Token, TokenVec};
+use crate::public::value::symbols::Symbols;
 use crate::public::ast::{ASTNode, ASTNodeTypes, ASTNodeVec};
 use crate::public::keywords::Keyword;
+use crate::compiler::tokenizer::token::{Token, TokenVec};
 
 use super::expression_resolve::expression_resolve;
 use super::sequence_resolve::sequence_resolve;

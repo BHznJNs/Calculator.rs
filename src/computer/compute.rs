@@ -1,6 +1,6 @@
 use crate::public::ast::ASTNode;
 use crate::public::global::Global;
-use crate::public::number::Number;
+use crate::public::value::number::Number;
 
 use super::sequence_resolve::sequence_resolve;
 

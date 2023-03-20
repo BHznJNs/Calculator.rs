@@ -2,7 +2,7 @@ use std::io::{self, Write};
 
 use super::attempt::attempt;
 use crate::public::global::Global;
-use crate::public::number::Number;
+use crate::public::value::number::Number;
 
 pub fn repl(mut global: Global) -> ! {
     // print program name and version

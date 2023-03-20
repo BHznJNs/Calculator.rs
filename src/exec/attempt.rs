@@ -1,7 +1,7 @@
 use crate::compiler::compile;
 use crate::computer::compute;
 use crate::public::global::Global;
-use crate::public::number::Number;
+use crate::public::value::number::Number;
 
 pub fn attempt(
     input: String, global: &mut Global

@@ -1,7 +1,8 @@
 use std::fmt;
-use super::symbols::Symbols;
-use super::number::Number;
-use super::keywords::Keyword;
+
+use crate::public::value::symbols::Symbols;
+use crate::public::value::number::Number;
+use crate::public::keywords::Keyword;
 
 #[derive(PartialEq, Clone, Copy)]
 pub enum TokenTypes {

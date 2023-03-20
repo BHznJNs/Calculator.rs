@@ -1,4 +1,10 @@
+# fibonacci | 斐波那契
+
 a = 0
 b = 1
-for 10 {c = a + b; a = b; b = c}
+for 10 {:
+    c = a + b;:
+    a = b;:
+    b = c;:
+}
 out c # 89

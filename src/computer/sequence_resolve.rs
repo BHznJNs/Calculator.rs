@@ -1,6 +1,6 @@
 use crate::public::ast::{ASTNode, ASTNodeTypes};
 use crate::public::global::Global;
-use crate::public::number::Number;
+use crate::public::value::number::Number;
 
 use super::expression_compute::expression_compute;
 use super::statement_resolve::statement_resolve;

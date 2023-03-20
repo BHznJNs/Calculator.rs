@@ -1,7 +1,8 @@
-use crate::public::number::Number;
-use crate::public::token::{Token, TokenTypes, TokenVec};
-use crate::public::symbols::Symbols;
+use crate::public::value::number::Number;
+use crate::public::value::symbols::Symbols;
 use crate::public::keywords;
+
+use super::token::{Token, TokenTypes, TokenVec};
 
 const NUM_ASCII_START: u8 = 48;
 const POINT_ASCII: u8 = 46;
@@ -146,6 +147,7 @@ pub fn tokenize(source: String) -> Result<TokenVec, ()> {
         const SEMICOLON_ASCII  : u8 = 59; // ;  
         const NUMBER_SIGN_ASCII: u8 = 35; // #
         const SPACE_ASCII  : u8 = 32; // ' '
+        const TAB_ASCII    : u8 = 9;
         const RETURN_ASCII : u8 = 13; // '\r'
 
         match current {
@@ -232,8 +234,10 @@ pub fn tokenize(source: String) -> Result<TokenVec, ()> {
                 last_type = TokenTypes::Symbol;
                 tokens.push(Token::Divider);
             },
-            // skip space
+
+            // skip Space and Tab
             SPACE_ASCII => {},
+            TAB_ASCII   => {},
 
             // comment symbol: #
             NUMBER_SIGN_ASCII => break,

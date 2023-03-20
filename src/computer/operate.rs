@@ -1,5 +1,5 @@
-use crate::public::number::Number;
-use crate::public::symbols::Symbols;
+use crate::public::value::number::Number;
+use crate::public::value::symbols::Symbols;
 
 pub fn operate(num1: Number, num2: Number, operator: Symbols) -> Result<Number, ()> {
     match operator {

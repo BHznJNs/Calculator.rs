@@ -1,7 +1,8 @@
 use std::fmt;
+
 use super::keywords::Keyword;
-use super::number::Number;
-use super::symbols::Symbols;
+use super::value::number::Number;
+use super::value::symbols::Symbols;
 
 #[derive(PartialEq, Clone)]
 pub enum ASTNodeTypes {

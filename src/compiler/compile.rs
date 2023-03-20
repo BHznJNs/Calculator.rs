@@ -1,6 +1,6 @@
 use crate::public::ast::ASTNode;
 
-use super::tokenizer::tokenize;
+use super::tokenizer::tokenizer::tokenize;
 use super::analyzer::analyzer::analyze;
 
 pub fn compile(input: String) -> Result<ASTNode, ()> {

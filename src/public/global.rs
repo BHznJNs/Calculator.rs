@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use super::number::Number;
 use super::ast::ASTNode;
 use super::build_in;
+use super::value::number::Number;
 
 pub struct Global {
     pub build_in_funcs: HashMap<&'static str, fn(f64) -> f64>,
