@@ -1,4 +1,4 @@
 a = 0
 b = 1
 for 10 {c = a + b; a = b; b = c}
-out c
+out c # 89
