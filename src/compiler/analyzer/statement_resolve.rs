@@ -1,3 +1,4 @@
+use crate::public::value::parens::Parens;
 use crate::public::value::symbols::Symbols;
 use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes, ASTNodeVec};
 use crate::public::compile_time::keywords::Keyword;
@@ -18,7 +19,7 @@ fn statement_body_resolve(
     while first_index < tokens.len() {
         let current = tokens.remove(first_index);
 
-        if current == Token::Paren(Symbols::LeftBrace) {break}
+        if current == Token::Paren(Parens::LeftBrace) {break}
         sub_tokens.push(current);
     }
     let condition =
@@ -37,7 +38,7 @@ fn statement_body_resolve(
         let current = tokens.remove(first_index);
 
         let is_divider = current == Token::Divider;
-        let is_rightbrace = current == Token::Paren(Symbols::RightBrace);
+        let is_rightbrace = current == Token::Paren(Parens::RightBrace);
 
         if is_divider || is_rightbrace {
             // when `;` OR `}`

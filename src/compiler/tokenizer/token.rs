@@ -1,5 +1,6 @@
 use std::fmt;
 
+use crate::public::value::parens::Parens;
 use crate::public::value::symbols::Symbols;
 use crate::public::value::number::Number;
 use crate::public::compile_time::keywords::Keyword;
@@ -21,7 +22,7 @@ pub enum TokenTypes {
 pub enum Token {
     Number(Number),
     Symbol(Symbols),
-    Paren(Symbols),
+    Paren(Parens),
     Identi(String),
     Keyword(Keyword),
 

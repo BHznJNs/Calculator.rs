@@ -1,4 +1,5 @@
 use crate::public::value::number::Number;
+use crate::public::value::parens::Parens;
 use crate::public::value::symbols::Symbols;
 use crate::public::compile_time::keywords;
 
@@ -129,10 +130,12 @@ pub fn tokenize(source: String) -> Result<TokenVec, ()> {
 
         // --- --- --- --- --- ---
 
-        const LEFT_PAREN_ASCII  : u8 = 40;  // (
-        const RIGHT_PAREN_ASCII : u8 = 41;  // )
-        const LEFT_BRACE_ASCII  : u8 = 123; // {
-        const RIGHT_BRACE_ASCII : u8 = 125; // }
+        const LEFT_PAREN_ASCII   : u8 = 40;  // (
+        const RIGHT_PAREN_ASCII  : u8 = 41;  // )
+        const LEFT_BRACKET_ASCII : u8 = 91;  // [
+        const RIGHT_BRACKET_ASCII: u8 = 93;  // ]
+        const LEFT_BRACE_ASCII   : u8 = 123; // {
+        const RIGHT_BRACE_ASCII  : u8 = 125; // }
 
         const PLUS_ASCII     : u8 = 43; // +
         const MINUS_ASCII    : u8 = 45; // -
@@ -153,19 +156,27 @@ pub fn tokenize(source: String) -> Result<TokenVec, ()> {
         match current {
             LEFT_PAREN_ASCII => {
                 last_type = TokenTypes::Paren;
-                tokens.push(Token::Paren(Symbols::LeftParen));
+                tokens.push(Token::Paren(Parens::LeftParen));
             },
             RIGHT_PAREN_ASCII => {
                 last_type = TokenTypes::Paren;
-                tokens.push(Token::Paren(Symbols::RightParen));
+                tokens.push(Token::Paren(Parens::RightParen));
+            },
+            LEFT_BRACKET_ASCII => {
+                last_type = TokenTypes::Paren;
+                tokens.push(Token::Paren(Parens::LeftBracket));
+            },
+            RIGHT_BRACKET_ASCII => {
+                last_type = TokenTypes::Paren;
+                tokens.push(Token::Paren(Parens::RightBracket));
             },
             LEFT_BRACE_ASCII => {
                 last_type = TokenTypes::Paren;
-                tokens.push(Token::Paren(Symbols::LeftBrace));
+                tokens.push(Token::Paren(Parens::LeftBrace));
             },
             RIGHT_BRACE_ASCII => {
                 last_type = TokenTypes::Paren;
-                tokens.push(Token::Paren(Symbols::RightBrace));
+                tokens.push(Token::Paren(Parens::RightBrace));
             },
 
             PLUS_ASCII => {

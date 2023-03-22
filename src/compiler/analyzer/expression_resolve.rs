@@ -1,3 +1,4 @@
+use crate::public::value::parens::Parens;
 use crate::public::value::symbols::Symbols;
 use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes, ASTNodeVec};
 use crate::compiler::tokenizer::token::{Token, TokenVec};
@@ -51,7 +52,7 @@ pub fn expression_resolve(
                 if is_more_token {
                     let next_token = tokens.remove(first_index);
 
-                    if next_token == Token::Paren(Symbols::LeftParen) {
+                    if next_token == Token::Paren(Parens::LeftParen) {
                         // function invocation
                         let mut current_node = ASTNode {
                             type__: ASTNodeTypes::Invocation(name.clone()),
@@ -127,7 +128,7 @@ pub fn expression_resolve(
                 });
             },
             Token::Paren(paren) => {
-                if paren == Symbols::LeftBrace {
+                if paren == Parens::LeftBrace {
                     // Goto-statement
                     // vec[expression-node]
 
@@ -140,10 +141,10 @@ pub fn expression_resolve(
                         }
 
                         let current = tokens.remove(first_index);
-                        if current == Token::Paren(Symbols::LeftBrace) {
+                        if current == Token::Paren(Parens::LeftBrace) {
                             brace_count += 1;
                         }
-                        if current == Token::Paren(Symbols::RightBrace) {
+                        if current == Token::Paren(Parens::RightBrace) {
                             brace_count -= 1;
                             if brace_count == 0 {
                                 break;
@@ -160,7 +161,7 @@ pub fn expression_resolve(
 
                     params.push(current_node);
                 } else
-                if paren == Symbols::LeftParen {
+                if paren == Parens::LeftParen {
                     // nested expression
                     tokens.insert(first_index, current);
                     let nested_expression =
@@ -171,7 +172,7 @@ pub fn expression_resolve(
                     };
                     params.push(current_node);
                 } else
-                if paren == Symbols::RightParen { break }
+                if paren == Parens::RightParen { break }
             },
             _ => {
                 println!("Unexpected token: '{}'.", current);
