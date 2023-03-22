@@ -1,6 +1,6 @@
 use crate::compiler::compile;
 use crate::computer::compute;
-use crate::public::global::Global;
+use crate::public::run_time::global::Global;
 use crate::public::value::number::Number;
 
 pub fn attempt(

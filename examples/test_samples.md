@@ -39,4 +39,5 @@ sin(1) ^ 2 + cos(1) ^ 2 # 1
 a = 0
 condition = {if a == 5 {brk}}
 for 10 {condition(); a += 1}
+a # 5
 ```

@@ -1,5 +1,5 @@
 use crate::public::value::symbols::Symbols;
-use crate::public::ast::{ASTNode, ASTNodeTypes, ASTNodeVec};
+use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes, ASTNodeVec};
 use crate::compiler::tokenizer::token::{Token, TokenVec};
 
 use super::symbol_priority::compare;

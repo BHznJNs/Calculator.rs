@@ -1,7 +1,7 @@
 use std::io::{self, Write};
 
 use super::attempt::attempt;
-use crate::public::global::Global;
+use crate::public::run_time::global::Global;
 use crate::public::value::number::Number;
 
 pub fn repl(mut global: Global) -> ! {

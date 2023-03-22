@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::public::value::symbols::Symbols;
 use crate::public::value::number::Number;
-use crate::public::keywords::Keyword;
+use crate::public::compile_time::keywords::Keyword;
 
 #[derive(PartialEq, Clone, Copy)]
 pub enum TokenTypes {

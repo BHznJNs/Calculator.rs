@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{self, BufRead};
 
 use crate::exec::attempt::attempt;
-use crate::public::global::Global;
+use crate::public::run_time::global::Global;
 
 type FileBuf = io::BufReader<File>;
 fn read_lines(path: String) -> io::Result<io::Lines<FileBuf>> {

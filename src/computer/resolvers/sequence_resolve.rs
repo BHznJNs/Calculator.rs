@@ -1,8 +1,8 @@
-use crate::public::ast::{ASTNode, ASTNodeTypes};
-use crate::public::global::Global;
+use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes};
+use crate::public::run_time::global::Global;
 use crate::public::value::number::Number;
 
-use super::expression_compute::expression_compute;
+use super::super::expression_compute::expression_compute;
 use super::statement_resolve::statement_resolve;
 
 pub fn sequence_resolve(

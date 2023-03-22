@@ -1,8 +1,8 @@
-use crate::public::ast::ASTNode;
-use crate::public::global::Global;
+use crate::public::compile_time::ast::ASTNode;
+use crate::public::run_time::global::Global;
 use crate::public::value::number::Number;
 
-use super::sequence_resolve::sequence_resolve;
+use super::resolvers::sequence_resolve::sequence_resolve;
 
 pub fn compute(
     root_node: ASTNode,

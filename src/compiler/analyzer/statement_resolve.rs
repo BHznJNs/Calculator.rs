@@ -1,6 +1,6 @@
 use crate::public::value::symbols::Symbols;
-use crate::public::ast::{ASTNode, ASTNodeTypes, ASTNodeVec};
-use crate::public::keywords::Keyword;
+use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes, ASTNodeVec};
+use crate::public::compile_time::keywords::Keyword;
 use crate::compiler::tokenizer::token::{Token, TokenVec};
 
 use super::expression_resolve::expression_resolve;

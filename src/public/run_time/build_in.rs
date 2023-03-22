@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::f64::consts::PI;
 use std::f64::consts::E;
 
-use super::value::number::Number;
+use crate::public::value::number::Number;
 
 pub struct BuildIn {
     pub  sin: fn(f64) -> f64,

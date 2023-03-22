@@ -1,6 +1,3 @@
-pub mod global;
-pub mod ast;
-pub mod keywords;
+pub mod run_time;
+pub mod compile_time;
 pub mod value;
-
-mod build_in;

@@ -5,7 +5,7 @@ mod exec;
 
 use std::env;
 
-use public::global::Global;
+use public::run_time::global::Global;
 use exec::repl::repl;
 use exec::run_script::run_script;
 

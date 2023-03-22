@@ -1,6 +1,6 @@
 use crate::public::value::number::Number;
 use crate::public::value::symbols::Symbols;
-use crate::public::keywords;
+use crate::public::compile_time::keywords;
 
 use super::token::{Token, TokenTypes, TokenVec};
 

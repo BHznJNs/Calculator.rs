@@ -1,5 +1,5 @@
 use crate::public::value::symbols::Symbols;
-use crate::public::ast::{ASTNode, ASTNodeTypes};
+use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes};
 
 fn get_priority(symbol_node: &ASTNode) -> Result<i8, ()> {
     if let ASTNodeTypes::SymbolLiteral(symbol) = symbol_node.type__ {

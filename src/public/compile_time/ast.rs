@@ -1,8 +1,9 @@
 use std::fmt;
 
+use crate::public::value::number::Number;
+use crate::public::value::symbols::Symbols;
+
 use super::keywords::Keyword;
-use super::value::number::Number;
-use super::value::symbols::Symbols;
 
 #[derive(PartialEq, Clone)]
 pub enum ASTNodeTypes {

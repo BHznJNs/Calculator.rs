@@ -1,4 +1,4 @@
-use crate::public::ast::{ASTNode, ASTNodeTypes};
+use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes};
 
 use crate::compiler::tokenizer::token::TokenVec;
 use super::sequence_resolve::sequence_resolve;

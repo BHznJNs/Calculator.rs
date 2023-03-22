@@ -2,7 +2,7 @@ use std::f64::INFINITY;
 use std::ops::{Add, Sub, Mul, Div};
 use std::fmt;
 
-use crate::public::keywords::Keyword;
+use crate::public::compile_time::keywords::Keyword;
 
 #[derive(PartialEq, PartialOrd, Clone, Copy)]
 pub enum Number {

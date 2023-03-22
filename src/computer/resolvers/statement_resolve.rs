@@ -1,9 +1,9 @@
-use crate::public::ast::ASTNode;
-use crate::public::global::Global;
-use crate::public::keywords::Keyword;
+use crate::public::compile_time::ast::ASTNode;
+use crate::public::compile_time::keywords::Keyword;
+use crate::public::run_time::global::Global;
 use crate::public::value::number::Number;
 
-use super::expression_compute::expression_compute;
+use super::super::expression_compute::expression_compute;
 use super::sequence_resolve::sequence_resolve;
 
 pub fn statement_resolve(

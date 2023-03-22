@@ -1,4 +1,4 @@
-use crate::public::ast::ASTNode;
+use crate::public::compile_time::ast::ASTNode;
 
 use super::tokenizer::tokenizer::tokenize;
 use super::analyzer::analyzer::analyze;

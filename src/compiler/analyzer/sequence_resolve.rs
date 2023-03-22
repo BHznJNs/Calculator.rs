@@ -1,5 +1,5 @@
 use crate::compiler::tokenizer::token::TokenVec;
-use crate::public::ast::{ASTNode, ASTNodeTypes};
+use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes};
 use crate::compiler::tokenizer::token::Token;
 
 
