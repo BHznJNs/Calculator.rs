@@ -21,7 +21,7 @@ fn get_priority(symbol_node: &ASTNode) -> Result<i8, ()> {
             }
         }
     } else {
-        println!("Analyzer error.");
+        println!("Analyzer error from 'get_priority'.");
         return Err(())
     }
 }

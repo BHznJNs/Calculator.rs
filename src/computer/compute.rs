@@ -1,13 +1,13 @@
 use crate::public::compile_time::ast::ASTNode;
 use crate::public::run_time::global::Global;
-use crate::public::value::number::Number;
+use crate::public::value::value::Value;
 
 use super::resolvers::sequence_resolve::sequence_resolve;
 
 pub fn compute(
     root_node: ASTNode,
     global: &mut Global,
-) -> Result<Number, ()> {
+) -> Result<Value, ()> {
     /*
         Root {
           Expression {

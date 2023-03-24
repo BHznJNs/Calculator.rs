@@ -6,6 +6,88 @@ use crate::compiler::tokenizer::token::{Token, TokenVec};
 use super::symbol_priority::compare;
 use super::sequence_resolve::sequence_resolve;
 
+fn lazy_expression_resolve(
+    tokens: &mut TokenVec,
+) -> Result<ASTNode, ()> {
+    let first_index = 0;
+    let mut sub_tokens = TokenVec::new();
+    let mut brace_count = 1;
+
+    while first_index < tokens.len() {
+        if first_index == tokens.len() {
+            println!("Unmatched brace.");
+            return Err(())
+        }
+
+        let current = tokens.pop_front().unwrap();
+        if current == Token::Paren(Parens::LeftBrace) {
+            brace_count += 1;
+        }
+        if current == Token::Paren(Parens::RightBrace) {
+            brace_count -= 1;
+            if brace_count == 0 {
+                break;
+            }
+        }
+        sub_tokens.push_back(current);
+    }
+
+    let sub_sequence = sequence_resolve(&mut sub_tokens)?;
+    let current_node = ASTNode {
+        type__: ASTNodeTypes::LazyExpression,
+        params: Some(vec![sub_sequence]),
+    };
+
+    Ok(current_node)
+}
+
+fn array_literal_resolve(
+    tokens: &mut TokenVec
+) -> Result<ASTNode, ()> {
+    let first_index = 0;
+    let mut elements = ASTNodeVec::new();
+    let mut sub_tokens = TokenVec::new();
+
+    while first_index < tokens.len() {
+        let current = tokens.pop_front().unwrap();
+
+        let is_divider =
+            current == Token::Divider;
+        let is_right_bracket =
+            current == Token::Paren(Parens::RightBracket);
+        
+        if current == Token::Paren(Parens::LeftBracket) {
+            // sub array element
+            let sub_array_node =
+                array_literal_resolve(tokens)?;
+            elements.push(sub_array_node);
+        } else if is_divider || is_right_bracket {
+            // number element
+            if sub_tokens.len() > 0 {
+                let sub_expression =
+                    expression_resolve(&mut sub_tokens, false)?;
+                sub_tokens.clear();
+
+                let sub_expression_node = ASTNode {
+                    type__: ASTNodeTypes::Expression,
+                    params: Some(sub_expression),
+                };
+                elements.push(sub_expression_node);
+            }
+            if is_right_bracket { break }
+        } else {
+            sub_tokens.push_back(current);
+        }
+    }
+
+    let array_node = ASTNode {
+        type__: ASTNodeTypes::ArrayLiteral,
+        params: Some(elements),
+    };
+
+    Ok(array_node)
+}
+
 // input default with paired-paren
 pub fn expression_resolve(
     tokens: &mut TokenVec,
@@ -15,17 +97,17 @@ pub fn expression_resolve(
     let first_index = 0;
 
     if within_paren {
-        // if `within_paren`, first token should be Symbols::LeftParen
-        if let Token::Symbol(Symbols::LeftParen) = tokens[first_index] {
-            println!("Analyzer error.");
+        // if `within_paren`, first token should be Paren::LeftParen
+        if tokens[first_index] != Token::Paren(Parens::LeftParen) {
+            println!("Analyzer error from 'expression_resolve'.");
             return Err(())
         }
         tokens.remove(first_index);
     }
 
     while first_index < tokens.len() {
-        let current = tokens.remove(first_index);
-
+        let current = tokens.pop_front().unwrap();
+    
         match current {
             Token::Number(number) => {
                 params.push(ASTNode {
@@ -50,7 +132,7 @@ pub fn expression_resolve(
                 // and the next token is LeftParen.
                 let is_more_token = tokens.len() > 0;
                 if is_more_token {
-                    let next_token = tokens.remove(first_index);
+                    let next_token = tokens.pop_front().unwrap();
 
                     if next_token == Token::Paren(Parens::LeftParen) {
                         // function invocation
@@ -66,20 +148,41 @@ pub fn expression_resolve(
                         params.push(current_node);
                         continue;
                     } else
+                    if next_token == Token::Paren(Parens::LeftBracket) {
+                        // array element reading
+                        let mut sub_tokens = TokenVec::new();
+                        while first_index < tokens.len() {
+                            let current = tokens.pop_front().unwrap();
+                            if current == Token::Paren(Parens::RightBracket) {
+                                break;
+                            }
+                            sub_tokens.push_back(current);
+                        }
+                        let reading_index_expression =
+                            expression_resolve(&mut sub_tokens, false)?;
+                        params.push(ASTNode {
+                            type__: ASTNodeTypes::ArrayElementReading(name),
+                            params: Some(reading_index_expression),
+                        });
+                        continue;
+                    } else
                     if let Token::Symbol(symbol) = next_token {
                         if Symbols::is_equal_symbol(symbol) {
+                            // assignment
+                            // symbols: += | -= | *= | /= | ^=
                             let equal_symbol = symbol;
                             let right_hand_nodes =
                                 expression_resolve(tokens, false)?;
-                            
+
                             if right_hand_nodes.len() == 0 {
                                 println!("Invalid assignment.");
                                 return Err(())
                             }
 
                             let right_hand_expression =
-                            if right_hand_nodes[0].type__ == ASTNodeTypes::LazyExpression {
-                                // lazy-expression assignment
+                            if right_hand_nodes[0].type__ == ASTNodeTypes::LazyExpression ||
+                               right_hand_nodes[0].type__ == ASTNodeTypes::ArrayLiteral {
+                                // lazy-expression || array assignment
                                 right_hand_nodes[0].to_owned()
                             } else {
                                 let original = ASTNode {
@@ -90,8 +193,8 @@ pub fn expression_resolve(
                                 if equal_symbol == Symbols::Equal {
                                     original
                                 } else {
-                                    // resolve: += | -= | *= | /= | ^=
-                                    // separated: + | - | * | / | ^
+                                    // resolve:   += | -= | *= | /= | ^=
+                                    // separated: +  | -  | *  | /  | ^
                                     let separated = equal_symbol.separate();
                                     let variable_node = ASTNode {
                                         type__: ASTNodeTypes::Variable(name.clone()),
@@ -108,7 +211,7 @@ pub fn expression_resolve(
                                 }
                             };
                             let current_node = ASTNode {
-                                type__: ASTNodeTypes::Assignment(name.clone()),
+                                type__: ASTNodeTypes::Assignment(name),
                                 params: Some(vec![right_hand_expression]),
                             };
 
@@ -129,36 +232,16 @@ pub fn expression_resolve(
             },
             Token::Paren(paren) => {
                 if paren == Parens::LeftBrace {
-                    // Goto-statement
+                    // lazy-expression
                     // vec[expression-node]
-
-                    let mut sub_tokens = TokenVec::new();
-                    let mut brace_count = 1;
-                    while first_index < tokens.len() {
-                        if first_index == tokens.len() {
-                            println!("Unmatched brace");
-                            return Err(())
-                        }
-
-                        let current = tokens.remove(first_index);
-                        if current == Token::Paren(Parens::LeftBrace) {
-                            brace_count += 1;
-                        }
-                        if current == Token::Paren(Parens::RightBrace) {
-                            brace_count -= 1;
-                            if brace_count == 0 {
-                                break;
-                            }
-                        }
-                        sub_tokens.push(current);
-                    }
-
-                    let sub_sequence = sequence_resolve(&mut sub_tokens)?;
-                    let current_node = ASTNode {
-                        type__: ASTNodeTypes::LazyExpression,
-                        params: Some(vec![sub_sequence]),
-                    };
-
+                    let current_node =
+                        lazy_expression_resolve(tokens)?;
+                    params.push(current_node);
+                } else
+                if paren == Parens::LeftBracket {
+                    // array literal
+                    let current_node =
+                        array_literal_resolve(tokens)?;
                     params.push(current_node);
                 } else
                 if paren == Parens::LeftParen {
@@ -188,12 +271,14 @@ pub fn expression_resolve(
     for node in params {
         match node.type__ {
             // regard the following ASTNode as number
-            ASTNodeTypes::Variable(_) => result_stack.push(node),
-            ASTNodeTypes::Assignment(_) => result_stack.push(node),
-            ASTNodeTypes::NumberLiteral(_) => result_stack.push(node),
-            ASTNodeTypes::Expression => result_stack.push(node),
-            ASTNodeTypes::Invocation(_) => result_stack.push(node),
-            ASTNodeTypes::LazyExpression => result_stack.push(node),
+            ASTNodeTypes::Variable(_)      |
+            ASTNodeTypes::Assignment(_)    |
+            ASTNodeTypes::NumberLiteral(_) |
+            ASTNodeTypes::ArrayLiteral     |
+            ASTNodeTypes::Expression       |
+            ASTNodeTypes::Invocation(_)    |
+            ASTNodeTypes::LazyExpression   |
+            ASTNodeTypes::ArrayElementReading(_) => result_stack.push(node),
 
             ASTNodeTypes::SymbolLiteral(_) => {
                 if symbol_stack.len() == 0 {

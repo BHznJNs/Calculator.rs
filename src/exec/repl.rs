@@ -3,6 +3,7 @@ use std::io::{self, Write};
 use super::attempt::attempt;
 use crate::public::run_time::global::Global;
 use crate::public::value::number::Number;
+use crate::public::value::value::Value;
 
 pub fn repl(mut global: Global) -> ! {
     // print program name and version
@@ -19,11 +20,11 @@ pub fn repl(mut global: Global) -> ! {
 
         let result = attempt(input, &mut global);
 
-        if let Ok(num) = result {
-            if let Number::Empty(_) = num {
+        if let Ok(val) = result {
+            if let Value::Number(Number::Empty(_)) = val {
                 continue;
             }
-            println!("= {}", num);
+            println!("= {}", val);
         }
     }
 }

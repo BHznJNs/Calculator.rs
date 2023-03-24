@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use std::fmt;
 
 use crate::public::value::parens::Parens;
@@ -28,7 +29,7 @@ pub enum Token {
 
     Divider,
 }
-pub type TokenVec = Vec<Token>;
+pub type TokenVec = VecDeque<Token>;
 
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

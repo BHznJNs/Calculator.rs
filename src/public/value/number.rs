@@ -4,7 +4,7 @@ use std::fmt;
 
 use crate::public::compile_time::keywords::Keyword;
 
-#[derive(PartialEq, PartialOrd, Clone, Copy)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Copy)]
 pub enum Number {
     // is used when comment line
     // or blank line or

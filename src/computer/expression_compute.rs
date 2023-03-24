@@ -1,6 +1,7 @@
 use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes};
 use crate::public::run_time::global::Global;
 use crate::public::value::number::Number;
+use crate::public::value::value::{Value, ValueVec};
 
 use super::resolvers::sequence_resolve::sequence_resolve;
 use super::resolvers::assignment_resolve::assignment_resolve;
@@ -9,45 +10,91 @@ use super::operate::operate;
 pub fn expression_compute(
     expression_node: &ASTNode,
     global: &mut Global,
-) -> Result<Number, ()> {
+) -> Result<Value, ()> {
     let params = expression_node
         .params
         .as_ref()
         .unwrap();
-    let mut number_stack = Vec::<Number>::new();
+
+    let mut value_stack = ValueVec::new();
     let mut index = 0;
 
     while index < params.len() {
         let node = &params[index];
 
         match &node.type__ {
-            ASTNodeTypes::Variable(name) => {
-                let optional_var =
-                    global.variables.get(name.as_str());
-                if optional_var.is_none() {
-                    println!("Undefined variable: '{}'.", name);
-                    return Err(())
-                }
-                number_stack.push(*optional_var.unwrap());
-            },
-            ASTNodeTypes::NumberLiteral(number) => number_stack.push(*number),
-            ASTNodeTypes::SymbolLiteral(symbol) => {
-                if number_stack.len() < 2 {
-                    println!("Invalid expression.");
-                    return Err(())
-                }
-                let num2 = number_stack.pop().unwrap();
-                let num1 = number_stack.pop().unwrap();
-                let current_symbol = *symbol;
-                let value = operate(num1, num2, current_symbol)?;
-
-                number_stack.push(value);
-            },
             ASTNodeTypes::Expression => {
                 let express_res = expression_compute(
                     node, global
                 )?;
-                number_stack.push(express_res);
+                value_stack.push(express_res);
+            },
+
+            ASTNodeTypes::Variable(name) => {
+                let optional_var =
+                    global.variables.get(name.as_str());
+                let variable_value = match optional_var {
+                    Some(val) => val,
+                    None => {
+                        println!("Undefined variable: '{}'.", name);
+                        return Err(())
+                    },
+                };
+                value_stack.push(variable_value.to_owned());
+            },
+            ASTNodeTypes::NumberLiteral(number) =>
+                value_stack.push(Value::Number(*number)),
+            ASTNodeTypes::SymbolLiteral(symbol) => {
+                if value_stack.len() < 2 {
+                    println!("Invalid expression: operating number is missing.");
+                    return Err(())
+                }
+                let num2 = value_stack.pop().unwrap();
+                let num1 = value_stack.pop().unwrap();
+                let current_symbol = *symbol;
+                let value = operate(num1, num2, current_symbol)?;
+
+                value_stack.push(value);
+            },
+            ASTNodeTypes::ArrayElementReading(arr_name) => {
+                // get index value as `usize`
+                let index_expression_params =
+                    node.params.to_owned();
+
+                let index_expression_node = ASTNode {
+                    type__: ASTNodeTypes::Expression,
+                    params: index_expression_params,
+                };
+                let index_value =
+                    expression_compute(&index_expression_node, global)?;
+                let index_number =
+                if let Value::Number(Number::Int(target)) = index_value {
+                    if target < 0 {
+                        println!("Index of an array should not be less than ZERO.");
+                        return Err(())
+                    }
+                    target as usize
+                } else {
+                    println!("Invalid array index.");
+                    return Err(())
+                };
+
+                // read actual element value
+                let arr = global.variables.get(arr_name);
+                match arr {
+                    Some(Value::Array(arr)) => {
+                        if index_number >= arr.len() {
+                            println!("Index out of range.");
+                            return Err(())
+                        }
+                        let target_value = arr[index_number].clone();
+                        value_stack.push(target_value)
+                    },
+                    _ => {
+                        println!("'{}' is not an array.", arr_name);
+                        return Err(())
+                    },
+                }
             },
             ASTNodeTypes::Assignment(name) => {
                 let right_hand = &node
@@ -55,13 +102,12 @@ pub fn expression_compute(
                     .as_ref()
                     .unwrap()[0];
 
-                let assignment_res = assignment_resolve(
-                    name, right_hand, global
-                )?;
-                number_stack.push(assignment_res);
+                let assignment_res = 
+                    assignment_resolve(name, right_hand, global)?;
+                value_stack.push(assignment_res);
             },
             ASTNodeTypes::Invocation(name) => {
-                let func_result: Number;
+                let func_result: Value;
 
                 let optional_func =
                     global.build_in_funcs.get(name.as_str());
@@ -81,36 +127,41 @@ pub fn expression_compute(
                                 params: Some(params.to_vec()),
                             };
 
-                            let expression_value = expression_compute(
-                                &expression_node, global
-                            )?;
-                            let func_result_f = match expression_value {
-                                Number::Int(i) => func(i as f64),
-                                Number::Float(f) => func(f),
-                                _ => {
-                                    println!("Not A Number Error.");
-                                    return Err(())
-                                },
-                            };
-                            func_result = Number::Float(func_result_f);
+                            let expression_value =
+                                expression_compute(&expression_node, global)?;
+                            if let Value::Number(num) = expression_value {
+                                let func_result_f = match num {
+                                    Number::Int(i) => func(i as f64),
+                                    Number::Float(f) => func(f),
+                                    _ => {
+                                        println!("Not A Number Error.");
+                                        return Err(())
+                                    },
+                                };
+                                func_result = Value::Number(Number::Float(func_result_f));
+                            } else {
+                                println!("Invalid params for function '{}'.", name);
+                                return Err(())
+                            }
                         } else {
-                            println!("Analyzer error.");
+                            println!("Analyzer error from 'expression_compute'.");
                             return Err(())
                         }
                     },
-                    None => match global.lazy_expressions.get(name) {
+                    None => match global.variables.get(name) {
                         // user defined LazyExpression
-                        Some(func) => {
+                        // le => LazyExpression
+                        Some(Value::LazyExpression(le)) => {
                             func_result =
-                                sequence_resolve(&func.clone(), global)?;
+                                sequence_resolve(&le.clone(), global)?;
                         },
-                        None => {
+                        _ => {
                             println!("Undefined function OR lazy-expression: '{}'.", name);
                             return Err(())
                         },
                     },
                 }
-                number_stack.push(func_result);
+                value_stack.push(func_result);
             },
             _ => {
                 println!("Unexpected node type: '{}'.", node.type__);
@@ -120,5 +171,5 @@ pub fn expression_compute(
         index += 1;
     }
 
-    Ok(number_stack[0])
+    Ok(value_stack.remove(0))
 }

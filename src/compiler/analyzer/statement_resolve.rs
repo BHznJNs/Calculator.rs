@@ -1,5 +1,4 @@
 use crate::public::value::parens::Parens;
-use crate::public::value::symbols::Symbols;
 use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes, ASTNodeVec};
 use crate::public::compile_time::keywords::Keyword;
 use crate::compiler::tokenizer::token::{Token, TokenVec};
@@ -17,10 +16,10 @@ fn statement_body_resolve(
     let mut sub_tokens = TokenVec::new();
     // sub condition tokens
     while first_index < tokens.len() {
-        let current = tokens.remove(first_index);
+        let current = tokens.pop_front().unwrap();
 
         if current == Token::Paren(Parens::LeftBrace) {break}
-        sub_tokens.push(current);
+        sub_tokens.push_back(current);
     }
     let condition =
         expression_resolve(&mut sub_tokens, false)?;
@@ -35,10 +34,12 @@ fn statement_body_resolve(
     // within `{ ... }`
     let mut sub_tokens = TokenVec::new();
     while first_index < tokens.len() {
-        let current = tokens.remove(first_index);
+        let current = tokens.pop_front().unwrap();
 
-        let is_divider = current == Token::Divider;
-        let is_rightbrace = current == Token::Paren(Parens::RightBrace);
+        let is_divider =
+            current == Token::Divider;
+        let is_rightbrace =
+            current == Token::Paren(Parens::RightBrace);
 
         if is_divider || is_rightbrace {
             // when `;` OR `}`
@@ -49,7 +50,7 @@ fn statement_body_resolve(
 
             if is_rightbrace { break }
         } else {
-            sub_tokens.push(current);
+            sub_tokens.push_back(current);
         }
     }
     Ok(())

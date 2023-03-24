@@ -5,7 +5,7 @@ use crate::public::value::symbols::Symbols;
 
 use super::keywords::Keyword;
 
-#[derive(PartialEq, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub enum ASTNodeTypes {
     Root,
     Comment,
@@ -14,6 +14,8 @@ pub enum ASTNodeTypes {
     Assignment(String),
     NumberLiteral(Number),
     SymbolLiteral(Symbols),
+    ArrayLiteral,
+    ArrayElementReading(String),
     Expression,
     LazyExpression,
     Invocation(String),
@@ -30,6 +32,9 @@ impl fmt::Display for ASTNodeTypes {
             ASTNodeTypes::Assignment(name) => write!(f, "type: Assignment, name: {}", name),
             ASTNodeTypes::NumberLiteral(num) => write!(f, "type: NumberLiteral, value: {}", num),
             ASTNodeTypes::SymbolLiteral(symbol) => write!(f, "type: SymbolLiteral, value: {}", symbol),
+            ASTNodeTypes::ArrayLiteral => write!(f, "type: ArrayLiteral"),
+            ASTNodeTypes::ArrayElementReading(name) => write!(f, "type: ArrayElementReading, name: {}", name),
+
             ASTNodeTypes::Expression => write!(f, "type: Expression"),
             ASTNodeTypes::LazyExpression => write!(f, "type: LazyExpression"),
             ASTNodeTypes::Invocation(name) => write!(f, "type: Invocation, name: {}", name),
@@ -40,7 +45,7 @@ impl fmt::Display for ASTNodeTypes {
 
 // --- --- --- --- --- --- --- ---
 
-#[derive(Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct ASTNode {
     pub type__: ASTNodeTypes,
     pub params: Option<ASTNodeVec>,

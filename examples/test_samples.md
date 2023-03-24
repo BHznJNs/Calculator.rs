@@ -16,6 +16,15 @@ var2 = 2 # 2
 var1 + var2 # 3
 ```
 
+# Array
+
+```calcrs
+arr = [1, 2, 3, 4]
+arr[0] # 1
+arr[-1] # Index of an array should not be less than ZERO.
+arr[4] # Index out of range.
+```
+
 # Lazy-expression
 
 ```calcrs

@@ -3,6 +3,7 @@ use std::f64::consts::PI;
 use std::f64::consts::E;
 
 use crate::public::value::number::Number;
+use crate::public::value::value::Value;
 
 pub struct BuildIn {
     pub  sin: fn(f64) -> f64,
@@ -92,10 +93,10 @@ pub fn build_in_funcs(build_in_inst: &BuildIn) -> HashMap<&'static str, fn(f64) 
     return map
 }
 
-pub fn variables(build_in_inst: &BuildIn) -> HashMap<String, Number> {
+pub fn variables(build_in_inst: &BuildIn) -> HashMap<String, Value> {
     let map = HashMap::from([
-        (String::from("PI"), Number::Float(build_in_inst.pi)),
-        (String::from("E") , Number::Float(build_in_inst.e )),
+        (String::from("PI"), Value::Number(Number::Float(build_in_inst.pi))),
+        (String::from("E") , Value::Number(Number::Float(build_in_inst.e ))),
     ]);
     return map
 }

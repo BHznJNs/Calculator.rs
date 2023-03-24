@@ -2,6 +2,7 @@ use crate::public::compile_time::ast::ASTNode;
 use crate::public::compile_time::keywords::Keyword;
 use crate::public::run_time::global::Global;
 use crate::public::value::number::Number;
+use crate::public::value::value::Value;
 
 use super::super::expression_compute::expression_compute;
 use super::sequence_resolve::sequence_resolve;
@@ -11,11 +12,11 @@ pub fn statement_resolve(
     statement_node: &ASTNode,
     global: &mut Global
 ) -> Result<Option<Keyword>, ()> {
-    let mut params =
+    let params =
     if let Some(ast_nodes) = &statement_node.params {
-        ast_nodes.to_owned()
+        ast_nodes
     } else {
-        println!("Analyzer error.");
+        println!("Analyzer error from 'statement_resolve'.");
         return Err(())
     };
 
@@ -28,28 +29,37 @@ pub fn statement_resolve(
             Ok(None)
         },
         Keyword::For => {
-            let loop_count_expressiom = params.remove(0);
+            let loop_count_expressiom = &params[0];
             let loop_count_struct =
                 expression_compute(&loop_count_expressiom, global)?;
-            let loop_count = loop_count_struct.int_value();
+            let loop_count = match loop_count_struct {
+                Value::Number(num) => num.int_value(),
+                _ => {
+                    println!("Invalid loop count for 'for' statement");
+                    return Err(())
+                }
+            };
 
             for _ in 0..loop_count {
-                let mut is_broken = false;
+                let mut is_ended = false;
+                let loop_body = &params[1..];
 
-                for sequence in &params {
+                for sequence in loop_body {
                     let sequence_result =
                         sequence_resolve(sequence, global)?;
                     
-                    if sequence_result == Number::Empty(Some(Keyword::Continue)) {
+                    if sequence_result ==
+                       Value::Number(Number::Empty(Some(Keyword::Continue))) {
                         break;
                     }
-                    if sequence_result == Number::Empty(Some(Keyword::Break)) {
-                        is_broken = true;
+                    if sequence_result ==
+                       Value::Number(Number::Empty(Some(Keyword::Break))) {
+                        is_ended = true;
                         break;
                     }
                 }
 
-                if is_broken {
+                if is_ended {
                     break;
                 }
             }
@@ -57,17 +67,25 @@ pub fn statement_resolve(
             Ok(None)
         },
         Keyword::If => {
-            let condition = params.remove(0);
+            let condition = &params[0];
             let condition_struct =
                 expression_compute(&condition, global)?;
-            let condition_value = condition_struct.int_value();
+            let condition_value = match condition_struct {
+                Value::Number(num) => num.int_value(),
+                _ => {
+                    println!("Invalid condition for 'if' statement.");
+                    return Err(())
+                }
+            };
 
             if condition_value == 1 {
-                for sequence in &params {
+                let condition_body = &params[1..];
+                for sequence in condition_body {
                     let sequence_result =
                         sequence_resolve(sequence, global)?;
 
-                    if let Number::Empty(keyword) = sequence_result {
+                    if let Value::Number(Number::Empty(keyword)) =
+                           sequence_result {
                         return Ok(keyword)
                     }
                 }

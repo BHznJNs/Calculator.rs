@@ -84,7 +84,7 @@ pub fn tokenize(source: String) -> Result<TokenVec, ()> {
             }
 
             let current_token = Token::Number(value);
-            tokens.push(current_token);
+            tokens.push_back(current_token);
             continue;
         }
 
@@ -114,7 +114,7 @@ pub fn tokenize(source: String) -> Result<TokenVec, ()> {
 
                     keyword = keywords::KEYWORDS_ENUM[index];
                     current_token = Token::Keyword(keyword);
-                    tokens.push(current_token);
+                    tokens.push_back(current_token);
                     break;
                 }
                 index += 1;
@@ -123,7 +123,7 @@ pub fn tokenize(source: String) -> Result<TokenVec, ()> {
             if !is_keyword {
                 last_type = TokenTypes::Identifier;
                 current_token = Token::Identi(value);
-                tokens.push(current_token);
+                tokens.push_back(current_token);
             }
             continue;
         }
@@ -147,36 +147,38 @@ pub fn tokenize(source: String) -> Result<TokenVec, ()> {
         const MORE_THAN_ASCII: u8 = 62; // >
         const EQUAL_ASCII    : u8 = 61; // =
         
-        const SEMICOLON_ASCII  : u8 = 59; // ;  
+        const SEMICOLON_ASCII  : u8 = 59; // ;
+        const COMMA_ASCII      : u8 = 44; // ,
         const NUMBER_SIGN_ASCII: u8 = 35; // #
-        const SPACE_ASCII  : u8 = 32; // ' '
-        const TAB_ASCII    : u8 = 9;
-        const RETURN_ASCII : u8 = 13; // '\r'
+        const SPACE_ASCII      : u8 = 32; // ' '
+        const TAB_ASCII        : u8 = 9;
+        const NEW_LINE_ASCII   : u8 = 10; // '\n'
+        const RETURN_ASCII     : u8 = 13; // '\r'
 
         match current {
             LEFT_PAREN_ASCII => {
                 last_type = TokenTypes::Paren;
-                tokens.push(Token::Paren(Parens::LeftParen));
+                tokens.push_back(Token::Paren(Parens::LeftParen));
             },
             RIGHT_PAREN_ASCII => {
                 last_type = TokenTypes::Paren;
-                tokens.push(Token::Paren(Parens::RightParen));
+                tokens.push_back(Token::Paren(Parens::RightParen));
             },
             LEFT_BRACKET_ASCII => {
                 last_type = TokenTypes::Paren;
-                tokens.push(Token::Paren(Parens::LeftBracket));
+                tokens.push_back(Token::Paren(Parens::LeftBracket));
             },
             RIGHT_BRACKET_ASCII => {
                 last_type = TokenTypes::Paren;
-                tokens.push(Token::Paren(Parens::RightBracket));
+                tokens.push_back(Token::Paren(Parens::RightBracket));
             },
             LEFT_BRACE_ASCII => {
                 last_type = TokenTypes::Paren;
-                tokens.push(Token::Paren(Parens::LeftBrace));
+                tokens.push_back(Token::Paren(Parens::LeftBrace));
             },
             RIGHT_BRACE_ASCII => {
                 last_type = TokenTypes::Paren;
-                tokens.push(Token::Paren(Parens::RightBrace));
+                tokens.push_back(Token::Paren(Parens::RightBrace));
             },
 
             PLUS_ASCII => {
@@ -184,66 +186,74 @@ pub fn tokenize(source: String) -> Result<TokenVec, ()> {
                     is_num_minus = false;
                 } else {
                     last_type = TokenTypes::Symbol;
-                    tokens.push(Token::Symbol(Symbols::Plus));
+                    tokens.push_back(Token::Symbol(Symbols::Plus));
                 }
             },
             MINUS_ASCII => {
-                if last_type == TokenTypes::Unknown ||
-                   last_type == TokenTypes::Symbol
+                let last_token = tokens.back();
+                if last_type  == TokenTypes::Unknown ||
+                   last_type  == TokenTypes::Symbol  ||
+                   last_token == Some(&Token::Paren(Parens::LeftParen)) ||
+                   last_token == Some(&Token::Paren(Parens::LeftBrace)) ||
+                   last_token == Some(&Token::Paren(Parens::LeftBracket))
                 {
                     is_num_minus = true;
                 } else {
                     last_type = TokenTypes::Symbol;
-                    tokens.push(Token::Symbol(Symbols::Minus));
+                    tokens.push_back(Token::Symbol(Symbols::Minus));
                 }
             },
             MULTIPLY_ASCII => {
                 last_type = TokenTypes::Symbol;
-                tokens.push(Token::Symbol(Symbols::Multiply));
+                tokens.push_back(Token::Symbol(Symbols::Multiply));
             },
             DIVIDE_ASCII => {
                 last_type = TokenTypes::Symbol;
-                tokens.push(Token::Symbol(Symbols::Divide));
+                tokens.push_back(Token::Symbol(Symbols::Divide));
             },
             POWER_ASCII  => {
                 last_type = TokenTypes::Symbol;
-                tokens.push(Token::Symbol(Symbols::Power));
+                tokens.push_back(Token::Symbol(Symbols::Power));
             },
             LESS_THAN_ASCII => {
                 last_type = TokenTypes::Symbol;
-                tokens.push(Token::Symbol(Symbols::LessThan));
+                tokens.push_back(Token::Symbol(Symbols::LessThan));
             },
             MORE_THAN_ASCII => {
                 last_type = TokenTypes::Symbol;
-                tokens.push(Token::Symbol(Symbols::MoreThan));
+                tokens.push_back(Token::Symbol(Symbols::MoreThan));
             }
             EQUAL_ASCII  => {
                 if tokens.len() == 0 {
-                    println!("Invalid expression.");
+                    println!("Invalid assignment: left-hand value missing.");
                     return Err(())
                 }
                 last_type = TokenTypes::Symbol;
-                let last_token = tokens.pop().unwrap();
+                let last_token = tokens.pop_back().unwrap();
 
                 if let Token::Symbol(last_symbol) = last_token {
                     // if last_symbol
                     if Symbols::is_basic_symbol(last_symbol) {
                         // if last char is: + - * / ^
                         let target_symbol = Symbols::Equal.combine(last_symbol)?;
-                        tokens.push(Token::Symbol(target_symbol));
+                        tokens.push_back(Token::Symbol(target_symbol));
                         index += 1;
                         continue;
                     }
                 }
 
                 let current_token = Token::Symbol(Symbols::Equal);
-                tokens.push(last_token);
-                tokens.push(current_token);
+                tokens.push_back(last_token);
+                tokens.push_back(current_token);
             },
 
             SEMICOLON_ASCII => {
                 last_type = TokenTypes::Symbol;
-                tokens.push(Token::Divider);
+                tokens.push_back(Token::Divider);
+            },
+            COMMA_ASCII => {
+                last_type = TokenTypes::Symbol;
+                tokens.push_back(Token::Divider);
             },
 
             // skip Space and Tab
@@ -252,7 +262,8 @@ pub fn tokenize(source: String) -> Result<TokenVec, ()> {
 
             // comment symbol: #
             NUMBER_SIGN_ASCII => break,
-            RETURN_ASCII => break,
+            NEW_LINE_ASCII    => break,
+            RETURN_ASCII      => break,
             _ => {
                 println!("Unknown token: '{}' at index {}.", current as char, index);
                 return Err(());
