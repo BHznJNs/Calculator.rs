@@ -40,6 +40,29 @@ An simple command-line calculator program writen with Rust.
 = 2
 ```
 
+- Array support
+
+```text
+> arr = [1, 2, 3] 
+= [
+  1, 2, 3,
+]
+> push(arr, 4) 
+> arr
+= [
+  1, 2, 3, 4,
+]
+>
+```
+
+- Function defining support
+
+```text
+> plus1 = fn(i $num) {i + 1} 
+> plus1(1) 
+= 2
+```
+
 - Script execute support
 
 ```text
