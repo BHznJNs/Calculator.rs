@@ -70,8 +70,9 @@ impl Scope {
             let build_in_map =
                 &mut self.global.build_in_funcs;
             let func_list = match target_module {
-                StdModules::Math  => math::function_list(),
-                StdModules::Array => array::function_list(),
+                StdModules::Math   => math::function_list(),
+                StdModules::String => todo!(),
+                StdModules::Array  => array::function_list(),
                 StdModules::FileSystem => todo!(),
             };
 
