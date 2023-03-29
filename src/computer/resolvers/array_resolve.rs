@@ -21,7 +21,7 @@ pub fn resolve(
                 let expression_value =
                     expression_resolve::resolve(&node, scope)?;
                 if let Value::Number(num) = *expression_value {
-                    elements.push(Value::Number(num))
+                    elements.push_back(Value::Number(num))
                 } else {
                     println!("Invalid element type for an array.");
                     return Err(())
@@ -30,7 +30,7 @@ pub fn resolve(
             ASTNodeTypes::ArrayLiteral => {
                 let array_value =
                     resolve(&node, scope)?;
-                elements.push(Value::create(array_value));
+                elements.push_back(Value::create(array_value));
             },
             _ => {
                 println!("Invalid array element.");

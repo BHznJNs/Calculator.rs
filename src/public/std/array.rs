@@ -40,30 +40,105 @@ pub fn implement(
                 let mut refer = arr.borrow_mut();
                 match element_rc.as_ref() {
                     Value::Number(num) =>
-                        refer.push(Value::Number(*num)),
+                        refer.push_back(Value::Number(*num)),
                     Value::Array(child_arr) =>
-                        refer.push(Value::Array(child_arr.clone())),
+                        refer.push_back(Value::Array(child_arr.clone())),
                     _ => {}
                 }
             }
             Value::Number(Number::Empty(None))
         },
         BuildInFuncs::Pop => {
+            let arr_rc = get_val("arr", scope)?;
+
+            if let Value::Array(arr) = arr_rc.as_ref() {
+                let mut refer = arr.borrow_mut();
+                refer.pop_back();
+            }
             Value::Number(Number::Empty(None))
         },
         BuildInFuncs::Shift => {
+            let arr_rc = get_val("arr", scope)?;
+
+            if let Value::Array(arr) = arr_rc.as_ref() {
+                let mut refer = arr.borrow_mut();
+                refer.pop_front();
+            }
             Value::Number(Number::Empty(None))
         },
         BuildInFuncs::Unshift => {
+            let arr_rc = get_val("arr", scope)?;
+            let element_rc = get_val("element", scope)?;
+
+            if let Value::Array(arr) = arr_rc.as_ref() {
+                let mut refer = arr.borrow_mut();
+                match element_rc.as_ref() {
+                    Value::Number(num) =>
+                        refer.push_front(Value::Number(*num)),
+                    Value::Array(child_arr) =>
+                        refer.push_front(Value::Array(child_arr.clone())),
+                    _ => {}
+                }
+            }
             Value::Number(Number::Empty(None))
         },
         BuildInFuncs::Insert => {
+            let arr_rc = get_val("arr", scope)?;
+            let index_rc = get_val("index", scope)?;
+            let element_rc = get_val("element", scope)?;
+
+            let index = index_rc.get_i64()? as usize;
+
+            if let Value::Array(arr) = arr_rc.as_ref() {
+                let mut refer = arr.borrow_mut();
+                match element_rc.as_ref() {
+                    Value::Number(num) =>
+                        refer.insert(index, Value::Number(*num)),
+                    Value::Array(child_arr) =>
+                        refer.insert(index, Value::Array(child_arr.clone())),
+                    _ => {}
+                }
+            }
             Value::Number(Number::Empty(None))
         },
         BuildInFuncs::Remove => {
+            let arr_rc = get_val("arr", scope)?;
+            let index_rc = get_val("index", scope)?;
+
+            let index = index_rc.get_i64()? as usize;
+
+            if let Value::Array(arr) = arr_rc.as_ref() {
+                let mut refer = arr.borrow_mut();
+                refer.remove(index);
+            }
             Value::Number(Number::Empty(None))
         },
         BuildInFuncs::Update => {
+            let arr_rc = get_val("arr", scope)?;
+            let index_rc = get_val("index", scope)?;
+            let element_rc = get_val("element", scope)?;
+
+            let index = index_rc.get_i64()? as usize;
+
+            if let Value::Array(arr) = arr_rc.as_ref() {
+                let mut refer = arr.borrow_mut();
+
+                if index >= refer.len() {
+                    println!("Index out of range, current length: {}.", refer.len());
+                    return Err(())
+                }
+
+                refer[index] = match element_rc.as_ref() {
+                    Value::Number(num) =>
+                        Value::Number(*num),
+                    Value::Array(child_arr) =>
+                        Value::Array(child_arr.clone()),
+                    _ => {
+                        println!("Invalid element type.");
+                        return Err(())
+                    }
+                }
+            }
             Value::Number(Number::Empty(None))
         },
         BuildInFuncs::Len => {
@@ -115,7 +190,7 @@ pub const PUSH: BuildInFunction = BuildInFunction {
 pub const POP: BuildInFunction = BuildInFunction {
     params: [
         Some(BuildInParam {
-            type__: ValueTypes::Number,
+            type__: ValueTypes::Array,
             identi: "arr"
         }), None, None
     ],
@@ -138,7 +213,11 @@ pub const UNSHIFT: BuildInFunction = BuildInFunction {
         Some(BuildInParam {
             type__: ValueTypes::Array,
             identi: "arr"
-        }), None, None
+        }),
+        Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "element"
+        }), None
     ],
     lib: StdModules::Array, 
     body: BuildInFuncs::Unshift,
@@ -148,7 +227,15 @@ pub const INSERT: BuildInFunction = BuildInFunction {
         Some(BuildInParam {
             type__: ValueTypes::Array,
             identi: "arr"
-        }), None, None
+        }),
+        Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "index"
+        }),
+        Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "element"
+        })
     ],
     lib: StdModules::Array, 
     body: BuildInFuncs::Insert,
@@ -158,7 +245,10 @@ pub const REMOVE: BuildInFunction = BuildInFunction {
         Some(BuildInParam {
             type__: ValueTypes::Array,
             identi: "arr"
-        }), None, None
+        }), Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "index"
+        }), None
     ],
     lib: StdModules::Array, 
     body: BuildInFuncs::Remove,
@@ -168,7 +258,14 @@ pub const UPDATE: BuildInFunction = BuildInFunction {
         Some(BuildInParam {
             type__: ValueTypes::Array,
             identi: "arr"
-        }), None, None
+        }), Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "index"
+        }),
+        Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "element"
+        })
     ],
     lib: StdModules::Array, 
     body: BuildInFuncs::Update,

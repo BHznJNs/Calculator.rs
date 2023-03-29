@@ -1,4 +1,5 @@
 use std::cell::RefCell;
+use std::collections::VecDeque;
 use std::fmt;
 use std::rc::Rc;
 
@@ -56,7 +57,7 @@ pub enum Value {
     LazyExpression(Rc<ASTNode>),
     Function(Rc<UserDefinedFunction>),
 }
-pub type ArrayLiteral = Vec<Value>;
+pub type ArrayLiteral = VecDeque<Value>;
 
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -87,6 +88,13 @@ impl fmt::Display for Value {
 impl Value {
     pub fn empty(keyword: Option<Keywords>) -> Rc<Value> {
         Rc::new(Value::Number(Number::Empty(keyword)))
+    }
+    pub fn get_i64(&self) -> Result<i64, ()> {
+        let Value::Number(num) = self else {
+            println!("Target value is not a valid number value.");
+            return Err(())
+        };
+        Ok(num.int_value())
     }
     pub fn get_f64(&self) -> Result<f64, ()> {
         let Value::Number(num) = self else {

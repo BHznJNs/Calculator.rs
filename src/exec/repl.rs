@@ -18,7 +18,7 @@ pub fn repl(mut scope: Scope) -> ! {
     println!("Calculator.rs v1.4.0");
     // import stantard libraries
     if import_all(&mut scope).is_err() {
-        println!("Standard Module import error.");
+        println!("Standard module import error.");
     }
 
     loop {
