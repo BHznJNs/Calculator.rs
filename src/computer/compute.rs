@@ -38,10 +38,5 @@ pub fn compute(
     let result =
         sequence_resolve::resolve(param_element, scope)?;
 
-    // let result =
-    //     Value::Array(Rc::new(vec![Value::Number(Number::Int(1)), Value::Number(Number::Int(2))]));
-    // let result_box = Rc::new(result);
-    // global.variables.insert("arr".to_owned(), result_box.clone());
-
     Ok(result)
 }

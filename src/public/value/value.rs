@@ -63,7 +63,7 @@ impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Value::Number(num) => write!(f, "{}", num),
-            Value::String(str) => write!(f, "{}", *str),
+            Value::String(str) => write!(f, "'{}'", str),
             Value::LazyExpression(le) => write!(f, "{}", le),
             Value::Function(_) => write!(f, "User-defined-function"),
             Value::Array(arr) => {

@@ -30,6 +30,8 @@ pub fn resolve(
                 value_stack.push(assignment_resolve::resolve(node, scope)?),
             ASTNodeTypes::NumberLiteral(num) => 
                 value_stack.push(Rc::new(Value::Number(*num))),
+            ASTNodeTypes::StringLiteral(str) =>
+                value_stack.push(Rc::new(Value::create(str.to_owned()))),
             ASTNodeTypes::SymbolLiteral(symbol) => {
                 if value_stack.len() < 2 {
                     println!("Invalid expression: operating number is missing.");
@@ -47,18 +49,6 @@ pub fn resolve(
                     array_resolve::resolve(node, scope)?;
                 let array_rc =
                     Rc::new(Value::create(array_elements));
-
-                // let mut cloned = array_rc.clone();
-                // match *cloned {
-                //     Value::Number(_) => todo!(),
-                //     Value::String(_) => todo!(),
-                //     Value::Array(mut arr) => {
-                //         let mut refer = arr.borrow_mut().as_ref();
-                //         refer.get_mut().push(Value::create(0));
-                //     },
-                //     Value::LazyExpression(_) => todo!(),
-                //     Value::Function(_) => todo!(),
-                // }
 
                 value_stack.push(array_rc);
             },

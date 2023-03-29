@@ -229,6 +229,12 @@ pub fn resolve(
                     params: None,
                 });
             },
+            Token::String(str) => {
+                params.push(ASTNode {
+                    type__: ASTNodeTypes::StringLiteral(str),
+                    params: None,
+                });
+            },
             Token::Symbol(symbol) => {
                 if symbol == Symbols::Equal {
                     println!("Invalid variable / lazy-expression assignment.");
@@ -383,6 +389,7 @@ pub fn resolve(
             ASTNodeTypes::Variable(_)      |
             ASTNodeTypes::Assignment(_)    |
             ASTNodeTypes::NumberLiteral(_) |
+            ASTNodeTypes::StringLiteral(_) |
             ASTNodeTypes::ArrayLiteral     |
             ASTNodeTypes::Expression       |
             ASTNodeTypes::Invocation(_)    |

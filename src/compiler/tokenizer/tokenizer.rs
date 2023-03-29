@@ -169,6 +169,8 @@ pub fn tokenize(source: String) -> Result<TokenVec, ()> {
         const MORE_THAN_ASCII: u8 = 62; // >
         const EQUAL_ASCII    : u8 = 61; // =
 
+        const QUOTE_ASCII    : u8 = 34; // '"'
+
         const SEMICOLON_ASCII  : u8 = 59; // ;
         const COMMA_ASCII      : u8 = 44; // ,
         const DOLLAR_ASCII     : u8 = 36; // $
@@ -268,6 +270,26 @@ pub fn tokenize(source: String) -> Result<TokenVec, ()> {
                 let current_token = Token::Symbol(Symbols::Equal);
                 tokens.push_back(last_token);
                 tokens.push_back(current_token);
+            },
+
+            QUOTE_ASCII => { // String token resolve
+                let mut value = String::new();
+                index += 1;
+                current = chars[index];
+
+                while current != QUOTE_ASCII {
+                    if index == chars.len() - 1 {
+                        println!("Unmatched quote symbol at index {}.", index);
+                        return Err(())
+                    }
+                    value.push(current as char);
+                    index += 1;
+                    current = chars[index];
+                }
+                index += 1; // skip the right quote.
+                tokens.push_back(Token::String(value));
+                last_type = TokenTypes::String;
+                continue;
             },
 
             SEMICOLON_ASCII => {

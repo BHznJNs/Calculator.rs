@@ -12,6 +12,7 @@ pub enum TokenTypes {
     Unknown,
 
     Number,
+    String,
     Symbol,
     Identifier,
     Paren,
@@ -25,6 +26,7 @@ pub enum TokenTypes {
 #[derive(PartialEq)]
 pub enum Token {
     Number(Number),
+    String(String),
     Symbol(Symbols),
     Paren(Parens),
     Identi(String),
@@ -39,6 +41,7 @@ impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Token::Number(_)   => write!(f, "token: Number"),
+            Token::String(_)   => write!(f, "token: String"),
             Token::Symbol(_)   => write!(f, "token: Symbol"),
             Token::Paren(_)    => write!(f, "token: Paren"),
             Token::Identi(_)   => write!(f, "token: Identifier"),

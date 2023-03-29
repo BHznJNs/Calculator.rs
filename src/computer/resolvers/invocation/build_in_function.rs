@@ -15,9 +15,12 @@ fn call(
     match function.lib {
         StdModules::Math =>
             math::implement(&function.body, scope),
+        StdModules::String =>
+            todo!(),
         StdModules::Array =>
             array::implement(&function.body, scope),
-        StdModules::FileSystem => todo!(),
+        StdModules::FileSystem =>
+            todo!(),
     }
 }
 

@@ -33,7 +33,7 @@ pub fn operate(
             },
         }
     } else {
-        println!("Invalid computing expression: Invalid conputing token.");
+        println!("Invalid computing expression: Invalid computing token.");
         return Err(())
     };
     Ok(Value::Number(result))
