@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{self, BufRead};
 
 use crate::exec::attempt::attempt;
-use crate::public::run_time::global::Global;
+use crate::public::run_time::scope::Scope;
 
 type FileBuf = io::BufReader<File>;
 fn read_lines(path: String) -> io::Result<io::Lines<FileBuf>> {
@@ -12,7 +12,7 @@ fn read_lines(path: String) -> io::Result<io::Lines<FileBuf>> {
 
 pub fn run_script(
     path: String,
-    mut global: Global
+    mut scope: Scope
 ) {
     let mut script_lines =
     if let Ok(lines) = read_lines(path) {
@@ -58,7 +58,7 @@ pub fn run_script(
 
                     // execuse the line
                     let line_result =
-                        attempt(current_line, &mut global);
+                        attempt(current_line, &mut scope);
                     if line_result.is_err() {
                         println!("Error occured at line {}", line_count);
                         break;

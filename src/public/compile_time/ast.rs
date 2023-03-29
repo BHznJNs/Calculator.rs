@@ -1,11 +1,12 @@
 use std::fmt;
 
+use crate::public::value::function::Param;
 use crate::public::value::number::Number;
 use crate::public::value::symbols::Symbols;
 
-use super::keywords::Keyword;
+use super::keywords::Keywords;
 
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Clone)]
 pub enum ASTNodeTypes {
     Root,
     Comment,
@@ -18,8 +19,9 @@ pub enum ASTNodeTypes {
     ArrayElementReading(String),
     Expression,
     LazyExpression,
+    FunctionDefinition(Vec<Param>),
     Invocation(String),
-    Statement(Keyword),
+    Statement(Keywords),
 }
 
 impl fmt::Display for ASTNodeTypes {
@@ -37,6 +39,7 @@ impl fmt::Display for ASTNodeTypes {
 
             ASTNodeTypes::Expression => write!(f, "type: Expression"),
             ASTNodeTypes::LazyExpression => write!(f, "type: LazyExpression"),
+            ASTNodeTypes::FunctionDefinition(_) => write!(f, "type: UserDefinedFunction"),
             ASTNodeTypes::Invocation(name) => write!(f, "type: Invocation, name: {}", name),
             ASTNodeTypes::Statement(keyword) => write!(f, "type: Statement, keyword: {}", keyword),
         }
@@ -45,7 +48,7 @@ impl fmt::Display for ASTNodeTypes {
 
 // --- --- --- --- --- --- --- ---
 
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Clone)]
 pub struct ASTNode {
     pub type__: ASTNodeTypes,
     pub params: Option<ASTNodeVec>,

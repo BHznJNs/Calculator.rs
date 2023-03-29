@@ -1,13 +1,25 @@
 use std::io::{self, Write};
 
 use super::attempt::attempt;
-use crate::public::run_time::global::Global;
+use crate::public::run_time::scope::Scope;
 use crate::public::value::number::Number;
 use crate::public::value::value::Value;
 
-pub fn repl(mut global: Global) -> ! {
+fn import_all(
+    scope: &mut Scope
+) -> Result<(), ()> {
+    scope.import("Math")?;
+    scope.import("Array")?;
+    Ok(())
+}
+
+pub fn repl(mut scope: Scope) -> ! {
     // print program name and version
-    println!("Calculator.rs v1.3.1");
+    println!("Calculator.rs v1.4.0");
+    // import stantard libraries
+    if import_all(&mut scope).is_err() {
+        println!("Standard Module import error.");
+    }
 
     loop {
         print!("> ");
@@ -18,9 +30,10 @@ pub fn repl(mut global: Global) -> ! {
             .read_line(&mut input)
             .unwrap();
 
-        let result = attempt(input, &mut global);
+        let result = attempt(input, &mut scope);
 
-        if let Ok(val) = result {
+        if let Ok(val_box) = result {
+            let val = val_box.as_ref();
             if let Value::Number(Number::Empty(_)) = val {
                 continue;
             }

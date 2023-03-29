@@ -1,39 +1,37 @@
-use crate::computer::resolvers::expression_resolve;
-use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes};
+use crate::public::compile_time::ast::ASTNode;
 use crate::public::compile_time::keywords::Keywords;
-use crate::public::run_time::scope::Scope;
+use crate::public::run_time::global::Global;
 use crate::public::value::number::Number;
 use crate::public::value::value::Value;
 
-use super::sequence_resolve;
+use super::super::expression_compute::expression_compute;
+use super::sequence_resolve::sequence_resolve;
 
-pub fn resolve(
+pub fn statement_resolve(
+    keyword: Keywords,
     statement_node: &ASTNode,
-    scope: &mut Scope
+    global: &mut Global
 ) -> Result<Option<Keywords>, ()> {
-    let ASTNodeTypes::Statement(keyword) = statement_node.type__ else {
-        println!("Sequence_resolver error.");
+    let params =
+    if let Some(ast_nodes) = &statement_node.params {
+        ast_nodes
+    } else {
+        println!("Analyzer error from 'statement_resolve'.");
         return Err(())
     };
-    let params =
-        statement_node
-        .params.as_ref().unwrap();
 
     match keyword {
         Keywords::Out => {
             let expression_node = &params[0];
             let expression_res =
-                expression_resolve::resolve(expression_node, scope)?;
+                expression_compute(expression_node, global)?;
             println!("{}", expression_res);
-            Ok(None)
-        },
-        Keywords::Fn => {
             Ok(None)
         },
         Keywords::For => {
             let loop_count_expressiom = &params[0];
             let loop_count_struct =
-                expression_resolve::resolve(&loop_count_expressiom, scope)?;
+                expression_compute(&loop_count_expressiom, global)?;
             let loop_count = match *loop_count_struct {
                 Value::Number(num) => num.int_value(),
                 _ => {
@@ -48,16 +46,14 @@ pub fn resolve(
 
                 for sequence in loop_body {
                     let sequence_result =
-                        sequence_resolve::resolve(sequence, scope)?;
+                        *sequence_resolve(sequence, global)?;
 
-                    if *sequence_result ==
+                    if sequence_result ==
                        Value::Number(Number::Empty(Some(Keywords::Continue))) {
-                        // encount `continue` | `ctn`
                         break;
                     }
-                    if *sequence_result ==
+                    if sequence_result ==
                        Value::Number(Number::Empty(Some(Keywords::Break))) {
-                        // encount `break` | `brk`
                         is_ended = true;
                         break;
                     }
@@ -73,7 +69,7 @@ pub fn resolve(
         Keywords::If => {
             let condition = &params[0];
             let condition_struct =
-                expression_resolve::resolve(&condition, scope)?;
+                expression_compute(&condition, global)?;
             let condition_value = match *condition_struct {
                 Value::Number(num) => num.int_value(),
                 _ => {
@@ -86,7 +82,7 @@ pub fn resolve(
                 let condition_body = &params[1..];
                 for sequence in condition_body {
                     let sequence_result =
-                        sequence_resolve::resolve(sequence, scope)?;
+                        sequence_resolve(sequence, global)?;
 
                     if let Value::Number(Number::Empty(keyword)) =
                            *sequence_result {
@@ -97,19 +93,6 @@ pub fn resolve(
 
             Ok(None)
         },
-
-        Keywords::Import => {
-            let module_node = &params[0];
-            let ASTNodeTypes::Variable(module_name) =
-                &module_node.type__ else {
-                println!("Analyzer error: invalid module type.");
-                return Err(())
-            };
-
-            scope.import(module_name)?;
-            Ok(None)
-        },
-
         Keywords::Continue => Ok(Some(keyword)),
         Keywords::Break    => Ok(Some(keyword)),
     }

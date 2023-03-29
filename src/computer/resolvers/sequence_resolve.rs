@@ -1,29 +1,26 @@
+use std::rc::Rc;
+
 use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes};
-use crate::public::run_time::global::Global;
-use crate::public::value::number::Number;
+use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
 
-use super::super::expression_compute::expression_compute;
-use super::statement_resolve::statement_resolve;
+use super::{expression_resolve, statement_resolve};
 
-pub fn sequence_resolve(
-    sequence: &ASTNode,
-    global: &mut Global,
-) -> Result<Value, ()> {
-    let result = match sequence.type__ {
+pub fn resolve(
+    sequence_node: &ASTNode,
+    scope: &mut Scope,
+) -> Result<Rc<Value>, ()> {
+    let result = match sequence_node.type__ {
         ASTNodeTypes::Expression => {
-            let expression_result =
-                expression_compute(sequence, global)?;
-
-            expression_result
+            expression_resolve::resolve(sequence_node, scope)?
         },
-        ASTNodeTypes::Statement(keyword) => {
+        ASTNodeTypes::Statement(_) => {
             let optional_keyword =
-                statement_resolve(keyword, sequence, global)?;
-            Value::Number(Number::Empty(optional_keyword))
+                statement_resolve::resolve(sequence_node, scope)?;
+            Value::empty(optional_keyword)
         },
-        // ASTNodeTypes::Comment => {},
-        _ => Value::Number(Number::Empty(None))
+        _ => Value::empty(None)
     };
+
     Ok(result)
 }

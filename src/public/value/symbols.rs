@@ -1,6 +1,6 @@
 use std::fmt;
 
-#[derive(PartialEq, Debug, Clone, Copy)]
+#[derive(PartialEq, Clone, Copy)]
 pub enum Symbols {
     // math symbols
     Plus,  // low  priority
@@ -94,10 +94,10 @@ impl fmt::Display for Symbols {
             Symbols::Power    => write!(f, "Power"),
             Symbols::LessThan => write!(f, "LessThan"),
             Symbols::MoreThan => write!(f, "MoreThan"),
+            Symbols::Equal    => write!(f, "Equal"),
             Symbols::LessThanEqual => write!(f, "LessThanEqual"),
             Symbols::MoreThanEqual => write!(f, "MoreThanEqual"),
             Symbols::CompareEqual  => write!(f, "CompareEqual"),
-            Symbols::Equal    => write!(f, "Equal"),
 
             Symbols::PlusEqual     => write!(f, "PlusEqual"),
             Symbols::MinusEqual    => write!(f, "MinusEqual"),

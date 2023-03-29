@@ -5,22 +5,22 @@ mod exec;
 
 use std::env;
 
-use public::run_time::global::Global;
+use public::run_time::scope::Scope;
 use exec::repl::repl;
 use exec::run_script::run_script;
 
 fn main() {
-    let global = Global::init();
+    let scope = Scope::init();
     let args: Vec<String> = env::args().collect();
 
     match args.len() {
         1 => {
             // REPL mode
-            repl(global);
+            repl(scope);
         },
         2 => {
             // script mode
-            run_script(args[1].to_owned(), global);
+            run_script(args[1].to_owned(), scope);
         },
         _ => {
             println!("Too many args.");

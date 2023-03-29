@@ -1,95 +1,140 @@
 use crate::public::value::parens::Parens;
 use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes, ASTNodeVec};
-use crate::public::compile_time::keywords::Keyword;
+use crate::public::compile_time::keywords::Keywords;
 use crate::compiler::tokenizer::token::{Token, TokenVec};
 
-use super::expression_resolve::expression_resolve;
-use super::sequence_resolve::sequence_resolve;
+use super::expression_resolve;
+use super::sequence_resolve;
 
-fn statement_body_resolve(
+// get condition for statement
+fn statement_condition_resolve(
     tokens: &mut TokenVec,
     params: &mut ASTNodeVec,
 ) -> Result<(), ()> {
     let first_index = 0;
-
-    // get condition for statement
     let mut sub_tokens = TokenVec::new();
     // sub condition tokens
+
     while first_index < tokens.len() {
         let current = tokens.pop_front().unwrap();
-
-        if current == Token::Paren(Parens::LeftBrace) {break}
+        //                         '{'
+        if current == Token::Paren(Parens::LeftBrace) { break }
         sub_tokens.push_back(current);
     }
     let condition =
-        expression_resolve(&mut sub_tokens, false)?;
+        expression_resolve::resolve(&mut sub_tokens, false)?;
     params.push(ASTNode {
         type__: ASTNodeTypes::Expression,
         params: Some(condition),
     });
-
-    // --- --- --- --- --- ---
-
+    Ok(())
+}
+pub fn statement_body_resolve(
+    tokens: &mut TokenVec,
+    params: &mut ASTNodeVec,
+) -> Result<(), ()> {
     // statement body sequence resolve
-    // within `{ ... }`
+    // without LeftBrace
+    // template: `{ ...; ... }`
+
+    let first_index = 0;
+    let mut brace_count = 1;
     let mut sub_tokens = TokenVec::new();
+
     while first_index < tokens.len() {
         let current = tokens.pop_front().unwrap();
 
         let is_divider =
             current == Token::Divider;
-        let is_rightbrace =
+        let is_left_brace =
+            current == Token::Paren(Parens::LeftBrace);
+        let is_right_brace =
             current == Token::Paren(Parens::RightBrace);
 
-        if is_divider || is_rightbrace {
-            // when `;` OR `}`
+        if is_left_brace {
+            brace_count += 1;
+        }
+        if is_divider {
             let sub_sequence_node =
-                sequence_resolve(&mut sub_tokens)?;
+                sequence_resolve::resolve(&mut sub_tokens)?;
             sub_tokens.clear();
             params.push(sub_sequence_node);
-
-            if is_rightbrace { break }
-        } else {
-            sub_tokens.push_back(current);
+            continue;
         }
+        if is_right_brace {
+            brace_count -= 1;
+            if brace_count == 0 {
+                let sub_sequence_node =
+                    sequence_resolve::resolve(&mut sub_tokens)?;
+                sub_tokens.clear();
+                params.push(sub_sequence_node);
+                break;
+            }
+        }
+
+        sub_tokens.push_back(current);
     }
     Ok(())
 }
 
-pub fn statement_resolve(
-    keyword: Keyword,
+pub fn resolve(
+    keyword: Keywords,
     tokens: &mut TokenVec
 ) -> Result<ASTNodeVec, ()> {
     // remove the keyword token
-    let first_index = 0;
-    tokens.remove(first_index);
+    tokens.pop_front();
 
     let mut params = ASTNodeVec::new();
 
     match keyword {
-        Keyword::Out => {
+        Keywords::Out => {
             let output_expression =
-                expression_resolve(tokens, false)?;
+                expression_resolve::resolve(tokens, false)?;
             let current_node = ASTNode {
                 type__: ASTNodeTypes::Expression,
                 params: Some(output_expression),
             };
             params.push(current_node);
         },
-        Keyword::For => {
+        Keywords::For => {
+            statement_condition_resolve(tokens, &mut params)?;
             statement_body_resolve(tokens, &mut params)?;
         },
-        Keyword::If => {
+        Keywords::If => {
+            statement_condition_resolve(tokens, &mut params)?;
             statement_body_resolve(tokens, &mut params)?;
         },
-        Keyword::Continue => params.push(ASTNode {
-            type__: ASTNodeTypes::Statement(Keyword::Continue),
+        Keywords::Import => {
+            if tokens.len() > 0 {
+                println!("Invalid import statement: module name missing.");
+                return Err(())
+            }
+            let next_token = tokens.pop_front().unwrap();
+            let Token::Identi(module_name) = next_token else {
+                println!("Invalid import statement: invalid module name.");
+                return Err(())
+            };
+
+            params.push(ASTNode {
+                type__: ASTNodeTypes::Statement(Keywords::Continue),
+                params: Some(vec![ASTNode {
+                    type__: ASTNodeTypes::Variable(module_name),
+                    params: None,
+                }]),
+            })
+        },
+        Keywords::Continue => params.push(ASTNode {
+            type__: ASTNodeTypes::Statement(Keywords::Continue),
             params: None,
         }),
-        Keyword::Break => params.push(ASTNode {
-            type__: ASTNodeTypes::Statement(Keyword::Continue),
+        Keywords::Break => params.push(ASTNode {
+            type__: ASTNodeTypes::Statement(Keywords::Continue),
             params: None,
         }),
+        _ => {
+            println!("Tokenizer error: unexpected function definition.");
+            return Err(())
+        }
     }
 
     Ok(params)

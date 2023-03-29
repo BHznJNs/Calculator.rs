@@ -50,3 +50,13 @@ condition = {if a == 5 {brk}}
 for 10 {condition(); a += 1}
 a # 5
 ```
+
+# function definition
+
+```calcrs
+func = fn(i $num) {out i}
+plus = fn(a $num, b $num) {a + b}
+plus1 = fn(i $num) {i + 1}
+
+recurse = fn(i $num) {if i == 5 {brk}; out i; recurse(i + 1)}
+```

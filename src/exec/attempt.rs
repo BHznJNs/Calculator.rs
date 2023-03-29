@@ -1,14 +1,17 @@
-use crate::compiler::compile;
-use crate::computer::compute;
-use crate::public::run_time::global::Global;
+use std::rc::Rc;
+
+use crate::compiler::compile::compile;
+use crate::computer::compute::compute;
+use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
 
 pub fn attempt(
-    input: String, global: &mut Global
-) -> Result<Value, ()> {
-    let root_node = compile::compile(input)?;
+    input: String,
+    scope: &mut Scope
+) -> Result<Rc<Value>, ()> {
+    let root_node = compile(input)?;
     // println!("{}", root_node); // LOG
-    let result_num = compute::compute(root_node, global)?;
+    let result_num = compute(root_node, scope)?;
 
     Ok(result_num)
 }

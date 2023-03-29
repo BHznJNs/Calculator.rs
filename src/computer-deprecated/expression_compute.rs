@@ -1,8 +1,9 @@
 use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes};
 use crate::public::run_time::global::Global;
 use crate::public::value::number::Number;
-use crate::public::value::value::{Value, ValueVec};
+use crate::public::value::value::Value;
 
+use super::resolvers::array_reading_resolve::array_reading_resolve;
 use super::resolvers::sequence_resolve::sequence_resolve;
 use super::resolvers::assignment_resolve::assignment_resolve;
 use super::operate::operate;
@@ -10,13 +11,13 @@ use super::operate::operate;
 pub fn expression_compute(
     expression_node: &ASTNode,
     global: &mut Global,
-) -> Result<Value, ()> {
+) -> Result<Box<Value>, ()> {
     let params = expression_node
         .params
         .as_ref()
         .unwrap();
 
-    let mut value_stack = ValueVec::new();
+    let mut value_stack = Vec::<Box::<Value>>::new();
     let mut index = 0;
 
     while index < params.len() {
@@ -43,7 +44,7 @@ pub fn expression_compute(
                 value_stack.push(variable_value.to_owned());
             },
             ASTNodeTypes::NumberLiteral(number) =>
-                value_stack.push(Value::Number(*number)),
+                value_stack.push(Box::new(Value::Number(*number))),
             ASTNodeTypes::SymbolLiteral(symbol) => {
                 if value_stack.len() < 2 {
                     println!("Invalid expression: operating number is missing.");
@@ -54,47 +55,14 @@ pub fn expression_compute(
                 let current_symbol = *symbol;
                 let value = operate(num1, num2, current_symbol)?;
 
-                value_stack.push(value);
+                value_stack.push(Box::new(value));
             },
-            ASTNodeTypes::ArrayElementReading(arr_name) => {
-                // get index value as `usize`
-                let index_expression_params =
-                    node.params.to_owned();
-
-                let index_expression_node = ASTNode {
-                    type__: ASTNodeTypes::Expression,
-                    params: index_expression_params,
-                };
-                let index_value =
-                    expression_compute(&index_expression_node, global)?;
-                let index_number =
-                if let Value::Number(Number::Int(target)) = index_value {
-                    if target < 0 {
-                        println!("Index of an array should not be less than ZERO.");
-                        return Err(())
-                    }
-                    target as usize
-                } else {
-                    println!("Invalid array index.");
-                    return Err(())
-                };
-
-                // read actual element value
-                let arr = global.variables.get(arr_name);
-                match arr {
-                    Some(Value::Array(arr)) => {
-                        if index_number >= arr.len() {
-                            println!("Index out of range.");
-                            return Err(())
-                        }
-                        let target_value = arr[index_number].clone();
-                        value_stack.push(target_value)
-                    },
-                    _ => {
-                        println!("'{}' is not an array.", arr_name);
-                        return Err(())
-                    },
-                }
+            ASTNodeTypes::ArrayElementReading(_) => {
+                let target_element = array_reading_resolve(
+                    node, None,
+                    true, global
+                )?;
+                value_stack.push(target_element);
             },
             ASTNodeTypes::Assignment(name) => {
                 let right_hand = &node
@@ -107,7 +75,7 @@ pub fn expression_compute(
                 value_stack.push(assignment_res);
             },
             ASTNodeTypes::Invocation(name) => {
-                let func_result: Value;
+                let func_result: Box<Value>;
 
                 let optional_func =
                     global.build_in_funcs.get(name.as_str());
@@ -129,16 +97,16 @@ pub fn expression_compute(
 
                             let expression_value =
                                 expression_compute(&expression_node, global)?;
-                            if let Value::Number(num) = expression_value {
+                            if let Value::Number(num) = expression_value.as_ref() {
                                 let func_result_f = match num {
-                                    Number::Int(i) => func(i as f64),
-                                    Number::Float(f) => func(f),
+                                    Number::Int(i) => func(*i as f64),
+                                    Number::Float(f) => func(*f),
                                     _ => {
                                         println!("Not A Number Error.");
                                         return Err(())
                                     },
                                 };
-                                func_result = Value::Number(Number::Float(func_result_f));
+                                func_result = Box::new(Value::Number(Number::Float(func_result_f)));
                             } else {
                                 println!("Invalid params for function '{}'.", name);
                                 return Err(())
@@ -151,9 +119,15 @@ pub fn expression_compute(
                     None => match global.variables.get(name) {
                         // user defined LazyExpression
                         // le => LazyExpression
-                        Some(Value::LazyExpression(le)) => {
-                            func_result =
-                                sequence_resolve(&le.clone(), global)?;
+                        Some(value_box) => {
+                            let le_value = value_box.as_ref();
+                            if let Value::LazyExpression(le) = le_value {
+                                func_result =
+                                    sequence_resolve(le, global)?;
+                            } else {
+                                println!("'{}' is not a lazy-expression.", name);
+                                return Err(())
+                            }
                         },
                         _ => {
                             println!("Undefined function OR lazy-expression: '{}'.", name);

@@ -4,7 +4,8 @@ use std::fmt;
 use crate::public::value::parens::Parens;
 use crate::public::value::symbols::Symbols;
 use crate::public::value::number::Number;
-use crate::public::compile_time::keywords::Keyword;
+use crate::public::compile_time::keywords::Keywords;
+use crate::public::value::value::ValueTypes;
 
 #[derive(PartialEq, Clone, Copy)]
 pub enum TokenTypes {
@@ -14,7 +15,9 @@ pub enum TokenTypes {
     Symbol,
     Identifier,
     Paren,
-    Keyword,
+    Keywords,
+
+    Annotation,
 }
 
 // --- --- --- --- --- ---
@@ -25,21 +28,23 @@ pub enum Token {
     Symbol(Symbols),
     Paren(Parens),
     Identi(String),
-    Keyword(Keyword),
+    Keywords(Keywords),
 
     Divider,
+    Annotation(ValueTypes),
 }
 pub type TokenVec = VecDeque<Token>;
 
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Token::Number(_)  => write!(f, "token: Number"),
-            Token::Symbol(_)  => write!(f, "token: Symbol"),
-            Token::Paren(_)   => write!(f, "token: Paren"),
-            Token::Identi(_)  => write!(f, "token: Identifier"),
-            Token::Keyword(_) => write!(f, "token: Keyword"),
-            Token::Divider => write!(f, "token: Divider"),
+            Token::Number(_)   => write!(f, "token: Number"),
+            Token::Symbol(_)   => write!(f, "token: Symbol"),
+            Token::Paren(_)    => write!(f, "token: Paren"),
+            Token::Identi(_)   => write!(f, "token: Identifier"),
+            Token::Keywords(_) => write!(f, "token: Keywords"),
+            Token::Divider     => write!(f, "token: Divider"),
+            Token::Annotation(_)  => write!(f, "token: Annotation"),
         }
     }
 }

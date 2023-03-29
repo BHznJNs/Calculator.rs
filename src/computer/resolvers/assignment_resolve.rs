@@ -1,51 +1,67 @@
+use std::rc::Rc;
+
 use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes};
-use crate::public::run_time::global::Global;
-use crate::public::value::number::Number;
-use crate::public::value::value::Value;
+use crate::public::run_time::scope::Scope;
+use crate::public::value::function::UserDefinedFunction;
+use crate::public::value::value::{Value, Overload};
 
-use super::array_resolve::array_resolve;
-use super::super::expression_compute::expression_compute;
+use super::{expression_resolve, array_resolve};
 
-pub fn assignment_resolve(
-    name: &String,
-    right_hand: &ASTNode,
-    global: &mut Global
-) -> Result<Value, ()> {
-    let result = match right_hand.type__ {
-        ASTNodeTypes::Expression => {
-            let expression_value =
-                expression_compute(right_hand, global)?;
+pub fn resolve(
+    assignment_node: &ASTNode,
+    scope: &mut Scope
+) -> Result<Rc<Value>, ()> {
+    let ASTNodeTypes::Assignment(var_name) = &assignment_node.type__ else {
+        println!("Invalid variable name for assignment.");
+        return Err(())
+    };
+    let right_hand_node = &assignment_node
+        .params
+        .as_ref()
+        .unwrap()[0];
 
-            global.variables.insert(
-                name.clone(),
-                expression_value.clone(),
-            );
-            expression_value
-        },
-        ASTNodeTypes::LazyExpression => {
-            let sub_expression = &right_hand
-                .params
-                .as_ref()
-                .unwrap()[0];
-
-            global.variables.insert(
-                name.clone(),
-                Value::LazyExpression(sub_expression.to_owned())
-            );
-            Value::Number(Number::Empty(None))
+    let right_hand_value = match &right_hand_node.type__ {
+        ASTNodeTypes::Expression =>
+            expression_resolve::resolve(&right_hand_node, scope)?,
+        ASTNodeTypes::LazyExpression =>
+            Rc::new(Value::create(right_hand_node.clone())),
+        ASTNodeTypes::FunctionDefinition(func_params) => {
+            Rc::new(Value::create(UserDefinedFunction {
+                params: func_params.to_owned(),
+                body: right_hand_node.params
+                      .as_ref().unwrap().to_owned(),
+            }))
         },
         ASTNodeTypes::ArrayLiteral => {
-            let array =
-                array_resolve(right_hand, global)?;
-
-            global.variables.insert(name.clone(), array);
-            Value::Number(Number::Empty(None))
+            let array_elements =
+                array_resolve::resolve(&right_hand_node, scope)?;
+            Rc::new(Value::create(array_elements))
         },
-
         _ => {
-            println!("Analyzer error from 'assignment_resolve'.");
+            println!("Analyzer error for invalid right_hand_node.");
             return Err(())
         }
     };
-    Ok(result)
+
+    // if local-scope, assign variable to
+    // the local-scope is preferred.
+    match &mut scope.local {
+        Some(local_scope) =>
+            // usually in a function invocation.
+            local_scope.variables.insert(
+                var_name.to_owned(),
+                right_hand_value.clone()
+            ),
+        None =>
+            scope.global.variables.insert(
+                var_name.to_owned(),
+                right_hand_value.clone()
+            ),
+    };
+
+    if let Value::LazyExpression(_) | Value::Function(_) = *right_hand_value {
+        Ok(Value::empty(None))
+    } else {
+        Ok(right_hand_value)
+    }
 }

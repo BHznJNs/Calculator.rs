@@ -1,11 +1,11 @@
 use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes};
 
 use crate::compiler::tokenizer::token::TokenVec;
-use super::sequence_resolve::sequence_resolve;
+use super::sequence_resolve;
 
 pub fn analyze(mut tokens: TokenVec) -> Result<ASTNode, ()> {
     let params =
-        vec![sequence_resolve(&mut tokens)?];
+        vec![sequence_resolve::resolve(&mut tokens)?];
 
     let root = ASTNode {
         type__: ASTNodeTypes::Root,

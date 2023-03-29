@@ -1,4 +1,5 @@
-use crate::public::value::number::Number;
+use crate::public::value::value::{VALUE_TYPE_ARR, VALUE_TYPE_ENUM};
+use crate::public::value::{number::Number, value::ValueTypes};
 use crate::public::value::parens::Parens;
 use crate::public::value::symbols::Symbols;
 use crate::public::compile_time::keywords;
@@ -10,7 +11,7 @@ const POINT_ASCII: u8 = 46;
 const UNDERLINE_ASCII: u8 = 95;
 
 enum State {
-    Int, Float
+    Int, Float,
 }
 
 fn is_identi_ascii(ascii: u8) -> bool {
@@ -99,31 +100,52 @@ pub fn tokenize(source: String) -> Result<TokenVec, ()> {
                 index += 1;
                 current = chars[index];
             }
+            
+            if last_type == TokenTypes::Annotation {
+                // Type annotation
+                let mut is_valid_type = false;
+                let mut value_type: ValueTypes;
 
-            // check is keyword
-            let mut is_keyword = false;
-            let mut current_token: Token;
-            let keyword: keywords::Keyword;
-
-            let mut index = 0;
-            while index < keywords::KEYWORDS.len() {
-                let current = keywords::KEYWORDS[index];
-                if value.eq(current) {
-                    is_keyword = true;
-                    last_type = TokenTypes::Keyword;
-
-                    keyword = keywords::KEYWORDS_ENUM[index];
-                    current_token = Token::Keyword(keyword);
-                    tokens.push_back(current_token);
-                    break;
+                let mut index = 0;
+                while index < VALUE_TYPE_ARR.len() {
+                    let current = VALUE_TYPE_ARR[index];
+                    if value.eq(current) {
+                        is_valid_type = true;
+                        value_type = VALUE_TYPE_ENUM[index].clone();
+                        tokens.push_back(Token::Annotation(value_type))
+                    }
+                    index += 1;
                 }
-                index += 1;
-            }
 
-            if !is_keyword {
-                last_type = TokenTypes::Identifier;
-                current_token = Token::Identi(value);
-                tokens.push_back(current_token);
+                if !is_valid_type {
+                    println!("Invalid type: '{}'.", value);
+                    return Err(())
+                }
+
+            } else {
+                // check is keyword
+                let mut is_keyword = false;
+                let keyword: keywords::Keywords;
+
+                let mut index = 0;
+                while index < keywords::KEYWORDS.len() {
+                    let current = keywords::KEYWORDS[index];
+                    if value.eq(current) {
+                        is_keyword = true;
+                        last_type = TokenTypes::Keywords;
+
+                        keyword = keywords::KEYWORDS_ENUM[index];
+                        tokens.push_back(Token::Keywords(keyword));
+                        break;
+                    }
+                    index += 1;
+                }
+
+                if !is_keyword {
+                    last_type = TokenTypes::Identifier;
+                    tokens.push_back(Token::Identi(value));
+                }
+                
             }
             continue;
         }
@@ -146,12 +168,13 @@ pub fn tokenize(source: String) -> Result<TokenVec, ()> {
         const LESS_THAN_ASCII: u8 = 60; // <
         const MORE_THAN_ASCII: u8 = 62; // >
         const EQUAL_ASCII    : u8 = 61; // =
-        
+
         const SEMICOLON_ASCII  : u8 = 59; // ;
         const COMMA_ASCII      : u8 = 44; // ,
+        const DOLLAR_ASCII     : u8 = 36; // $
         const NUMBER_SIGN_ASCII: u8 = 35; // #
         const SPACE_ASCII      : u8 = 32; // ' '
-        const TAB_ASCII        : u8 = 9;
+        const TAB_ASCII        : u8 = 9;  // '\t'
         const NEW_LINE_ASCII   : u8 = 10; // '\n'
         const RETURN_ASCII     : u8 = 13; // '\r'
 
@@ -255,6 +278,10 @@ pub fn tokenize(source: String) -> Result<TokenVec, ()> {
                 last_type = TokenTypes::Symbol;
                 tokens.push_back(Token::Divider);
             },
+            DOLLAR_ASCII => {
+                // type annotation
+                last_type = TokenTypes::Annotation;
+            }
 
             // skip Space and Tab
             SPACE_ASCII => {},
