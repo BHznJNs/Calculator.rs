@@ -78,28 +78,42 @@ Then just execuse it.
 ## Build-ins
 
 - Functions
-  - sin
-  - cos
-  - tan
-  - asin
-  - acos
-  - atan
-  - sinh
-  - cosh
-  - tanh
+  - Basic
+    - int
+    - float
+    - string
+  - Array
+    - push
+    - pop
+    - shift
+    - unshift
+    - insert
+    - remove
+    - update
+    - len
+  - Math
+    - sin
+    - cos
+    - tan
+    - asin
+    - acos
+    - atan
+    - sinh
+    - cosh
+    - tanh
 
-  - rad
-  - deg
+    - rad
+    - deg
 
-  - log10
-  - log2
-  - ln
-  - exp
+    - log10
+    - log2
+    - ln
+    - exp
 
-  - abs
-  - sqrt
-  - floor
-  - round
+    - abs
+    - sqrt
+    - floor
+    - round
 
 - Constants
   - PI
