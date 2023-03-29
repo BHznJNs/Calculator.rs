@@ -13,8 +13,6 @@ pub fn resolve(
     expression_node: &ASTNode,
     scope: &mut Scope,
 ) -> Result<Rc<Value>, ()> {
-    // println!("expr_node: {}", expression_node); // LOG
-
     let params = expression_node
         .params
         .as_ref()

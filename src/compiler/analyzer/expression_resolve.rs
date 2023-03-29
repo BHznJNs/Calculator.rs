@@ -50,6 +50,23 @@ fn func_params_resolve(
     // 1, 2)
     // a, 1)
 
+    fn param_expr_resolve(
+        sub_tokens: &mut TokenVec,
+        params: &mut ASTNodeVec,
+    ) -> Result<(), ()> {
+        if sub_tokens.len() > 0 {
+            let sub_expression =
+                resolve(sub_tokens, false)?;
+            let sub_expression_node = ASTNode {
+                type__: ASTNodeTypes::Expression,
+                params: Some(sub_expression),
+            };
+            params.push(sub_expression_node);
+            sub_tokens.clear();
+        }
+        Ok(())
+    }
+
     let first_index = 0;
     let mut paren_count = 1;
     let mut sub_tokens = TokenVec::new();
@@ -73,26 +90,17 @@ fn func_params_resolve(
         if is_left_paren {
             paren_count += 1;
         }
-        if is_divider || is_right_paren {
-            if sub_tokens.len() > 0 {
-                // avoid empty expression
-                let sub_expression =
-                    resolve(&mut sub_tokens, false)?;
-                let sub_expression_node = ASTNode {
-                    type__: ASTNodeTypes::Expression,
-                    params: Some(sub_expression),
-                };
-                params.push(sub_expression_node);
-                sub_tokens.clear();
-            }
-
-            if is_right_paren {
-                paren_count -= 1;
-                if paren_count == 0 {
-                    break;
-                }
+        if is_divider {
+            param_expr_resolve(&mut sub_tokens, &mut params)?;
+        }
+        if is_right_paren {
+            paren_count -= 1;
+            if paren_count == 0 {
+                param_expr_resolve(&mut sub_tokens, &mut params)?;
+                break;
             }
         }
+
         if !is_divider {
             sub_tokens.push_back(current);
         }

@@ -105,7 +105,6 @@ pub fn resolve(
             statement_body_resolve(tokens, &mut params)?;
         },
         Keywords::Import => {
-            println!("keyword import"); // LOG
             if tokens.len() == 0 {
                 println!("Invalid import statement: module name missing.");
                 return Err(())
