@@ -6,153 +6,134 @@ use crate::public::value::function::{BuildInParam, BuildInFunction};
 use crate::public::value::value::{ValueTypes, Value, Overload};
 
 use super::std::StdModules;
+use super::utils::get_val::get_val;
 
 pub fn implement(
     func_body: &BuildInFuncs,
     scope: &mut Scope,
 ) -> Result<Value, ()> {
-    fn get_input(
-        scope: &mut Scope
-    ) -> Result<Rc<Value>, ()> {
-        let val =
-            scope.local
-            .as_ref().unwrap()
-            .variables
-            .get("input");
-        match val {
-            Some(rc_val) =>
-                Ok(rc_val.clone()),
-            None => {
-                println!("Input for function is missing.");
-                Err(())
-            },
-        }
-    }
-
     let result = match func_body {
         BuildInFuncs::Sin => {
             let input =
-                get_input(scope)?;
+                get_val("input", scope)?;
             let f = input.get_f64()?;
             f.sin()
         },
         BuildInFuncs::Cos => {
             let input =
-                get_input(scope)?;
+                get_val("input", scope)?;
             let f = input.get_f64()?;
             f.cos()
         },
         BuildInFuncs::Tan => {
             let input =
-                get_input(scope)?;
+                get_val("input", scope)?;
             let f = input.get_f64()?;
             f.tan()
         },
         BuildInFuncs::Asin => {
             let input =
-                get_input(scope)?;
+                get_val("input", scope)?;
             let f = input.get_f64()?;
             f.asin()
         },
         BuildInFuncs::Acos => {
             let input =
-                get_input(scope)?;
+                get_val("input", scope)?;
             let f = input.get_f64()?;
             f.acos()
         },
         BuildInFuncs::Atan => {
             let input =
-                get_input(scope)?;
+                get_val("input", scope)?;
             let f = input.get_f64()?;
             f.atan()
         },
         BuildInFuncs::Sinh => {
             let input =
-                get_input(scope)?;
+                get_val("input", scope)?;
             let f = input.get_f64()?;
             f.sinh()
         },
         BuildInFuncs::Cosh => {
             let input =
-                get_input(scope)?;
+                get_val("input", scope)?;
             let f = input.get_f64()?;
             f.cosh()
         },
         BuildInFuncs::Tanh => {
             let input =
-                get_input(scope)?;
+                get_val("input", scope)?;
             let f = input.get_f64()?;
             f.tanh()
         },
         BuildInFuncs::Rad => {
             let input =
-                get_input(scope)?;
+                get_val("input", scope)?;
             let f = input.get_f64()?;
             f.to_radians()
         },
         BuildInFuncs::Deg => {
             let input =
-                get_input(scope)?;
+                get_val("input", scope)?;
             let f = input.get_f64()?;
             f.to_degrees()
         },
         BuildInFuncs::Log10 => {
             let input =
-                get_input(scope)?;
+                get_val("input", scope)?;
             let f = input.get_f64()?;
             f.log10()
         },
         BuildInFuncs::Log2 => {
             let input =
-                get_input(scope)?;
+                get_val("input", scope)?;
             let f = input.get_f64()?;
             f.sin()
         },
         BuildInFuncs::Log => {
-            let base = scope
-                .local.as_ref().unwrap()
-                .variables.get("base").unwrap();
-            let nature = scope
-                .local.as_ref().unwrap()
-                .variables.get("natural").unwrap();
+            let base =
+                get_val("base", scope)?;
+            let natural =
+                get_val("natural", scope)?;
 
             let base_f = base.get_f64()?;
-            let nature_f = nature.get_f64()?;
+            let nature_f = natural.get_f64()?;
             nature_f.log(base_f)
         },
         BuildInFuncs::Ln => {
             let input =
-                get_input(scope)?;
+                get_val("input", scope)?;
             let f = input.get_f64()?;
             f.ln()
         },
         BuildInFuncs::Exp => {
             let input =
-                get_input(scope)?;
+                get_val("input", scope)?;
             let f = input.get_f64()?;
             f.exp()
         },
         BuildInFuncs::Abs => {
             let input =
-                get_input(scope)?;
+                get_val("input", scope)?;
             let f = input.get_f64()?;
             f.abs()
         },
         BuildInFuncs::Sqrt => {
             let input =
-                get_input(scope)?;
+                get_val("input", scope)?;
             let f = input.get_f64()?;
             f.sqrt()
         },
         BuildInFuncs::Floor => {
             let input =
-                get_input(scope)?;
+                get_val("input", scope)?;
             let f = input.get_f64()?;
             f.floor()
         },
         BuildInFuncs::Round => {
             let input =
-                get_input(scope)?;
+                get_val("input", scope)?;
             let f = input.get_f64()?;
             f.round()
         },

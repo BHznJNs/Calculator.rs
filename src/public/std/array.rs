@@ -7,30 +7,12 @@ use crate::public::value::number::Number;
 use crate::public::value::value::{ValueTypes, Value};
 
 use super::std::StdModules;
+use super::utils::get_val::get_val;
 
 pub fn implement(
     func_body: &BuildInFuncs,
     scope: &mut Scope,
 ) -> Result<Value, ()> {
-    fn get_val(
-        val_name: &str,
-        scope: &mut Scope
-    ) -> Result<Rc<Value>, ()> {
-        let val =
-            scope.local
-            .as_ref().unwrap()
-            .variables
-            .get(val_name);
-        match val {
-            Some(rc_val) =>
-                Ok(rc_val.clone()),
-            None => {
-                println!("Input for function is missing.");
-                Err(())
-            },
-        }
-    }
-
     let result = match func_body {
         BuildInFuncs::Push => {
             let arr_rc = get_val("arr", scope)?;

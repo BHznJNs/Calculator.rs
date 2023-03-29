@@ -8,6 +8,7 @@ use crate::public::value::value::Value;
 fn import_all(
     scope: &mut Scope
 ) -> Result<(), ()> {
+    scope.import("Basic")?;
     scope.import("Math")?;
     scope.import("Array")?;
     Ok(())

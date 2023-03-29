@@ -52,7 +52,7 @@ impl fmt::Display for ValueTypes {
 #[derive(PartialEq)]
 pub enum Value {
     Number(Number),
-    String(Rc<String>),
+    String(Rc<RefCell<String>>),
     Array(Rc<RefCell<ArrayLiteral>>),
     LazyExpression(Rc<ASTNode>),
     Function(Rc<UserDefinedFunction>),
@@ -63,7 +63,7 @@ impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Value::Number(num) => write!(f, "{}", num),
-            Value::String(str) => write!(f, "'{}'", str),
+            Value::String(str) => write!(f, "'{}'", str.as_ref().borrow()),
             Value::LazyExpression(le) => write!(f, "{}", le),
             Value::Function(_) => write!(f, "User-defined-function"),
             Value::Array(arr) => {
@@ -139,7 +139,7 @@ impl Overload<f64> for Value {
 }
 impl Overload<String> for Value {
     fn create(value: String) -> Self {
-        Value::String(Rc::new(value))
+        Value::String(Rc::new(RefCell::new(value)))
     }
 }
 impl Overload<ArrayLiteral> for Value {

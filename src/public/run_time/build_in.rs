@@ -8,6 +8,9 @@ use crate::public::value::value::Value;
 
 #[derive(Clone)]
 pub enum BuildInFuncs {
+    // Basic
+    Int, Float, String,
+
     // Math
      Sin,  Cos,  Tan,
     Asin, Acos, Atan,

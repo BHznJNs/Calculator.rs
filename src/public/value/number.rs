@@ -87,7 +87,7 @@ impl fmt::Display for Number {
                 if *num == num.floor() {
                     write!(f, "{}", *num as i64)
                 } else {
-                    write!(f, "{:.8}", num)
+                    write!(f, "{:.10}", num)
                 }
             },
         }

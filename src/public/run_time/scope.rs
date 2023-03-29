@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use crate::public::std::{math, array};
+use crate::public::std::{math, array, basic};
 use crate::public::std::std::StdModules;
 use crate::public::value::function::BuildInFunction;
 
@@ -45,9 +45,10 @@ pub struct Scope {
 impl Scope {
     pub fn init() -> Scope {
         let module_map = HashMap::from([
-            ("Math",  StdModules::Math),
-            ("Array", StdModules::Array),
-            ("FS",    StdModules::FileSystem),
+            ("Basic",  StdModules::Basic),
+            ("Math" ,  StdModules::Math),
+            ("Array",  StdModules::Array),
+            ("FS"   ,  StdModules::FileSystem),
         ]);
         Scope {
             global: GlobalScope::init(),
@@ -70,6 +71,7 @@ impl Scope {
             let build_in_map =
                 &mut self.global.build_in_funcs;
             let func_list = match target_module {
+                StdModules::Basic  => basic::function_list(),
                 StdModules::Math   => math::function_list(),
                 StdModules::String => todo!(),
                 StdModules::Array  => array::function_list(),
