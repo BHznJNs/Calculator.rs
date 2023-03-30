@@ -1,8 +1,9 @@
+use std::rc::Rc;
+
 use crate::computer::resolvers::expression_resolve;
 use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes};
 use crate::public::compile_time::keywords::Keywords;
 use crate::public::run_time::scope::Scope;
-use crate::public::value::number::Number;
 use crate::public::value::value::Value;
 
 use super::sequence_resolve;
@@ -10,7 +11,7 @@ use super::sequence_resolve;
 pub fn resolve(
     statement_node: &ASTNode,
     scope: &mut Scope
-) -> Result<Option<Keywords>, ()> {
+) -> Result<Rc<Value>, ()> {
     let ASTNodeTypes::Statement(keyword) = statement_node.type__ else {
         println!("Sequence_resolver error.");
         return Err(())
@@ -19,16 +20,19 @@ pub fn resolve(
         statement_node
         .params.as_ref().unwrap();
 
-    match keyword {
+    let result = match keyword {
         Keywords::Out => {
             let expression_node = &params[0];
             let expression_res =
                 expression_resolve::resolve(expression_node, scope)?;
-            println!("{}", expression_res);
-            Ok(None)
+            // do not print empty sequence
+            if expression_res != Value::empty(None) {
+                println!("{}", expression_res);
+            }
+            expression_res
         },
         Keywords::Fn => {
-            Ok(None)
+            Value::empty(None)
         },
         Keywords::For => {
             let loop_count_expressiom = &params[0];
@@ -50,15 +54,14 @@ pub fn resolve(
                     let sequence_result =
                         sequence_resolve::resolve(sequence, scope)?;
 
-                    if *sequence_result ==
-                       Value::Number(Number::Empty(Some(Keywords::Continue))) {
-                        // encount `continue` | `ctn`
-                        break;
-                    }
-                    if *sequence_result ==
-                       Value::Number(Number::Empty(Some(Keywords::Break))) {
+                    if let Value::Void(_) = *sequence_result {
                         // encount `break` | `brk`
                         is_ended = true;
+                        break;
+                    }
+
+                    if let Value::Void(None) = *sequence_result {
+                        // encount `continue` | `ctn`
                         break;
                     }
                 }
@@ -68,7 +71,7 @@ pub fn resolve(
                 }
             }
 
-            Ok(None)
+            Value::empty(None)
         },
         Keywords::If => {
             let condition = &params[0];
@@ -88,14 +91,14 @@ pub fn resolve(
                     let sequence_result =
                         sequence_resolve::resolve(sequence, scope)?;
 
-                    if let Value::Number(Number::Empty(keyword)) =
+                    if let Value::Void(_) =
                            *sequence_result {
-                        return Ok(keyword)
+                        return Ok(sequence_result)
                     }
                 }
             }
 
-            Ok(None)
+            Value::empty(None)
         },
 
         Keywords::Import => {
@@ -107,10 +110,19 @@ pub fn resolve(
             };
 
             scope.import(module_name)?;
-            Ok(None)
+            Value::empty(None)
         },
 
-        Keywords::Continue => Ok(Some(keyword)),
-        Keywords::Break    => Ok(Some(keyword)),
-    }
+        Keywords::Break => {
+            let expression_node = &params[0];
+            let expression_res =
+                expression_resolve::resolve(expression_node, scope)?;
+            Rc::new(Value::Void(Some(expression_res)))
+        },
+
+        Keywords::Continue =>
+            Rc::new(Value::Void(None)),
+    };
+
+    Ok(result)
 }

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use crate::public::std::{math, array, basic};
+use crate::public::std::modules::{math, array, basic};
 use crate::public::std::std::StdModules;
 use crate::public::value::function::BuildInFunction;
 
@@ -68,8 +68,6 @@ impl Scope {
         };
 
         if !self.module.contains(&target_module) {
-            let build_in_map =
-                &mut self.global.build_in_funcs;
             let func_list = match target_module {
                 StdModules::Basic  => basic::function_list(),
                 StdModules::Math   => math::function_list(),
@@ -78,7 +76,7 @@ impl Scope {
                 StdModules::FileSystem => todo!(),
             };
 
-            build_in_map.extend(func_list)
+            self.global.build_in_funcs.extend(func_list)
         }
         Ok(())
     }

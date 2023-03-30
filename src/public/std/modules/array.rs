@@ -6,8 +6,8 @@ use crate::public::value::function::{BuildInParam, BuildInFunction};
 use crate::public::value::number::Number;
 use crate::public::value::value::{ValueTypes, Value};
 
-use super::std::StdModules;
-use super::utils::get_val::get_val;
+use super::super::std::StdModules;
+use super::super::utils::get_val::get_val;
 
 pub fn implement(
     func_body: &BuildInFuncs,

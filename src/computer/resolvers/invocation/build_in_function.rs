@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use crate::computer::resolvers::sequence_resolve;
 use crate::public::compile_time::ast::ASTNode;
-use crate::public::std::{math, array, basic};
+use crate::public::std::modules::{math, array, basic};
 use crate::public::std::std::StdModules;
 use crate::public::value::function::BuildInFunction;
 use crate::public::run_time::scope::{Scope, LocalScope};

@@ -1,0 +1,10 @@
+# One line version.
+# climb_stairs = fn(n $num) {if n == 1 {brk 1}; if n == 2 {brk 2}; t(n - 1) + t(n - 2)}
+
+climb_stairs = fn(n $num) {:
+    if n == 1 { brk 1 };:
+    if n == 2 { brk 2 };:
+    climb_stairs(n - 1) + climb_stairs(n - 2):
+}
+
+out climb_stairs(10) # 89

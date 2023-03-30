@@ -4,12 +4,15 @@ use std::f64::consts::E;
 use std::rc::Rc;
 
 use crate::public::value::number::Number;
+use crate::public::value::value::Overload;
 use crate::public::value::value::Value;
+use crate::public::value::value::ValueTypes;
 
 #[derive(Clone)]
 pub enum BuildInFuncs {
     // Basic
-    Int, Float, String,
+    Type,
+    Int, Float, String, Ascii,
 
     // Math
      Sin,  Cos,  Tan,
@@ -34,6 +37,13 @@ pub enum BuildInFuncs {
 
 pub fn variables() -> HashMap<String, Rc<Value>> {
     HashMap::from([
+        (String::from("VOID")  , Rc::new(Value::create(ValueTypes::Void   as i64))),
+        (String::from("NUM")   , Rc::new(Value::create(ValueTypes::Number as i64))),
+        (String::from("STR")   , Rc::new(Value::create(ValueTypes::String as i64))),
+        (String::from("ARR")   , Rc::new(Value::create(ValueTypes::Array  as i64))),
+        (String::from("LEXPR") , Rc::new(Value::create(ValueTypes::LazyExpression as i64))),
+        (String::from("FUNC")  , Rc::new(Value::create(ValueTypes::Function as i64))),
+
         (String::from("PI"), Rc::new(Value::Number(Number::Float(PI)))),
         (String::from("E") , Rc::new(Value::Number(Number::Float(E )))),
     ])

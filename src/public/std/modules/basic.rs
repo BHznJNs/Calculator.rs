@@ -7,8 +7,8 @@ use crate::public::run_time::scope::Scope;
 use crate::public::value::function::{BuildInParam, BuildInFunction};
 use crate::public::value::value::{ValueTypes, Value, Overload};
 
-use super::std::StdModules;
-use super::utils::get_val::get_val;
+use super::super::std::StdModules;
+use super::super::utils::get_val::get_val;
 
 pub fn implement(
     func_body: &BuildInFuncs,
@@ -28,6 +28,12 @@ pub fn implement(
     }
 
     let result = match func_body {
+        BuildInFuncs::Type => {
+            let input =
+                get_val("input", scope)?;
+
+            Value::create(input.get_type() as i64)
+        },
         BuildInFuncs::Int => {
             let input =
                 get_val("input", scope)?;
@@ -66,6 +72,29 @@ pub fn implement(
                 return Err(())
             }
         },
+        BuildInFuncs::Ascii => {
+            let input =
+                get_val("input", scope)?;
+
+            if let Value::String(str) = input.as_ref() {
+                let temp = str.as_ref().borrow();
+                let option_first_char = temp.chars().next();
+                if let Some(char) = option_first_char {
+                    if char.is_ascii() {
+                        Value::create(char as i64)
+                    } else {
+                        println!("Invalid ASCII character");
+                        return Err(())
+                    }
+                } else {
+                    println!("Invalid params to convert.");
+                    return Err(())
+                }
+            } else {
+                println!("Invalid param type: expected String.");
+                return Err(())
+            }
+        },
         _ => {
             println!("Unexpected function in math implement.");
             return Err(())
@@ -77,12 +106,25 @@ pub fn implement(
 
 pub fn function_list() -> Vec<(&'static str, Rc<BuildInFunction>)> {
     vec![
+        ("type"   , Rc::new(TYPE)),
         ("int"    , Rc::new(INT)),
         ("float"  , Rc::new(FLOAT)),
         ("string" , Rc::new(STR)),
+        ("ascii"  , Rc::new(ASCII)),
     ]
 }
 
+// get value type
+pub const TYPE: BuildInFunction = BuildInFunction {
+    params: [Some(BuildInParam {
+        type__: ValueTypes::Void,
+        identi: "input"
+    }), None, None],
+    lib: StdModules::Basic, 
+    body: BuildInFuncs::Type,
+};
+
+// Type converters
 pub const INT: BuildInFunction = BuildInFunction {
     params: [Some(BuildInParam {
         type__: ValueTypes::String,
@@ -106,4 +148,13 @@ pub const STR: BuildInFunction = BuildInFunction {
     }), None, None],
     lib: StdModules::Basic, 
     body: BuildInFuncs::String,
+};
+
+pub const ASCII: BuildInFunction = BuildInFunction {
+    params: [Some(BuildInParam {
+        type__: ValueTypes::String,
+        identi: "input"
+    }), None, None],
+    lib: StdModules::Basic,
+    body: BuildInFuncs::Ascii,
 };

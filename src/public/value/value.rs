@@ -11,13 +11,13 @@ use super::function::UserDefinedFunction;
 
 #[derive(PartialEq, Clone)]
 pub enum ValueTypes {
+    Void, // all value type
+
     Number,
     String,
     Array,
     LazyExpression,
     Function,
-
-    Value, // all value type
 }
 pub const VALUE_TYPE_ARR: [&'static str; 5] = [
     "num",
@@ -37,12 +37,12 @@ pub const VALUE_TYPE_ENUM: [ValueTypes; 5] = [
 impl fmt::Display for ValueTypes {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            ValueTypes::Void   => write!(f, "Void"),
             ValueTypes::Number => write!(f, "Number"),
             ValueTypes::String => write!(f, "String"),
             ValueTypes::Array  => write!(f, "Array"),
             ValueTypes::LazyExpression => write!(f, "LazyExpression"),
             ValueTypes::Function => write!(f, "Function"),
-            ValueTypes::Value  => write!(f, "Value"),
         }
     }
 }
@@ -51,6 +51,8 @@ impl fmt::Display for ValueTypes {
 
 #[derive(PartialEq)]
 pub enum Value {
+    Void(Option<Rc<Value>>),
+
     Number(Number),
     String(Rc<RefCell<String>>),
     Array(Rc<RefCell<ArrayLiteral>>),
@@ -62,6 +64,8 @@ pub type ArrayLiteral = VecDeque<Value>;
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Value::Void(_) => write!(f, "void"),
+
             Value::Number(num) => write!(f, "{}", num),
             Value::String(str) => write!(f, "'{}'", str.as_ref().borrow()),
             Value::LazyExpression(le) => write!(f, "{}", le),
@@ -105,6 +109,8 @@ impl Value {
     }
     pub fn get_type(&self) -> ValueTypes {
         match self {
+            Value::Void(_)   => ValueTypes::Void,
+
             Value::Number(_) => ValueTypes::Number,
             Value::String(_) => ValueTypes::String,
             Value::Array(_)  => ValueTypes::Array,
@@ -113,7 +119,13 @@ impl Value {
         }
     }
     pub fn check_type(&self, target_type: &ValueTypes) -> bool {
+        if *target_type == ValueTypes::Void {
+            // `void` type can be any type
+            return true
+        }
+
         match self {
+            Value::Void(_)   => *target_type == ValueTypes::Void,
             Value::Number(_) => *target_type == ValueTypes::Number,
             Value::String(_) => *target_type == ValueTypes::String,
             Value::Array(_)  => *target_type == ValueTypes::Array,

@@ -2,10 +2,8 @@ use std::rc::Rc;
 
 use crate::computer::resolvers::sequence_resolve;
 use crate::public::compile_time::ast::ASTNode;
-use crate::public::compile_time::keywords::Keywords;
 use crate::public::value::function::UserDefinedFunction;
 use crate::public::run_time::scope::{Scope, LocalScope};
-use crate::public::value::number::Number;
 use crate::public::value::value::Value;
 
 fn call(
@@ -18,19 +16,21 @@ fn call(
         let node = &function.body[index];
         let sequence_result =
             sequence_resolve::resolve(node, scope)?;
-        
+
         // when encount keyword `brk` | `break`,
-        // function end with empty value.
-        if *sequence_result == Value::Number(Number::Empty(Some(Keywords::Break))) {
-            return Ok(Value::empty(None))
+        // function end with current sequence result.
+        if let Value::Void(Some(val)) = sequence_result.as_ref() {
+            return Ok(val.clone())
         }
 
         if index == node_count - 1 {
+            // when last sequence of function
+            // return the value of the sequence.
             return Ok(sequence_result)
         }
         index += 1;
     }
-    Ok(Value::empty(None))
+    Ok(Rc::new(Value::Void(None)))
 }
 
 pub fn invoke(
@@ -71,10 +71,24 @@ pub fn invoke(
         index += 1;
     }
 
+    // cached local scope
+    let mut local_scope_cached = if scope.local.is_some() {
+        // nested function invocation
+        scope.local.take()
+    } else {
+        None
+    };
+
+    // assign new scope
     scope.local = Some(local_scope);
     let func_result =
         call(&function, scope)?;
-    scope.local = None;
+
+    scope.local = if local_scope_cached.is_some() {
+        local_scope_cached.take()
+    } else {
+        None
+    };
 
     Ok(func_result)
 }

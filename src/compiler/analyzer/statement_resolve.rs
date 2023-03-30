@@ -120,8 +120,16 @@ pub fn resolve(
                 params: None,
             });
         },
+        Keywords::Break => {
+            let return_expression =
+                expression_resolve::resolve(tokens, false)?;
+            let current_node = ASTNode {
+                type__: ASTNodeTypes::Expression,
+                params: Some(return_expression),
+            };
+            params.push(current_node);
+        },
         Keywords::Continue => {},
-        Keywords::Break => {},
         _ => {
             println!("Tokenizer error: unexpected function definition.");
             return Err(())

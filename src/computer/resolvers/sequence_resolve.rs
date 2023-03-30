@@ -11,14 +11,10 @@ pub fn resolve(
     scope: &mut Scope,
 ) -> Result<Rc<Value>, ()> {
     let result = match sequence_node.type__ {
-        ASTNodeTypes::Expression => {
-            expression_resolve::resolve(sequence_node, scope)?
-        },
-        ASTNodeTypes::Statement(_) => {
-            let optional_keyword =
-                statement_resolve::resolve(sequence_node, scope)?;
-            Value::empty(optional_keyword)
-        },
+        ASTNodeTypes::Expression =>
+            expression_resolve::resolve(sequence_node, scope)?,
+        ASTNodeTypes::Statement(_) =>
+            statement_resolve::resolve(sequence_node, scope)?,
         _ => Value::empty(None)
     };
 
