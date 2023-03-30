@@ -1,3 +1,5 @@
+# LeetCode: https://leetcode.cn/problems/climbing-stairs/
+
 # One line version.
 # climb_stairs = fn(n $num) {if n == 1 {brk 1}; if n == 2 {brk 2}; t(n - 1) + t(n - 2)}
 
