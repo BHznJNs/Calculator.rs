@@ -6,7 +6,7 @@ use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
 
 pub fn attempt(
-    input: String,
+    input: &String,
     scope: &mut Scope
 ) -> Result<Rc<Value>, ()> {
     let root_node = compile(input)?;

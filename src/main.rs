@@ -7,7 +7,7 @@ use std::env;
 
 use public::run_time::scope::Scope;
 use exec::repl::repl;
-use exec::run_script::run_script;
+use exec::script::run::run_script;
 
 fn main() {
     let scope = Scope::init();

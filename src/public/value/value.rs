@@ -49,7 +49,7 @@ impl fmt::Display for ValueTypes {
 
 // --- --- --- --- --- ---
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub enum Value {
     Void(Option<Rc<Value>>),
 

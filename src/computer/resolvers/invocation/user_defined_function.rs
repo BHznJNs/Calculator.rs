@@ -43,7 +43,7 @@ pub fn invoke(
 
     while index < function.params.len() {
         if index >= params.len() {
-            println!("Function param missing.");
+            println!("User defined function param missing.");
             return Err(())
         }
 
@@ -72,23 +72,14 @@ pub fn invoke(
     }
 
     // cached local scope
-    let mut local_scope_cached = if scope.local.is_some() {
-        // nested function invocation
-        scope.local.take()
-    } else {
-        None
-    };
+    let mut local_scope_cached = scope.local.take();
 
     // assign new scope
     scope.local = Some(local_scope);
     let func_result =
         call(&function, scope)?;
 
-    scope.local = if local_scope_cached.is_some() {
-        local_scope_cached.take()
-    } else {
-        None
-    };
+    scope.local = local_scope_cached.take();
 
     Ok(func_result)
 }

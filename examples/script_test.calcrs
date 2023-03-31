@@ -1,0 +1,16 @@
+import Math
+import Array
+
+arr = [0]
+
+t = fn() {:
+    a = 10;:
+    b = 10;:
+
+    out sin(a);:
+    # update(arr, 0, a);:
+    out b;:
+}
+
+t()
+# out arr

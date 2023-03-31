@@ -1,12 +1,21 @@
-# LeetCode: https://leetcode.cn/problems/climbing-stairs/
+# LeetCode: https://leetcode.com/problems/climbing-stairs/
+# LeetCodeCn: https://leetcode.cn/problems/climbing-stairs/
 
-# One line version.
-# climb_stairs = fn(n $num) {if n == 1 {brk 1}; if n == 2 {brk 2}; t(n - 1) + t(n - 2)}
+import Basic
+import Array
+
+cache = array(51)
 
 climb_stairs = fn(n $num) {:
     if n == 1 { brk 1 };:
     if n == 2 { brk 2 };:
-    climb_stairs(n - 1) + climb_stairs(n - 2):
+    if cache[n] > 0 { brk cache[n] };:
+
+    result =:
+        climb_stairs(n - 1) + climb_stairs(n - 2);:
+    update(cache, n, result);:
+    result:
 }
 
 out climb_stairs(10) # 89
+out climb_stairs(50) # 20365011074

@@ -5,7 +5,7 @@ use std::str::FromStr;
 use crate::public::run_time::build_in::BuildInFuncs;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::function::{BuildInParam, BuildInFunction};
-use crate::public::value::value::{ValueTypes, Value, Overload};
+use crate::public::value::value::{ValueTypes, Value, Overload, ArrayLiteral};
 
 use super::super::std::StdModules;
 use super::super::utils::get_val::get_val;
@@ -72,6 +72,20 @@ pub fn implement(
                 return Err(())
             }
         },
+        BuildInFuncs::Array => {
+            let input =
+                get_val("input", scope)?;
+
+            if let Value::Number(num) = input.as_ref() {
+                let size = num.int_value() as usize;
+                let arr_literal: ArrayLiteral =
+                    vec![Value::create(0); size].into();
+                Value::create(arr_literal)
+            } else {
+                println!("Invalid param type: expected Number.");
+                return Err(())
+            }
+        },
         BuildInFuncs::Ascii => {
             let input =
                 get_val("input", scope)?;
@@ -110,6 +124,7 @@ pub fn function_list() -> Vec<(&'static str, Rc<BuildInFunction>)> {
         ("int"    , Rc::new(INT)),
         ("float"  , Rc::new(FLOAT)),
         ("string" , Rc::new(STR)),
+        ("array"  , Rc::new(ARRAY)),
         ("ascii"  , Rc::new(ASCII)),
     ]
 }
@@ -149,7 +164,14 @@ pub const STR: BuildInFunction = BuildInFunction {
     lib: StdModules::Basic, 
     body: BuildInFuncs::String,
 };
-
+pub const ARRAY: BuildInFunction = BuildInFunction {
+    params: [Some(BuildInParam {
+        type__: ValueTypes::Number,
+        identi: "input"
+    }), None, None],
+    lib: StdModules::Basic, 
+    body: BuildInFuncs::Array,
+};
 pub const ASCII: BuildInFunction = BuildInFunction {
     params: [Some(BuildInParam {
         type__: ValueTypes::String,

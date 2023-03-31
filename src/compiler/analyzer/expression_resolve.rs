@@ -43,13 +43,12 @@ fn lazy_expression_resolve(
     Ok(current_node)
 }
 
-fn func_params_resolve(
+fn invocation_params_resolve(
     tokens: &mut TokenVec
 ) -> Result<ASTNodeVec, ()> {
     // examples:
     // 1, 2)
     // a, 1)
-
     fn param_expr_resolve(
         sub_tokens: &mut TokenVec,
         params: &mut ASTNodeVec,
@@ -265,7 +264,7 @@ pub fn resolve(
                     if next_token == Token::Paren(Parens::LeftParen) {
                         // function invocation
                         let invoke_params =
-                            func_params_resolve(tokens)?;
+                            invocation_params_resolve(tokens)?;
                         let current_node = ASTNode {
                             type__: ASTNodeTypes::Invocation(name.clone()),
                             params: Some(invoke_params),
@@ -402,7 +401,7 @@ pub fn resolve(
             ASTNodeTypes::Expression       |
             ASTNodeTypes::Invocation(_)    |
             ASTNodeTypes::LazyExpression   |
-            ASTNodeTypes::FunctionDefinition(_) | // test
+            ASTNodeTypes::FunctionDefinition(_) |
             ASTNodeTypes::ArrayElementReading(_) => result_stack.push(node),
 
             ASTNodeTypes::SymbolLiteral(_) => {

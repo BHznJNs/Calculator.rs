@@ -12,7 +12,7 @@ use crate::public::value::value::ValueTypes;
 pub enum BuildInFuncs {
     // Basic
     Type,
-    Int, Float, String, Ascii,
+    Int, Float, String, Array, Ascii,
 
     // Math
      Sin,  Cos,  Tan,

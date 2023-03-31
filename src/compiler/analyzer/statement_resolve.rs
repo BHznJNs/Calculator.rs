@@ -37,8 +37,15 @@ pub fn statement_body_resolve(
     // without LeftBrace
     // template: `{ ...; ... }`
 
+    #[derive(PartialEq)]
+    enum State {
+        Inner,
+        Outer,
+    }
+
     let first_index = 0;
-    let mut brace_count = 1;
+    let mut state = State::Outer;
+    let mut paren_count = 1; // All type of paren: Paren | Brace | Bracket
     let mut sub_tokens = TokenVec::new();
 
     while first_index < tokens.len() {
@@ -46,24 +53,32 @@ pub fn statement_body_resolve(
 
         let is_divider =
             current == Token::Divider;
-        let is_left_brace =
-            current == Token::Paren(Parens::LeftBrace);
-        let is_right_brace =
-            current == Token::Paren(Parens::RightBrace);
+        let is_left_paren =
+            current == Token::Paren(Parens::LeftBrace) ||
+            current == Token::Paren(Parens::LeftParen) ||
+            current == Token::Paren(Parens::LeftBracket);
+        let is_right_paren =
+            current == Token::Paren(Parens::RightBrace) ||
+            current == Token::Paren(Parens::RightParen) ||
+            current == Token::Paren(Parens::RightBracket);
 
-        if is_left_brace {
-            brace_count += 1;
+        if is_left_paren {
+            state = State::Inner;
+            paren_count += 1;
         }
-        if is_divider {
+        if is_divider && (state == State::Outer) {
             let sub_sequence_node =
                 sequence_resolve::resolve(&mut sub_tokens)?;
             sub_tokens.clear();
             params.push(sub_sequence_node);
             continue;
         }
-        if is_right_brace {
-            brace_count -= 1;
-            if brace_count == 0 {
+        if is_right_paren {
+            paren_count -= 1;
+            if paren_count == 1 {
+                state = State::Outer;
+            }
+            if paren_count == 0 {
                 let sub_sequence_node =
                     sequence_resolve::resolve(&mut sub_tokens)?;
                 sub_tokens.clear();

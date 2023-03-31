@@ -22,7 +22,7 @@ fn ascii_to_num(ascii: u8) -> u8 {
     return ascii - NUM_ASCII_START
 }
 
-pub fn tokenize(source: String) -> Result<TokenVec, ()> {
+pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
     let mut index = 0;
 
     // use to control if number is minus

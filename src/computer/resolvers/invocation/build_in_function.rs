@@ -41,7 +41,7 @@ pub fn invoke(
         match formal_param {
             Some(p) => {
                 if index >= params.len() {
-                    println!("Function param missing.");
+                    println!("Build-in function param missing.");
                     return Err(())
                 }
 
@@ -68,10 +68,15 @@ pub fn invoke(
         index += 1;
     }
 
+    // cached local scope
+    let mut local_scope_cached = scope.local.take();
+
     scope.local = Some(local_scope);
     let func_result =
         call(&function, scope)?;
     scope.local = None;
+
+    scope.local = local_scope_cached.take();
 
     Ok(Rc::new(func_result))
 }

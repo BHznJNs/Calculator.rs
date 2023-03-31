@@ -1,3 +1,3 @@
 pub mod repl;
-pub mod run_script;
+pub mod script;
 mod attempt;
