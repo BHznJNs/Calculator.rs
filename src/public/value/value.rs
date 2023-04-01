@@ -68,8 +68,8 @@ impl fmt::Display for Value {
 
             Value::Number(num) => write!(f, "{}", num),
             Value::String(str) => write!(f, "'{}'", str.as_ref().borrow()),
-            Value::LazyExpression(le) => write!(f, "{}", le),
-            Value::Function(_) => write!(f, "User-defined-function"),
+            Value::LazyExpression(_) => write!(f, "<Lazy-Expression>"),
+            Value::Function(_) => write!(f, "<User-defined-function>"),
             Value::Array(arr) => {
                 const LINE_COUNT: i8 = 5;
                 let mut index = 0;

@@ -17,6 +17,7 @@ pub fn resolve(
 
     } else
     if let Token::Keywords(keyword) = tokens[0] {
+        // if matches keyword,
         // regard the whole sequence as a statement
         let statement_nodes =
             statement_resolve::resolve(keyword, tokens)?;

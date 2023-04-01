@@ -25,6 +25,7 @@ pub enum ASTNodeTypes {
     Statement(Keywords),
 }
 
+// display for debug
 impl fmt::Display for ASTNodeTypes {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {

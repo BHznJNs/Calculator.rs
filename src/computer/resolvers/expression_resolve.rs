@@ -36,13 +36,15 @@ pub fn resolve(
                 value_stack.push(Rc::new(Value::create(str.to_owned()))),
             ASTNodeTypes::SymbolLiteral(symbol) => {
                 if value_stack.len() < 2 {
+                    // no enough value for operating
                     println!("Invalid expression: operating number is missing.");
                     return Err(())
                 }
                 let num2 = value_stack.pop().unwrap();
                 let num1 = value_stack.pop().unwrap();
                 let current_symbol = *symbol;
-                let value = operate(num1, num2, current_symbol)?;
+                let value =
+                    operate(num1, num2, current_symbol)?;
 
                 value_stack.push(Rc::new(value));
             },

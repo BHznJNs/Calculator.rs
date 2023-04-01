@@ -220,10 +220,12 @@ pub fn resolve(
     if within_paren {
         // if `within_paren`, first token should be Paren::LeftParen
         if tokens[first_index] != Token::Paren(Parens::LeftParen) {
+            // error msg for debug
             println!("Analyzer error from 'expression_resolve'.");
             return Err(())
         }
-        tokens.remove(first_index);
+        // remove LeftParen
+        tokens.pop_front();
     }
 
     while first_index < tokens.len() {
@@ -256,13 +258,13 @@ pub fn resolve(
                 // variable || function invocation || array element reading
 
                 // if there is the next token
-                // and the next token is LeftParen.
                 let is_more_token = tokens.len() > 0;
                 if is_more_token {
                     let next_token = tokens.pop_front().unwrap();
 
                     if next_token == Token::Paren(Parens::LeftParen) {
-                        // function invocation
+                        // invocation for:
+                        // build-in function || lazy-expression || user-defined-function
                         let invoke_params =
                             invocation_params_resolve(tokens)?;
                         let current_node = ASTNode {
@@ -282,22 +284,23 @@ pub fn resolve(
                     if let Token::Symbol(symbol) = next_token {
                         if Symbols::is_equal_symbol(symbol) {
                             // assignment
-                            // symbols: += | -= | *= | /= | ^=
+                            // `symbol` may be: += | -= | *= | /= | ^=
                             let equal_symbol = symbol;
                             let mut right_hand_nodes =
                                 resolve(tokens, false)?;
 
                             if right_hand_nodes.len() == 0 {
+                                // example:
+                                // var =
                                 println!("Invalid assignment.");
                                 return Err(())
                             }
 
                             let right_hand_expression =
-                            if let ASTNodeTypes::LazyExpression |
-                                   ASTNodeTypes::ArrayLiteral   |
-                                   ASTNodeTypes::FunctionDefinition(_) =
+                            if let ASTNodeTypes::LazyExpression | // lazy-expression
+                                   ASTNodeTypes::ArrayLiteral   | // array assignment
+                                   ASTNodeTypes::FunctionDefinition(_) = // function
                                    right_hand_nodes[0].type__ {
-                                // lazy-expression || array assignment || function
                                 right_hand_nodes.remove(0)
                                 // right_hand_nodes[0].to_owned()
                             } else {
@@ -307,10 +310,16 @@ pub fn resolve(
                                 };
                                 // variable assignment
                                 if equal_symbol == Symbols::Equal {
+                                    // directly assignment
                                     original
                                 } else {
                                     // resolve:   += | -= | *= | /= | ^=
                                     // separated: +  | -  | *  | /  | ^
+
+                                    // example:
+                                    // input : var += 1 
+                                    // output: var = var 1 +
+                                    //               ^^^^^^^ using postfix-expression
                                     let separated = equal_symbol.separate();
                                     let variable_node = ASTNode {
                                         type__: ASTNodeTypes::Variable(name.clone()),
@@ -322,6 +331,7 @@ pub fn resolve(
                                     };
                                     ASTNode {
                                         type__: ASTNodeTypes::Expression,
+                                        // postfix-expression
                                         params: Some(vec![variable_node, original, symbol_node])
                                     }
                                 }

@@ -14,6 +14,7 @@ enum State {
     Int, Float,
 }
 
+// identi -> identifier
 fn is_identi_ascii(ascii: u8) -> bool {
     return ascii.is_ascii_alphabetic() || ascii == UNDERLINE_ASCII;
 }
@@ -25,8 +26,11 @@ fn ascii_to_num(ascii: u8) -> u8 {
 pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
     let mut index = 0;
 
-    // use to control if number is minus
+    // is used for check is number minus OR
+    // check is in annotation state.
     let mut last_type = TokenTypes::Unknown;
+
+    // use to control if number is minus
     let mut is_num_minus = false;
 
     let mut tokens = TokenVec::new();
@@ -47,7 +51,8 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
 
             let mut state = State::Int;
             let mut float_para: f64 = 10.0;
-            let mut value = Number::Int(ascii_to_num(current) as i64);
+            let mut value =
+                Number::Int(ascii_to_num(current) as i64);
 
             index += 1;
             current = chars[index];
@@ -69,9 +74,11 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
                     current = chars[index];
                     continue;
                 }
+
                 if current == POINT_ASCII {
                     state = State::Float;
                     value = value.float();
+
                     index += 1;
                     current = chars[index];
                     continue;
@@ -181,6 +188,7 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
         const RETURN_ASCII     : u8 = 13; // '\r'
 
         match current {
+            // Parenthesis
             LEFT_PAREN_ASCII => {
                 last_type = TokenTypes::Paren;
                 tokens.push_back(Token::Paren(Parens::LeftParen));
@@ -206,6 +214,7 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
                 tokens.push_back(Token::Paren(Parens::RightBrace));
             },
 
+            // Computing symbols
             PLUS_ASCII => {
                 if last_type == TokenTypes::Symbol || last_type == TokenTypes::Unknown {
                     is_num_minus = false;
@@ -272,6 +281,7 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
                 tokens.push_back(current_token);
             },
 
+            // Other symbols
             QUOTE_ASCII => { // String token resolve
                 let mut value = String::new();
                 index += 1;
@@ -310,7 +320,10 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
             TAB_ASCII   => {},
 
             // comment symbol: #
+            // when encount comment,
+            // stop resolving current line
             NUMBER_SIGN_ASCII => break,
+
             NEW_LINE_ASCII    => break,
             RETURN_ASCII      => break,
             _ => {

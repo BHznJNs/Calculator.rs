@@ -78,7 +78,7 @@ pub fn resolve(
             params: Some(func_body_params),
         })
     } else {
-        println!("Expected token: LeftParen '('.");
+        println!("Expected token: LeftParen '(' for function definition.");
         return Err(())
     }
 }

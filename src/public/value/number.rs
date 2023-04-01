@@ -94,6 +94,7 @@ impl fmt::Display for Number {
     }
 }
 
+// override operating symbols
 impl Add for Number {
     type Output = Number;
     fn add(self, other: Number) -> Number {

@@ -13,6 +13,7 @@ pub fn resolve(
     scope: &mut Scope
 ) -> Result<Rc<Value>, ()> {
     let ASTNodeTypes::Statement(keyword) = statement_node.type__ else {
+        // msg for debug
         println!("Sequence_resolver error.");
         return Err(())
     };
@@ -23,6 +24,7 @@ pub fn resolve(
     let result = match keyword {
         Keywords::Out => {
             let expression_node = &params[0];
+            // compute value of the expression after `out`
             let expression_res =
                 expression_resolve::resolve(expression_node, scope)?;
             // do not print empty sequence

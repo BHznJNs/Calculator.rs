@@ -12,10 +12,12 @@ pub fn operate(
     let val1 = box1.as_ref();
     let val2 = box2.as_ref();
 
-    let result = 
+    let result =
     if let (Value::Number(n1), Value::Number(n2)) = (val1, val2) {
+        // operating value must be type of Number.
         let num1 = *n1;
         let num2 = *n2;
+
         match operator {
             Symbols::Plus     => num1 + num2,
             Symbols::Minus    => num1 - num2,
