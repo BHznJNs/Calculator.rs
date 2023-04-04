@@ -3,8 +3,6 @@ use std::collections::VecDeque;
 use std::fmt;
 use std::rc::Rc;
 
-use crate::public::compile_time::keywords::Keywords;
-
 use super::number::Number;
 use super::super::compile_time::ast::ASTNode;
 use super::function::UserDefinedFunction;
@@ -90,8 +88,8 @@ impl fmt::Display for Value {
 }
 
 impl Value {
-    pub fn empty(keyword: Option<Keywords>) -> Rc<Value> {
-        Rc::new(Value::Number(Number::Empty(keyword)))
+    pub fn empty() -> Rc<Value> {
+        Rc::new(Value::Number(Number::Empty))
     }
     pub fn get_i64(&self) -> Result<i64, ()> {
         let Value::Number(num) = self else {

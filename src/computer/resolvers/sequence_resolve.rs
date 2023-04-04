@@ -15,7 +15,7 @@ pub fn resolve(
             expression_resolve::resolve(sequence_node, scope)?,
         ASTNodeTypes::Statement(_) =>
             statement_resolve::resolve(sequence_node, scope)?,
-        _ => Value::empty(None)
+        _ => Value::empty()
     };
 
     Ok(result)

@@ -60,7 +60,7 @@ pub fn resolve(
     };
 
     if let Value::LazyExpression(_) | Value::Function(_) = *right_hand_value {
-        Ok(Value::empty(None))
+        Ok(Value::empty())
     } else {
         Ok(right_hand_value)
     }

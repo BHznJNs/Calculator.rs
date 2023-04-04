@@ -28,7 +28,7 @@ pub fn implement(
                     _ => {}
                 }
             }
-            Value::Number(Number::Empty(None))
+            Value::Number(Number::Empty)
         },
         BuildInFuncs::Pop => {
             let arr_rc = get_val("arr", scope)?;
@@ -37,7 +37,7 @@ pub fn implement(
                 let mut refer = arr.borrow_mut();
                 refer.pop_back();
             }
-            Value::Number(Number::Empty(None))
+            Value::Number(Number::Empty)
         },
         BuildInFuncs::Shift => {
             let arr_rc = get_val("arr", scope)?;
@@ -46,7 +46,7 @@ pub fn implement(
                 let mut refer = arr.borrow_mut();
                 refer.pop_front();
             }
-            Value::Number(Number::Empty(None))
+            Value::Number(Number::Empty)
         },
         BuildInFuncs::Unshift => {
             let arr_rc = get_val("arr", scope)?;
@@ -62,7 +62,7 @@ pub fn implement(
                     _ => {}
                 }
             }
-            Value::Number(Number::Empty(None))
+            Value::Number(Number::Empty)
         },
         BuildInFuncs::Insert => {
             let arr_rc = get_val("arr", scope)?;
@@ -81,7 +81,7 @@ pub fn implement(
                     _ => {}
                 }
             }
-            Value::Number(Number::Empty(None))
+            Value::Number(Number::Empty)
         },
         BuildInFuncs::Remove => {
             let arr_rc = get_val("arr", scope)?;
@@ -93,7 +93,7 @@ pub fn implement(
                 let mut refer = arr.borrow_mut();
                 refer.remove(index);
             }
-            Value::Number(Number::Empty(None))
+            Value::Number(Number::Empty)
         },
         BuildInFuncs::Update => {
             let arr_rc = get_val("arr", scope)?;
@@ -121,7 +121,7 @@ pub fn implement(
                     }
                 }
             }
-            Value::Number(Number::Empty(None))
+            Value::Number(Number::Empty)
         },
         BuildInFuncs::Len => {
             let arr_rc = get_val("arr", scope)?;
@@ -130,7 +130,7 @@ pub fn implement(
                 let refer = arr.borrow();
                 Value::Number(Number::Int(refer.len() as i64))
             } else {
-                Value::Number(Number::Empty(None))
+                Value::Number(Number::Empty)
             }
         },
         _ => {

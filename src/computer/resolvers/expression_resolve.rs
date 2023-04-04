@@ -19,7 +19,7 @@ pub fn resolve(
         .unwrap();
     // empty expression
     if params.len() == 0 {
-        return Ok(Value::empty(None))
+        return Ok(Value::empty())
     }
 
     let mut value_stack = Vec::<Rc<Value>>::new();

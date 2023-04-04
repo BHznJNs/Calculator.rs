@@ -4,6 +4,7 @@ use crate::computer::resolvers::expression_resolve;
 use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes};
 use crate::public::compile_time::keywords::Keywords;
 use crate::public::run_time::scope::Scope;
+use crate::public::value::number::Number;
 use crate::public::value::value::Value;
 
 use super::sequence_resolve;
@@ -28,29 +29,46 @@ pub fn resolve(
             let expression_res =
                 expression_resolve::resolve(expression_node, scope)?;
             // do not print empty sequence
-            if expression_res != Value::empty(None) {
+            if expression_res != Value::empty() {
                 println!("{}", expression_res);
             }
             expression_res
         },
         Keywords::Fn => {
-            Value::empty(None)
+            Value::empty()
         },
         Keywords::For => {
             let loop_count_expressiom = &params[0];
             let loop_count_struct =
                 expression_resolve::resolve(&loop_count_expressiom, scope)?;
+            
+            let is_inf_loop;
             let loop_count = match *loop_count_struct {
-                Value::Number(num) => num.int_value(),
+                Value::Number(num) => {
+                    is_inf_loop =
+                        num == Number::Empty;
+                    num.int_value()
+                },
                 _ => {
                     println!("Invalid loop count for 'for' statement");
                     return Err(())
                 }
             };
 
-            for _ in 0..loop_count {
+            let mut count = 0;
+            let loop_body = &params[1..];
+            loop {
+                // these is used to control loop times
+                if !is_inf_loop {
+                    if count == loop_count {
+                        break;
+                    }
+                    count += 1;
+                }
+
+                // --- --- --- --- --- ---
+
                 let mut is_ended = false;
-                let loop_body = &params[1..];
 
                 for sequence in loop_body {
                     let sequence_result =
@@ -73,7 +91,7 @@ pub fn resolve(
                 }
             }
 
-            Value::empty(None)
+            Value::empty()
         },
         Keywords::If => {
             let condition = &params[0];
@@ -100,7 +118,7 @@ pub fn resolve(
                 }
             }
 
-            Value::empty(None)
+            Value::empty()
         },
 
         Keywords::Import => {
@@ -112,7 +130,7 @@ pub fn resolve(
             };
 
             scope.import(module_name)?;
-            Value::empty(None)
+            Value::empty()
         },
 
         Keywords::Break => {

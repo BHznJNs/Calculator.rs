@@ -2,14 +2,12 @@ use std::f64::INFINITY;
 use std::ops::{Add, Sub, Mul, Div};
 use std::fmt;
 
-use crate::public::compile_time::keywords::Keywords;
-
 #[derive(PartialEq, PartialOrd, Clone, Copy)]
 pub enum Number {
     // is used when comment line
     // or blank line or
     // or return state for statement.
-    Empty(Option<Keywords>),
+    Empty,
 
     NotANumber,
 
@@ -75,13 +73,7 @@ impl fmt::Display for Number {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Number::NotANumber => write!(f, "Not a Number"),
-            Number::Empty(keyword) => {
-                if keyword.is_some() {
-                    write!(f, "Empty Number, keyword: {}", keyword.unwrap())
-                } else {
-                    write!(f, "Empty Number")
-                }
-            },
+            Number::Empty => write!(f, "Empty Number"),
             Number::Int(num) => write!(f, "{}", num),
             Number::Float(num) => {
                 if *num == num.floor() {

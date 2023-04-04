@@ -36,7 +36,7 @@ pub fn repl(mut scope: Scope) -> ! {
 
         if let Ok(val_box) = result {
             let val = val_box.as_ref();
-            if let Value::Number(Number::Empty(_)) = val {
+            if let Value::Number(Number::Empty) = val {
                 continue;
             }
             println!("= {}", val);
