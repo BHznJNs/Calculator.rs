@@ -7,7 +7,7 @@ use crate::public::compile_time::keywords;
 use super::token::{Token, TokenTypes, TokenVec};
 
 const NUM_ASCII_START: u8 = 48;
-const POINT_ASCII: u8 = 46;
+const POINT_ASCII    : u8 = 46;
 const UNDERLINE_ASCII: u8 = 95;
 
 enum State {
@@ -314,6 +314,11 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
                 // type annotation
                 last_type = TokenTypes::Annotation;
             }
+
+            POINT_ASCII  => {
+                last_type = TokenTypes::Symbol;
+                tokens.push_back(Token::Symbol(Symbols::ObjectReading));
+            },
 
             // skip Space and Tab
             SPACE_ASCII => {},

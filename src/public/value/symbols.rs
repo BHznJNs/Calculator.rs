@@ -21,6 +21,8 @@ pub enum Symbols {
     MultiplyEqual,
     DivideEqual,
     PowerEqual,
+
+    ObjectReading,
 }
 
 impl Symbols {
@@ -104,6 +106,8 @@ impl fmt::Display for Symbols {
             Symbols::MultiplyEqual => write!(f, "MultiplyEqual"),
             Symbols::DivideEqual   => write!(f, "DivideEqual"),
             Symbols::PowerEqual    => write!(f, "PowerEqual"),
+
+            Symbols::ObjectReading => write!(f, "ObjectReading"),
         }
     }
 }

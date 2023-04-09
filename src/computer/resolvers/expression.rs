@@ -5,9 +5,8 @@ use crate::public::run_time::scope::Scope;
 use crate::public::value::value::{Value, Overload};
 
 use super::invocation::invocation_resolve;
-use super::variable_reading::variable_reading;
-use super::{array_resolve, array_reading_resolve};
-use super::{assignment_resolve, operate::operate};
+use super::{array_literal, array_reading, variable_reading, function_definition, object_reading, instantiation};
+use super::{assignment, operate::operate};
 
 pub fn resolve(
     expression_node: &ASTNode,
@@ -25,15 +24,28 @@ pub fn resolve(
     let mut value_stack = Vec::<Rc<Value>>::new();
 
     for node in params {
+        let current_value =
         match &node.type__ {
             ASTNodeTypes::Variable(name) =>
-                value_stack.push(variable_reading(name, scope)?),
+                variable_reading::resolve(name, scope)?,
             ASTNodeTypes::Assignment(_) =>
-                value_stack.push(assignment_resolve::resolve(node, scope)?),
+                assignment::resolve(node, scope)?,
             ASTNodeTypes::NumberLiteral(num) => 
-                value_stack.push(Rc::new(Value::Number(*num))),
+                Rc::new(Value::Number(*num)),
             ASTNodeTypes::StringLiteral(str) =>
-                value_stack.push(Rc::new(Value::create(str.to_owned()))),
+                Value::create_rc(str.to_owned()),
+
+            ASTNodeTypes::ArrayElementReading(_) =>
+                array_reading::resolve(node, scope)?,
+            ASTNodeTypes::Expression =>
+                resolve(node, scope)?,
+            ASTNodeTypes::LazyExpression =>
+                Value::create_rc(node.to_owned()),
+            ASTNodeTypes::Invocation(_) =>
+                invocation_resolve::resolve(node, scope)?,
+            ASTNodeTypes::FunctionDefinition(_) =>
+                Value::create_rc(function_definition::resolve(node)?),
+
             ASTNodeTypes::SymbolLiteral(symbol) => {
                 if value_stack.len() < 2 {
                     // no enough value for operating
@@ -46,29 +58,26 @@ pub fn resolve(
                 let value =
                     operate(num1, num2, current_symbol)?;
 
-                value_stack.push(Rc::new(value));
+                Rc::new(value)
             },
             ASTNodeTypes::ArrayLiteral => {
                 let array_elements =
-                    array_resolve::resolve(node, scope)?;
+                    array_literal::resolve(node, scope)?;
                 let array_rc =
-                    Rc::new(Value::create(array_elements));
+                    Value::create_rc(array_elements);
 
-                value_stack.push(array_rc);
+                array_rc
             },
-            ASTNodeTypes::ArrayElementReading(_) =>
-                value_stack.push(array_reading_resolve::resolve(node, scope)?),
-            ASTNodeTypes::Expression =>
-                value_stack.push(resolve(node, scope)?),
-            ASTNodeTypes::LazyExpression =>
-                value_stack.push(Rc::new(Value::create(node.to_owned()))),
-            ASTNodeTypes::Invocation(_) =>
-                value_stack.push(invocation_resolve::resolve(node, scope)?),
+            ASTNodeTypes::Instantiation(_) =>
+                Value::create_rc(instantiation::resolve(node, scope)?),
+            ASTNodeTypes::ObjectReading(_) =>
+                object_reading::resolve(node, scope)?,
             _ => {
                 println!("Unexpected node type: '{}'.", node.type__);
                 return Err(())
             }
-        }
+        };
+        value_stack.push(current_value);
     }
     Ok(value_stack.remove(0))
 }

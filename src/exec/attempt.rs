@@ -11,7 +11,7 @@ pub fn attempt(
 ) -> Result<Rc<Value>, ()> {
     let root_node = compile(input)?;
     // println!("{}", root_node); // LOG
-    let result_num = compute(root_node, scope)?;
+    let result = compute(root_node, scope)?;
 
-    Ok(result_num)
+    Ok(result)
 }

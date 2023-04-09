@@ -23,7 +23,7 @@ pub enum TokenTypes {
 
 // --- --- --- --- --- ---
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub enum Token {
     Number(Number),
     String(String),
@@ -40,14 +40,14 @@ pub type TokenVec = VecDeque<Token>;
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Token::Number(_)   => write!(f, "token: Number"),
-            Token::String(_)   => write!(f, "token: String"),
-            Token::Symbol(_)   => write!(f, "token: Symbol"),
-            Token::Paren(_)    => write!(f, "token: Paren"),
-            Token::Identi(_)   => write!(f, "token: Identifier"),
-            Token::Keywords(_) => write!(f, "token: Keywords"),
-            Token::Divider     => write!(f, "token: Divider"),
-            Token::Annotation(_)  => write!(f, "token: Annotation"),
+            Token::Number(_)   => write!(f, "Number"),
+            Token::String(_)   => write!(f, "String"),
+            Token::Symbol(_)   => write!(f, "Symbol"),
+            Token::Paren(_)    => write!(f, "Paren"),
+            Token::Identi(_)   => write!(f, "Identifier"),
+            Token::Keywords(_) => write!(f, "Keywords"),
+            Token::Divider     => write!(f, "Divider"),
+            Token::Annotation(_)  => write!(f, "Annotation"),
         }
     }
 }

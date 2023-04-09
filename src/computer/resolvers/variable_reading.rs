@@ -3,7 +3,7 @@ use std::rc::Rc;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
 
-pub fn variable_reading(
+pub fn resolve(
     var_name: &String,
     scope: &mut Scope
 ) -> Result<Rc<Value>, ()> {

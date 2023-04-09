@@ -3,8 +3,14 @@ use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes, ASTNodeVec};
 use crate::public::compile_time::keywords::Keywords;
 use crate::compiler::tokenizer::token::{Token, TokenVec};
 
-use super::expression_resolve;
-use super::sequence_resolve;
+use super::expression;
+use super::sequence;
+
+#[derive(PartialEq)]
+enum State {
+    Inner,
+    Outer,
+}
 
 // get condition for statement
 fn statement_condition_resolve(
@@ -22,7 +28,7 @@ fn statement_condition_resolve(
         sub_tokens.push_back(current);
     }
     let condition =
-        expression_resolve::resolve(&mut sub_tokens, false)?;
+        expression::resolve(&mut sub_tokens, false)?;
     params.push(ASTNode {
         type__: ASTNodeTypes::Expression,
         params: Some(condition),
@@ -36,12 +42,6 @@ pub fn statement_body_resolve(
     // statement body sequence resolve
     // without LeftBrace
     // template: `{ ...; ... }`
-
-    #[derive(PartialEq)]
-    enum State {
-        Inner,
-        Outer,
-    }
 
     let first_index = 0;
     let mut state = State::Outer;
@@ -68,7 +68,7 @@ pub fn statement_body_resolve(
         }
         if is_divider && (state == State::Outer) {
             let sub_sequence_node =
-                sequence_resolve::resolve(&mut sub_tokens)?;
+                sequence::resolve(&mut sub_tokens)?;
             sub_tokens.clear();
             params.push(sub_sequence_node);
             continue;
@@ -80,7 +80,7 @@ pub fn statement_body_resolve(
             }
             if paren_count == 0 {
                 let sub_sequence_node =
-                    sequence_resolve::resolve(&mut sub_tokens)?;
+                    sequence::resolve(&mut sub_tokens)?;
                 sub_tokens.clear();
                 params.push(sub_sequence_node);
                 break;
@@ -104,7 +104,7 @@ pub fn resolve(
     match keyword {
         Keywords::Out => {
             let output_expression =
-                expression_resolve::resolve(tokens, false)?;
+                expression::resolve(tokens, false)?;
             let current_node = ASTNode {
                 type__: ASTNodeTypes::Expression,
                 params: Some(output_expression),
@@ -135,18 +135,19 @@ pub fn resolve(
                 params: None,
             });
         },
+
         Keywords::Break => {
             let return_expression =
-                expression_resolve::resolve(tokens, false)?;
+                expression::resolve(tokens, false)?;
             let current_node = ASTNode {
                 type__: ASTNodeTypes::Expression,
                 params: Some(return_expression),
             };
             params.push(current_node);
         },
-        Keywords::Continue => {},
+        Keywords::Continue => {}, // Do nothing
         _ => {
-            println!("Tokenizer error: unexpected function definition.");
+            println!("Tokenizer error: unexpected keyword '{}'.", keyword);
             return Err(())
         }
     }

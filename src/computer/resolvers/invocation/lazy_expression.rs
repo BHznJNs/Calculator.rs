@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::computer::resolvers::sequence_resolve;
+use crate::computer::resolvers::sequence;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
 use crate::public::compile_time::ast::ASTNode;
@@ -29,7 +29,7 @@ pub fn invoke(
     let expression_node = &params[0];
 
     let result =
-        sequence_resolve::resolve(expression_node, scope)?;
+        sequence::resolve(expression_node, scope)?;
 
     Ok(result)
 }

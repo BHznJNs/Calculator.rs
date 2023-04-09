@@ -1,13 +1,13 @@
 use std::rc::Rc;
 
-use crate::computer::resolvers::expression_resolve;
+use crate::computer::resolvers::expression;
 use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes};
 use crate::public::compile_time::keywords::Keywords;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::number::Number;
 use crate::public::value::value::Value;
 
-use super::sequence_resolve;
+use super::sequence;
 
 pub fn resolve(
     statement_node: &ASTNode,
@@ -27,20 +27,17 @@ pub fn resolve(
             let expression_node = &params[0];
             // compute value of the expression after `out`
             let expression_res =
-                expression_resolve::resolve(expression_node, scope)?;
+                expression::resolve(expression_node, scope)?;
             // do not print empty sequence
             if expression_res != Value::empty() {
                 println!("{}", expression_res);
             }
             expression_res
         },
-        Keywords::Fn => {
-            Value::empty()
-        },
         Keywords::For => {
             let loop_count_expressiom = &params[0];
             let loop_count_struct =
-                expression_resolve::resolve(&loop_count_expressiom, scope)?;
+                expression::resolve(&loop_count_expressiom, scope)?;
             
             let is_inf_loop;
             let loop_count = match *loop_count_struct {
@@ -72,7 +69,7 @@ pub fn resolve(
 
                 for sequence in loop_body {
                     let sequence_result =
-                        sequence_resolve::resolve(sequence, scope)?;
+                        sequence::resolve(sequence, scope)?;
 
                     if let Value::Void(_) = *sequence_result {
                         // encount `break` | `brk`
@@ -96,7 +93,7 @@ pub fn resolve(
         Keywords::If => {
             let condition = &params[0];
             let condition_struct =
-                expression_resolve::resolve(&condition, scope)?;
+                expression::resolve(&condition, scope)?;
             let condition_value = match *condition_struct {
                 Value::Number(num) => num.int_value(),
                 _ => {
@@ -109,7 +106,7 @@ pub fn resolve(
                 let condition_body = &params[1..];
                 for sequence in condition_body {
                     let sequence_result =
-                        sequence_resolve::resolve(sequence, scope)?;
+                        sequence::resolve(sequence, scope)?;
 
                     if let Value::Void(_) =
                            *sequence_result {
@@ -136,12 +133,14 @@ pub fn resolve(
         Keywords::Break => {
             let expression_node = &params[0];
             let expression_res =
-                expression_resolve::resolve(expression_node, scope)?;
+                expression::resolve(expression_node, scope)?;
             Rc::new(Value::Void(Some(expression_res)))
         },
 
         Keywords::Continue =>
             Rc::new(Value::Void(None)),
+        
+        _ => Value::empty(),
     };
 
     Ok(result)

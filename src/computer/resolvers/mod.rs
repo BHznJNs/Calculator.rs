@@ -1,10 +1,18 @@
-pub mod sequence_resolve;
-mod expression_resolve;
-mod statement_resolve;
-mod assignment_resolve;
-mod array_resolve;
-mod array_reading_resolve;
+pub mod sequence;
+mod expression;
+mod statement;
+mod assignment;
 mod variable_reading;
+
+mod array_literal;
+mod array_reading;
+
+mod function_definition;
+mod invocation;
+
+mod class;
+mod instantiation;
+mod object_reading;
+
 mod operate;
 
-mod invocation;

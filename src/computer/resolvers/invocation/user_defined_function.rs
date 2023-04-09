@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::computer::resolvers::sequence_resolve;
+use crate::computer::resolvers::sequence;
 use crate::public::compile_time::ast::ASTNode;
 use crate::public::value::function::UserDefinedFunction;
 use crate::public::run_time::scope::{Scope, LocalScope};
@@ -15,7 +15,7 @@ fn call(
     while index < node_count {
         let node = &function.body[index];
         let sequence_result =
-            sequence_resolve::resolve(node, scope)?;
+            sequence::resolve(node, scope)?;
 
         // when encount keyword `brk` | `break`,
         // function end with current sequence result.
@@ -52,7 +52,7 @@ pub fn invoke(
 
         let actual_param_node = &params[index];
         let actual_param_value =
-            sequence_resolve::resolve(actual_param_node, scope)?;
+            sequence::resolve(actual_param_node, scope)?;
 
         // param type check
         if actual_param_value.check_type(&formal_param.type__) {

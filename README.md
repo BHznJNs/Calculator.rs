@@ -69,6 +69,21 @@ An simple command-line calculator program writen with Rust.
 calculator.exe script
 ```
 
+- OOP support
+
+```text
+> Person = cls {age, name}
+= {
+  name,
+  age,
+}
+> inst = new Person["test", 10] 
+= {
+  name : 'test',
+  age : 10,
+}
+```
+
 ## Installation
 
 Go to the [release page](https://github.com/BHznJNs/Calculator.rs/releases) and download the latest released .exe file

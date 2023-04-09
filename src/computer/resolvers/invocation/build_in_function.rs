@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::computer::resolvers::sequence_resolve;
+use crate::computer::resolvers::sequence;
 use crate::public::compile_time::ast::ASTNode;
 use crate::public::std::modules::{math, array, basic};
 use crate::public::std::std::StdModules;
@@ -47,7 +47,7 @@ pub fn invoke(
 
                 let actual_param_node = &params[index];
                 let actual_param_value =
-                    sequence_resolve::resolve(actual_param_node, scope)?;
+                    sequence::resolve(actual_param_node, scope)?;
 
                 // param type check
                 if actual_param_value.check_type(&p.type__) {

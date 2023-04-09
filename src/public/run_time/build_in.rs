@@ -37,12 +37,12 @@ pub enum BuildInFuncs {
 
 pub fn variables() -> HashMap<String, Rc<Value>> {
     HashMap::from([
-        (String::from("VOID")  , Rc::new(Value::create(ValueTypes::Void   as i64))),
-        (String::from("NUM")   , Rc::new(Value::create(ValueTypes::Number as i64))),
-        (String::from("STR")   , Rc::new(Value::create(ValueTypes::String as i64))),
-        (String::from("ARR")   , Rc::new(Value::create(ValueTypes::Array  as i64))),
-        (String::from("LEXPR") , Rc::new(Value::create(ValueTypes::LazyExpression as i64))),
-        (String::from("FUNC")  , Rc::new(Value::create(ValueTypes::Function as i64))),
+        (String::from("VOID")  , Value::create_rc(ValueTypes::Void   as i64)),
+        (String::from("NUM")   , Value::create_rc(ValueTypes::Number as i64)),
+        (String::from("STR")   , Value::create_rc(ValueTypes::String as i64)),
+        (String::from("ARR")   , Value::create_rc(ValueTypes::Array  as i64)),
+        (String::from("LEXPR") , Value::create_rc(ValueTypes::LazyExpression as i64)),
+        (String::from("FUNC")  , Value::create_rc(ValueTypes::Function as i64)),
 
         (String::from("PI"), Rc::new(Value::Number(Number::Float(PI)))),
         (String::from("E") , Rc::new(Value::Number(Number::Float(E )))),

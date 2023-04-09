@@ -9,14 +9,14 @@ fn import_all(
     scope: &mut Scope
 ) -> Result<(), ()> {
     scope.import("Basic")?;
-    scope.import("Math")?;
+    scope.import("Math" )?;
     scope.import("Array")?;
     Ok(())
 }
 
 pub fn repl(mut scope: Scope) -> ! {
     // print program name and version
-    println!("Calculator.rs v1.4.3");
+    println!("Calculator.rs v1.5.0");
     // import stantard libraries
     if import_all(&mut scope).is_err() {
         println!("Standard module import error.");

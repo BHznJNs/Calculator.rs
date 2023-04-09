@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::computer::resolvers::variable_reading::variable_reading;
+use crate::computer::resolvers::variable_reading;
 use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
@@ -30,7 +30,7 @@ pub fn resolve(
         },
         None => {
             let func =
-                variable_reading(func_name, scope)?;
+                variable_reading::resolve(func_name, scope)?;
             match func.as_ref() {
                 Value::LazyExpression(le) =>
                     lazy_expression::invoke(le, scope)?,

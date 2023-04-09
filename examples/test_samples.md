@@ -62,3 +62,11 @@ recurse = fn(i $num) {if i == 5 {brk}; out i; recurse(i + 1)}
 
 t = fn() {update(arr, index, element)}
 ```
+
+# class definition
+
+```calcrs
+Person = cls {age, name}
+inst = new Person[10, "test"]
+nested_inst = new Person[10, new Person[1, 2]]
+```

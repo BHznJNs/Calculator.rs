@@ -2,8 +2,8 @@ use crate::compiler::tokenizer::token::TokenVec;
 use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes};
 use crate::compiler::tokenizer::token::Token;
 
-use super::statement_resolve;
-use super::expression_resolve;
+use super::statement;
+use super::expression;
 
 pub fn resolve(
     tokens: &mut TokenVec
@@ -20,7 +20,7 @@ pub fn resolve(
         // if matches keyword,
         // regard the whole sequence as a statement
         let statement_nodes =
-            statement_resolve::resolve(keyword, tokens)?;
+            statement::resolve(keyword, tokens)?;
 
         let current_node = ASTNode {
             type__: ASTNodeTypes::Statement(keyword),
@@ -28,9 +28,9 @@ pub fn resolve(
         };
         Ok(current_node)
     } else {
-        // regard the whole sequence as a expression
+        // regard the whole sequence as an expression
         let expression_nodes =
-            expression_resolve::resolve(tokens, false)?;
+            expression::resolve(tokens, false)?;
 
         let current_node = ASTNode {
             type__: ASTNodeTypes::Expression,

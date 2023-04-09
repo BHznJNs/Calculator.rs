@@ -1,0 +1,1 @@
+Person = cls {age; name; greet = fn() {out "hello"}}

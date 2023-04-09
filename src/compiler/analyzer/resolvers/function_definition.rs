@@ -3,7 +3,7 @@ use crate::compiler::tokenizer::token::{TokenVec, Token};
 use crate::public::value::function::Param;
 use crate::public::value::parens::Parens;
 
-use super::statement_resolve::statement_body_resolve;
+use super::statement::statement_body_resolve;
 
 fn func_params_resolve(
     tokens: &mut TokenVec
@@ -59,7 +59,8 @@ pub fn resolve(
         println!("Invalid function definition.");
         return Err(())
     }
-    let first_token = tokens.pop_front().unwrap();
+    let first_token =
+        tokens.pop_front().unwrap();
     if first_token == Token::Paren(Parens::LeftParen) {
         let func_params =
             func_params_resolve(tokens)?;
