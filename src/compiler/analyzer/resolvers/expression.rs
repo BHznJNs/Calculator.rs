@@ -5,7 +5,7 @@ use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes, ASTNodeVec};
 use crate::compiler::tokenizer::token::{Token, TokenVec};
 
 use super::symbol_priority::compare;
-use super::{function_definition, class_definition, instantiation, lazy_expression, array, invocation_params, assignment, object_reading};
+use super::{function_definition, class_definition, instantiation, lazy_expression, array, compose};
 
 pub fn resolve(
     tokens: &mut TokenVec,
@@ -27,7 +27,7 @@ pub fn resolve(
 
     while first_index < tokens.len() {
         let current = tokens.pop_front().unwrap();
-    
+
         match current {
             Token::Number(number) => {
                 params.push(ASTNode {
@@ -53,106 +53,14 @@ pub fn resolve(
             },
             Token::Identi(name) => {
                 // variable || function invocation || array element reading
-
-                // if there is the next token
-                let is_more_token = tokens.len() > 0;
-                if is_more_token {
-                    let next_token = tokens.pop_front().unwrap();
-
-                    if next_token == Token::Paren(Parens::LeftParen) {
-                        // invocation for:
-                        // build-in function || lazy-expression || user-defined-function
-                        let invoke_params =
-                            invocation_params::resolve(tokens)?;
-                        let current_node = ASTNode {
-                            type__: ASTNodeTypes::Invocation(name.clone()),
-                            params: Some(invoke_params),
-                        };
-                        params.push(current_node);
-                        continue;
-                    } else
-                    if next_token == Token::Paren(Parens::LeftBracket) {
-                        // array element reading
-                        let array_reading_node =
-                            array::reading_resolve(name, tokens)?;
-
-                        match tokens.pop_front() {
-                            Some(token) => {
-                                let Token::Symbol(symbol) = token else {
-                                    tokens.push_front(token);
-                                    continue;
-                                };
-                                if Symbols::is_equal_symbol(symbol) {
-                                    let current_node =
-                                        assignment::resolve(
-                                            tokens, symbol,
-                                            array_reading_node
-                                        )?;
-                                    params.push(current_node);
-                                } else {
-                                    params.push(array_reading_node);
-                                    tokens.push_front(token);
-                                }
-                            },
-                            None => params.push(array_reading_node),
-                        }
-                        continue;
-                    } else
-                    if next_token == Token::Symbol(Symbols::ObjectReading) {
-                        // object property / method reading
-                        let object_reading_node =
-                            object_reading::resolve(&name, tokens)?;
-
-                        match tokens.pop_front() {
-                            Some(token) => {
-                                let Token::Symbol(symbol) = token else {
-                                    tokens.push_front(token);
-                                    continue;
-                                };
-                                if Symbols::is_equal_symbol(symbol) {
-                                    let current_node =
-                                        assignment::resolve(
-                                            tokens, symbol,
-                                            object_reading_node
-                                        )?;
-                                    params.push(current_node);
-                                } else {
-                                    params.push(object_reading_node);
-                                    tokens.push_front(token);
-                                }
-                            },
-                            None => params.push(object_reading_node),
-                        }
-                        continue;
-                    } else
-                    if let Token::Symbol(symbol) = next_token {
-                        if Symbols::is_equal_symbol(symbol) {
-                            // assignment
-                            let assignment_node =
-                                assignment::resolve(
-                                    tokens, symbol,
-                                    ASTNode {
-                                        type__: ASTNodeTypes::Variable(name),
-                                        params: None,
-                            })?;
-
-                            params.push(assignment_node);
-                            continue;
-                        } else {
-                            // next_token is symbol: + - * /
-                            tokens.push_front(next_token);
-                        }
-                    } else {
-                        println!("Unexpected token: '{}'.", next_token);
-                        return Err(())
-                    }
-                }
-
-                // variable reading
-                params.push(ASTNode {
+                // as compose
+                let current_node =
+                compose::resolve(ASTNode {
                     type__: ASTNodeTypes::Variable(name),
                     params: None,
-                });
+                }, tokens)?;
+
+                params.push(current_node);
             },
             Token::Paren(paren) => {
                 if paren == Parens::LeftBrace {

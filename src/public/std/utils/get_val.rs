@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
 
@@ -7,15 +5,15 @@ use crate::public::value::value::Value;
 pub fn get_val(
     val_name: &str,
     scope: &mut Scope,
-) -> Result<Rc<Value>, ()> {
-    let val =
+) -> Result<Value, ()> {
+    let option_val =
         scope.local
         .as_ref().unwrap()
         .variables
         .get(val_name);
-    match val {
-        Some(rc_val) =>
-            Ok(rc_val.clone()),
+    match option_val {
+        Some(val) =>
+            Ok(val.clone()),
         None => {
             println!("Input for function is missing.");
             Err(())

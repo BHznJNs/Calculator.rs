@@ -40,14 +40,14 @@ pub type TokenVec = VecDeque<Token>;
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Token::Number(_)   => write!(f, "Number"),
-            Token::String(_)   => write!(f, "String"),
-            Token::Symbol(_)   => write!(f, "Symbol"),
-            Token::Paren(_)    => write!(f, "Paren"),
-            Token::Identi(_)   => write!(f, "Identifier"),
-            Token::Keywords(_) => write!(f, "Keywords"),
-            Token::Divider     => write!(f, "Divider"),
-            Token::Annotation(_)  => write!(f, "Annotation"),
+            Token::Number(num)     => write!(f, "Number: {}", num),
+            Token::String(str)     => write!(f, "String: {}", str),
+            Token::Symbol(sym)    => write!(f, "Symbol: {}", sym),
+            Token::Paren(par)      => write!(f, "Paren: {:#?}", par),
+            Token::Identi(ide)     => write!(f, "Identifier: {}", ide),
+            Token::Keywords(key) => write!(f, "Keywords: {}", key),
+            Token::Divider                  => write!(f, "Divider"),
+            Token::Annotation(typ)  => write!(f, "Annotation: {}", typ),
         }
     }
 }

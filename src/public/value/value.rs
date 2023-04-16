@@ -108,8 +108,8 @@ impl fmt::Display for Value {
 }
 
 impl Value {
-    pub fn empty() -> Rc<Value> {
-        Rc::new(Value::Number(Number::Empty))
+    pub fn empty() -> Value {
+        Value::Number(Number::Empty)
     }
     pub fn get_i64(&self) -> Result<i64, ()> {
         let Value::Number(num) = self else {
@@ -126,12 +126,6 @@ impl Value {
         Ok(num.float_value())
     }
 
-    pub fn get_ref(&self) -> Rc<Value> {
-        match self {
-            Value::Void(_) => todo!(),
-            _ => Rc::new(self.clone())
-        }
-    }
     pub fn unwrap(&self) -> Value {
         // Rc<Value> -> Value
         match self {

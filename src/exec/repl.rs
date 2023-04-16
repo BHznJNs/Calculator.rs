@@ -16,7 +16,7 @@ fn import_all(
 
 pub fn repl(mut scope: Scope) -> ! {
     // print program name and version
-    println!("Calculator.rs v1.5.0");
+    println!("Calculator.rs v1.6.0");
     // import stantard libraries
     if import_all(&mut scope).is_err() {
         println!("Standard module import error.");
@@ -33,10 +33,9 @@ pub fn repl(mut scope: Scope) -> ! {
 
         let result =
             attempt(&input, &mut scope);
-
-        if let Ok(val_box) = result {
-            let val = val_box.as_ref();
-            if let Value::Number(Number::Empty) = val {
+        
+        if let Ok(val) = result {
+            if val == Value::Number(Number::Empty) {
                 continue;
             }
             println!("= {}", val);

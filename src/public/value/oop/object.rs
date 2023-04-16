@@ -3,8 +3,6 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fmt;
 
-use crate::public::value::function::UserDefinedFunction;
-
 use super::super::value::Value;
 use super::class::Class;
 use super::utils::data_storage::DataStoragePattern;
@@ -20,23 +18,27 @@ pub struct Object {
 }
 
 impl Object {
-    pub fn get_method(
-        &self, method_name: &String
-    ) -> Result<Rc<UserDefinedFunction>, ()>  {
-        self.prototype.get_method(method_name)
-    }
-
-    pub fn get(&self, prop_name: &String) -> Result<Rc<Value>, ()> {
-        let target_value =
+    pub fn get(&self, prop_name: &String) -> Result<Value, ()> {
+        let target_value_result =
         getter::<Rc<RefCell<Value>>>(
             self.storage_pattern,
             prop_name,
             &self.data_list,
             &self.data_map,
-        )?;
-        let target_ref =
-            target_value.as_ref().borrow();
-        Ok(target_ref.get_ref())
+        );
+        match target_value_result {
+            Ok(target_rc) => {
+                let target_ref =
+                    target_rc.as_ref().borrow();
+                Ok(target_ref.unwrap())
+            },
+            Err(_) => {
+                let target_method =
+                    self.prototype
+                    .get_method(prop_name)?;
+                Ok(Value::Function(target_method.clone()))
+            },
+        }
     }
 
     pub fn set(
@@ -44,17 +46,28 @@ impl Object {
         prop_name: &String,
         value: Value
     ) -> Result<(), ()> {
-        let target_value =
+        let result_target_rc =
         getter::<Rc<RefCell<Value>>>(
             self.storage_pattern,
             prop_name,
             &self.data_list,
             &self.data_map,
-        )?;
-        let mut target_ref =
-            target_value.as_ref().borrow_mut();
-        *target_ref = value;
-        Ok(())
+        );
+
+        match result_target_rc {
+            Ok(target_rc) => {
+                let mut target_ref =
+                    target_rc.as_ref().borrow_mut();
+                *target_ref = value;
+                Ok(())
+            },
+            Err(err_msg) => {
+                println!("{}", err_msg);
+                Err(())
+            },
+        }
+
+        
     }
 }
 

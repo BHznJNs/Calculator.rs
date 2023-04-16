@@ -25,12 +25,22 @@ impl Class {
     pub fn get_method(
         &self, target_method: &String
     ) -> Result<Rc<UserDefinedFunction>, ()> {
-        Ok(getter::<Rc<UserDefinedFunction>>(
+        let result_target_method =
+        getter::<Rc<UserDefinedFunction>>(
             self.method_storage,
             target_method,
             &self.method_list,
             &self.method_map,
-        )?)
+        );
+
+        match result_target_method {
+            Ok(target_method) =>
+                Ok(target_method),
+            Err(err_msg) => {
+                println!("{}", err_msg);
+                Err(())
+            },
+        }
     }
 
     pub fn instantiate(

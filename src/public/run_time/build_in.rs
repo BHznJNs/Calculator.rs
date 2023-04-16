@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use std::f64::consts::PI;
 use std::f64::consts::E;
-use std::rc::Rc;
 
 use crate::public::value::number::Number;
 use crate::public::value::value::Overload;
@@ -35,16 +34,18 @@ pub enum BuildInFuncs {
     // Read, Write
 }
 
-pub fn variables() -> HashMap<String, Rc<Value>> {
+pub fn variables() -> HashMap<String, Value> {
     HashMap::from([
-        (String::from("VOID")  , Value::create_rc(ValueTypes::Void   as i64)),
-        (String::from("NUM")   , Value::create_rc(ValueTypes::Number as i64)),
-        (String::from("STR")   , Value::create_rc(ValueTypes::String as i64)),
-        (String::from("ARR")   , Value::create_rc(ValueTypes::Array  as i64)),
-        (String::from("LEXPR") , Value::create_rc(ValueTypes::LazyExpression as i64)),
-        (String::from("FUNC")  , Value::create_rc(ValueTypes::Function as i64)),
+        (String::from("VOID")  , Value::create(ValueTypes::Void   as i64)),
+        (String::from("NUM")   , Value::create(ValueTypes::Number as i64)),
+        (String::from("STR")   , Value::create(ValueTypes::String as i64)),
+        (String::from("ARR")   , Value::create(ValueTypes::Array  as i64)),
+        (String::from("LEXPR") , Value::create(ValueTypes::LazyExpression as i64)),
+        (String::from("FUNC")  , Value::create(ValueTypes::Function as i64)),
+        (String::from("CLS")   , Value::create(ValueTypes::Class  as i64)),
+        (String::from("OBJ")   , Value::create(ValueTypes::Object as i64)),
 
-        (String::from("PI"), Rc::new(Value::Number(Number::Float(PI)))),
-        (String::from("E") , Rc::new(Value::Number(Number::Float(E )))),
+        (String::from("PI"), Value::Number(Number::Float(PI))),
+        (String::from("E") , Value::Number(Number::Float(E ))),
     ])
 }

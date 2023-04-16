@@ -1,37 +1,36 @@
-use std::rc::Rc;
-
 use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::{Value, Overload};
 
-use super::{expression, array_literal, class, function_definition, instantiation, array_reading, object_reading};
+use super::compose::{array_reading, object_reading, compose};
+use super::{expression, array_literal, class, function_definition, instantiation};
 
 fn right_hand_resolve(
     node: &ASTNode,
     scope: &mut Scope,
-) -> Result<Rc<Value>, ()> {
+) -> Result<Value, ()> {
     let result = match &node.type__ {
         ASTNodeTypes::Expression =>
             expression::resolve(node, scope)?,
         ASTNodeTypes::LazyExpression =>
-            Value::create_rc(node.clone()),
+            Value::create(node.clone()),
 
         ASTNodeTypes::ArrayLiteral => {
             let array_elements =
                 array_literal::resolve(node, scope)?;
-            Value::create_rc(array_elements)
+            Value::create(array_elements)
         },
         ASTNodeTypes::FunctionDefinition(_) =>
-            Value::create_rc(function_definition::resolve(node)?),
+            Value::create(function_definition::resolve(node)?),
         ASTNodeTypes::ClassDefinition => {
             let class_definition =
                 class::resolve(&node)?;
-            Value::create_rc(class_definition)
+            Value::create(class_definition)
         },
         ASTNodeTypes::Instantiation(_) => {
             let inst =
                 instantiation::resolve(node, scope)?;
-            Value::create_rc(inst)
+            Value::create(inst)
         },
         _ => {
             println!("Analyzer error for invalid right_hand_node.");
@@ -44,8 +43,9 @@ fn right_hand_resolve(
 pub fn resolve(
     assignment_node: &ASTNode,
     scope: &mut Scope
-) -> Result<Rc<Value>, ()> {
-    let ASTNodeTypes::Assignment(left_hand_rc) = &assignment_node.type__ else {
+) -> Result<Value, ()> {
+    let ASTNodeTypes::Assignment(left_hand_rc) =
+        &assignment_node.type__ else {
         println!("Invalid variable name for assignment.");
         return Err(())
     };
@@ -56,6 +56,11 @@ pub fn resolve(
 
     let right_hand_value =
         right_hand_resolve(right_hand_node, scope)?;
+    
+    let params =
+        left_hand_rc
+        .params
+        .as_ref();
 
     match &left_hand_rc.type__ {
         ASTNodeTypes::Variable(var_name) => {
@@ -75,18 +80,23 @@ pub fn resolve(
                     ),
             };
         },
-        ASTNodeTypes::ArrayElementReading(_) => {
+        ASTNodeTypes::ArrayElementReading(sub_node) => {
+            let left_hand_arr =
+                compose::resolve(sub_node, scope)?;
             array_reading::assign(
-                left_hand_rc,
+                left_hand_arr,
+                &params.unwrap()[0],
                 right_hand_value.clone(),
                 scope
             )?;
         },
-        ASTNodeTypes::ObjectReading(_) => {
+        ASTNodeTypes::ObjectReading(sub_node) => {
+            let left_hand_obj =
+                compose::resolve(sub_node, scope)?;
             object_reading::assign(
-                left_hand_rc,
+                left_hand_obj,
+                &params.unwrap()[0],
                 right_hand_value.clone(),
-                scope
             )?;
         },
         _ => {

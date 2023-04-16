@@ -38,7 +38,7 @@ pub fn implement(
             let input =
                 get_val("input", scope)?;
 
-            if let Value::String(str) = input.as_ref() {
+            if let Value::String(str) = input {
                 let refer = str.borrow();
                 let i = str_to_num::<i64>(refer)?;
                 Value::create(i)
@@ -51,7 +51,7 @@ pub fn implement(
             let input =
                 get_val("input", scope)?;
 
-            if let Value::String(str) = input.as_ref() {
+            if let Value::String(str) = input {
                 let refer = str.borrow();
                 let f = str_to_num::<f64>(refer)?;
                 Value::create(f)
@@ -64,7 +64,7 @@ pub fn implement(
             let input =
                 get_val("input", scope)?;
 
-            if let Value::Number(num) = input.as_ref() {
+            if let Value::Number(num) = input {
                 let str = num.to_string();
                 Value::create(str)
             } else {
@@ -76,7 +76,7 @@ pub fn implement(
             let input =
                 get_val("input", scope)?;
 
-            if let Value::Number(num) = input.as_ref() {
+            if let Value::Number(num) = input {
                 let size = num.int_value() as usize;
                 let arr_literal: ArrayLiteral =
                     vec![Value::create(0); size].into();
@@ -90,7 +90,7 @@ pub fn implement(
             let input =
                 get_val("input", scope)?;
 
-            if let Value::String(str) = input.as_ref() {
+            if let Value::String(str) = input {
                 let temp = str.as_ref().borrow();
                 let option_first_char = temp.chars().next();
                 if let Some(char) = option_first_char {

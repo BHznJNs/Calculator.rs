@@ -10,7 +10,7 @@ use super::super::value::value::Value;
 
 pub struct GlobalScope {
     pub build_in_funcs: HashMap<&'static str, Rc<BuildInFunction>>,
-    pub variables: HashMap<String, Rc<Value>>,
+    pub variables: HashMap<String, Value>,
 }
 impl GlobalScope {
     pub fn init() -> GlobalScope {
@@ -24,7 +24,7 @@ impl GlobalScope {
 }
 
 pub struct LocalScope {
-    pub variables: HashMap<String, Rc<Value>>,
+    pub variables: HashMap<String, Value>,
 }
 impl LocalScope {
     pub fn init() -> LocalScope {

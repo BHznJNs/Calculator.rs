@@ -35,6 +35,7 @@ pub fn resolve(
 
                 match next_token {
                     Token::Divider | Token::Paren(Parens::RightBrace) => {
+                        // class property
                         tokens.push_front(next_token);
                         class_params.push(ASTNode {
                             type__: ASTNodeTypes::Variable(prop),
@@ -43,6 +44,7 @@ pub fn resolve(
                     },
                     Token::Symbol(Symbols::Equal) => {
                         let next_token = tokens.pop_front();
+                        // class method
                         if next_token == Some(Token::Keywords(Keywords::Function)) {
                             let method_node =
                                 function_definition::resolve(tokens)?;

@@ -1,12 +1,10 @@
-use std::rc::Rc;
-
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
 
 pub fn resolve(
     var_name: &String,
-    scope: &mut Scope
-) -> Result<Rc<Value>, ()> {
+    scope: &mut Scope,
+) -> Result<Value, ()> {
     let variable_value = match &scope.local {
         // use local-scope preferer
         Some(local_scope) =>

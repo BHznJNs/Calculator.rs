@@ -7,7 +7,7 @@ pub fn getter<T: Clone>(
     target_prop: &String,
     list: &Option<Vec<(String, T)>>,
     map : &Option<HashMap<String, T>>,
-) -> Result<T, ()> {
+) -> Result<T, String> {
     match storage_pattern {
         DataStoragePattern::List => {
             let data_list =
@@ -21,8 +21,9 @@ pub fn getter<T: Clone>(
                     return Ok(target_value.clone())
                 }
             }
-            println!("Property '{}' does not exist.", target_prop);
-            return Err(())
+            Err(format!("Property '{}' does not exist.", target_prop))
+            // println!("Property '{}' does not exist.", target_prop);
+            // return Err(())
         },
         DataStoragePattern::Map => {
             let data_map =
@@ -35,8 +36,9 @@ pub fn getter<T: Clone>(
                     return Ok(target_value.clone())
                 },
                 None => {
-                    println!("Property '{}' does not exist.", target_prop);
-                    return Err(())
+                    Err(format!("Property '{}' does not exist.", target_prop))
+                    // println!("Property '{}' does not exist.", target_prop);
+                    // return Err(())
                 },
             }
         },

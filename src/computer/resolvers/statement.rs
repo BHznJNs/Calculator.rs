@@ -12,7 +12,7 @@ use super::sequence;
 pub fn resolve(
     statement_node: &ASTNode,
     scope: &mut Scope
-) -> Result<Rc<Value>, ()> {
+) -> Result<Value, ()> {
     let ASTNodeTypes::Statement(keyword) = statement_node.type__ else {
         // msg for debug
         println!("Sequence_resolver error.");
@@ -40,7 +40,7 @@ pub fn resolve(
                 expression::resolve(&loop_count_expressiom, scope)?;
             
             let is_inf_loop;
-            let loop_count = match *loop_count_struct {
+            let loop_count = match loop_count_struct {
                 Value::Number(num) => {
                     is_inf_loop =
                         num == Number::Empty;
@@ -71,13 +71,13 @@ pub fn resolve(
                     let sequence_result =
                         sequence::resolve(sequence, scope)?;
 
-                    if let Value::Void(_) = *sequence_result {
+                    if let Value::Void(_) = sequence_result {
                         // encount `break` | `brk`
                         is_ended = true;
                         break;
                     }
 
-                    if let Value::Void(None) = *sequence_result {
+                    if let Value::Void(None) = sequence_result {
                         // encount `continue` | `ctn`
                         break;
                     }
@@ -94,7 +94,7 @@ pub fn resolve(
             let condition = &params[0];
             let condition_struct =
                 expression::resolve(&condition, scope)?;
-            let condition_value = match *condition_struct {
+            let condition_value = match condition_struct {
                 Value::Number(num) => num.int_value(),
                 _ => {
                     println!("Invalid condition for 'if' statement.");
@@ -108,8 +108,7 @@ pub fn resolve(
                     let sequence_result =
                         sequence::resolve(sequence, scope)?;
 
-                    if let Value::Void(_) =
-                           *sequence_result {
+                    if let Value::Void(_) = sequence_result {
                         return Ok(sequence_result)
                     }
                 }
@@ -134,12 +133,12 @@ pub fn resolve(
             let expression_node = &params[0];
             let expression_res =
                 expression::resolve(expression_node, scope)?;
-            Rc::new(Value::Void(Some(expression_res)))
+            Value::Void(Some(Rc::new(expression_res)))
         },
 
         Keywords::Continue =>
-            Rc::new(Value::Void(None)),
-        
+            Value::Void(None),
+
         _ => Value::empty(),
     };
 

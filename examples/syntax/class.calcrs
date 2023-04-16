@@ -1,1 +1,4 @@
-Person = cls {age; name; greet = fn() {out "hello"}}
+Person = cls {age; name; greet = fn(self $obj) {out self.name;}}
+inst = new Person[10, "test"]
+
+inst.greet() # 'test'

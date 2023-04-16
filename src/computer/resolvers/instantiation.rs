@@ -19,7 +19,7 @@ pub fn resolve(
     let target_class_value =
         variable_reading::resolve(class_name, scope)?;
     let Value::Class(target_class) =
-        target_class_value.as_ref() else {
+        target_class_value else {
         println!("'{}' is not a valid class.", class_name);
         return Err(())
     };

@@ -15,14 +15,14 @@ pub fn implement(
 ) -> Result<Value, ()> {
     let result = match func_body {
         BuildInFuncs::Push => {
-            let arr_rc = get_val("arr", scope)?;
-            let element_rc = get_val("element", scope)?;
+            let arr_value = get_val("arr", scope)?;
+            let element_value = get_val("element", scope)?;
 
-            if let Value::Array(arr) = arr_rc.as_ref() {
+            if let Value::Array(arr) = arr_value {
                 let mut refer = arr.borrow_mut();
-                match element_rc.as_ref() {
+                match element_value {
                     Value::Number(num) =>
-                        refer.push_back(Value::Number(*num)),
+                        refer.push_back(Value::Number(num)),
                     Value::Array(child_arr) =>
                         refer.push_back(Value::Array(child_arr.clone())),
                     _ => {}
@@ -31,32 +31,32 @@ pub fn implement(
             Value::Number(Number::Empty)
         },
         BuildInFuncs::Pop => {
-            let arr_rc = get_val("arr", scope)?;
+            let arr_value = get_val("arr", scope)?;
 
-            if let Value::Array(arr) = arr_rc.as_ref() {
+            if let Value::Array(arr) = arr_value {
                 let mut refer = arr.borrow_mut();
                 refer.pop_back();
             }
             Value::Number(Number::Empty)
         },
         BuildInFuncs::Shift => {
-            let arr_rc = get_val("arr", scope)?;
+            let arr_value = get_val("arr", scope)?;
 
-            if let Value::Array(arr) = arr_rc.as_ref() {
+            if let Value::Array(arr) = arr_value {
                 let mut refer = arr.borrow_mut();
                 refer.pop_front();
             }
             Value::Number(Number::Empty)
         },
         BuildInFuncs::Unshift => {
-            let arr_rc = get_val("arr", scope)?;
-            let element_rc = get_val("element", scope)?;
+            let arr_value = get_val("arr", scope)?;
+            let element_value = get_val("element", scope)?;
 
-            if let Value::Array(arr) = arr_rc.as_ref() {
+            if let Value::Array(arr) = arr_value {
                 let mut refer = arr.borrow_mut();
-                match element_rc.as_ref() {
+                match element_value {
                     Value::Number(num) =>
-                        refer.push_front(Value::Number(*num)),
+                        refer.push_front(Value::Number(num)),
                     Value::Array(child_arr) =>
                         refer.push_front(Value::Array(child_arr.clone())),
                     _ => {}
@@ -65,17 +65,17 @@ pub fn implement(
             Value::Number(Number::Empty)
         },
         BuildInFuncs::Insert => {
-            let arr_rc = get_val("arr", scope)?;
-            let index_rc = get_val("index", scope)?;
-            let element_rc = get_val("element", scope)?;
+            let arr_value = get_val("arr", scope)?;
+            let index_value = get_val("index", scope)?;
+            let element_value = get_val("element", scope)?;
 
-            let index = index_rc.get_i64()? as usize;
+            let index = index_value.get_i64()? as usize;
 
-            if let Value::Array(arr) = arr_rc.as_ref() {
+            if let Value::Array(arr) = arr_value {
                 let mut refer = arr.borrow_mut();
-                match element_rc.as_ref() {
+                match element_value {
                     Value::Number(num) =>
-                        refer.insert(index, Value::Number(*num)),
+                        refer.insert(index, Value::Number(num)),
                     Value::Array(child_arr) =>
                         refer.insert(index, Value::Array(child_arr.clone())),
                     _ => {}
@@ -84,25 +84,25 @@ pub fn implement(
             Value::Number(Number::Empty)
         },
         BuildInFuncs::Remove => {
-            let arr_rc = get_val("arr", scope)?;
-            let index_rc = get_val("index", scope)?;
+            let arr_value = get_val("arr", scope)?;
+            let index_value = get_val("index", scope)?;
 
-            let index = index_rc.get_i64()? as usize;
+            let index = index_value.get_i64()? as usize;
 
-            if let Value::Array(arr) = arr_rc.as_ref() {
+            if let Value::Array(arr) = arr_value {
                 let mut refer = arr.borrow_mut();
                 refer.remove(index);
             }
             Value::Number(Number::Empty)
         },
         BuildInFuncs::Update => {
-            let arr_rc = get_val("arr", scope)?;
-            let index_rc = get_val("index", scope)?;
-            let element_rc = get_val("element", scope)?;
+            let arr_value = get_val("arr", scope)?;
+            let index_value = get_val("index", scope)?;
+            let element_value = get_val("element", scope)?;
 
-            let index = index_rc.get_i64()? as usize;
+            let index = index_value.get_i64()? as usize;
 
-            if let Value::Array(arr) = arr_rc.as_ref() {
+            if let Value::Array(arr) = arr_value {
                 let mut refer = arr.borrow_mut();
 
                 if index >= refer.len() {
@@ -110,9 +110,9 @@ pub fn implement(
                     return Err(())
                 }
 
-                refer[index] = match element_rc.as_ref() {
+                refer[index] = match element_value {
                     Value::Number(num) =>
-                        Value::Number(*num),
+                        Value::Number(num),
                     Value::Array(child_arr) =>
                         Value::Array(child_arr.clone()),
                     _ => {
@@ -124,9 +124,9 @@ pub fn implement(
             Value::Number(Number::Empty)
         },
         BuildInFuncs::Len => {
-            let arr_rc = get_val("arr", scope)?;
+            let arr_value = get_val("arr", scope)?;
 
-            if let Value::Array(arr) = arr_rc.as_ref() {
+            if let Value::Array(arr) = arr_value {
                 let refer = arr.borrow();
                 Value::Number(Number::Int(refer.len() as i64))
             } else {

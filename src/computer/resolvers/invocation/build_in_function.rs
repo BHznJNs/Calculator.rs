@@ -30,7 +30,7 @@ pub fn invoke(
     function: Rc<BuildInFunction>,
     params: &Vec<ASTNode>,
     scope: &mut Scope,
-) -> Result<Rc<Value>, ()> {
+) -> Result<Value, ()> {
     let mut local_scope = LocalScope::init();
     let mut index = 0;
 
@@ -78,5 +78,5 @@ pub fn invoke(
 
     scope.local = local_scope_cached.take();
 
-    Ok(Rc::new(func_result))
+    Ok(func_result)
 }

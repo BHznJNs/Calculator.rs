@@ -18,17 +18,17 @@ pub enum ASTNodeTypes {
     StringLiteral(String),
     SymbolLiteral(Symbols),
     ArrayLiteral,
-    ArrayElementReading(String),
+    ArrayElementReading(Rc<ASTNode>),
     Expression,
     LazyExpression,
 
-    Invocation(String),
+    Invocation(Rc<ASTNode>),
     Statement(Keywords),
 
     FunctionDefinition(Vec<Param>),
     ClassDefinition,
     Instantiation(String),
-    ObjectReading(String), // (obj_name, property_name)
+    ObjectReading(Rc<ASTNode>), // (obj_name, property_name)
 }
 
 // display for debug
@@ -39,21 +39,21 @@ impl fmt::Display for ASTNodeTypes {
             ASTNodeTypes::Comment => write!(f, "type: Comment"),
 
             ASTNodeTypes::Variable(name) => write!(f, "type: Variable, name: {}", name),
-            ASTNodeTypes::Assignment(name) => write!(f, "type: Assignment, name: {}", name),
+            ASTNodeTypes::Assignment(left_hand) => write!(f, "type: Assignment, left_hand:\n  {}", left_hand),
             ASTNodeTypes::NumberLiteral(num) => write!(f, "type: NumberLiteral, value: {}", num),
             ASTNodeTypes::StringLiteral(str) => write!(f, "type: StringLiteral, value: {}", str),
             ASTNodeTypes::SymbolLiteral(symbol) => write!(f, "type: SymbolLiteral, value: {}", symbol),
             ASTNodeTypes::ArrayLiteral => write!(f, "type: ArrayLiteral"),
-            ASTNodeTypes::ArrayElementReading(array_name) => write!(f, "type: ArrayElementReading, name: {}", array_name),
+            ASTNodeTypes::ArrayElementReading(arr_node) => write!(f, "type: ArrayElementReading, arr_node:\n  {}", arr_node),
 
             ASTNodeTypes::Expression => write!(f, "type: Expression"),
             ASTNodeTypes::LazyExpression => write!(f, "type: LazyExpression"),
             ASTNodeTypes::FunctionDefinition(_) => write!(f, "type: UserDefinedFunction"),
             ASTNodeTypes::ClassDefinition => write!(f, "type: UserDefinedClass"),
-            ASTNodeTypes::Invocation(name) => write!(f, "type: Invocation, name: {}", name),
+            ASTNodeTypes::Invocation(caller) => write!(f, "type: Invocation, caller:\n  {}", caller),
             ASTNodeTypes::Statement(keyword) => write!(f, "type: Statement, keyword: {}", keyword),
             ASTNodeTypes::Instantiation(class_name) => write!(f, "type: Instantiation, name: {}", class_name),
-            ASTNodeTypes::ObjectReading(obj_name) => write!(f, "type: ObjectReading, obj: {:?}", obj_name),
+            ASTNodeTypes::ObjectReading(obj_node) => write!(f, "type: ObjectReading, obj:\n  {}", obj_node),
         }
     }
 }
@@ -74,7 +74,7 @@ impl fmt::Display for ASTNode {
             Some(params) => {
                 // if sub-params,
                 // recursively show sub-params
-                print!("params: {{\n");
+                print!("params: {{\n  ");
                 for node in params {
                     println!("{}", node);
                 }

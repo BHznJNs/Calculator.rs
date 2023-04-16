@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::public::value::parens::Parens;
 use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes, ASTNodeVec};
 use crate::compiler::tokenizer::token::{Token, TokenVec};
@@ -81,15 +83,15 @@ pub fn literal_resolve(
 }
 
 pub fn reading_resolve(
-    arr_name: String,
+    arr_node: Rc<ASTNode>,
     tokens: &mut TokenVec,
 ) -> Result<ASTNode, ()> {
     // example:
     // 1] | from `arr[1]`
     // 1][2] | from `arr[1][2]`
+
     let first_index = 0;
     let mut bracket_count = 1;
-    let mut params = ASTNodeVec::new();
     let mut sub_tokens = TokenVec::new();
 
     while first_index < tokens.len() {
@@ -105,30 +107,16 @@ pub fn reading_resolve(
         }
         sub_tokens.push_back(current);
     }
-    let reading_index_expression_nodes =
-        expression::resolve(&mut sub_tokens, false)?;
-    params.push(ASTNode {
+    let reading_index_expression = ASTNode {
         type__: ASTNodeTypes::Expression,
-        params: Some(reading_index_expression_nodes),
-    });
-
-    // sub array element reading
-    let next_token = tokens.pop_front();
-    if let Some(Token::Paren(Parens::LeftBracket)) = next_token {
-        let sub_element_reading =
-            reading_resolve(arr_name.clone(), tokens)?;
-        params.push(sub_element_reading);
-    } else if next_token == None {
-        // empty
-    } else {
-        // exist next_token and next_token
-        // is not equal Token::Paren(Parens::LeftBracket)
-        tokens.push_front(next_token.unwrap())
-    }
+        params: Some(expression::resolve(
+            &mut sub_tokens, false
+        )?),
+    };
 
     let current_node = ASTNode {
-        type__: ASTNodeTypes::ArrayElementReading(arr_name),
-        params: Some(params)
+        type__: ASTNodeTypes::ArrayElementReading(arr_node),
+        params: Some(vec![reading_index_expression]),
     };
     Ok(current_node)
 }

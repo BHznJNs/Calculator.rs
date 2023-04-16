@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use crate::public::compile_time::ast::ASTNode;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
@@ -9,7 +7,7 @@ use super::resolvers::sequence;
 pub fn compute(
     root_node: ASTNode,
     scope: &mut Scope,
-) -> Result<Rc<Value>, ()> {
+) -> Result<Value, ()> {
     /*
       Root {
         Expression {

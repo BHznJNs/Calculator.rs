@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use crate::computer::resolvers::sequence;
 use crate::public::compile_time::ast::ASTNode;
 use crate::public::value::function::UserDefinedFunction;
@@ -9,7 +7,7 @@ use crate::public::value::value::Value;
 fn call(
     function: &UserDefinedFunction,
     scope: &mut Scope,
-) -> Result<Rc<Value>, ()> {
+) -> Result<Value, ()> {
     let node_count = function.body.len();
     let mut index = 0;
     while index < node_count {
@@ -19,8 +17,8 @@ fn call(
 
         // when encount keyword `brk` | `break`,
         // function end with current sequence result.
-        if let Value::Void(Some(val)) = sequence_result.as_ref() {
-            return Ok(val.clone())
+        if let Value::Void(Some(val)) = sequence_result {
+            return Ok(val.unwrap())
         }
 
         if index == node_count - 1 {
@@ -30,14 +28,14 @@ fn call(
         }
         index += 1;
     }
-    Ok(Rc::new(Value::Void(None)))
+    Ok(Value::Void(None))
 }
 
 pub fn invoke(
     function: &UserDefinedFunction,
     params: &Vec<ASTNode>,
     scope: &mut Scope,
-) -> Result<Rc<Value>, ()> {
+) -> Result<Value, ()> {
     let mut local_scope = LocalScope::init();
     let mut index = 0;
 
