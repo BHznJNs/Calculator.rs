@@ -51,6 +51,13 @@ pub fn resolve(
                 // array element reading
                 array::reading_resolve(Rc::new(var_node), tokens)?
             },
+            Token::Paren(_) => {
+                // examples:
+                // ...  PI)
+                // ..., PI]
+                tokens.push_front(next_token);
+                return Ok(var_node)
+            },
             Token::Symbol(Symbols::ObjectReading) => {
                 // object property / method reading
                 object_reading::resolve(Rc::new(var_node), tokens)?

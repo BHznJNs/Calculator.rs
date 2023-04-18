@@ -128,10 +128,7 @@ impl Value {
 
     pub fn unwrap(&self) -> Value {
         // Rc<Value> -> Value
-        match self {
-            Value::Void(_) => todo!(),
-            _ => self.clone()
-        }
+        self.clone()
     }
 
 
@@ -172,47 +169,31 @@ impl Value {
 // Overload functions
 pub trait Overload<T> {
     fn create(value: T) -> Self;
-    fn create_rc(value: T) -> Rc<Self>;
 }
 
 impl Overload<i64> for Value {
     fn create(value: i64) -> Self {
         Value::Number(Number::Int(value))
     }
-    fn create_rc(value: i64) -> Rc<Self> {
-        Rc::new(Value::create(value))
-    }
 }
 impl Overload<f64> for Value {
     fn create(value: f64) -> Self {
         Value::Number(Number::Float(value))
-    }
-    fn create_rc(value: f64) -> Rc<Self> {
-        Rc::new(Value::create(value))
     }
 }
 impl Overload<String> for Value {
     fn create(value: String) -> Self {
         Value::String(Rc::new(RefCell::new(value)))
     }
-    fn create_rc(value: String) -> Rc<Self> {
-        Rc::new(Value::create(value))
-    }
 }
 impl Overload<ArrayLiteral> for Value {
     fn create(value: ArrayLiteral) -> Self {
         Value::Array(Rc::new(RefCell::new(value)))
     }
-    fn create_rc(value: ArrayLiteral) -> Rc<Self> {
-        Rc::new(Value::create(value))
-    }
 }
 impl Overload<ASTNode> for Value {
     fn create(value: ASTNode) -> Self {
         Value::LazyExpression(Rc::new(value))
-    }
-    fn create_rc(value: ASTNode) -> Rc<Self> {
-        Rc::new(Value::create(value))
     }
 }
 
@@ -220,23 +201,14 @@ impl Overload<UserDefinedFunction> for Value {
     fn create(value: UserDefinedFunction) -> Self {
         Value::Function(Rc::new(value))
     }
-    fn create_rc(value: UserDefinedFunction) -> Rc<Self> {
-        Rc::new(Value::create(value))
-    }
 }
 impl Overload<Class> for Value {
     fn create(value: Class) -> Self {
         Value::Class(Rc::new(value))
     }
-    fn create_rc(value: Class) -> Rc<Self> {
-        Rc::new(Value::create(value))
-    }
 }
 impl Overload<Object> for Value {
     fn create(value: Object) -> Self {
         Value::Object(Rc::new(RefCell::new(value)))
-    }
-    fn create_rc(value: Object) -> Rc<Self> {
-        Rc::new(Value::create(value))
     }
 }

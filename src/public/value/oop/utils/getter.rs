@@ -22,8 +22,6 @@ pub fn getter<T: Clone>(
                 }
             }
             Err(format!("Property '{}' does not exist.", target_prop))
-            // println!("Property '{}' does not exist.", target_prop);
-            // return Err(())
         },
         DataStoragePattern::Map => {
             let data_map =
@@ -32,14 +30,10 @@ pub fn getter<T: Clone>(
                 .unwrap();
 
             match data_map.get(target_prop) {
-                Some(target_value) => {
-                    return Ok(target_value.clone())
-                },
-                None => {
-                    Err(format!("Property '{}' does not exist.", target_prop))
-                    // println!("Property '{}' does not exist.", target_prop);
-                    // return Err(())
-                },
+                Some(target_value) =>
+                    Ok(target_value.clone()),
+                None =>
+                    Err(format!("Property '{}' does not exist.", target_prop)),
             }
         },
     }
