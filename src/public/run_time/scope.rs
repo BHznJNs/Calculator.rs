@@ -71,7 +71,6 @@ impl Scope {
             let func_list = match target_module {
                 StdModules::Basic  => basic::function_list(),
                 StdModules::Math   => math::function_list(),
-                StdModules::String => todo!(),
                 StdModules::Array  => array::function_list(),
                 StdModules::FileSystem => todo!(),
             };

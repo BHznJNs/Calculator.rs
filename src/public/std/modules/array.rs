@@ -20,15 +20,9 @@ pub fn implement(
 
             if let Value::Array(arr) = arr_value {
                 let mut refer = arr.borrow_mut();
-                match element_value {
-                    Value::Number(num) =>
-                        refer.push_back(Value::Number(num)),
-                    Value::Array(child_arr) =>
-                        refer.push_back(Value::Array(child_arr.clone())),
-                    _ => {}
-                }
+                refer.push_back(element_value.clone());
             }
-            Value::Number(Number::Empty)
+            element_value
         },
         BuildInFuncs::Pop => {
             let arr_value = get_val("arr", scope)?;
@@ -54,15 +48,9 @@ pub fn implement(
 
             if let Value::Array(arr) = arr_value {
                 let mut refer = arr.borrow_mut();
-                match element_value {
-                    Value::Number(num) =>
-                        refer.push_front(Value::Number(num)),
-                    Value::Array(child_arr) =>
-                        refer.push_front(Value::Array(child_arr.clone())),
-                    _ => {}
-                }
+                refer.push_front(element_value.clone());
             }
-            Value::Number(Number::Empty)
+            element_value
         },
         BuildInFuncs::Insert => {
             let arr_value = get_val("arr", scope)?;
@@ -73,61 +61,35 @@ pub fn implement(
 
             if let Value::Array(arr) = arr_value {
                 let mut refer = arr.borrow_mut();
-                match element_value {
-                    Value::Number(num) =>
-                        refer.insert(index, Value::Number(num)),
-                    Value::Array(child_arr) =>
-                        refer.insert(index, Value::Array(child_arr.clone())),
-                    _ => {}
-                }
+                refer.insert(index, element_value.clone());
             }
-            Value::Number(Number::Empty)
+            element_value
         },
         BuildInFuncs::Remove => {
             let arr_value = get_val("arr", scope)?;
             let index_value = get_val("index", scope)?;
 
             let index = index_value.get_i64()? as usize;
-
+            let mut removed_element: Option<Value> = None;
+    
             if let Value::Array(arr) = arr_value {
                 let mut refer = arr.borrow_mut();
-                refer.remove(index);
+                removed_element = refer.remove(index);
             }
-            Value::Number(Number::Empty)
-        },
-        BuildInFuncs::Update => {
-            let arr_value = get_val("arr", scope)?;
-            let index_value = get_val("index", scope)?;
-            let element_value = get_val("element", scope)?;
-
-            let index = index_value.get_i64()? as usize;
-
-            if let Value::Array(arr) = arr_value {
-                let mut refer = arr.borrow_mut();
-
-                if index >= refer.len() {
-                    println!("Index out of range, current length: {}.", refer.len());
-                    return Err(())
-                }
-
-                refer[index] = match element_value {
-                    Value::Number(num) =>
-                        Value::Number(num),
-                    Value::Array(child_arr) =>
-                        Value::Array(child_arr.clone()),
-                    _ => {
-                        println!("Invalid element type.");
-                        return Err(())
-                    }
-                }
+            match removed_element {
+                Some(val) => val,
+                None => Value::Number(Number::Empty)
             }
-            Value::Number(Number::Empty)
         },
         BuildInFuncs::Len => {
             let arr_value = get_val("arr", scope)?;
 
             if let Value::Array(arr) = arr_value {
                 let refer = arr.borrow();
+                Value::Number(Number::Int(refer.len() as i64))
+            } else
+            if let Value::String(str) = arr_value {
+                let refer = str.borrow();
                 Value::Number(Number::Int(refer.len() as i64))
             } else {
                 Value::Number(Number::Empty)
@@ -149,7 +111,6 @@ pub fn function_list() -> Vec<(&'static str, Rc<BuildInFunction>)> {
         ("unshift", Rc::new(UNSHIFT)),
         ("insert" , Rc::new(INSERT)),
         ("remove" , Rc::new(REMOVE)),
-        ("update" , Rc::new(UPDATE)),
         ("len"    , Rc::new(LEN)),
     ]
 }
@@ -161,7 +122,7 @@ pub const PUSH: BuildInFunction = BuildInFunction {
             identi: "arr"
         }),
         Some(BuildInParam {
-            type__: ValueTypes::Number,
+            type__: ValueTypes::Void,
             identi: "element"
         }), None
     ],
@@ -197,7 +158,7 @@ pub const UNSHIFT: BuildInFunction = BuildInFunction {
             identi: "arr"
         }),
         Some(BuildInParam {
-            type__: ValueTypes::Number,
+            type__: ValueTypes::Void,
             identi: "element"
         }), None
     ],
@@ -215,7 +176,7 @@ pub const INSERT: BuildInFunction = BuildInFunction {
             identi: "index"
         }),
         Some(BuildInParam {
-            type__: ValueTypes::Number,
+            type__: ValueTypes::Void,
             identi: "element"
         })
     ],
@@ -235,27 +196,10 @@ pub const REMOVE: BuildInFunction = BuildInFunction {
     lib: StdModules::Array, 
     body: BuildInFuncs::Remove,
 };
-pub const UPDATE: BuildInFunction = BuildInFunction {
-    params: [
-        Some(BuildInParam {
-            type__: ValueTypes::Array,
-            identi: "arr"
-        }), Some(BuildInParam {
-            type__: ValueTypes::Number,
-            identi: "index"
-        }),
-        Some(BuildInParam {
-            type__: ValueTypes::Number,
-            identi: "element"
-        })
-    ],
-    lib: StdModules::Array, 
-    body: BuildInFuncs::Update,
-};
 pub const LEN: BuildInFunction = BuildInFunction {
     params: [
         Some(BuildInParam {
-            type__: ValueTypes::Array,
+            type__: ValueTypes::Void,
             identi: "arr"
         }), None, None
     ],

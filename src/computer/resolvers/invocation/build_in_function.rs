@@ -17,8 +17,6 @@ fn call(
             basic::implement(&function.body, scope),
         StdModules::Math =>
             math::implement(&function.body, scope),
-        StdModules::String =>
-            todo!(),
         StdModules::Array =>
             array::implement(&function.body, scope),
         StdModules::FileSystem =>

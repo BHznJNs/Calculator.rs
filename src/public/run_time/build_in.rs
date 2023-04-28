@@ -28,7 +28,7 @@ pub enum BuildInFuncs {
     Push, Pop,
     Shift, Unshift,
     Insert, Remove,
-    Update, Len,
+    Len,
 
     // // File system
     // Read, Write
