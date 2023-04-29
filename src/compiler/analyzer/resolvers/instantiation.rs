@@ -9,7 +9,7 @@ pub fn resolve(
 ) -> Result<ASTNode, ()> {
     // no `new` keyword
     // example:
-    // Person["BHznJNs", 99] | from `new Person["BHznJNs", 99]`
+    // Person["test", 99] | from `new Person["test", 99]`
 
     let option_target_class =
         tokens.pop_front();

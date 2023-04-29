@@ -1,0 +1,8 @@
+import Array
+
+self = cls {:
+    data;:
+    push=fn(self $obj, el $_) {:
+        push(self.data, el);:
+    };:
+}

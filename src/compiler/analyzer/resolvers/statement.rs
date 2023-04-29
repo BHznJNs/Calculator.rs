@@ -125,15 +125,21 @@ pub fn resolve(
                 return Err(())
             }
             let next_token = tokens.pop_front().unwrap();
-            let Token::Identi(module_name) = next_token else {
+            if let Token::Identi(module_name) = next_token {
+                params.push(ASTNode {
+                    type__: ASTNodeTypes::Variable(module_name),
+                    params: None,
+                });
+            } else
+            if let Token::String(module_path) = next_token {
+                params.push(ASTNode {
+                    type__: ASTNodeTypes::StringLiteral(module_path),
+                    params: None,
+                });
+            } else {
                 println!("Invalid import statement: invalid module name.");
                 return Err(())
-            };
-
-            params.push(ASTNode {
-                type__: ASTNodeTypes::Variable(module_name),
-                params: None,
-            });
+            }
         },
 
         Keywords::Break => {

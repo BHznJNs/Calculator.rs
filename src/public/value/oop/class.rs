@@ -107,7 +107,7 @@ impl Class {
         }
 
         Ok(Object {
-            prototype: class_self.clone(),
+            prototype: Some(class_self.clone()),
             storage_pattern,
             data_list,
             data_map,

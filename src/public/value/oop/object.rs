@@ -10,7 +10,7 @@ use super::utils::getter::getter;
 
 #[derive(PartialEq)]
 pub struct Object {
-    pub prototype: Rc<Class>,
+    pub prototype: Option<Rc<Class>>,
 
     pub storage_pattern: DataStoragePattern,
     pub data_list: Option<Vec<(String, Rc<RefCell<Value>>)>>,
@@ -33,10 +33,17 @@ impl Object {
                 Ok(target_ref.unwrap())
             },
             Err(_) => {
-                let target_method =
-                    self.prototype
-                    .get_method(prop_name)?;
-                Ok(Value::Function(target_method.clone()))
+                match &self.prototype {
+                    Some(proto) => {
+                        let target_method =
+                            proto.get_method(prop_name)?;
+                        Ok(Value::Function(target_method.clone()))
+                    },
+                    None => {
+                        println!("Property '{}' in object does not exist.", prop_name);
+                        Err(())
+                    }
+                }
             },
         }
     }
@@ -66,8 +73,6 @@ impl Object {
                 Err(())
             },
         }
-
-        
     }
 }
 

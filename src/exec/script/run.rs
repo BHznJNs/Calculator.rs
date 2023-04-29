@@ -14,13 +14,10 @@ fn read_lines(path: String) -> io::Result<io::Lines<FileBuf>> {
 
 pub fn run_script(
     path: String,
-    mut scope: Scope
+    scope: &mut Scope
 ) {
-    let mut script_lines =
-    if let Ok(lines) = read_lines(path) {
-        lines
-    } else {
-        println!("Invalid file.");
+    let Ok(mut script_lines) = read_lines(path) else {
+        println!("Invalid script file.");
         return
     };
 
@@ -65,7 +62,7 @@ pub fn run_script(
 
                     // execuse the line
                     let line_result =
-                        attempt(current_line, &mut scope);
+                        attempt(current_line, scope);
                     
                     if !cached_multiline.is_empty() {
                         cached_multiline.clear();
