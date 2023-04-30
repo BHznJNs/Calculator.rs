@@ -6,7 +6,7 @@ import Array
 
 cache = array(51)
 
-climb_stairs = fn(n $num) {:
+climb_stairs = fn (n $num) {:
     if n == 1 { brk 1 };:
     if n == 2 { brk 2 };:
     if cache[n] > 0 { brk cache[n] };:

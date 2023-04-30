@@ -2,7 +2,29 @@ import Array
 
 self = cls {:
     data;:
-    push=fn(self $obj, el $_) {:
-        push(self.data, el);:
+
+    push = fn (self $obj, val $_) {:
+        brk push(self.data, val);:
+    };:
+    pop  = fn (self $obj) {:
+        brk pop(self.data);:
+    };:
+
+    shift   = fn (self $obj) {:
+        brk shift(self.data);:
+    };:
+    unshift = fn (self $obj, val $_) {:
+        brk unshift(self.data, val);:
+    };:
+
+    insert = fn (self $obj, ind $num, val $_) {:
+        brk insert(self.data, ind, val);:
+    };:
+    remove = fn (self $obj, ind $num, val $_) {:
+        brk remove(self.data, ind, val);:
+    };:
+
+    len = fn (self $obj) {:
+        brk len(self.data);:
     };:
 }

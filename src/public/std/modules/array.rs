@@ -29,7 +29,10 @@ pub fn implement(
 
             if let Value::Array(arr) = arr_value {
                 let mut refer = arr.borrow_mut();
-                refer.pop_back();
+                let poped_el = refer.pop_back();
+                if let Some(val) = poped_el {
+                    return Ok(val)
+                }
             }
             Value::Number(Number::Empty)
         },
@@ -71,7 +74,7 @@ pub fn implement(
 
             let index = index_value.get_i64()? as usize;
             let mut removed_element: Option<Value> = None;
-    
+
             if let Value::Array(arr) = arr_value {
                 let mut refer = arr.borrow_mut();
                 removed_element = refer.remove(index);
