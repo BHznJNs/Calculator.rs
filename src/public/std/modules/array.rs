@@ -29,6 +29,7 @@ pub fn implement(
 
             if let Value::Array(arr) = arr_value {
                 let mut refer = arr.borrow_mut();
+                // return poped value
                 let poped_el = refer.pop_back();
                 if let Some(val) = poped_el {
                     return Ok(val)
@@ -41,7 +42,11 @@ pub fn implement(
 
             if let Value::Array(arr) = arr_value {
                 let mut refer = arr.borrow_mut();
-                refer.pop_front();
+                // return shifted value
+                let shifted = refer.pop_front();
+                if let Some(val) = shifted {
+                    return Ok(val)
+                }
             }
             Value::Number(Number::Empty)
         },

@@ -48,8 +48,11 @@ pub fn implement(
                 let refer = str.borrow();
                 let i = str_to_num::<i64>(refer)?;
                 Value::create(i)
+            } else
+            if let Value::Number(num) = input {
+                Value::Number(num.int())
             } else {
-                println!("Invalid param type: expected String.");
+                println!("Invalid param type: expected String OR Number.");
                 return Err(())
             }
         },
@@ -61,8 +64,11 @@ pub fn implement(
                 let refer = str.borrow();
                 let f = str_to_num::<f64>(refer)?;
                 Value::create(f)
+            } else
+            if let Value::Number(num) = input {
+                Value::Number(num.float())
             } else {
-                println!("Invalid param type: expected String.");
+                println!("Invalid param type: expected String OR Number.");
                 return Err(())
             }
         },
@@ -158,7 +164,7 @@ pub const CLONE: BuildInFunction = BuildInFunction {
 // Type converters
 pub const INT: BuildInFunction = BuildInFunction {
     params: [Some(BuildInParam {
-        type__: ValueTypes::String,
+        type__: ValueTypes::Void,
         identi: "input"
     }), None, None],
     lib: StdModules::Basic, 
@@ -166,7 +172,7 @@ pub const INT: BuildInFunction = BuildInFunction {
 };
 pub const FLOAT: BuildInFunction = BuildInFunction {
     params: [Some(BuildInParam {
-        type__: ValueTypes::String,
+        type__: ValueTypes::Void,
         identi: "input"
     }), None, None],
     lib: StdModules::Basic, 
