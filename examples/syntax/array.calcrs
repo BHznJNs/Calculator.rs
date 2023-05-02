@@ -1,0 +1,48 @@
+import Array
+
+arr = [1, 2, 3]
+
+out push(arr, 0)
+out arr
+# 0
+# [
+#   1, 2, 3, 0,
+# ]
+
+out pop(arr)
+out arr
+# 0
+# [
+#   1, 2, 3,
+# ]
+
+out shift(arr)
+out arr
+# 1
+# [
+#   2, 3,
+# ]
+
+out unshift(arr, 4)
+out arr
+# 4
+# [
+#   4, 2, 3,
+# ]
+
+out insert(arr, 1, 5)
+out arr
+# 5
+# [
+#   4, 5, 2, 3,
+# ]
+
+out remove(arr, 1)
+out arr
+# 5
+# [
+#   4, 2, 3,
+# ]
+
+out len(arr)
+# 3

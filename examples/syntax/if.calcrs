@@ -1,0 +1,7 @@
+a = 1
+
+if a {:
+    out "a is equal to 1":
+}
+
+# 'a is equal to 1'

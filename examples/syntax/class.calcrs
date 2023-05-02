@@ -1,3 +1,4 @@
+# class definition
 Person = cls {:
     age;:
     name;:
@@ -5,6 +6,9 @@ Person = cls {:
         out self.name;:
     };:
 }
+
+# instantiate class
 inst = new Person[10, "test"]
+# use brackets!<-^__________^
 
 inst.greet() # 'test'

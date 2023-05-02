@@ -1,0 +1,10 @@
+add1 = fn (i $num) {:
+    #        ^^^^   ^
+    #  param_type   multi-line statements need this symbol
+
+    # use `brk` to return value
+    # from function.
+    brk i + 1:
+}
+
+out add1(10) # 11
