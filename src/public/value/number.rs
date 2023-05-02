@@ -41,12 +41,28 @@ impl Number {
             _ => Number::NotANumber,
         }
     }
+
+    pub fn not(self) -> Number {
+        match self {
+            Number::Int(i)   => Number::Int(!(i > 0) as i64),
+            Number::Float(f) => Number::Int(!(f > 0.0) as i64),
+            _ => Number::Int(1)
+        }
+    }
+
+    pub fn int(self) -> Number {
+        match self {
+            Number::Float(f) => Number::Int(f as i64),
+            _ => self,
+        }
+    }
     pub fn float(self) -> Number {
         match self {
             Number::Int(i) => Number::Float(i as f64),
             _ => self,
         }
     }
+
     pub fn int_value(self) -> i64 {
         match self {
             Number::Int(i) => i,

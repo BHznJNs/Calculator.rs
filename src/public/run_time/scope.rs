@@ -21,7 +21,7 @@ impl GlobalScope {
             build_in_funcs:
                 HashMap::<&'static str, Rc<BuildInFunction>>::new(),
             variables:
-                HashMap::<String, Value>::new(),
+                build_in::variables(),
         }
     }
 }

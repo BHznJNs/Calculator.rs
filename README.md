@@ -94,9 +94,12 @@ Then just execuse it.
 
 - Functions
   - Basic
+    - type
+    - clone
     - int
     - float
     - string
+    - ascii
   - Array
     - push
     - pop
@@ -104,7 +107,6 @@ Then just execuse it.
     - unshift
     - insert
     - remove
-    - update
     - len
   - Math
     - sin
@@ -133,3 +135,12 @@ Then just execuse it.
 - Constants
   - PI
   - E
+
+  - VOID
+  - NUM
+  - STR
+  - ARR
+  - LEXPR
+  - FUNC
+  - CLS
+  - OBJ

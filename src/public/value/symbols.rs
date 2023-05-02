@@ -9,11 +9,13 @@ pub enum Symbols {
     Divide,
     Power, // high priority
 
+    Not,
     LessThan,
     MoreThan,
     LessThanEqual,
     MoreThanEqual,
     CompareEqual,
+    NotEqual,
     Equal,
 
     PlusEqual,
@@ -46,6 +48,7 @@ impl Symbols {
             Symbols::Power    => Symbols::PowerEqual,
             Symbols::LessThan => Symbols::LessThanEqual,
             Symbols::MoreThan => Symbols::MoreThanEqual,
+            Symbols::Not      => Symbols::NotEqual,
             Symbols::Equal    => Symbols::CompareEqual,
             _ => {
                 println!("Invalid symbol: {}", other);
@@ -66,11 +69,13 @@ impl Symbols {
     }
 
     pub fn is_basic_symbol(symbol: Symbols) -> bool {
-        return symbol == Symbols::Plus  ||
-               symbol == Symbols::Minus ||
+        return symbol == Symbols::Plus     ||
+               symbol == Symbols::Minus    ||
                symbol == Symbols::Multiply ||
-               symbol == Symbols::Divide ||
-               symbol == Symbols::Power  ||
+               symbol == Symbols::Divide   ||
+               symbol == Symbols::Power    ||
+
+               symbol == Symbols::Not      ||
                symbol == Symbols::LessThan ||
                symbol == Symbols::MoreThan ||
                symbol == Symbols::Equal
@@ -94,11 +99,14 @@ impl fmt::Display for Symbols {
             Symbols::Multiply => write!(f, "Multiply"),
             Symbols::Divide   => write!(f, "Divide"),
             Symbols::Power    => write!(f, "Power"),
+
+            Symbols::Not      => write!(f, "Not"),
             Symbols::LessThan => write!(f, "LessThan"),
             Symbols::MoreThan => write!(f, "MoreThan"),
             Symbols::Equal    => write!(f, "Equal"),
             Symbols::LessThanEqual => write!(f, "LessThanEqual"),
             Symbols::MoreThanEqual => write!(f, "MoreThanEqual"),
+            Symbols::NotEqual      => write!(f, "NotEqual"),
             Symbols::CompareEqual  => write!(f, "CompareEqual"),
 
             Symbols::PlusEqual     => write!(f, "PlusEqual"),
