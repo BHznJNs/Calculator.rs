@@ -1,25 +1,30 @@
-use crate::public::value::symbols::Symbols;
 use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes};
+
+const PRIORITY: [i8; 12] = [
+    1, //Symbols::Plus
+    1, //Symbols::Minus
+    2, //Symbols::Multiply
+    2, //Symbols::Divide
+    3, //Symbols::Power
+
+    5, //Symbols::Not
+
+    4, //Symbols::NotEqual
+    4, //Symbols::LessThan
+    4, //Symbols::MoreThan
+    4, //Symbols::LessThanEqual
+    4, //Symbols::MoreThanEqual
+    4, //Symbols::CompareEqual
+];
 
 fn get_priority(symbol_node: &ASTNode) -> Result<i8, ()> {
     if let ASTNodeTypes::SymbolLiteral(symbol) = symbol_node.type__ {
-        match symbol {
-            Symbols::Plus     => Ok(1),
-            Symbols::Minus    => Ok(1),
-            Symbols::Multiply => Ok(2),
-            Symbols::Divide   => Ok(2),
-            Symbols::Power    => Ok(3),
-
-            Symbols::LessThan      => Ok(4),
-            Symbols::MoreThan      => Ok(4),
-            Symbols::LessThanEqual => Ok(4),
-            Symbols::MoreThanEqual => Ok(4),
-            Symbols::CompareEqual  => Ok(4),
-            _ => {
-                println!("Invalid symbol: '{}'.", symbol);
-                return Err(())
-            }
+        let symbol_index = symbol as usize;
+        if symbol_index >= PRIORITY.len() {
+            println!("Invalid symbol: '{}'.", symbol);
+            return Err(())
         }
+        Ok(PRIORITY[symbol_index])
     } else {
         println!("Analyzer error from 'get_priority'.");
         return Err(())

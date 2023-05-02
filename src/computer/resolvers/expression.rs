@@ -1,5 +1,6 @@
 use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes};
 use crate::public::run_time::scope::Scope;
+use crate::public::value::symbols::Symbols;
 use crate::public::value::value::{Value, Overload};
 
 use super::assignment;
@@ -39,15 +40,29 @@ pub fn resolve(
                 Value::create(function_definition::resolve(node)?),
 
             ASTNodeTypes::SymbolLiteral(symbol) => {
-                if value_stack.len() < 2 {
-                    // no enough value for operating
-                    println!("Invalid expression: operating number is missing.");
-                    return Err(())
+                if *symbol == Symbols::Not {
+                    if let Some(val) = value_stack.pop() {
+                        let Value::Number(num) = val else {
+                            println!("Invalid operating value type, expected Number.");
+                            return Err(())
+                        };
+                        Value::Number(num.not())
+                    } else {
+                        println!("Operating value is missing for Not operator.");
+                        return Err(())
+                    }
+                } else {
+                    if value_stack.len() < 2 {
+                        // no enough value for operating
+                        println!("Invalid expression: operating number is missing.");
+                        return Err(())
+                    }
+                    let num2 = value_stack.pop().unwrap();
+                    let num1 = value_stack.pop().unwrap();
+                    let current_symbol = *symbol;
+                    operate(num1, num2, current_symbol)?
                 }
-                let num2 = value_stack.pop().unwrap();
-                let num1 = value_stack.pop().unwrap();
-                let current_symbol = *symbol;
-                operate(num1, num2, current_symbol)?
+                
             },
             ASTNodeTypes::ArrayLiteral => {
                 let array_elements =

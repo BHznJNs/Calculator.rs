@@ -172,11 +172,12 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
         const DIVIDE_ASCII   : u8 = 47; // /
         const POWER_ASCII    : u8 = 94; // ^
 
-        const LESS_THAN_ASCII: u8 = 60; // <
-        const MORE_THAN_ASCII: u8 = 62; // >
-        const EQUAL_ASCII    : u8 = 61; // =
+        const NOT_SYMBOL_ASCII : u8 = 33; // !
+        const LESS_THAN_ASCII  : u8 = 60; // <
+        const MORE_THAN_ASCII  : u8 = 62; // >
+        const EQUAL_ASCII      : u8 = 61; // =
 
-        const QUOTE_ASCII    : u8 = 34; // '"'
+        const QUOTE_ASCII : u8 = 34; // '"'
 
         const SEMICOLON_ASCII  : u8 = 59; // ;
         const COMMA_ASCII      : u8 = 44; // ,
@@ -249,15 +250,20 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
                 last_type = TokenTypes::Symbol;
                 tokens.push_back(Token::Symbol(Symbols::Power));
             },
-            LESS_THAN_ASCII => {
+            
+            NOT_SYMBOL_ASCII => {
+                last_type = TokenTypes::Symbol;
+                tokens.push_back(Token::Symbol(Symbols::Not));
+            },
+            LESS_THAN_ASCII  => {
                 last_type = TokenTypes::Symbol;
                 tokens.push_back(Token::Symbol(Symbols::LessThan));
             },
-            MORE_THAN_ASCII => {
+            MORE_THAN_ASCII  => {
                 last_type = TokenTypes::Symbol;
                 tokens.push_back(Token::Symbol(Symbols::MoreThan));
             }
-            EQUAL_ASCII  => {
+            EQUAL_ASCII => {
                 if tokens.len() == 0 {
                     println!("Invalid assignment: left-hand value missing.");
                     return Err(())
@@ -268,7 +274,7 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
                 if let Token::Symbol(last_symbol) = last_token {
                     // if last_symbol
                     if Symbols::is_basic_symbol(last_symbol) {
-                        // if last char is: + - * / ^
+                        // if last char is: + - * / ^ ! > < = 
                         let target_symbol = Symbols::Equal.combine(last_symbol)?;
                         tokens.push_back(Token::Symbol(target_symbol));
                         index += 1;

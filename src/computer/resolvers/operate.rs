@@ -20,6 +20,7 @@ pub fn operate(
             Symbols::Power    => num1.pow(num2),
             Symbols::LessThan => Number::Int((num1 < num2) as i64),
             Symbols::MoreThan => Number::Int((num1 > num2) as i64),
+            Symbols::NotEqual => Number::Int((num1 != num2) as i64),
             Symbols::CompareEqual  => Number::Int((num1 == num2) as i64),
             Symbols::LessThanEqual => Number::Int((num1 <= num2) as i64),
             Symbols::MoreThanEqual => Number::Int((num1 >= num2) as i64),
