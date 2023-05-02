@@ -24,6 +24,18 @@ fn index_resolve(
     }
 }
 
+fn check_outof_range(
+    index: usize,
+    len: usize,
+) -> Result<(), ()> {
+    if index >= len {
+        println!("Array reading out of range, expected index < {}, found {}.", len, index);
+        Err(())
+    } else {
+        Ok(())
+    }
+}
+
 // --- --- --- --- --- ---
 
 pub fn assign(
@@ -37,6 +49,7 @@ pub fn assign(
     if let Value::Array(arr_ref) = arr_value {
         let mut arr =
             arr_ref.as_ref().borrow_mut();
+        check_outof_range(index_value, arr.len())?;
         arr[index_value] = value;
     } else
     if let Value::String(str_ref) = arr_value {
@@ -46,7 +59,9 @@ pub fn assign(
             println!("Invalid element for String.");
             return Err(())
         };
-        let char_str = &target.as_ref().borrow();
+        check_outof_range(index_value, str.len())?;
+        let char_str =
+            &target.as_ref().borrow();
         str.replace_range(index_value..index_value+1, char_str);
     } else {
         println!("Invalid array reading.");
@@ -64,11 +79,17 @@ pub fn resolve(
         index_resolve(index_node, scope)?;
 
     if let Value::Array(arr_ref) = arr_rc {
-        let arr = arr_ref.as_ref().borrow();
+        let arr =
+            arr_ref.as_ref().borrow();
+        // check if out of range
+        check_outof_range(index_value, arr.len())?;
         Ok(arr[index_value].clone())
     } else
     if let Value::String(str_ref) = arr_rc {
-        let str = str_ref.as_ref().borrow();
+        let str =
+            str_ref.as_ref().borrow();
+        // check if out of range
+        check_outof_range(index_value, str.len())?;
         let slice = &str[index_value..index_value+1];
         Ok(Value::create(slice.to_string()))
     } else {
