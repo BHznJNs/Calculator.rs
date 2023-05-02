@@ -130,6 +130,33 @@ impl Value {
         // Rc<Value> -> Value
         self.clone()
     }
+    pub fn deep_clone(&self) -> Result<Value, ()> {
+        match self {
+            Value::Number(_) => Ok(self.clone()),
+            Value::String(str) => {
+                let cloned_str =
+                    str.as_ref()
+                    .borrow().clone();
+                Ok(Value::create(cloned_str))
+            },
+            Value::Array(arr) => {
+                let cloned_arr =
+                    arr.as_ref()
+                    .borrow().clone();
+                Ok(Value::create(cloned_arr))
+            },
+            Value::Object(obj) => {
+                let cloned_obj =
+                    obj.as_ref()
+                    .borrow().clone();
+                Ok(Value::create(cloned_obj))
+            },
+            _ => {
+                println!("Invalid clone type.");
+                Err(())
+            }
+        }
+    }
 
 
     pub fn get_type(&self) -> ValueTypes {

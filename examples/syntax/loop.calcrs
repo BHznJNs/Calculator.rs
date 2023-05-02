@@ -1,10 +1,10 @@
-# fibonacci | 斐波那契
-
-a = 0
-b = 1
+i = 0
+# loop 10 times
 for 10 {:
-    c = a + b;:
-    a = b;:
-    b = c;:
+    i += 1;:
 }
-out c # 89
+
+out i
+
+# infinity loop
+for { out i }

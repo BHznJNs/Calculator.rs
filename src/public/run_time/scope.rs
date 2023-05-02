@@ -42,7 +42,7 @@ impl LocalScope {
 pub struct Scope {
     pub global: GlobalScope,
     pub local: Option<LocalScope>,
-    module: Vec<StdModules>,
+    module: HashMap<String, bool>,
     std_module_map: HashMap<&'static str, StdModules>,
 }
 const STD_MODULE_DATA: [(&str, StdModules); 4] = [
@@ -58,28 +58,24 @@ impl Scope {
         Scope {
             global: GlobalScope::init(),
             local: None,
-            module: Vec::<StdModules>::new(),
+            module: HashMap::<String, bool>::new(),
             std_module_map,
         }
     }
     pub fn import(&mut self, module_name: &str) -> Result<(), ()> {
-        let option_target_module =
-            self.std_module_map.get(module_name);
-        let target_module = if option_target_module.is_some() {
-            option_target_module.unwrap()
-        } else {
+        let Some(target_module) = self.std_module_map.get(module_name) else {
             println!("Target module '{}' does not exist.", module_name);
             return Err(())
         };
 
-        if !self.module.contains(&target_module) {
+        if let None = self.module.get(module_name) {
             let func_list = match target_module {
                 StdModules::Basic  => basic::function_list(),
                 StdModules::Math   => math::function_list(),
                 StdModules::Array  => array::function_list(),
                 StdModules::FileSystem => todo!(),
             };
-
+            self.module.insert(module_name.to_string(), true);
             self.global.build_in_funcs.extend(func_list)
         }
         Ok(())
@@ -92,20 +88,38 @@ impl Scope {
         let module_name =
             get_module_name(module_path);
 
-        // execute the module file
-        run_script(
-            module_path.to_string(),
-            &mut module_scope
-        );
-        // regard the whole module as an Object
-        let module_obj =
-            module_create(module_scope.global);
-        // insert the Object as a variable into
-        // the global scope.
-        self.global.variables.insert(
-            module_name.to_string(),
-            Value::create(module_obj)
-        );
+        if let None = self.module.get(module_name) {
+            // execute the module file
+            run_script(
+                module_path.to_string(),
+                &mut module_scope
+            );
+
+            // import modules that imported by module
+            for (module, _) in module_scope.module {
+                if let Some(_) = self.std_module_map.get(module.as_str()) {
+                    self.import(&module)?;
+                } else {
+                    self.import_from_path(&module)?;
+                }
+            }
+
+            // regard the whole module as an Object
+            let module_obj =
+                module_create(module_scope.global);
+            // insert the Object as a variable into
+            // the global scope.
+            self.global.variables.insert(
+                module_name.to_string(),
+                Value::create(module_obj)
+            );
+
+            self.module.insert(
+                module_name.to_string(),
+                true
+            );
+        }
+        
         Ok(())
     }
 }

@@ -34,6 +34,12 @@ pub fn implement(
 
             Value::create(input.get_type() as i64)
         },
+        BuildInFuncs::Clone => {
+            let input =
+                get_val("input", scope)?;
+            input.deep_clone()?
+        },
+
         BuildInFuncs::Int => {
             let input =
                 get_val("input", scope)?;
@@ -121,6 +127,7 @@ pub fn implement(
 pub fn function_list() -> Vec<(&'static str, Rc<BuildInFunction>)> {
     vec![
         ("type"   , Rc::new(TYPE)),
+        ("clone"  , Rc::new(CLONE)),
         ("int"    , Rc::new(INT)),
         ("float"  , Rc::new(FLOAT)),
         ("string" , Rc::new(STR)),
@@ -137,6 +144,15 @@ pub const TYPE: BuildInFunction = BuildInFunction {
     }), None, None],
     lib: StdModules::Basic, 
     body: BuildInFuncs::Type,
+};
+// deep clone value
+pub const CLONE: BuildInFunction = BuildInFunction {
+    params: [Some(BuildInParam {
+        type__: ValueTypes::Void,
+        identi: "input"
+    }), None, None],
+    lib: StdModules::Basic, 
+    body: BuildInFuncs::Clone,
 };
 
 // Type converters

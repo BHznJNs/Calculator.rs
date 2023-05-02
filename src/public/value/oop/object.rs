@@ -8,7 +8,7 @@ use super::class::Class;
 use super::utils::data_storage::DataStoragePattern;
 use super::utils::getter::getter;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub struct Object {
     pub prototype: Option<Rc<Class>>,
 

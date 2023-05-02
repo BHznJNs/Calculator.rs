@@ -1,16 +1,23 @@
-import Math
-import Array
+import "test_modules/array.calcrs"
 
-arr = [0]
+arr_cls = array.self
+a = new arr_cls[[1, 2, 3]]
+a.push(1)
+out a
 
-t = fn() {:
-    a = 10;:
-    b = 10;:
+# import Math
+# import Array
 
-    out sin(a);:
-    # update(arr, 0, a);:
-    out b;:
-}
+# arr = [0]
 
-t()
-# out arr
+# t = fn() {:
+#     a = 10;:
+#     b = 10;:
+
+#     out sin(a);:
+#     # update(arr, 0, a);:
+#     out b;:
+# }
+
+# t()
+# # out arr
