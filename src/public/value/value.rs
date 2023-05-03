@@ -81,7 +81,7 @@ impl fmt::Display for Value {
             Value::Void(_) => write!(f, "void"),
 
             Value::Number(num) => write!(f, "{}", num),
-            Value::String(str) => write!(f, "'{}'", str.as_ref().borrow()),
+            Value::String(str) => write!(f, "{}", str.as_ref().borrow()),
             Value::LazyExpression(_) => write!(f, "<Lazy-Expression>"),
             Value::Function(_) => write!(f, "<User-Defined-Function>"),
             Value::Array(arr) => {

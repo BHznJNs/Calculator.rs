@@ -89,7 +89,7 @@ impl fmt::Display for Number {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Number::NotANumber => write!(f, "Not a Number"),
-            Number::Empty => write!(f, "Empty Number"),
+            Number::Empty => write!(f, "<Empty-Value>"),
             Number::Int(num) => write!(f, "{}", num),
             Number::Float(num) => {
                 if *num == num.floor() {

@@ -28,11 +28,8 @@ pub fn resolve(
             // compute value of the expression after `out`
             let expression_res =
                 expression::resolve(expression_node, scope)?;
-            // do not print empty sequence
-            if expression_res != Value::empty() {
-                println!("{}", expression_res);
-            }
-            expression_res
+            println!("{}", expression_res);
+            Value::empty()
         },
         Keywords::For => {
             let loop_count_expressiom = &params[0];
