@@ -128,7 +128,7 @@ impl fmt::Display for Class {
                     .as_ref()
                     .unwrap();
                 for method in list {
-                    println!("  {}: <Class-method>,", method.0);
+                    println!("  {}: <Class-Method>,", method.0);
                 }
             },
             DataStoragePattern::Map => {
@@ -138,7 +138,7 @@ impl fmt::Display for Class {
                     .unwrap();
 
                 for (key, _) in map {
-                    println!("  {}: <Class-method>,", key);
+                    println!("  {}: <Class-Method>,", key);
                 }
             },
         }

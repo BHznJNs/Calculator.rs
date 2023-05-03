@@ -1,23 +1,7 @@
-import "test_modules/array.calcrs"
+import "test_modules/node.calcrs"
 
-arr_cls = array.self
-a = new arr_cls[[1, 2, 3]]
-a.push(1)
-out a
+node_cls  = node.self
+node_inst = new node_cls[1, 0]
 
-# import Math
-# import Array
-
-# arr = [0]
-
-# t = fn() {:
-#     a = 10;:
-#     b = 10;:
-
-#     out sin(a);:
-#     # update(arr, 0, a);:
-#     out b;:
-# }
-
-# t()
-# # out arr
+out "node instance:"
+out node_inst

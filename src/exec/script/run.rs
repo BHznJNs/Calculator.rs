@@ -59,7 +59,6 @@ pub fn run_script(
                         cached_multiline += &script_line;
                         current_line = &cached_multiline;
                     }
-
                     // execuse the line
                     let line_result =
                         attempt(current_line, scope);

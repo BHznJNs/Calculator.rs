@@ -107,7 +107,7 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
                 index += 1;
                 current = chars[index];
             }
-            
+
             if last_type == TokenTypes::Annotation {
                 // Type annotation
                 let mut is_valid_type = false;
