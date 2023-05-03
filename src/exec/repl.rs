@@ -16,7 +16,7 @@ fn import_all(
 
 pub fn repl(scope: &mut Scope) -> ! {
     // print program name and version
-    println!("Calculator.rs v1.7.3");
+    println!("Calculator.rs v1.7.4");
     // import stantard libraries
     if import_all(scope).is_err() {
         println!("Standard module import error.");
