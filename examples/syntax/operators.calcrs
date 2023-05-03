@@ -8,6 +8,8 @@ out 2 ^ 2 # 4
 # not operator
 out !10   # 0
 out !0    # 1
+out 10!   # 0
+out  0!   # 1
 
 # comparing operator
 out 1 > 2 # 0

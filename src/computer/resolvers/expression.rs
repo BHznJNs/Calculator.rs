@@ -28,7 +28,6 @@ pub fn resolve(
             ASTNodeTypes::Expression =>
                 resolve(node, scope)?,
 
-
             ASTNodeTypes::NumberLiteral(num) => 
                 Value::Number(*num),
             ASTNodeTypes::StringLiteral(str) =>
