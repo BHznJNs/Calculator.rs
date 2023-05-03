@@ -42,9 +42,6 @@ pub fn implement(
             io::stdin()
                 .read_line(&mut input)
                 .unwrap();
-            for ch in input.chars() {
-                println!("char: {}", ch as i8);
-            }
 
             // remove the "\r\n" at the end of input
             if input.ends_with('\n') {

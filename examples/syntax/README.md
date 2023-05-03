@@ -2,6 +2,7 @@
 
 - [Variable](./variable.calcrs)
 - [Operator](./operators.calcrs)
+- [Input-Output](./input-output.calcrs)
 - [IF-Condition](./if.calcrs)
 - [Loop](./loop.calcrs)
 - [Function](./function.calcrs)
