@@ -4,13 +4,6 @@ An simple command-line calculator program writen with Rust.
 
 ## Features
 
-- Math functions support
-
-```text
-> sin(1) 
-= 0.84147098
-```
-
 - Variable support
 
 ```text
@@ -18,6 +11,13 @@ An simple command-line calculator program writen with Rust.
 = 1
 > a
 = 1
+```
+
+- Math functions support
+
+```text
+> sin(1) 
+= 0.84147098
 ```
 
 - Lazy-Expression support
@@ -86,20 +86,47 @@ calculator.exe script
 
 ## Installation
 
+### Windows
+
 Go to the [release page](https://github.com/BHznJNs/Calculator.rs/releases) and download the latest released .exe file
 
 Then just execuse it.
+
+### Other OS
+
+You need to install the Rust (version >= 1.60).
+
+Clone this repository
+
+```sh
+git clone https://github.com/BHznJNs/Calculator.rs
+cd Calculator.rs
+```
+
+Then, use Cargo to compile
+
+```sh
+cargo build --release
+```
+
+The release executable file will be at: `Calculator.rs/target/release`
+
+## Tutorial
+
+See here: [Syntax Tutorial](./examples/syntax)
 
 ## Build-ins
 
 - Functions
   - Basic
+    - input
     - type
     - clone
     - int
     - float
     - string
     - ascii
+
   - Array
     - push
     - pop
@@ -108,6 +135,7 @@ Then just execuse it.
     - insert
     - remove
     - len
+
   - Math
     - sin
     - cos
