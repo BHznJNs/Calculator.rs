@@ -10,7 +10,7 @@ use crate::public::value::value::ValueTypes;
 #[derive(Clone)]
 pub enum BuildInFuncs {
     // Basic
-    Type,
+    Input, Type,
     Int, Float, String, Array, Ascii,
 
     // Math

@@ -1,4 +1,5 @@
 use std::cell::Ref;
+use std::io::{self, Write};
 use std::rc::Rc;
 use std::str::FromStr;
 
@@ -28,6 +29,33 @@ pub fn implement(
     }
 
     let result = match func_body {
+        BuildInFuncs::Input => {
+            let prompt =
+                get_val("prompt", scope)?;
+            // show prompt
+            if let Value::String(str) = prompt {
+                print!("{}", str.as_ref().borrow());
+                io::stdout().flush().unwrap();
+            }
+            // get input
+            let mut input = String::new();
+            io::stdin()
+                .read_line(&mut input)
+                .unwrap();
+            for ch in input.chars() {
+                println!("char: {}", ch as i8);
+            }
+
+            // remove the "\r\n" at the end of input
+            if input.ends_with('\n') {
+                input.pop();
+                if input.ends_with('\r') {
+                    input.pop();
+                }
+            }
+
+            Value::create(input)
+        },
         BuildInFuncs::Type => {
             let input =
                 get_val("input", scope)?;
@@ -45,7 +73,8 @@ pub fn implement(
                 get_val("input", scope)?;
 
             if let Value::String(str) = input {
-                let refer = str.borrow();
+                let refer =
+                    str.as_ref().borrow();
                 let i = str_to_num::<i64>(refer)?;
                 Value::create(i)
             } else
@@ -61,7 +90,8 @@ pub fn implement(
                 get_val("input", scope)?;
 
             if let Value::String(str) = input {
-                let refer = str.borrow();
+                let refer =
+                    str.as_ref().borrow();
                 let f = str_to_num::<f64>(refer)?;
                 Value::create(f)
             } else
@@ -132,6 +162,7 @@ pub fn implement(
 
 pub fn function_list() -> Vec<(&'static str, Rc<BuildInFunction>)> {
     vec![
+        ("input"  , Rc::new(INPUT)),
         ("type"   , Rc::new(TYPE)),
         ("clone"  , Rc::new(CLONE)),
         ("int"    , Rc::new(INT)),
@@ -142,6 +173,14 @@ pub fn function_list() -> Vec<(&'static str, Rc<BuildInFunction>)> {
     ]
 }
 
+pub const INPUT: BuildInFunction = BuildInFunction {
+    params: [Some(BuildInParam {
+        type__: ValueTypes::String,
+        identi: "prompt"
+    }), None, None],
+    lib: StdModules::Basic, 
+    body: BuildInFuncs::Input,
+};
 // get value type
 pub const TYPE: BuildInFunction = BuildInFunction {
     params: [Some(BuildInParam {
