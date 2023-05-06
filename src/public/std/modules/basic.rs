@@ -1,11 +1,11 @@
 use std::cell::Ref;
 use std::io::{self, Write};
-use std::rc::Rc;
 use std::str::FromStr;
 
 use crate::public::run_time::build_in::BuildInFuncs;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::function::{BuildInParam, BuildInFunction};
+use crate::public::value::number::Number;
 use crate::public::value::value::{ValueTypes, Value, Overload, ArrayLiteral};
 
 use super::super::std::StdModules;
@@ -148,6 +148,20 @@ pub fn implement(
                 return Err(())
             }
         },
+        BuildInFuncs::Len => {
+            let arr_value: Value = get_val("input", scope)?;
+
+            if let Value::Array(arr) = arr_value {
+                let refer = arr.borrow();
+                Value::Number(Number::Int(refer.len() as i64))
+            } else
+            if let Value::String(str) = arr_value {
+                let refer = str.borrow();
+                Value::Number(Number::Int(refer.len() as i64))
+            } else {
+                Value::Number(Number::Empty)
+            }
+        },
         _ => {
             println!("Unexpected function in math implement.");
             return Err(())
@@ -157,16 +171,17 @@ pub fn implement(
     Ok(result)
 }
 
-pub fn function_list() -> Vec<(&'static str, Rc<BuildInFunction>)> {
+pub fn function_list() -> Vec<(String, Value)> {
     vec![
-        ("input"  , Rc::new(INPUT)),
-        ("type"   , Rc::new(TYPE)),
-        ("clone"  , Rc::new(CLONE)),
-        ("int"    , Rc::new(INT)),
-        ("float"  , Rc::new(FLOAT)),
-        ("string" , Rc::new(STR)),
-        ("array"  , Rc::new(ARRAY)),
-        ("ascii"  , Rc::new(ASCII)),
+        (String::from("input")  , Value::create(INPUT)),
+        (String::from("type")   , Value::create(TYPE)),
+        (String::from("clone")  , Value::create(CLONE)),
+        (String::from("int")    , Value::create(INT)),
+        (String::from("float")  , Value::create(FLOAT)),
+        (String::from("string") , Value::create(STR)),
+        (String::from("array")  , Value::create(ARRAY)),
+        (String::from("ascii")  , Value::create(ASCII)),
+        (String::from("len")    , Value::create(LEN)),
     ]
 }
 
@@ -174,7 +189,7 @@ pub const INPUT: BuildInFunction = BuildInFunction {
     params: [Some(BuildInParam {
         type__: ValueTypes::String,
         identi: "prompt"
-    }), None, None],
+    }), None, None, None,],
     lib: StdModules::Basic, 
     body: BuildInFuncs::Input,
 };
@@ -183,7 +198,7 @@ pub const TYPE: BuildInFunction = BuildInFunction {
     params: [Some(BuildInParam {
         type__: ValueTypes::Void,
         identi: "input"
-    }), None, None],
+    }), None, None, None,],
     lib: StdModules::Basic, 
     body: BuildInFuncs::Type,
 };
@@ -192,7 +207,7 @@ pub const CLONE: BuildInFunction = BuildInFunction {
     params: [Some(BuildInParam {
         type__: ValueTypes::Void,
         identi: "input"
-    }), None, None],
+    }), None, None, None,],
     lib: StdModules::Basic, 
     body: BuildInFuncs::Clone,
 };
@@ -202,7 +217,7 @@ pub const INT: BuildInFunction = BuildInFunction {
     params: [Some(BuildInParam {
         type__: ValueTypes::Void,
         identi: "input"
-    }), None, None],
+    }), None, None, None,],
     lib: StdModules::Basic, 
     body: BuildInFuncs::Int,
 };
@@ -210,7 +225,7 @@ pub const FLOAT: BuildInFunction = BuildInFunction {
     params: [Some(BuildInParam {
         type__: ValueTypes::Void,
         identi: "input"
-    }), None, None],
+    }), None, None, None,],
     lib: StdModules::Basic, 
     body: BuildInFuncs::Float,
 };
@@ -218,7 +233,7 @@ pub const STR: BuildInFunction = BuildInFunction {
     params: [Some(BuildInParam {
         type__: ValueTypes::Number,
         identi: "input"
-    }), None, None],
+    }), None, None, None,],
     lib: StdModules::Basic, 
     body: BuildInFuncs::String,
 };
@@ -226,7 +241,7 @@ pub const ARRAY: BuildInFunction = BuildInFunction {
     params: [Some(BuildInParam {
         type__: ValueTypes::Number,
         identi: "input"
-    }), None, None],
+    }), None, None, None,],
     lib: StdModules::Basic, 
     body: BuildInFuncs::Array,
 };
@@ -234,7 +249,17 @@ pub const ASCII: BuildInFunction = BuildInFunction {
     params: [Some(BuildInParam {
         type__: ValueTypes::String,
         identi: "input"
-    }), None, None],
+    }), None, None, None,],
     lib: StdModules::Basic,
     body: BuildInFuncs::Ascii,
+};
+
+
+pub const LEN: BuildInFunction = BuildInFunction {
+    params: [Some(BuildInParam {
+        type__: ValueTypes::Void,
+        identi: "input"
+    }), None, None, None,],
+    lib: StdModules::Basic,
+    body: BuildInFuncs::Len,
 };

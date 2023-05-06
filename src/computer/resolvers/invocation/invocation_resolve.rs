@@ -1,6 +1,7 @@
 use crate::computer::resolvers::{variable_reading, compose::compose};
 use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes, ASTNodeVec};
 use crate::public::run_time::scope::Scope;
+use crate::public::value::function::Function;
 use crate::public::value::value::Value;
 
 use super::{build_in_function, lazy_expression, user_defined_function};
@@ -10,22 +11,10 @@ fn variable_invoke(
     params: &ASTNodeVec,
     scope: &mut Scope,
 ) -> Result<Value, ()> {
+    let func_value =
+        variable_reading::resolve(func_name, scope)?;
     let result =
-    match scope.global.build_in_funcs.get(func_name.as_str()) {
-        Some(func_struct) => {
-            // invoke build-in function has
-            // the higher priority.
-            build_in_function::invoke(
-                func_struct.clone(),
-                params, scope
-            )?
-        },
-        None => {
-            let func =
-                variable_reading::resolve(func_name, scope)?;
-            func_invoke(func, params, scope)?
-        }
-    };
+        func_invoke(func_value, params, scope)?;
     Ok(result)
 }
 
@@ -38,11 +27,22 @@ fn func_invoke(
     match func_value {
         Value::LazyExpression(le) =>
             lazy_expression::invoke(&le, scope)?,
-        Value::Function(func_struct) =>
-            user_defined_function::invoke(
-                &func_struct, 
-                func_params, scope
-            )?,
+        Value::Function(func_enum) => {
+            match func_enum {
+                Function::BuildIn(build_in_fn) => {
+                    build_in_function::invoke(
+                        build_in_fn.clone(),
+                        func_params, scope,
+                    )?
+                },
+                Function::UserDefined(user_defined_fn) => {
+                    user_defined_function::invoke(
+                        &user_defined_fn, 
+                        func_params, scope,
+                    )?
+                },
+            }
+        },
         _ => {
             println!("Invalid callable target.");
             return Err(())

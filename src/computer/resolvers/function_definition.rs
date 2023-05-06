@@ -4,8 +4,8 @@ use crate::public::value::function::UserDefinedFunction;
 pub fn resolve(
     node: &ASTNode
 ) -> Result<UserDefinedFunction, ()> {
-    let ASTNodeTypes::FunctionDefinition(func_params) = &node.type__
-    else {
+    let ASTNodeTypes::FunctionDefinition(func_params)
+        = &node.type__ else {
         println!("Invalid function definition.");
         return Err(())
     };

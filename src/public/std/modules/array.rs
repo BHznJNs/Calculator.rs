@@ -1,9 +1,12 @@
-use std::rc::Rc;
+use std::collections::HashMap;
 
 use crate::public::run_time::build_in::BuildInFuncs;
 use crate::public::run_time::scope::Scope;
-use crate::public::value::function::{BuildInParam, BuildInFunction};
+use crate::public::value::function::{BuildInParam, BuildInFunction, Function, Overload};
 use crate::public::value::number::Number;
+use crate::public::value::oop::class::Class;
+use crate::public::value::oop::object::Object;
+use crate::public::value::oop::utils::data_storage::DataStoragePattern;
 use crate::public::value::value::{ValueTypes, Value};
 
 use super::super::std::StdModules;
@@ -13,9 +16,20 @@ pub fn implement(
     func_body: &BuildInFuncs,
     scope: &mut Scope,
 ) -> Result<Value, ()> {
+    fn get_self_v(self_value: Value) -> Result<Value, ()> {
+        let Value::Object(obj) = self_value else {
+            println!("Invalid array getter invocation.");
+            return Err(())
+        };
+
+        let obj_ref = obj.as_ref().borrow();
+        Object::get(&obj_ref, &String::from("v"))
+    }
+
     let result = match func_body {
         BuildInFuncs::Push => {
-            let arr_value = get_val("arr", scope)?;
+            let self_value = get_val("self", scope)?;
+            let arr_value = get_self_v(self_value)?;
             let element_value = get_val("element", scope)?;
 
             if let Value::Array(arr) = arr_value {
@@ -25,7 +39,8 @@ pub fn implement(
             element_value
         },
         BuildInFuncs::Pop => {
-            let arr_value = get_val("arr", scope)?;
+            let self_value = get_val("self", scope)?;
+            let arr_value = get_self_v(self_value)?;
 
             if let Value::Array(arr) = arr_value {
                 let mut refer = arr.borrow_mut();
@@ -38,7 +53,8 @@ pub fn implement(
             Value::Number(Number::Empty)
         },
         BuildInFuncs::Shift => {
-            let arr_value = get_val("arr", scope)?;
+            let self_value = get_val("self", scope)?;
+            let arr_value = get_self_v(self_value)?;
 
             if let Value::Array(arr) = arr_value {
                 let mut refer = arr.borrow_mut();
@@ -51,9 +67,10 @@ pub fn implement(
             Value::Number(Number::Empty)
         },
         BuildInFuncs::Unshift => {
-            let arr_value = get_val("arr", scope)?;
+            let self_value = get_val("self", scope)?;
             let element_value = get_val("element", scope)?;
 
+            let arr_value = get_self_v(self_value)?;
             if let Value::Array(arr) = arr_value {
                 let mut refer = arr.borrow_mut();
                 refer.push_front(element_value.clone());
@@ -61,12 +78,12 @@ pub fn implement(
             element_value
         },
         BuildInFuncs::Insert => {
-            let arr_value = get_val("arr", scope)?;
+            let self_value = get_val("self", scope)?;
             let index_value = get_val("index", scope)?;
             let element_value = get_val("element", scope)?;
 
             let index = index_value.get_i64()? as usize;
-
+            let arr_value = get_self_v(self_value)?;
             if let Value::Array(arr) = arr_value {
                 let mut refer = arr.borrow_mut();
                 refer.insert(index, element_value.clone());
@@ -74,11 +91,12 @@ pub fn implement(
             element_value
         },
         BuildInFuncs::Remove => {
-            let arr_value = get_val("arr", scope)?;
+            let self_value = get_val("self", scope)?;
             let index_value = get_val("index", scope)?;
 
             let index = index_value.get_i64()? as usize;
             let mut removed_element: Option<Value> = None;
+            let arr_value = get_self_v(self_value)?;
 
             if let Value::Array(arr) = arr_value {
                 let mut refer = arr.borrow_mut();
@@ -89,20 +107,6 @@ pub fn implement(
                 None => Value::Number(Number::Empty)
             }
         },
-        BuildInFuncs::Len => {
-            let arr_value = get_val("arr", scope)?;
-
-            if let Value::Array(arr) = arr_value {
-                let refer = arr.borrow();
-                Value::Number(Number::Int(refer.len() as i64))
-            } else
-            if let Value::String(str) = arr_value {
-                let refer = str.borrow();
-                Value::Number(Number::Int(refer.len() as i64))
-            } else {
-                Value::Number(Number::Empty)
-            }
-        },
         _ => {
             println!("Unexpected function in array implement.");
             return Err(())
@@ -111,28 +115,32 @@ pub fn implement(
     Ok(result)
 }
 
-pub fn function_list() -> Vec<(&'static str, Rc<BuildInFunction>)> {
-    vec![
-        ("push"   , Rc::new(PUSH)),
-        ("pop"    , Rc::new(POP)),
-        ("shift"  , Rc::new(SHIFT)),
-        ("unshift", Rc::new(UNSHIFT)),
-        ("insert" , Rc::new(INSERT)),
-        ("remove" , Rc::new(REMOVE)),
-        ("len"    , Rc::new(LEN)),
-    ]
+pub fn module_class() -> Class {
+    Class {
+        properties: vec![String::from("v")],
+        method_storage: DataStoragePattern::Map,
+        method_list: None,
+        method_map: Some(HashMap::from([
+            (String::from("push")   , Function::create(PUSH)),
+            (String::from("pop")    , Function::create(POP)),
+            (String::from("shift")  , Function::create(SHIFT)),
+            (String::from("unshift"), Function::create(UNSHIFT)),
+            (String::from("insert") , Function::create(INSERT)),
+            (String::from("remove") , Function::create(REMOVE)),
+        ]))
+    }
 }
 
 pub const PUSH: BuildInFunction = BuildInFunction {
     params: [
         Some(BuildInParam {
-            type__: ValueTypes::Array,
-            identi: "arr"
+            type__: ValueTypes::Object,
+            identi: "self"
         }),
         Some(BuildInParam {
             type__: ValueTypes::Void,
             identi: "element"
-        }), None
+        }), None, None,
     ],
     lib: StdModules::Array, 
     body: BuildInFuncs::Push,
@@ -141,9 +149,9 @@ pub const PUSH: BuildInFunction = BuildInFunction {
 pub const POP: BuildInFunction = BuildInFunction {
     params: [
         Some(BuildInParam {
-            type__: ValueTypes::Array,
-            identi: "arr"
-        }), None, None
+            type__: ValueTypes::Object,
+            identi: "self"
+        }), None, None, None,
     ],
     lib: StdModules::Array, 
     body: BuildInFuncs::Pop,
@@ -152,9 +160,9 @@ pub const POP: BuildInFunction = BuildInFunction {
 pub const SHIFT: BuildInFunction = BuildInFunction {
     params: [
         Some(BuildInParam {
-            type__: ValueTypes::Array,
-            identi: "arr"
-        }), None, None
+            type__: ValueTypes::Object,
+            identi: "self"
+        }), None, None, None,
     ],
     lib: StdModules::Array, 
     body: BuildInFuncs::Shift,
@@ -162,13 +170,13 @@ pub const SHIFT: BuildInFunction = BuildInFunction {
 pub const UNSHIFT: BuildInFunction = BuildInFunction {
     params: [
         Some(BuildInParam {
-            type__: ValueTypes::Array,
-            identi: "arr"
+            type__: ValueTypes::Object,
+            identi: "self"
         }),
         Some(BuildInParam {
             type__: ValueTypes::Void,
             identi: "element"
-        }), None
+        }), None, None,
     ],
     lib: StdModules::Array, 
     body: BuildInFuncs::Unshift,
@@ -176,8 +184,8 @@ pub const UNSHIFT: BuildInFunction = BuildInFunction {
 pub const INSERT: BuildInFunction = BuildInFunction {
     params: [
         Some(BuildInParam {
-            type__: ValueTypes::Array,
-            identi: "arr"
+            type__: ValueTypes::Object,
+            identi: "self"
         }),
         Some(BuildInParam {
             type__: ValueTypes::Number,
@@ -186,7 +194,7 @@ pub const INSERT: BuildInFunction = BuildInFunction {
         Some(BuildInParam {
             type__: ValueTypes::Void,
             identi: "element"
-        })
+        }), None,
     ],
     lib: StdModules::Array, 
     body: BuildInFuncs::Insert,
@@ -194,23 +202,13 @@ pub const INSERT: BuildInFunction = BuildInFunction {
 pub const REMOVE: BuildInFunction = BuildInFunction {
     params: [
         Some(BuildInParam {
-            type__: ValueTypes::Array,
-            identi: "arr"
+            type__: ValueTypes::Object,
+            identi: "self"
         }), Some(BuildInParam {
             type__: ValueTypes::Number,
             identi: "index"
-        }), None
+        }), None, None,
     ],
     lib: StdModules::Array, 
     body: BuildInFuncs::Remove,
-};
-pub const LEN: BuildInFunction = BuildInFunction {
-    params: [
-        Some(BuildInParam {
-            type__: ValueTypes::Void,
-            identi: "arr"
-        }), None, None
-    ],
-    lib: StdModules::Array, 
-    body: BuildInFuncs::Len,
 };

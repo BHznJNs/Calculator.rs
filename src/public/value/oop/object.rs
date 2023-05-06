@@ -4,13 +4,12 @@ use std::collections::HashMap;
 use std::fmt;
 
 use super::super::value::Value;
-use super::class::Class;
 use super::utils::data_storage::DataStoragePattern;
 use super::utils::getter::getter;
 
 #[derive(PartialEq, Clone)]
 pub struct Object {
-    pub prototype: Option<Rc<Class>>,
+    pub prototype: Option<Value>,
 
     pub storage_pattern: DataStoragePattern,
     pub data_list: Option<Vec<(String, Rc<RefCell<Value>>)>>,
@@ -34,12 +33,12 @@ impl Object {
             },
             Err(_) => {
                 match &self.prototype {
-                    Some(proto) => {
+                    Some(Value::Class(proto)) => {
                         let target_method =
                             proto.get_method(prop_name)?;
                         Ok(Value::Function(target_method.clone()))
                     },
-                    None => {
+                    _ => {
                         println!("Property '{}' in object does not exist.", prop_name);
                         Err(())
                     }

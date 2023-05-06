@@ -1,15 +1,20 @@
+use std::rc::Rc;
+
 use crate::public::compile_time::ast::ASTNodeVec;
 use crate::public::run_time::build_in::BuildInFuncs;
 use crate::public::std::std::StdModules;
 
 use super::value::ValueTypes;
 
+#[derive(PartialEq)]
 pub struct BuildInParam {
     pub type__: ValueTypes,
     pub identi: &'static str,
 }
+
+#[derive(PartialEq)]
 pub struct BuildInFunction {
-    pub params: [Option<BuildInParam>; 3],
+    pub params: [Option<BuildInParam>; 4],
     pub lib: StdModules,
     pub body: BuildInFuncs,
 }
@@ -24,4 +29,27 @@ pub struct Param {
 pub struct UserDefinedFunction {
     pub params: Vec<Param>,
     pub body: ASTNodeVec,
+}
+
+// --- --- --- --- --- ---
+
+#[derive(PartialEq, Clone)]
+pub enum Function {
+    BuildIn(Rc<BuildInFunction>),
+    UserDefined(Rc<UserDefinedFunction>),
+}
+
+pub trait Overload<T> {
+    fn create(value: T) -> Self;
+}
+
+impl Overload<UserDefinedFunction> for Function {
+    fn create(value: UserDefinedFunction) -> Self {
+        Function::UserDefined(Rc::new(value))
+    }
+}
+impl Overload<BuildInFunction> for Function {
+    fn create(value: BuildInFunction) -> Self {
+        Function::BuildIn(Rc::new(value))
+    }
 }

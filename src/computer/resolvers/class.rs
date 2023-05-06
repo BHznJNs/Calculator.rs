@@ -1,8 +1,7 @@
 use std::collections::HashMap;
-use std::rc::Rc;
 
 use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes};
-use crate::public::value::function::UserDefinedFunction;
+use crate::public::value::function::{Function, Overload};
 use crate::public::value::oop::class::Class;
 use crate::public::value::oop::utils::data_storage::DataStoragePattern;
 
@@ -18,7 +17,7 @@ pub fn resolve(
 
     let mut property_stack = Vec::<String>::new();
     let mut method_stack =
-        Vec::<(String, Rc<UserDefinedFunction>)>::new();
+        Vec::<(String, Function)>::new();
 
     for param in params {
         if let ASTNodeTypes::Variable(name) = &param.type__ {
@@ -35,7 +34,7 @@ pub fn resolve(
                         function_definition::resolve(func_node)?;
                     method_stack.push((
                         name.clone(),
-                        Rc::new(func_definition)
+                        Function::create(func_definition)
                     ))
                 }
             } else {
@@ -57,8 +56,8 @@ pub fn resolve(
         DataStoragePattern::List
     };
 
-    let method_list: Option<Vec<(String, Rc<UserDefinedFunction>)>>;
-    let method_map : Option<HashMap<String, Rc<UserDefinedFunction>>>;
+    let method_list: Option<Vec<(String, Function)>>;
+    let method_map : Option<HashMap<String, Function>>;
     match storage_pattern {
         DataStoragePattern::List => {
             method_list = Some(method_stack);
@@ -66,7 +65,7 @@ pub fn resolve(
         },
         DataStoragePattern::Map => {
             let mut temp_map =
-                HashMap::<String, Rc<UserDefinedFunction>>::new();
+                HashMap::<String, Function>::new();
             for (k, v) in method_stack {
                 temp_map.insert(k, v);
             }

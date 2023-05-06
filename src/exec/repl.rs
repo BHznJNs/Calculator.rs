@@ -37,8 +37,12 @@ pub fn repl(scope: &mut Scope) -> ! {
         if let Ok(val) = result {
             if val == Value::Number(Number::Empty) {
                 continue;
+            } else
+            if let Value::String(_) = val {
+                println!("= \"{}\"", val);
+            } else {
+                println!("= {}", val);
             }
-            println!("= {}", val);
         }
     }
 }

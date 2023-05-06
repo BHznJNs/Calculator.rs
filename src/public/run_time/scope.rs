@@ -1,10 +1,8 @@
 use std::collections::HashMap;
-use std::rc::Rc;
 
 use crate::exec::script::run::run_script;
 use crate::public::std::modules::{math, array, basic};
 use crate::public::std::std::StdModules;
-use crate::public::value::function::BuildInFunction;
 use crate::public::value::oop::module::{module_create, get_module_name};
 use crate::public::value::value::Overload;
 
@@ -12,16 +10,12 @@ use super::build_in;
 use super::super::value::value::Value;
 
 pub struct GlobalScope {
-    pub build_in_funcs: HashMap<&'static str, Rc<BuildInFunction>>,
     pub variables: HashMap<String, Value>,
 }
 impl GlobalScope {
     pub fn init() -> GlobalScope {
         GlobalScope {
-            build_in_funcs:
-                HashMap::<&'static str, Rc<BuildInFunction>>::new(),
-            variables:
-                build_in::variables(),
+            variables: build_in::variables(),
         }
     }
 }
@@ -69,14 +63,28 @@ impl Scope {
         };
 
         if let None = self.module.get(module_name) {
-            let func_list = match target_module {
-                StdModules::Basic  => basic::function_list(),
-                StdModules::Math   => math::function_list(),
-                StdModules::Array  => array::function_list(),
+            self.module.insert(module_name.to_string(), true);
+            match target_module {
+                StdModules::Basic => {
+                    let func_list = basic::function_list();
+                    self.global.variables.extend(func_list);
+                },
+                StdModules::Math  => {
+                    let module_obj = math::module_object();
+                    self.global.variables.insert(
+                        String::from("Math"),
+                        Value::create(module_obj),
+                    );
+                },
+                StdModules::Array => {
+                    let module_cls = array::module_class();
+                    self.global.variables.insert(
+                        String::from("Array"),
+                        Value::create(module_cls),
+                    );
+                },
                 StdModules::FileSystem => todo!(),
             };
-            self.module.insert(module_name.to_string(), true);
-            self.global.build_in_funcs.extend(func_list)
         }
         Ok(())
     }

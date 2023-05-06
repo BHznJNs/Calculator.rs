@@ -5,7 +5,7 @@ use std::rc::Rc;
 
 use super::number::Number;
 use super::super::compile_time::ast::ASTNode;
-use super::function::UserDefinedFunction;
+use super::function::{UserDefinedFunction, BuildInFunction, Function, Overload as FunctionOverload};
 use super::oop::class::Class;
 use super::oop::object::Object;
 
@@ -69,7 +69,7 @@ pub enum Value {
     Array(Rc<RefCell<ArrayLiteral>>),
     LazyExpression(Rc<ASTNode>),
 
-    Function(Rc<UserDefinedFunction>),
+    Function(Function),
     Class(Rc<Class>),
     Object(Rc<RefCell<Object>>),
 }
@@ -80,10 +80,14 @@ impl fmt::Display for Value {
         match self {
             Value::Void(_) => write!(f, "void"),
 
-            Value::Number(num) => write!(f, "{}", num),
-            Value::String(str) => write!(f, "{}", str.as_ref().borrow()),
-            Value::LazyExpression(_) => write!(f, "<Lazy-Expression>"),
-            Value::Function(_) => write!(f, "<User-Defined-Function>"),
+            Value::Number(num) =>
+                write!(f, "{}", num),
+            Value::String(str) =>
+                write!(f, "{}", str.as_ref().borrow()),
+            Value::LazyExpression(_) =>
+                write!(f, "<Lazy-Expression>"),
+            Value::Function(_) =>
+                write!(f, "<User-Defined-Function>"),
             Value::Array(arr) => {
                 const LINE_COUNT: i8 = 5;
                 let mut index = 0;
@@ -226,7 +230,12 @@ impl Overload<ASTNode> for Value {
 
 impl Overload<UserDefinedFunction> for Value {
     fn create(value: UserDefinedFunction) -> Self {
-        Value::Function(Rc::new(value))
+        Value::Function(Function::create(value))
+    }
+}
+impl Overload<BuildInFunction> for Value {
+    fn create(value: BuildInFunction) -> Self {
+        Value::Function(Function::create(value))
     }
 }
 impl Overload<Class> for Value {

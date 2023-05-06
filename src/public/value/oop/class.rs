@@ -3,9 +3,9 @@ use std::collections::HashMap;
 use std::rc::Rc;
 use std::fmt;
 
+use crate::public::value::function::Function;
 use crate::public::value::value::{ArrayLiteral, Value};
 
-use super::super::function::UserDefinedFunction;
 use super::object::Object;
 use super::utils::data_storage::DataStoragePattern;
 use super::utils::getter::getter;
@@ -15,8 +15,8 @@ pub struct Class {
     pub properties: Vec<String>,
 
     pub method_storage: DataStoragePattern,
-    pub method_list: Option<Vec<(String, Rc<UserDefinedFunction>)>>,
-    pub method_map : Option<HashMap<String, Rc<UserDefinedFunction>>>,
+    pub method_list: Option<Vec<(String, Function)>>,
+    pub method_map : Option<HashMap<String, Function>>,
 }
 
 impl Class {
@@ -24,9 +24,9 @@ impl Class {
 
     pub fn get_method(
         &self, target_method: &String
-    ) -> Result<Rc<UserDefinedFunction>, ()> {
+    ) -> Result<Function, ()> {
         let result_target_method =
-        getter::<Rc<UserDefinedFunction>>(
+        getter::<Function>(
             self.method_storage,
             target_method,
             &self.method_list,
@@ -67,15 +67,14 @@ impl Class {
                 let mut index = 0;
                 while index < class_self.properties.len() {
                     let current_prop = &properties[index];
-                    let option_current_val =
-                        values.pop_front();
 
-                    let current_val = match option_current_val {
+                    let current_value =
+                    match values.pop_front() {
                         Some(val) => Rc::new(RefCell::new(val)),
                         None => break,
                     };
 
-                    list.push((current_prop.clone(), current_val));
+                    list.push((current_prop.clone(), current_value));
                     index += 1;
                 }
 
@@ -89,15 +88,14 @@ impl Class {
                 let mut index = 0;
                 while index < class_self.properties.len() {
                     let current_prop = &properties[index];
-                    let option_current_val =
-                        values.pop_front();
 
-                    let current_val = match option_current_val {
+                    let current_value =
+                    match values.pop_front() {
                         Some(val) => Rc::new(RefCell::new(val)),
                         None => break,
                     };
 
-                    map.insert(current_prop.clone(), current_val);
+                    map.insert(current_prop.clone(), current_value);
                     index += 1;
                 }
 
@@ -107,7 +105,7 @@ impl Class {
         }
 
         Ok(Object {
-            prototype: Some(class_self.clone()),
+            prototype: Some(Value::Class(class_self.clone())),
             storage_pattern,
             data_list,
             data_map,

@@ -1,8 +1,12 @@
+use std::cell::RefCell;
+use std::collections::HashMap;
 use std::rc::Rc;
 
 use crate::public::run_time::build_in::BuildInFuncs;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::function::{BuildInParam, BuildInFunction};
+use crate::public::value::oop::object::Object;
+use crate::public::value::oop::utils::data_storage::DataStoragePattern;
 use crate::public::value::value::{ValueTypes, Value, Overload};
 
 use super::super::std::StdModules;
@@ -145,143 +149,217 @@ pub fn implement(
     Ok(Value::create(result))
 }
 
-pub fn function_list() -> Vec<(&'static str, Rc<BuildInFunction>)> {
-    vec![
-        ("sin" , Rc::new(SIN)),
-        ("cos" , Rc::new(COS)),
-        ("tan" , Rc::new(TAN)),
-        ("asin", Rc::new(ASIN)),
-        ("acos", Rc::new(ACOS)),
-        ("atan", Rc::new(ATAN)),
-        ("sinh", Rc::new(SINH)),
-        ("cosh", Rc::new(COSH)),
-        ("tanh", Rc::new(TANH)),
-    
-        ("rad",  Rc::new(RAD)),
-        ("deg",  Rc::new(DEG)),
-    
-        ("log10", Rc::new(LOG10)),
-        ("log2" , Rc::new(LOG2)),
-        ("log"  , Rc::new(LOG)),
-        ("ln"   , Rc::new(LN)),
-        ("exp"  , Rc::new(EXP)),
-        ("abs"  , Rc::new(ABS)),
-        ("sqrt" , Rc::new(SQRT)),
-        ("floor", Rc::new(FLOOR)),
-        ("round", Rc::new(ROUND)),
-    ]
+pub fn module_object() -> Object {
+    Object {
+        prototype: None,
+        storage_pattern: DataStoragePattern::Map,
+        data_list: None,
+        data_map: Some(HashMap::from([
+            (String::from("sin") , Rc::new(RefCell::new(Value::create(SIN)))),
+            (String::from("cos") , Rc::new(RefCell::new(Value::create(COS)))),
+            (String::from("tan") , Rc::new(RefCell::new(Value::create(TAN)))),
+            (String::from("asin"), Rc::new(RefCell::new(Value::create(ASIN)))),
+            (String::from("acos"), Rc::new(RefCell::new(Value::create(ACOS)))),
+            (String::from("atan"), Rc::new(RefCell::new(Value::create(ATAN)))),
+            (String::from("sinh"), Rc::new(RefCell::new(Value::create(SINH)))),
+            (String::from("cosh"), Rc::new(RefCell::new(Value::create(COSH)))),
+            (String::from("tanh"), Rc::new(RefCell::new(Value::create(TANH)))),
+        
+            (String::from("rad"),  Rc::new(RefCell::new(Value::create(RAD)))),
+            (String::from("deg"),  Rc::new(RefCell::new(Value::create(DEG)))),
+        
+            (String::from("log10"), Rc::new(RefCell::new(Value::create(LOG10)))),
+            (String::from("log2") , Rc::new(RefCell::new(Value::create(LOG2)))),
+            (String::from("log")  , Rc::new(RefCell::new(Value::create(LOG)))),
+            (String::from("ln")   , Rc::new(RefCell::new(Value::create(LN)))),
+            (String::from("exp")  , Rc::new(RefCell::new(Value::create(EXP)))),
+            (String::from("abs")  , Rc::new(RefCell::new(Value::create(ABS)))),
+            (String::from("sqrt") , Rc::new(RefCell::new(Value::create(SQRT)))),
+            (String::from("floor"), Rc::new(RefCell::new(Value::create(FLOOR)))),
+            (String::from("round"), Rc::new(RefCell::new(Value::create(ROUND)))),
+        ])),
+    }
 }
 
 pub const SIN: BuildInFunction = BuildInFunction {
-    params: [Some(BuildInParam {
-        type__: ValueTypes::Number,
-        identi: "input"
-    }), None, None],
+    params: [
+        Some(BuildInParam {
+            type__: ValueTypes::Object,
+            identi: "self"
+        }), Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "input"
+        }), None, None,
+    ],
     lib: StdModules::Math, 
     body: BuildInFuncs::Sin,
 };
 pub const COS: BuildInFunction = BuildInFunction {
-    params: [Some(BuildInParam {
-        type__: ValueTypes::Number,
-        identi: "input"
-    }), None, None],
+    params: [
+        Some(BuildInParam {
+            type__: ValueTypes::Object,
+            identi: "self"
+        }), Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "input"
+        }), None, None,
+    ],
     lib: StdModules::Math,
     body: BuildInFuncs::Cos,
 };
 pub const TAN: BuildInFunction = BuildInFunction {
-    params: [Some(BuildInParam {
-        type__: ValueTypes::Number,
-        identi: "input"
-    }), None, None],
+    params: [
+        Some(BuildInParam {
+            type__: ValueTypes::Object,
+            identi: "self"
+        }), Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "input"
+        }), None, None,
+    ],
     lib: StdModules::Math,
     body: BuildInFuncs::Tan,
 };
 
 pub const ASIN: BuildInFunction = BuildInFunction {
-    params: [Some(BuildInParam {
-        type__: ValueTypes::Number,
-        identi: "input"
-    }), None, None],
+    params: [
+        Some(BuildInParam {
+            type__: ValueTypes::Object,
+            identi: "self"
+        }), Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "input"
+        }), None, None,
+    ],
     lib: StdModules::Math,
     body: BuildInFuncs::Asin,
 };
 pub const ACOS: BuildInFunction = BuildInFunction {
-    params: [Some(BuildInParam {
-        type__: ValueTypes::Number,
-        identi: "input"
-    }), None, None],
+    params: [
+        Some(BuildInParam {
+            type__: ValueTypes::Object,
+            identi: "self"
+        }), Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "input"
+        }), None, None,
+    ],
     lib: StdModules::Math,
     body: BuildInFuncs::Acos,
 };
 pub const ATAN: BuildInFunction = BuildInFunction {
-    params: [Some(BuildInParam {
-        type__: ValueTypes::Number,
-        identi: "input"
-    }), None, None],
+    params: [
+        Some(BuildInParam {
+            type__: ValueTypes::Object,
+            identi: "self"
+        }), Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "input"
+        }), None, None,
+    ],
     lib: StdModules::Math,
     body: BuildInFuncs::Atan,
 };
 
 pub const SINH: BuildInFunction = BuildInFunction {
-    params: [Some(BuildInParam {
-        type__: ValueTypes::Number,
-        identi: "input"
-    }), None, None],
+    params: [
+        Some(BuildInParam {
+            type__: ValueTypes::Object,
+            identi: "self"
+        }), Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "input"
+        }), None, None,
+    ],
     lib: StdModules::Math,
     body: BuildInFuncs::Sinh,
 };
 pub const COSH: BuildInFunction = BuildInFunction {
-    params: [Some(BuildInParam {
-        type__: ValueTypes::Number,
-        identi: "input"
-    }), None, None],
+    params: [
+        Some(BuildInParam {
+            type__: ValueTypes::Object,
+            identi: "self"
+        }), Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "input"
+        }), None, None,
+    ],
     lib: StdModules::Math,
     body: BuildInFuncs::Cosh,
 };
 pub const TANH: BuildInFunction = BuildInFunction {
-    params: [Some(BuildInParam {
-        type__: ValueTypes::Number,
-        identi: "input"
-    }), None, None],
+    params: [
+        Some(BuildInParam {
+            type__: ValueTypes::Object,
+            identi: "self"
+        }), Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "input"
+        }), None, None,
+    ],
     lib: StdModules::Math,
     body: BuildInFuncs::Tanh,
 };
 
 pub const RAD: BuildInFunction = BuildInFunction {
-    params: [Some(BuildInParam {
-        type__: ValueTypes::Number,
-        identi: "input"
-    }), None, None],
+    params: [
+        Some(BuildInParam {
+            type__: ValueTypes::Object,
+            identi: "self"
+        }), Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "input"
+        }), None, None,
+    ],
     lib: StdModules::Math,
     body: BuildInFuncs::Rad,
 };
 pub const DEG: BuildInFunction = BuildInFunction {
-    params: [Some(BuildInParam {
-        type__: ValueTypes::Number,
-        identi: "input"
-    }), None, None],
+    params: [
+        Some(BuildInParam {
+            type__: ValueTypes::Object,
+            identi: "self"
+        }), Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "input"
+        }), None, None,
+    ],
     lib: StdModules::Math,
     body: BuildInFuncs::Deg,
 };
 
 pub const LOG10: BuildInFunction = BuildInFunction {
-    params: [Some(BuildInParam {
-        type__: ValueTypes::Number,
-        identi: "input"
-    }), None, None],
+    params: [
+        Some(BuildInParam {
+            type__: ValueTypes::Object,
+            identi: "self"
+        }), Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "input"
+        }), None, None,
+    ],
     lib: StdModules::Math,
     body: BuildInFuncs::Log10,
 };
 pub const LOG2: BuildInFunction = BuildInFunction {
-    params: [Some(BuildInParam {
-        type__: ValueTypes::Number,
-        identi: "input"
-    }), None, None],
+    params: [
+        Some(BuildInParam {
+            type__: ValueTypes::Object,
+            identi: "self"
+        }), Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "input"
+        }), None, None,
+    ],
     lib: StdModules::Math,
     body: BuildInFuncs::Log2,
 };
 pub const LOG: BuildInFunction = BuildInFunction {
     params: [
+        Some(BuildInParam {
+            type__: ValueTypes::Object,
+            identi: "self"
+        }),
         Some(BuildInParam {
             type__: ValueTypes::Number,
             identi: "base"
@@ -290,57 +368,87 @@ pub const LOG: BuildInFunction = BuildInFunction {
             type__: ValueTypes::Number,
             identi: "natural"
         }),
-        None
+        None,
     ],
     lib: StdModules::Math,
     body: BuildInFuncs::Log,
 };
 pub const LN: BuildInFunction = BuildInFunction {
-    params: [Some(BuildInParam {
-        type__: ValueTypes::Number,
-        identi: "input"
-    }), None, None],
+    params: [
+        Some(BuildInParam {
+            type__: ValueTypes::Object,
+            identi: "self"
+        }), Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "input"
+        }), None, None,
+    ],
     lib: StdModules::Math,
     body: BuildInFuncs::Ln,
 };
 pub const EXP: BuildInFunction = BuildInFunction {
-    params: [Some(BuildInParam {
-        type__: ValueTypes::Number,
-        identi: "input"
-    }), None, None],
+    params: [
+        Some(BuildInParam {
+            type__: ValueTypes::Object,
+            identi: "self"
+        }), Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "input"
+        }), None, None,
+    ],
     lib: StdModules::Math,
     body: BuildInFuncs::Exp,
 };
 
 pub const ABS: BuildInFunction = BuildInFunction {
-    params: [Some(BuildInParam {
-        type__: ValueTypes::Number,
-        identi: "input"
-    }), None, None],
+    params: [
+        Some(BuildInParam {
+            type__: ValueTypes::Object,
+            identi: "self"
+        }), Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "input"
+        }), None, None,
+    ],
     lib: StdModules::Math,
     body: BuildInFuncs::Abs,
 };
 pub const SQRT: BuildInFunction = BuildInFunction {
-    params: [Some(BuildInParam {
-        type__: ValueTypes::Number,
-        identi: "input"
-    }), None, None],
+    params: [
+        Some(BuildInParam {
+            type__: ValueTypes::Object,
+            identi: "self"
+        }), Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "input"
+        }), None, None,
+    ],
     lib: StdModules::Math,
     body: BuildInFuncs::Sqrt,
 };
 pub const FLOOR: BuildInFunction = BuildInFunction {
-    params: [Some(BuildInParam {
-        type__: ValueTypes::Number,
-        identi: "input"
-    }), None, None],
+    params: [
+        Some(BuildInParam {
+            type__: ValueTypes::Object,
+            identi: "self"
+        }), Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "input"
+        }), None, None,
+    ],
     lib: StdModules::Math,
     body: BuildInFuncs::Floor,
 };
 pub const ROUND: BuildInFunction = BuildInFunction {
-    params: [Some(BuildInParam {
-        type__: ValueTypes::Number,
-        identi: "input"
-    }), None, None],
+    params: [
+        Some(BuildInParam {
+            type__: ValueTypes::Object,
+            identi: "self"
+        }), Some(BuildInParam {
+            type__: ValueTypes::Number,
+            identi: "input"
+        }), None, None,
+    ],
     lib: StdModules::Math,
     body: BuildInFuncs::Round,
 };

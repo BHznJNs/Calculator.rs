@@ -7,10 +7,10 @@ use crate::public::value::value::Overload;
 use crate::public::value::value::Value;
 use crate::public::value::value::ValueTypes;
 
-#[derive(Clone)]
+#[derive(PartialEq, Clone)]
 pub enum BuildInFuncs {
     // Basic
-    Input, Type,
+    Input, Type, Len,
     Int, Float, String, Array, Ascii,
 
     // Math
@@ -28,7 +28,7 @@ pub enum BuildInFuncs {
     Push, Pop,
     Shift, Unshift,
     Insert, Remove,
-    Len, Clone,
+    Clone,
 
     // // File system
     // Read, Write
