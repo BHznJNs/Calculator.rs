@@ -308,8 +308,7 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
                     if is_escape_char {
                         is_escape_char = false;
                         current = char_converter(current)?;
-                    }
-
+                    } else
                     // when meet '\'
                     if current == BACKSLASH_ASCII {
                         is_escape_char = true;
