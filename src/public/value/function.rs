@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::public::compile_time::ast::ASTNodeVec;
-use crate::public::run_time::build_in::BuildInFuncs;
+use crate::public::run_time::build_in::BuildInFnEnum;
 use crate::public::std::std::StdModules;
 
 use super::value::ValueTypes;
@@ -16,7 +16,7 @@ pub struct BuildInParam {
 pub struct BuildInFunction {
     pub params: [Option<BuildInParam>; 4],
     pub lib: StdModules,
-    pub body: BuildInFuncs,
+    pub body: BuildInFnEnum,
 }
 
 #[derive(PartialEq, Clone)]

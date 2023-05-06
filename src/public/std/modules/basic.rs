@@ -2,7 +2,7 @@ use std::cell::Ref;
 use std::io::{self, Write};
 use std::str::FromStr;
 
-use crate::public::run_time::build_in::BuildInFuncs;
+use crate::public::run_time::build_in::BuildInFnEnum;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::function::{BuildInParam, BuildInFunction};
 use crate::public::value::number::Number;
@@ -12,7 +12,7 @@ use super::super::std::StdModules;
 use super::super::utils::get_val::get_val;
 
 pub fn implement(
-    func_body: &BuildInFuncs,
+    func_body: &BuildInFnEnum,
     scope: &mut Scope,
 ) -> Result<Value, ()> {
     fn str_to_num<T: FromStr>(
@@ -29,7 +29,7 @@ pub fn implement(
     }
 
     let result = match func_body {
-        BuildInFuncs::Input => {
+        BuildInFnEnum::Input => {
             let prompt =
                 get_val("prompt", scope)?;
             // show prompt
@@ -53,19 +53,19 @@ pub fn implement(
 
             Value::create(input)
         },
-        BuildInFuncs::Type => {
+        BuildInFnEnum::Type => {
             let input =
                 get_val("input", scope)?;
 
             Value::create(input.get_type() as i64)
         },
-        BuildInFuncs::Clone => {
+        BuildInFnEnum::Clone => {
             let input =
                 get_val("input", scope)?;
             input.deep_clone()?
         },
 
-        BuildInFuncs::Int => {
+        BuildInFnEnum::Int => {
             let input =
                 get_val("input", scope)?;
 
@@ -82,7 +82,7 @@ pub fn implement(
                 return Err(())
             }
         },
-        BuildInFuncs::Float => {
+        BuildInFnEnum::Float => {
             let input =
                 get_val("input", scope)?;
 
@@ -99,7 +99,7 @@ pub fn implement(
                 return Err(())
             }
         },
-        BuildInFuncs::String => {
+        BuildInFnEnum::String => {
             let input =
                 get_val("input", scope)?;
 
@@ -111,7 +111,7 @@ pub fn implement(
                 return Err(())
             }
         },
-        BuildInFuncs::Array => {
+        BuildInFnEnum::Array => {
             let input =
                 get_val("input", scope)?;
 
@@ -125,7 +125,7 @@ pub fn implement(
                 return Err(())
             }
         },
-        BuildInFuncs::Ascii => {
+        BuildInFnEnum::Ascii => {
             let input =
                 get_val("input", scope)?;
 
@@ -148,7 +148,7 @@ pub fn implement(
                 return Err(())
             }
         },
-        BuildInFuncs::Len => {
+        BuildInFnEnum::Len => {
             let arr_value: Value = get_val("input", scope)?;
 
             if let Value::Array(arr) = arr_value {
@@ -191,7 +191,7 @@ pub const INPUT: BuildInFunction = BuildInFunction {
         identi: "prompt"
     }), None, None, None,],
     lib: StdModules::Basic, 
-    body: BuildInFuncs::Input,
+    body: BuildInFnEnum::Input,
 };
 // get value type
 pub const TYPE: BuildInFunction = BuildInFunction {
@@ -200,7 +200,7 @@ pub const TYPE: BuildInFunction = BuildInFunction {
         identi: "input"
     }), None, None, None,],
     lib: StdModules::Basic, 
-    body: BuildInFuncs::Type,
+    body: BuildInFnEnum::Type,
 };
 // deep clone value
 pub const CLONE: BuildInFunction = BuildInFunction {
@@ -209,7 +209,7 @@ pub const CLONE: BuildInFunction = BuildInFunction {
         identi: "input"
     }), None, None, None,],
     lib: StdModules::Basic, 
-    body: BuildInFuncs::Clone,
+    body: BuildInFnEnum::Clone,
 };
 
 // Type converters
@@ -219,7 +219,7 @@ pub const INT: BuildInFunction = BuildInFunction {
         identi: "input"
     }), None, None, None,],
     lib: StdModules::Basic, 
-    body: BuildInFuncs::Int,
+    body: BuildInFnEnum::Int,
 };
 pub const FLOAT: BuildInFunction = BuildInFunction {
     params: [Some(BuildInParam {
@@ -227,7 +227,7 @@ pub const FLOAT: BuildInFunction = BuildInFunction {
         identi: "input"
     }), None, None, None,],
     lib: StdModules::Basic, 
-    body: BuildInFuncs::Float,
+    body: BuildInFnEnum::Float,
 };
 pub const STR: BuildInFunction = BuildInFunction {
     params: [Some(BuildInParam {
@@ -235,7 +235,7 @@ pub const STR: BuildInFunction = BuildInFunction {
         identi: "input"
     }), None, None, None,],
     lib: StdModules::Basic, 
-    body: BuildInFuncs::String,
+    body: BuildInFnEnum::String,
 };
 pub const ARRAY: BuildInFunction = BuildInFunction {
     params: [Some(BuildInParam {
@@ -243,7 +243,7 @@ pub const ARRAY: BuildInFunction = BuildInFunction {
         identi: "input"
     }), None, None, None,],
     lib: StdModules::Basic, 
-    body: BuildInFuncs::Array,
+    body: BuildInFnEnum::Array,
 };
 pub const ASCII: BuildInFunction = BuildInFunction {
     params: [Some(BuildInParam {
@@ -251,7 +251,7 @@ pub const ASCII: BuildInFunction = BuildInFunction {
         identi: "input"
     }), None, None, None,],
     lib: StdModules::Basic,
-    body: BuildInFuncs::Ascii,
+    body: BuildInFnEnum::Ascii,
 };
 
 
@@ -261,5 +261,5 @@ pub const LEN: BuildInFunction = BuildInFunction {
         identi: "input"
     }), None, None, None,],
     lib: StdModules::Basic,
-    body: BuildInFuncs::Len,
+    body: BuildInFnEnum::Len,
 };

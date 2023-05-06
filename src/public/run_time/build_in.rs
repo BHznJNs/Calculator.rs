@@ -8,7 +8,7 @@ use crate::public::value::value::Value;
 use crate::public::value::value::ValueTypes;
 
 #[derive(PartialEq, Clone)]
-pub enum BuildInFuncs {
+pub enum BuildInFnEnum {
     // Basic
     Input, Type, Len,
     Int, Float, String, Array, Ascii,
@@ -29,6 +29,9 @@ pub enum BuildInFuncs {
     Shift, Unshift,
     Insert, Remove,
     Clone,
+
+    // String
+    Split, Replace,
 
     // // File system
     // Read, Write

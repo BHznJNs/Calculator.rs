@@ -19,6 +19,7 @@ fn call(
             math::implement(&function.body, scope),
         StdModules::Array =>
             array::implement(&function.body, scope),
+        StdModules::String => todo!(),
         StdModules::FileSystem =>
             todo!(),
     }

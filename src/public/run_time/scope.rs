@@ -83,6 +83,7 @@ impl Scope {
                         Value::create(module_cls),
                     );
                 },
+                StdModules::String => todo!(),
                 StdModules::FileSystem => todo!(),
             };
         }

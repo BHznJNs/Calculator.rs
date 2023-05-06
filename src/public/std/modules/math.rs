@@ -2,7 +2,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use crate::public::run_time::build_in::BuildInFuncs;
+use crate::public::run_time::build_in::BuildInFnEnum;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::function::{BuildInParam, BuildInFunction};
 use crate::public::value::oop::object::Object;
@@ -13,89 +13,89 @@ use super::super::std::StdModules;
 use super::super::utils::get_val::get_val;
 
 pub fn implement(
-    func_body: &BuildInFuncs,
+    func_body: &BuildInFnEnum,
     scope: &mut Scope,
 ) -> Result<Value, ()> {
     let result = match func_body {
-        BuildInFuncs::Sin => {
+        BuildInFnEnum::Sin => {
             let input =
                 get_val("input", scope)?;
             let f = input.get_f64()?;
             f.sin()
         },
-        BuildInFuncs::Cos => {
+        BuildInFnEnum::Cos => {
             let input =
                 get_val("input", scope)?;
             let f = input.get_f64()?;
             f.cos()
         },
-        BuildInFuncs::Tan => {
+        BuildInFnEnum::Tan => {
             let input =
                 get_val("input", scope)?;
             let f = input.get_f64()?;
             f.tan()
         },
-        BuildInFuncs::Asin => {
+        BuildInFnEnum::Asin => {
             let input =
                 get_val("input", scope)?;
             let f = input.get_f64()?;
             f.asin()
         },
-        BuildInFuncs::Acos => {
+        BuildInFnEnum::Acos => {
             let input =
                 get_val("input", scope)?;
             let f = input.get_f64()?;
             f.acos()
         },
-        BuildInFuncs::Atan => {
+        BuildInFnEnum::Atan => {
             let input =
                 get_val("input", scope)?;
             let f = input.get_f64()?;
             f.atan()
         },
-        BuildInFuncs::Sinh => {
+        BuildInFnEnum::Sinh => {
             let input =
                 get_val("input", scope)?;
             let f = input.get_f64()?;
             f.sinh()
         },
-        BuildInFuncs::Cosh => {
+        BuildInFnEnum::Cosh => {
             let input =
                 get_val("input", scope)?;
             let f = input.get_f64()?;
             f.cosh()
         },
-        BuildInFuncs::Tanh => {
+        BuildInFnEnum::Tanh => {
             let input =
                 get_val("input", scope)?;
             let f = input.get_f64()?;
             f.tanh()
         },
-        BuildInFuncs::Rad => {
+        BuildInFnEnum::Rad => {
             let input =
                 get_val("input", scope)?;
             let f = input.get_f64()?;
             f.to_radians()
         },
-        BuildInFuncs::Deg => {
+        BuildInFnEnum::Deg => {
             let input =
                 get_val("input", scope)?;
             let f = input.get_f64()?;
             f.to_degrees()
         },
-        BuildInFuncs::Log10 => {
+        BuildInFnEnum::Log10 => {
             let input =
                 get_val("input", scope)?;
             let f = input.get_f64()?;
             f.log10()
         },
-        BuildInFuncs::Log2 => {
+        BuildInFnEnum::Log2 => {
             let input =
                 get_val("input", scope)?;
             let f = input.get_f64()?;
             f.sin()
         },
-        BuildInFuncs::Log => {
+        BuildInFnEnum::Log => {
             let base =
                 get_val("base", scope)?;
             let natural =
@@ -105,37 +105,37 @@ pub fn implement(
             let nature_f = natural.get_f64()?;
             nature_f.log(base_f)
         },
-        BuildInFuncs::Ln => {
+        BuildInFnEnum::Ln => {
             let input =
                 get_val("input", scope)?;
             let f = input.get_f64()?;
             f.ln()
         },
-        BuildInFuncs::Exp => {
+        BuildInFnEnum::Exp => {
             let input =
                 get_val("input", scope)?;
             let f = input.get_f64()?;
             f.exp()
         },
-        BuildInFuncs::Abs => {
+        BuildInFnEnum::Abs => {
             let input =
                 get_val("input", scope)?;
             let f = input.get_f64()?;
             f.abs()
         },
-        BuildInFuncs::Sqrt => {
+        BuildInFnEnum::Sqrt => {
             let input =
                 get_val("input", scope)?;
             let f = input.get_f64()?;
             f.sqrt()
         },
-        BuildInFuncs::Floor => {
+        BuildInFnEnum::Floor => {
             let input =
                 get_val("input", scope)?;
             let f = input.get_f64()?;
             f.floor()
         },
-        BuildInFuncs::Round => {
+        BuildInFnEnum::Round => {
             let input =
                 get_val("input", scope)?;
             let f = input.get_f64()?;
@@ -192,7 +192,7 @@ pub const SIN: BuildInFunction = BuildInFunction {
         }), None, None,
     ],
     lib: StdModules::Math, 
-    body: BuildInFuncs::Sin,
+    body: BuildInFnEnum::Sin,
 };
 pub const COS: BuildInFunction = BuildInFunction {
     params: [
@@ -205,7 +205,7 @@ pub const COS: BuildInFunction = BuildInFunction {
         }), None, None,
     ],
     lib: StdModules::Math,
-    body: BuildInFuncs::Cos,
+    body: BuildInFnEnum::Cos,
 };
 pub const TAN: BuildInFunction = BuildInFunction {
     params: [
@@ -218,7 +218,7 @@ pub const TAN: BuildInFunction = BuildInFunction {
         }), None, None,
     ],
     lib: StdModules::Math,
-    body: BuildInFuncs::Tan,
+    body: BuildInFnEnum::Tan,
 };
 
 pub const ASIN: BuildInFunction = BuildInFunction {
@@ -232,7 +232,7 @@ pub const ASIN: BuildInFunction = BuildInFunction {
         }), None, None,
     ],
     lib: StdModules::Math,
-    body: BuildInFuncs::Asin,
+    body: BuildInFnEnum::Asin,
 };
 pub const ACOS: BuildInFunction = BuildInFunction {
     params: [
@@ -245,7 +245,7 @@ pub const ACOS: BuildInFunction = BuildInFunction {
         }), None, None,
     ],
     lib: StdModules::Math,
-    body: BuildInFuncs::Acos,
+    body: BuildInFnEnum::Acos,
 };
 pub const ATAN: BuildInFunction = BuildInFunction {
     params: [
@@ -258,7 +258,7 @@ pub const ATAN: BuildInFunction = BuildInFunction {
         }), None, None,
     ],
     lib: StdModules::Math,
-    body: BuildInFuncs::Atan,
+    body: BuildInFnEnum::Atan,
 };
 
 pub const SINH: BuildInFunction = BuildInFunction {
@@ -272,7 +272,7 @@ pub const SINH: BuildInFunction = BuildInFunction {
         }), None, None,
     ],
     lib: StdModules::Math,
-    body: BuildInFuncs::Sinh,
+    body: BuildInFnEnum::Sinh,
 };
 pub const COSH: BuildInFunction = BuildInFunction {
     params: [
@@ -285,7 +285,7 @@ pub const COSH: BuildInFunction = BuildInFunction {
         }), None, None,
     ],
     lib: StdModules::Math,
-    body: BuildInFuncs::Cosh,
+    body: BuildInFnEnum::Cosh,
 };
 pub const TANH: BuildInFunction = BuildInFunction {
     params: [
@@ -298,7 +298,7 @@ pub const TANH: BuildInFunction = BuildInFunction {
         }), None, None,
     ],
     lib: StdModules::Math,
-    body: BuildInFuncs::Tanh,
+    body: BuildInFnEnum::Tanh,
 };
 
 pub const RAD: BuildInFunction = BuildInFunction {
@@ -312,7 +312,7 @@ pub const RAD: BuildInFunction = BuildInFunction {
         }), None, None,
     ],
     lib: StdModules::Math,
-    body: BuildInFuncs::Rad,
+    body: BuildInFnEnum::Rad,
 };
 pub const DEG: BuildInFunction = BuildInFunction {
     params: [
@@ -325,7 +325,7 @@ pub const DEG: BuildInFunction = BuildInFunction {
         }), None, None,
     ],
     lib: StdModules::Math,
-    body: BuildInFuncs::Deg,
+    body: BuildInFnEnum::Deg,
 };
 
 pub const LOG10: BuildInFunction = BuildInFunction {
@@ -339,7 +339,7 @@ pub const LOG10: BuildInFunction = BuildInFunction {
         }), None, None,
     ],
     lib: StdModules::Math,
-    body: BuildInFuncs::Log10,
+    body: BuildInFnEnum::Log10,
 };
 pub const LOG2: BuildInFunction = BuildInFunction {
     params: [
@@ -352,7 +352,7 @@ pub const LOG2: BuildInFunction = BuildInFunction {
         }), None, None,
     ],
     lib: StdModules::Math,
-    body: BuildInFuncs::Log2,
+    body: BuildInFnEnum::Log2,
 };
 pub const LOG: BuildInFunction = BuildInFunction {
     params: [
@@ -371,7 +371,7 @@ pub const LOG: BuildInFunction = BuildInFunction {
         None,
     ],
     lib: StdModules::Math,
-    body: BuildInFuncs::Log,
+    body: BuildInFnEnum::Log,
 };
 pub const LN: BuildInFunction = BuildInFunction {
     params: [
@@ -384,7 +384,7 @@ pub const LN: BuildInFunction = BuildInFunction {
         }), None, None,
     ],
     lib: StdModules::Math,
-    body: BuildInFuncs::Ln,
+    body: BuildInFnEnum::Ln,
 };
 pub const EXP: BuildInFunction = BuildInFunction {
     params: [
@@ -397,7 +397,7 @@ pub const EXP: BuildInFunction = BuildInFunction {
         }), None, None,
     ],
     lib: StdModules::Math,
-    body: BuildInFuncs::Exp,
+    body: BuildInFnEnum::Exp,
 };
 
 pub const ABS: BuildInFunction = BuildInFunction {
@@ -411,7 +411,7 @@ pub const ABS: BuildInFunction = BuildInFunction {
         }), None, None,
     ],
     lib: StdModules::Math,
-    body: BuildInFuncs::Abs,
+    body: BuildInFnEnum::Abs,
 };
 pub const SQRT: BuildInFunction = BuildInFunction {
     params: [
@@ -424,7 +424,7 @@ pub const SQRT: BuildInFunction = BuildInFunction {
         }), None, None,
     ],
     lib: StdModules::Math,
-    body: BuildInFuncs::Sqrt,
+    body: BuildInFnEnum::Sqrt,
 };
 pub const FLOOR: BuildInFunction = BuildInFunction {
     params: [
@@ -437,7 +437,7 @@ pub const FLOOR: BuildInFunction = BuildInFunction {
         }), None, None,
     ],
     lib: StdModules::Math,
-    body: BuildInFuncs::Floor,
+    body: BuildInFnEnum::Floor,
 };
 pub const ROUND: BuildInFunction = BuildInFunction {
     params: [
@@ -450,5 +450,5 @@ pub const ROUND: BuildInFunction = BuildInFunction {
         }), None, None,
     ],
     lib: StdModules::Math,
-    body: BuildInFuncs::Round,
+    body: BuildInFnEnum::Round,
 };
