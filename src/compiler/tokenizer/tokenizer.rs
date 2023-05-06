@@ -1,3 +1,4 @@
+use crate::compiler::tokenizer::char_converter::char_converter;
 use crate::public::value::value::{VALUE_TYPE_ARR, VALUE_TYPE_ENUM};
 use crate::public::value::{number::Number, value::ValueTypes};
 use crate::public::value::parens::Parens;
@@ -177,7 +178,9 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
         const MORE_THAN_ASCII  : u8 = 62; // >
         const EQUAL_ASCII      : u8 = 61; // =
 
-        const QUOTE_ASCII : u8 = 34; // '"'
+        const SINGLE_QUOTE_ASCII : u8 = 39; // '''
+        const DOUBLE_QUOTE_ASCII : u8 = 34; // '"'
+        const BACKSLASH_ASCII : u8    = 92; // '\'
 
         const SEMICOLON_ASCII  : u8 = 59; // ;
         const COMMA_ASCII      : u8 = 44; // ,
@@ -288,20 +291,38 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
             },
 
             // Other symbols
-            QUOTE_ASCII => { // String token resolve
+            SINGLE_QUOTE_ASCII | DOUBLE_QUOTE_ASCII => { // String token resolve
                 let mut value = String::new();
+                let mut is_escape_char = false;
                 index += 1;
                 current = chars[index];
 
-                while current != QUOTE_ASCII {
-                    if index == chars.len() - 1 {
+                while is_escape_char || (current != SINGLE_QUOTE_ASCII && current != DOUBLE_QUOTE_ASCII) {
+                    if index == chars.len() - 2 {
                         println!("Unmatched quote symbol at index {}.", index);
                         return Err(())
                     }
+
+                    // if last char is '\', current is
+                    // escape character.
+                    if is_escape_char {
+                        is_escape_char = false;
+                        current = char_converter(current)?;
+                    }
+
+                    // when meet '\'
+                    if current == BACKSLASH_ASCII {
+                        is_escape_char = true;
+                        index += 1;
+                        current = chars[index];
+                        continue;
+                    }
+
                     value.push(current as char);
                     index += 1;
                     current = chars[index];
                 }
+
                 index += 1; // skip the right quote.
                 tokens.push_back(Token::String(value));
                 last_type = TokenTypes::String;
@@ -331,8 +352,8 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
             TAB_ASCII   => {},
 
             // comment symbol: #
-            // when encount comment,
-            // stop resolving current line
+            // when encount comment symbol,
+            // stop resolving current line.
             NUMBER_SIGN_ASCII => break,
 
             NEW_LINE_ASCII    => break,
