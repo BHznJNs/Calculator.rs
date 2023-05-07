@@ -3,8 +3,9 @@ use std::collections::HashMap;
 use std::rc::Rc;
 use std::fmt;
 
+use crate::public::value::array::ArrayLiteral;
 use crate::public::value::function::Function;
-use crate::public::value::value::{ArrayLiteral, Value};
+use crate::public::value::value::Value;
 
 use super::object::Object;
 use super::utils::data_storage::DataStoragePattern;
@@ -45,7 +46,7 @@ impl Class {
 
     pub fn instantiate(
         class_self: Rc<Class>,
-        mut values: ArrayLiteral
+        mut values: ArrayLiteral,
     ) -> Result<Object, ()> {
         let param_count = values.len();
         let storage_pattern =

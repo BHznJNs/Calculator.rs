@@ -98,7 +98,7 @@ pub fn implement(
             }
         },
         _ => {
-            println!("Unexpected function in array implement.");
+            println!("Unexpected function in Array implement.");
             return Err(())
         }
     };

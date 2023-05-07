@@ -117,7 +117,7 @@ pub fn resolve(
         Keywords::Import => {
             let module_node = &params[0];
             if let ASTNodeTypes::Variable(module_name) = &module_node.type__ {
-                scope.import(module_name)?;
+                scope.import_std(module_name)?;
             } else
             if let ASTNodeTypes::StringLiteral(module_path) = &module_node.type__ {
                 scope.import_from_path(module_path)?;

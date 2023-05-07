@@ -1,12 +1,12 @@
 use std::collections::HashMap;
+use std::rc::Rc;
 
 use crate::exec::script::run::run_script;
-use crate::public::std::modules::{math, array, basic};
 use crate::public::std::std::StdModules;
 use crate::public::value::oop::module::{module_create, get_module_name};
 use crate::public::value::value::Overload;
 
-use super::build_in;
+use super::{build_in, module};
 use super::super::value::value::Value;
 
 pub struct GlobalScope {
@@ -15,7 +15,7 @@ pub struct GlobalScope {
 impl GlobalScope {
     pub fn init() -> GlobalScope {
         GlobalScope {
-            variables: build_in::variables(),
+            variables: build_in::constants(),
         }
     }
 }
@@ -26,7 +26,7 @@ pub struct LocalScope {
 impl LocalScope {
     pub fn init() -> LocalScope {
         LocalScope {
-            variables: build_in::variables()
+            variables: HashMap::<String, Value>::new()
         }
     }
 }
@@ -37,55 +37,46 @@ pub struct Scope {
     pub global: GlobalScope,
     pub local: Option<LocalScope>,
     module: HashMap<String, bool>,
-    std_module_map: HashMap<&'static str, StdModules>,
+    std_module_map: Rc<HashMap<&'static str, StdModules>>,
 }
-const STD_MODULE_DATA: [(&str, StdModules); 4] = [
-    ("Basic",  StdModules::Basic),
-    ("Math" ,  StdModules::Math),
-    ("Array",  StdModules::Array),
-    ("FS"   ,  StdModules::FileSystem),
+const STD_MODULE_DATA: [(&str, StdModules); 5] = [
+    ("Basic" ,  StdModules::Basic),
+    ("Math"  ,  StdModules::Math),
+    ("Array" ,  StdModules::Array),
+    ("String",  StdModules::String),
+    ("FS"    ,  StdModules::FileSystem),
 ];
 impl Scope {
     pub fn init() -> Scope {
-        let std_module_map =
-            HashMap::from(STD_MODULE_DATA);
         Scope {
             global: GlobalScope::init(),
             local: None,
             module: HashMap::<String, bool>::new(),
-            std_module_map,
+            std_module_map: Rc::new(HashMap::from(STD_MODULE_DATA)),
         }
     }
-    pub fn import(&mut self, module_name: &str) -> Result<(), ()> {
-        let Some(target_module) = self.std_module_map.get(module_name) else {
+    // inherit self to create new scope
+    fn new(&self) -> Scope {
+        Scope {
+            global: GlobalScope::init(),
+            local: None,
+            module: HashMap::<String, bool>::new(),
+            std_module_map: self.std_module_map.clone(),
+        }
+    }
+    // import STD module
+    pub fn import_std(&mut self, module_name: &str) -> Result<(), ()> {
+        let std_module_map =
+            self.std_module_map.clone();
+        let Some(target_module) =
+            std_module_map.get(module_name) else {
             println!("Target module '{}' does not exist.", module_name);
             return Err(())
         };
 
         if let None = self.module.get(module_name) {
             self.module.insert(module_name.to_string(), true);
-            match target_module {
-                StdModules::Basic => {
-                    let func_list = basic::function_list();
-                    self.global.variables.extend(func_list);
-                },
-                StdModules::Math  => {
-                    let module_obj = math::module_object();
-                    self.global.variables.insert(
-                        String::from("Math"),
-                        Value::create(module_obj),
-                    );
-                },
-                StdModules::Array => {
-                    let module_cls = array::module_class();
-                    self.global.variables.insert(
-                        String::from("Array"),
-                        Value::create(module_cls),
-                    );
-                },
-                StdModules::String => todo!(),
-                StdModules::FileSystem => todo!(),
-            };
+            module::resolve(target_module, self);
         }
         Ok(())
     }
@@ -93,7 +84,7 @@ impl Scope {
         &mut self,
         module_path: &str,
     ) -> Result<(), ()>  {
-        let mut module_scope = Scope::init();
+        let mut module_scope = self.new();
         let module_name =
             get_module_name(module_path);
 
@@ -107,7 +98,7 @@ impl Scope {
             // import modules that imported by module
             for (module, _) in module_scope.module {
                 if let Some(_) = self.std_module_map.get(module.as_str()) {
-                    self.import(&module)?;
+                    self.import_std(&module)?;
                 } else {
                     self.import_from_path(&module)?;
                 }

@@ -1,7 +1,7 @@
 use super::expression;
 use crate::public::run_time::scope::Scope;
-use crate::public::value::value::ArrayLiteral;
 use crate::public::compile_time::ast::{ASTNode, ASTNodeTypes};
+use crate::public::value::array::ArrayLiteral;
 
 pub fn resolve(
     array_node: &ASTNode,

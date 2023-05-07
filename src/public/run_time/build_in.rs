@@ -31,13 +31,14 @@ pub enum BuildInFnEnum {
     Clone,
 
     // String
-    Split, Replace,
+    Split, Replace, Repeat, Join,
+    StartWith, EndWith,
 
     // // File system
     // Read, Write
 }
 
-pub fn variables() -> HashMap<String, Value> {
+pub fn constants() -> HashMap<String, Value> {
     HashMap::from([
         (String::from("VOID")  , Value::create(ValueTypes::Void   as i64)),
         (String::from("NUM")   , Value::create(ValueTypes::Number as i64)),

@@ -1,4 +1,5 @@
 use std::rc::Rc;
+use std::fmt;
 
 use crate::public::compile_time::ast::ASTNodeVec;
 use crate::public::run_time::build_in::BuildInFnEnum;
@@ -37,6 +38,15 @@ pub struct UserDefinedFunction {
 pub enum Function {
     BuildIn(Rc<BuildInFunction>),
     UserDefined(Rc<UserDefinedFunction>),
+}
+
+impl fmt::Display for Function {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Function::BuildIn(_) => write!(f, "<Build-in-Function>"),
+            Function::UserDefined(_) => write!(f, "<User-Defined-Function>"),
+        }
+    }
 }
 
 pub trait Overload<T> {

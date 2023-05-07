@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use crate::computer::resolvers::sequence;
 use crate::public::compile_time::ast::ASTNode;
-use crate::public::std::modules::{math, array, basic};
+use crate::public::std::modules::{math, array, basic, string};
 use crate::public::std::std::StdModules;
 use crate::public::value::function::BuildInFunction;
 use crate::public::run_time::scope::{Scope, LocalScope};
@@ -19,7 +19,8 @@ fn call(
             math::implement(&function.body, scope),
         StdModules::Array =>
             array::implement(&function.body, scope),
-        StdModules::String => todo!(),
+        StdModules::String =>
+            string::implement(&function.body, scope),
         StdModules::FileSystem =>
             todo!(),
     }
