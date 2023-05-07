@@ -1,7 +1,8 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::fmt;
+
+use crate::public::value::array;
 
 use super::super::value::Value;
 use super::utils::data_storage::DataStoragePattern;
@@ -14,6 +15,60 @@ pub struct Object {
     pub storage_pattern: DataStoragePattern,
     pub data_list: Option<Vec<(String, Rc<RefCell<Value>>)>>,
     pub data_map : Option<HashMap<String, Rc<RefCell<Value>>>>,
+}
+
+pub fn display(
+    obj: Rc<RefCell<Object>>,
+    level: usize,
+) {
+    fn display_item(
+        key: &String,
+        value: &Rc<RefCell<Value>>,
+        level: usize,
+    ) {
+        let value_ref =
+            value.as_ref().borrow();
+
+        // print indent and key
+        print!("{}{}: ", "  ".repeat(level), key);
+
+        // print value
+        match value_ref.unwrap() {
+            Value::Array(arr) =>
+                array::display(arr, level + 1),
+            Value::Object(obj) =>
+                display(obj, level + 1),
+            _ => print!("{}", value_ref),
+        }
+
+        // next line
+        println!();
+    }
+
+    let obj_ref = obj.as_ref().borrow(); 
+    println!("{{");
+    match obj_ref.storage_pattern {
+        DataStoragePattern::List => {
+            let list =
+                obj_ref.data_list
+                .as_ref()
+                .unwrap();
+            for (k, v) in list {
+                display_item(k, v, level);
+            }
+        },
+        DataStoragePattern::Map => {
+            let map =
+                obj_ref.data_map
+                .as_ref()
+                .unwrap();
+
+            for (k, v) in map {
+                display_item(k, v, level);
+            }
+        },
+    }
+    print!("{}}}", "  ".repeat(level - 1));
 }
 
 impl Object {
@@ -75,30 +130,30 @@ impl Object {
     }
 }
 
-impl fmt::Display for Object {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        println!("{{");
-        match self.storage_pattern {
-            DataStoragePattern::List => {
-                let list =
-                    self.data_list
-                    .as_ref()
-                    .unwrap();
-                for (k, v) in list {
-                    println!("  {} : {},", k, v.as_ref().borrow());
-                }
-            },
-            DataStoragePattern::Map => {
-                let map =
-                    self.data_map
-                    .as_ref()
-                    .unwrap();
+// impl fmt::Display for Object {
+//     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+//         println!("{{");
+//         match self.storage_pattern {
+//             DataStoragePattern::List => {
+//                 let list =
+//                     self.data_list
+//                     .as_ref()
+//                     .unwrap();
+//                 for (k, v) in list {
+//                     println!("  {} : {},", k, v.as_ref().borrow());
+//                 }
+//             },
+//             DataStoragePattern::Map => {
+//                 let map =
+//                     self.data_map
+//                     .as_ref()
+//                     .unwrap();
 
-                for (k, v) in map {
-                    println!("  {} : {},", k, v.as_ref().borrow());
-                }
-            },
-        }
-        write!(f, "}}")
-    }
-}
+//                 for (k, v) in map {
+//                     println!("  {} : {},", k, v.as_ref().borrow());
+//                 }
+//             },
+//         }
+//         write!(f, "}}")
+//     }
+// }

@@ -1,13 +1,13 @@
 use std::cell::RefCell;
-use std::collections::VecDeque;
 use std::fmt;
 use std::rc::Rc;
 
+use super::array::{ArrayLiteral, self};
 use super::number::Number;
 use super::super::compile_time::ast::ASTNode;
 use super::function::{UserDefinedFunction, BuildInFunction, Function, Overload as FunctionOverload};
 use super::oop::class::Class;
-use super::oop::object::Object;
+use super::oop::object::{Object, self};
 
 #[derive(PartialEq, Clone)]
 pub enum ValueTypes {
@@ -73,7 +73,6 @@ pub enum Value {
     Class(Rc<Class>),
     Object(Rc<RefCell<Object>>),
 }
-pub type ArrayLiteral = VecDeque<Value>;
 
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -89,24 +88,12 @@ impl fmt::Display for Value {
             Value::Function(_) =>
                 write!(f, "<User-Defined-Function>"),
             Value::Array(arr) => {
-                const LINE_COUNT: i8 = 5;
-                let mut index = 0;
-                write!(f, "[")?;
-                let iterator = &*(*arr.as_ref()).borrow();
-                // for element in arr.as_ref() {
-                for element in iterator {
-                    if index % LINE_COUNT == 0 {
-                        write!(f, "\n  ")?;
-                    }
-                    write!(f, "{}, ", element)?;
-                    index += 1;
-                }
-                write!(f, "\n]")
+                Ok(array::display(arr.clone(), 1))
             },
             Value::Class(cls) =>
                 write!(f, "{}", cls),
             Value::Object(obj) =>
-                write!(f, "{}", obj.as_ref().borrow()),
+                Ok(object::display(obj.clone(), 1))
         }
     }
 }
@@ -161,7 +148,6 @@ impl Value {
             }
         }
     }
-
 
     pub fn get_type(&self) -> ValueTypes {
         match self {
