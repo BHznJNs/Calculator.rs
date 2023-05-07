@@ -4,4 +4,4 @@ version = 3
 
 [[package]]
 name = "calculator"
-version = "1.7.5"
+version = "1.7.6"
