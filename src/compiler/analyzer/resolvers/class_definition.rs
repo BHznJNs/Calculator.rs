@@ -31,15 +31,18 @@ pub fn resolve(
         .unwrap();
 
     if first_token == Token::Paren(Paren::LeftBrace) {
-        let first_index = 0;
-        while first_index < tokens.len() {
+        loop {
+            if tokens.len() == 0 {
+                return Err(syntax_error("unmatched brace")?)
+            }
+
             let current =
                 tokens.pop_front().unwrap();
 
             if let Token::Identi(identi) = current {
                 let Some(next_token) = tokens.pop_front() else {
                     // if no token follows the property
-                    return Err(syntax_error("Unmatched brace")?)
+                    return Err(syntax_error("unmatched brace")?)
                 };
 
                 match next_token {
@@ -48,13 +51,6 @@ pub fn resolve(
                             type__, identi,
                         })
                     },
-                    // Token::Divider | Token::Paren(Paren::RightBrace) => {
-                    //     // current as class property
-                    //     tokens.push_front(next_token);
-                    //     // class_params.push(ASTNode::Variable(VariableNode {
-                    //     //     name: prop
-                    //     // }.into()));
-                    // },
                     Token::Symbol(Symbols::Equal) => {
                         let next_token =
                             tokens.pop_front();
@@ -86,7 +82,6 @@ pub fn resolve(
     }
     Ok(ClassDefinitionNode {
         properties,
-        method_nodes
-        // params: class_params,
+        method_nodes,
     })
 }

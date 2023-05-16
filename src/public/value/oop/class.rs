@@ -111,51 +111,6 @@ impl Class {
             },
         }
 
-        // match storage_pattern {
-        //     DataStoragePattern::List => {
-        //         let mut list =
-        //             Vec::<(String, Rc<RefCell<Value>>)>::new();
-
-        //         let mut index = 0;
-        //         while index < class_self.properties.len() {
-        //             let current_prop = &properties[index];
-
-        //             let current_value =
-        //             match values.pop_front() {
-        //                 Some(val) => Rc::new(RefCell::new(val)),
-        //                 None => break,
-        //             };
-
-        //             list.push((current_prop.identi.clone(), current_value));
-        //             index += 1;
-        //         }
-
-        //         data_list = Some(list);
-        //         data_map  = None;
-        //     },
-        //     DataStoragePattern::Map => {
-        //         let mut map =
-        //             HashMap::<String, Rc<RefCell<Value>>>::new();
-
-        //         let mut index = 0;
-        //         while index < class_self.properties.len() {
-        //             let current_prop = &properties[index];
-
-        //             let current_value =
-        //             match values.pop_front() {
-        //                 Some(val) => Rc::new(RefCell::new(val)),
-        //                 None => break,
-        //             };
-
-        //             map.insert(current_prop.identi.clone(), current_value);
-        //             index += 1;
-        //         }
-
-        //         data_list = None;
-        //         data_map  = Some(map);
-        //     },
-        // }
-
         Ok(Object {
             prototype: Some(Value::Class(class_self.clone())),
             storage_pattern,

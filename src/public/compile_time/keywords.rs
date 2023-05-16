@@ -60,6 +60,6 @@ pub const KEYWORDS: [&str; 9] = [
     "import",
 
     "fn",
-    "cls",
+    "cl",
     "new",
 ];
