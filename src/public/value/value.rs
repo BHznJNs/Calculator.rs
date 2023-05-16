@@ -24,13 +24,13 @@ pub enum ValueType {
 }
 pub const VALUE_TYPE_ARR: [&'static str; 7] = [
     "_",
-    "num",
-    "str",
-    "arr",
-    "lexpr",
+    "Number",
+    "String",
+    "Array",
+    "LazyExpr",
 
-    "func",
-    "obj",
+    "Function",
+    "Object",
 ];
 pub const VALUE_TYPE_ENUM: [ValueType; 7] = [
     ValueType::Void,
@@ -85,8 +85,8 @@ impl fmt::Display for Value {
                 write!(f, "{}", str.as_ref().borrow()),
             Value::LazyExpression(_) =>
                 write!(f, "<Lazy-Expression>"),
-            Value::Function(_) =>
-                write!(f, "<User-Defined-Function>"),
+            Value::Function(func) =>
+                write!(f, "{}", func),
             Value::Array(arr) =>
                 Ok(array::display(arr.clone(), 1)),
 

@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 use std::fmt;
 
-use crate::public::value::parens::Parens;
+use crate::public::compile_time::parens::Paren;
 use crate::public::value::symbols::Symbols;
 use crate::public::value::number::Number;
 use crate::public::compile_time::keywords::Keywords;
@@ -28,7 +28,7 @@ pub enum Token {
     Number(Number),
     String(String),
     Symbol(Symbols),
-    Paren(Parens),
+    Paren(Paren),
     Identi(String),
     Keywords(Keywords),
 

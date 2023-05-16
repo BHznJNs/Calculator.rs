@@ -1,4 +1,6 @@
-use crate::public::value::function::Param;
+use std::rc::Rc;
+
+use crate::public::value::{function::Param, oop::class::Property};
 use crate::public::compile_time::keywords::Keywords;
 
 use super::ast_enum::{ASTNode, ASTVec};
@@ -48,7 +50,8 @@ pub struct FunctionDefinitionNode {
 }
 #[derive(PartialEq, Clone)]
 pub struct ClassDefinitionNode {
-    pub params: ASTVec
+    pub properties: Vec<Property>,
+    pub method_nodes: Vec<Rc<FunctionDefinitionNode>>,
 }
 #[derive(PartialEq, Clone)]
 pub struct InstantiationNode {

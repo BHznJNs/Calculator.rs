@@ -1,9 +1,12 @@
 #[derive(PartialEq, Debug, Clone, Copy)]
-pub enum Parens {
+pub enum Paren {
+    // ()
     LeftParen,
     RightParen,
+    // []
     LeftBracket,
     RightBracket,
+    // {}
     LeftBrace,
     RightBrace,
 }

@@ -5,7 +5,7 @@ use crate::public::run_time::scope::Scope;
 use crate::public::std::utils::get_self_prop::get_self_prop;
 use crate::public::value::function::{BuildInParam, BuildInFunction, Function, Overload};
 use crate::public::value::number::Number;
-use crate::public::value::oop::class::Class;
+use crate::public::value::oop::class::{Class, Property};
 use crate::public::value::oop::utils::data_storage::DataStoragePattern;
 use crate::public::value::value::{ValueType, Value};
 
@@ -107,7 +107,10 @@ pub fn implement(
 
 pub fn module_class() -> Class {
     Class {
-        properties: vec![String::from("v")],
+        properties: vec![Property {
+            identi: String::from("v"),
+            type__: ValueType::Array,
+        }],
         method_storage: DataStoragePattern::Map,
         method_list: None,
         method_map: Some(HashMap::from([

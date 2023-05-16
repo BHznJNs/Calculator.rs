@@ -2,8 +2,8 @@ use crate::compiler::analyzer::resolvers::compose::compose;
 use crate::compiler::analyzer::resolvers::{function_definition, class_definition, instantiation};
 use crate::public::compile_time::ast::types::{ExpressionNode, VariableNode};
 use crate::public::compile_time::keywords::Keywords;
+use crate::public::compile_time::parens::Paren;
 use crate::public::error::syntax_error;
-use crate::public::value::parens::Parens;
 use crate::public::value::symbols::Symbols;
 use crate::public::compile_time::ast::ast_enum::{ASTNode, ASTVec};
 use crate::compiler::tokenizer::token::{Token, TokenVec};
@@ -34,7 +34,7 @@ pub fn resolve(
             },
 
             Token::Paren(paren) => {
-                if paren == Parens::LeftBrace {
+                if paren == Paren::LeftBrace {
                     // lazy-expression
                     // vec[expression-node]
                     let lazy_expression_node =
@@ -43,7 +43,7 @@ pub fn resolve(
                         lazy_expression_node.into()
                     ));
                 } else
-                if paren == Parens::LeftBracket {
+                if paren == Paren::LeftBracket {
                     // array literal
                     let array_literal_node =
                         array::literal_resolve(tokens)?;
@@ -51,14 +51,14 @@ pub fn resolve(
                         array_literal_node.into()
                     ));
                 } else
-                if paren == Parens::LeftParen {
+                if paren == Paren::LeftParen {
                     // nested expression
                     let current_node =
                         resolve(tokens)?.into();
                     params.push(ASTNode::Expression(current_node));
                 } else
                 // breaks when encount `)`
-                if paren == Parens::RightParen { break }
+                if paren == Paren::RightParen { break }
             },
             Token::Identi(name) => {
                 // variable || function invocation || array element reading

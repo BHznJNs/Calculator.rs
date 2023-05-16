@@ -1,9 +1,9 @@
 use crate::compiler::tokenizer::token::{TokenVec, Token};
-use crate::public::compile_time::ast::types::InstantiationNode;
+use crate::public::compile_time::ast::types::{InstantiationNode, ArrayLiteralNode};
+use crate::public::compile_time::parens::Paren;
 use crate::public::error::syntax_error;
-use crate::public::value::parens::Parens;
 
-use super::array;
+use super::list;
 
 pub fn resolve(
     tokens: &mut TokenVec,
@@ -18,15 +18,19 @@ pub fn resolve(
     };
 
     // expect: `[`
-    if tokens.pop_front() != Some(Token::Paren(Parens::LeftBracket)) {
+    if tokens.pop_front() != Some(Token::Paren(Paren::LeftParen)) {
         return Err(syntax_error("missing params for object instantiation, expected '['")?)
     }
 
     let instantiation_params =
-        array::literal_resolve(tokens)?;
+        list::resolve(tokens, Paren::RightParen)?;
+    // let instantiation_params =
+    //     array::literal_resolve(tokens)?;
 
     Ok(InstantiationNode {
         class: target_class,
-        params: instantiation_params,
+        params: ArrayLiteralNode {
+            elements: instantiation_params
+        },
     })
 }

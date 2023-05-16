@@ -1,8 +1,8 @@
 use crate::compiler::tokenizer::token::{TokenVec, Token};
 use crate::public::compile_time::ast::types::FunctionDefinitionNode;
+use crate::public::compile_time::parens::Paren;
 use crate::public::error::syntax_error;
 use crate::public::value::function::Param;
-use crate::public::value::parens::Parens;
 
 use super::statement_block;
 
@@ -32,14 +32,14 @@ fn params_resolve(
                     }
                 },
                 Token::Divider => continue,
-                Token::Paren(Parens::RightParen) => break,
+                Token::Paren(Paren::RightParen) => break,
                 _ => {
                     let msg = format!("unexpected token {} in function param", current);
                     return Err(syntax_error(&msg)?)
                 }
             }
         } else if tokens.len() > 0 {
-            if current == Token::Paren(Parens::RightParen) {
+            if current == Token::Paren(Paren::RightParen) {
                 break;
             }
         } else {
@@ -63,13 +63,13 @@ pub fn resolve(
 
     let first_token =
         tokens.pop_front().unwrap();
-    if first_token == Token::Paren(Parens::LeftParen) {
+    if first_token == Token::Paren(Paren::LeftParen) {
         let function_params =
             params_resolve(tokens)?;
 
         let next_token =
             tokens.pop_front();
-        if next_token != Some(Token::Paren(Parens::LeftBrace)) {
+        if next_token != Some(Token::Paren(Paren::LeftBrace)) {
             return Err(syntax_error("missing function body, expected '{'")?)
         }
 

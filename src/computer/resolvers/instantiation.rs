@@ -24,8 +24,10 @@ pub fn resolve(
         )?)
     };
 
+    let params_clone =
+        node.params.clone();
     let instantiation_params =
-        array_literal::resolve(node.params.clone().into(), scope)?;
+        array_literal::resolve(params_clone.into(), scope)?;
 
     Class::instantiate(
         target_class.clone(),

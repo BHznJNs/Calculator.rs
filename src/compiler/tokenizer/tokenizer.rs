@@ -1,8 +1,8 @@
 use crate::compiler::tokenizer::char_converter::char_converter;
+use crate::public::compile_time::parens::Paren;
 use crate::public::error::{syntax_error, assignment_error};
 use crate::public::value::value::{VALUE_TYPE_ARR, VALUE_TYPE_ENUM};
 use crate::public::value::{number::Number, value::ValueType};
-use crate::public::value::parens::Parens;
 use crate::public::value::symbols::Symbols;
 use crate::public::compile_time::keywords;
 
@@ -195,27 +195,27 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
             // Parenthesis
             LEFT_PAREN_ASCII => {
                 last_type = TokenTypes::Paren;
-                tokens.push_back(Token::Paren(Parens::LeftParen));
+                tokens.push_back(Token::Paren(Paren::LeftParen));
             },
             RIGHT_PAREN_ASCII => {
                 last_type = TokenTypes::Paren;
-                tokens.push_back(Token::Paren(Parens::RightParen));
+                tokens.push_back(Token::Paren(Paren::RightParen));
             },
             LEFT_BRACKET_ASCII => {
                 last_type = TokenTypes::Paren;
-                tokens.push_back(Token::Paren(Parens::LeftBracket));
+                tokens.push_back(Token::Paren(Paren::LeftBracket));
             },
             RIGHT_BRACKET_ASCII => {
                 last_type = TokenTypes::Paren;
-                tokens.push_back(Token::Paren(Parens::RightBracket));
+                tokens.push_back(Token::Paren(Paren::RightBracket));
             },
             LEFT_BRACE_ASCII => {
                 last_type = TokenTypes::Paren;
-                tokens.push_back(Token::Paren(Parens::LeftBrace));
+                tokens.push_back(Token::Paren(Paren::LeftBrace));
             },
             RIGHT_BRACE_ASCII => {
                 last_type = TokenTypes::Paren;
-                tokens.push_back(Token::Paren(Parens::RightBrace));
+                tokens.push_back(Token::Paren(Paren::RightBrace));
             },
 
             // Computing symbols
@@ -231,9 +231,9 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
                 let last_token = tokens.back();
                 if last_type  == TokenTypes::Unknown ||
                    last_type  == TokenTypes::Symbol  ||
-                   last_token == Some(&Token::Paren(Parens::LeftParen)) ||
-                   last_token == Some(&Token::Paren(Parens::LeftBrace)) ||
-                   last_token == Some(&Token::Paren(Parens::LeftBracket))
+                   last_token == Some(&Token::Paren(Paren::LeftParen)) ||
+                   last_token == Some(&Token::Paren(Paren::LeftBrace)) ||
+                   last_token == Some(&Token::Paren(Paren::LeftBracket))
                 {
                     is_num_minus = true;
                 } else {

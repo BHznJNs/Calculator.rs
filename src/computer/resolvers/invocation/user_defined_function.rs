@@ -88,7 +88,8 @@ pub fn invoke(
     }
 
     // cached local scope
-    let mut local_scope_cached = scope.local.take();
+    let mut local_scope_cached =
+        scope.local.take();
 
     // assign new scope
     scope.local = Some(local_scope);

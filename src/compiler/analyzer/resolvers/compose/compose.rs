@@ -1,6 +1,6 @@
 use crate::public::compile_time::ast::types::ExpressionNode;
+use crate::public::compile_time::parens::Paren;
 use crate::public::error::syntax_error;
-use crate::public::value::parens::Parens;
 use crate::public::value::symbols::Symbols;
 use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::compiler::tokenizer::token::{Token, TokenVec};
@@ -21,7 +21,7 @@ pub fn resolve(
 
         let current_node =
         match next_token {
-            Token::Paren(Parens::LeftParen) => {
+            Token::Paren(Paren::LeftParen) => {
                 // invocation for:
                 // build-in function || lazy-expression ||
                 // user-defined-function || object method.
@@ -42,7 +42,7 @@ pub fn resolve(
                 }
                 ASTNode::Invocation(invoke_node.into())
             },
-            Token::Paren(Parens::LeftBracket) => {
+            Token::Paren(Paren::LeftBracket) => {
                 // array element reading
                 let reading_node =
                     array::reading_resolve(var_node, tokens)?;

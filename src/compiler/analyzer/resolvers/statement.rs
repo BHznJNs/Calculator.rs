@@ -4,8 +4,8 @@ use crate::compiler::tokenizer::token::{TokenVec, Token};
 use crate::public::compile_time::ast::ast_enum::{ASTNode, ASTVec};
 use crate::public::compile_time::ast::types::{ExpressionNode, VariableNode};
 use crate::public::compile_time::{keywords::Keywords, ast::types::StatementNode};
+use crate::public::compile_time::parens::Paren;
 use crate::public::error::{import_error, syntax_error};
-use crate::public::value::parens::Parens;
 
 use super::{expression, statement_block};
 
@@ -20,7 +20,7 @@ fn statement_condition_resolve(
         let current =
             tokens.pop_front().unwrap();
         //                         '{'
-        if current == Token::Paren(Parens::LeftBrace) { break }
+        if current == Token::Paren(Paren::LeftBrace) { break }
         sub_tokens.push_back(current);
     }
     Ok(expression::resolve(&mut sub_tokens)?)

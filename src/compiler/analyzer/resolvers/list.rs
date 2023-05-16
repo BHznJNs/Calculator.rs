@@ -1,14 +1,18 @@
-use crate::compiler::analyzer::resolvers::sequence;
+use crate::compiler::analyzer::resolvers::expression;
 use crate::compiler::tokenizer::token::{TokenVec, Token};
-use crate::public::compile_time::ast::ast_enum::ASTVec;
+use crate::public::compile_time::ast::types::ExpressionNode;
 use crate::public::compile_time::parens::Paren;
+use crate::public::error::syntax_error;
 
 pub fn resolve(
     tokens: &mut TokenVec,
-) -> Result<ASTVec, ()> {
-    // statement body sequence resolve
-    // without LeftBrace
-    // template: `{ ...; ... }`
+    identi_paren: Paren,
+) -> Result<Vec<ExpressionNode>, ()> {
+    // examples:
+    // 1, 2)
+    // a, 1)
+    // 1, [2, 3])
+    // 1, {a + 1})
 
     #[derive(PartialEq)]
     enum State {
@@ -16,19 +20,37 @@ pub fn resolve(
         Outer,
     }
 
+    fn element_resolve(
+        sub_tokens: &mut TokenVec,
+        elements: &mut Vec<ExpressionNode>,
+    ) -> Result<(), ()> {
+        if sub_tokens.len() > 0 {
+            let element =
+                expression::resolve(sub_tokens)?;
+            sub_tokens.clear();
+            elements.push(element);
+        }
+        Ok(())
+    }
+
     let first_index = 0;
     let mut state = State::Outer;
-
-    // for all type of paren: Paren | Brace | Bracket
     let mut paren_count = 1;
+    let mut elements = Vec::<ExpressionNode>::new();
     let mut sub_tokens = TokenVec::new();
-    let mut result_params = ASTVec::new();
 
-    while first_index < tokens.len() {
-        let current = tokens.pop_front().unwrap();
+    loop {
+        if first_index == tokens.len() {
+            return Err(syntax_error("Unmatched parentheses")?)
+        }
+
+        let current =
+            tokens.pop_front().unwrap();
 
         let is_divider =
             current == Token::Divider;
+        let is_identi_paren =
+            current == Token::Paren(identi_paren);
         let is_left_paren =
             current == Token::Paren(Paren::LeftBrace) ||
             current == Token::Paren(Paren::LeftParen) ||
@@ -38,15 +60,13 @@ pub fn resolve(
             current == Token::Paren(Paren::RightParen) ||
             current == Token::Paren(Paren::RightBracket);
 
+
         if is_left_paren {
             state = State::Inner;
             paren_count += 1;
         }
         if is_divider && (state == State::Outer) {
-            let sub_sequence_node =
-                sequence::resolve(&mut sub_tokens)?;
-            sub_tokens.clear();
-            result_params.push(sub_sequence_node);
+            element_resolve(&mut sub_tokens, &mut elements)?;
             continue;
         }
         if is_right_paren {
@@ -54,16 +74,15 @@ pub fn resolve(
             if paren_count == 1 {
                 state = State::Outer;
             }
-            if paren_count == 0 {
-                let sub_sequence_node =
-                    sequence::resolve(&mut sub_tokens)?;
-                sub_tokens.clear();
-                result_params.push(sub_sequence_node);
+
+            if is_identi_paren && paren_count == 0 {
+                element_resolve(&mut sub_tokens, &mut elements)?;
                 break;
             }
         }
 
         sub_tokens.push_back(current);
     }
-    Ok(result_params)
+
+    Ok(elements)
 }

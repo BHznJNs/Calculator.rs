@@ -3,9 +3,10 @@ use std::collections::HashMap;
 use std::rc::Rc;
 use std::fmt;
 
+use crate::public::error::type_error;
 use crate::public::value::array::ArrayLiteral;
 use crate::public::value::function::Function;
-use crate::public::value::value::Value;
+use crate::public::value::value::{Value, ValueType};
 
 use super::object::Object;
 use super::utils::data_storage::DataStoragePattern;
@@ -13,11 +14,16 @@ use super::utils::getter::getter;
 
 #[derive(PartialEq)]
 pub struct Class {
-    pub properties: Vec<String>,
+    pub properties: Vec<Property>,
 
     pub method_storage: DataStoragePattern,
     pub method_list: Option<Vec<(String, Function)>>,
     pub method_map : Option<HashMap<String, Function>>,
+}
+#[derive(PartialEq, Clone)]
+pub struct Property {
+    pub type__: ValueType,
+    pub identi: String,
 }
 
 impl Class {
@@ -60,50 +66,95 @@ impl Class {
         let data_map : Option<HashMap<String, Rc<RefCell<Value>>>>;
         let properties = &class_self.properties;
 
+        let mut temp_list =
+            Vec::<(String, Rc<RefCell<Value>>)>::new();
+        let mut index = 0;
+        while index < class_self.properties.len() {
+            let current_prop = &properties[index];
+
+            let current_value =
+            match values.pop_front() {
+                Some(val) => {
+                    // check instantiation param type
+                    if !val.check_type(current_prop.type__) {
+                        return Err(type_error(
+                            Some("class instantiation"),
+                            current_prop.type__,
+                            val.get_type()
+                        )?)
+                    }
+
+                    Rc::new(RefCell::new(val))
+                },
+                None => break,
+            };
+
+            temp_list.push((
+                current_prop.identi.clone(),
+                current_value
+            ));
+            index += 1;
+        }
+
         match storage_pattern {
             DataStoragePattern::List => {
-                let mut list =
-                    Vec::<(String, Rc<RefCell<Value>>)>::new();
-
-                let mut index = 0;
-                while index < class_self.properties.len() {
-                    let current_prop = &properties[index];
-
-                    let current_value =
-                    match values.pop_front() {
-                        Some(val) => Rc::new(RefCell::new(val)),
-                        None => break,
-                    };
-
-                    list.push((current_prop.clone(), current_value));
-                    index += 1;
-                }
-
-                data_list = Some(list);
+                data_list = Some(temp_list);
                 data_map  = None;
             },
             DataStoragePattern::Map => {
-                let mut map =
+                let mut temp_map =
                     HashMap::<String, Rc<RefCell<Value>>>::new();
-
-                let mut index = 0;
-                while index < class_self.properties.len() {
-                    let current_prop = &properties[index];
-
-                    let current_value =
-                    match values.pop_front() {
-                        Some(val) => Rc::new(RefCell::new(val)),
-                        None => break,
-                    };
-
-                    map.insert(current_prop.clone(), current_value);
-                    index += 1;
-                }
+                temp_map.extend(temp_list);
 
                 data_list = None;
-                data_map  = Some(map);
+                data_map  = Some(temp_map);
             },
         }
+
+        // match storage_pattern {
+        //     DataStoragePattern::List => {
+        //         let mut list =
+        //             Vec::<(String, Rc<RefCell<Value>>)>::new();
+
+        //         let mut index = 0;
+        //         while index < class_self.properties.len() {
+        //             let current_prop = &properties[index];
+
+        //             let current_value =
+        //             match values.pop_front() {
+        //                 Some(val) => Rc::new(RefCell::new(val)),
+        //                 None => break,
+        //             };
+
+        //             list.push((current_prop.identi.clone(), current_value));
+        //             index += 1;
+        //         }
+
+        //         data_list = Some(list);
+        //         data_map  = None;
+        //     },
+        //     DataStoragePattern::Map => {
+        //         let mut map =
+        //             HashMap::<String, Rc<RefCell<Value>>>::new();
+
+        //         let mut index = 0;
+        //         while index < class_self.properties.len() {
+        //             let current_prop = &properties[index];
+
+        //             let current_value =
+        //             match values.pop_front() {
+        //                 Some(val) => Rc::new(RefCell::new(val)),
+        //                 None => break,
+        //             };
+
+        //             map.insert(current_prop.identi.clone(), current_value);
+        //             index += 1;
+        //         }
+
+        //         data_list = None;
+        //         data_map  = Some(map);
+        //     },
+        // }
 
         Ok(Object {
             prototype: Some(Value::Class(class_self.clone())),
@@ -118,7 +169,7 @@ impl fmt::Display for Class {
     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
         println!("{{");
         for prop in &self.properties {
-            println!("  {},", prop);
+            println!("  {},", prop.identi);
         }
         match self.method_storage {
             DataStoragePattern::List => {
