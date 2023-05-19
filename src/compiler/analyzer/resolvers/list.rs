@@ -33,14 +33,13 @@ pub fn resolve(
         Ok(())
     }
 
-    let first_index = 0;
     let mut state = State::Outer;
     let mut paren_count = 1;
     let mut elements = Vec::<ExpressionNode>::new();
     let mut sub_tokens = TokenVec::new();
 
     loop {
-        if first_index == tokens.len() {
+        if tokens.len() == 0 {
             return Err(syntax_error("Unmatched parentheses")?)
         }
 

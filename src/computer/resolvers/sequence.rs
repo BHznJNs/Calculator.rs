@@ -16,7 +16,7 @@ pub fn resolve(
             expression::resolve(expression_node.clone(), scope)?,
         ASTNode::Statement(statement_node) =>
             statement::resolve(statement_node.clone(), scope)?,
-        _ => Value::empty()
+        _ => Value::Void(None)
     };
 
     Ok(result)

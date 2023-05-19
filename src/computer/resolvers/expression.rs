@@ -19,7 +19,7 @@ pub fn resolve(
         &node.elements;
 
     if elements.len() == 0 {
-        return Ok(Value::empty())
+        return Ok(Value::Void(None))
     }
 
     let mut value_stack = Vec::<Value>::new();

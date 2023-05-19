@@ -9,7 +9,7 @@ pub fn resolve(
     tokens: &mut TokenVec
 ) -> Result<InvocationNode, ()> {
     let params =
-        list::resolve(tokens, Paren::RightBrace)?;
+        list::resolve(tokens, Paren::RightParen)?;
     Ok(InvocationNode { caller, params })
 }
 

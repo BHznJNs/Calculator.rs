@@ -160,7 +160,7 @@ pub fn implement(
                 let refer = str.borrow();
                 Value::Number(Number::Int(refer.len() as i64))
             } else {
-                Value::Number(Number::Empty)
+                Value::Void(None)
             }
         },
         _ => {

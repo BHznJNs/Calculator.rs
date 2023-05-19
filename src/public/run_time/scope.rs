@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use crate::exec::script::run::run_script;
+use crate::exec::script;
 use crate::public::error::import_error;
 use crate::public::std::std::StdModules;
 use crate::public::value::oop::module::{module_create, get_module_name};
@@ -57,7 +57,7 @@ impl Scope {
         }
     }
     // inherit self to create new scope
-    fn new(&self) -> Scope {
+    pub fn new(&self) -> Scope {
         Scope {
             global: GlobalScope::init(),
             local: None,
@@ -91,7 +91,7 @@ impl Scope {
 
         if let None = self.module.get(module_name) {
             // execute the module file
-            run_script(
+            script::run(
                 module_path.to_string(),
                 &mut module_scope
             );

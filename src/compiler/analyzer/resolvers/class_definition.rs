@@ -2,7 +2,6 @@ use std::rc::Rc;
 
 use crate::compiler::tokenizer::token::{TokenVec, Token};
 use crate::public::compile_time::ast::types::{ClassDefinitionNode, FunctionDefinitionNode};
-use crate::public::compile_time::keywords::Keywords;
 use crate::public::error::syntax_error;
 use crate::public::compile_time::parens::Paren;
 use crate::public::value::oop::class::Property;
@@ -15,7 +14,7 @@ pub fn resolve(
 ) -> Result<ClassDefinitionNode, ()> {
     // no `cls` keyword
     // example:
-    // { prop $_, method=fn(){do something...} }
+    // { prop $_, method=(self $_){do something...} }
 
     if tokens.len() == 0 {
         return Err(syntax_error("missing class body")?)
@@ -52,16 +51,12 @@ pub fn resolve(
                         })
                     },
                     Token::Symbol(Symbols::Equal) => {
-                        let next_token =
-                            tokens.pop_front();
                         // current as class method
-                        if next_token == Some(Token::Keywords(Keywords::Function)) {
-                            let mut method_node =
-                                function_definition::resolve(tokens)?;
-                            method_node.name = Some(identi);
+                        let mut method_node =
+                            function_definition::resolve(tokens)?;
+                        method_node.name = Some(identi);
 
-                            method_nodes.push(method_node.into())
-                        }
+                        method_nodes.push(method_node.into())
                     },
                     _ => {
                         let msg = format!("unexpected token {} in class body.", next_token);

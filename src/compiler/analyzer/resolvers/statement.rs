@@ -92,7 +92,7 @@ pub fn resolve(
         _ => {
             // example:
             // if 1 {new}
-            let msg = format!("unexpected keyword '{}' in statement", keyword);
+            let msg = format!("unexpected keyword '{}' at start of statement", keyword);
             return Err(syntax_error(&msg)?)
         }
     }

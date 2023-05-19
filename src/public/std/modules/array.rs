@@ -4,7 +4,6 @@ use crate::public::run_time::build_in::BuildInFnEnum;
 use crate::public::run_time::scope::Scope;
 use crate::public::std::utils::get_self_prop::get_self_prop;
 use crate::public::value::function::{BuildInParam, BuildInFunction, Function, Overload};
-use crate::public::value::number::Number;
 use crate::public::value::oop::class::{Class, Property};
 use crate::public::value::oop::utils::data_storage::DataStoragePattern;
 use crate::public::value::value::{ValueType, Value};
@@ -40,7 +39,7 @@ pub fn implement(
                     return Ok(val)
                 }
             }
-            Value::Number(Number::Empty)
+            Value::Void(None)
         },
         BuildInFnEnum::Shift => {
             let self_value = get_val("self", scope)?;
@@ -54,7 +53,7 @@ pub fn implement(
                     return Ok(val)
                 }
             }
-            Value::Number(Number::Empty)
+            Value::Void(None)
         },
         BuildInFnEnum::Unshift => {
             let self_value = get_val("self", scope)?;
@@ -94,7 +93,7 @@ pub fn implement(
             }
             match removed_element {
                 Some(val) => val,
-                None => Value::Number(Number::Empty)
+                None => Value::Void(None)
             }
         },
         _ => {

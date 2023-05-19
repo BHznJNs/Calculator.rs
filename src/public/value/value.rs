@@ -62,6 +62,11 @@ impl fmt::Display for ValueType {
 
 #[derive(PartialEq, Clone)]
 pub enum Value {
+    // Value::Void(None)
+    // is used when comment line
+    // or blank line or
+    // or return state for statement.
+
     Void(Option<Rc<Value>>),
 
     Number(Number),
@@ -77,7 +82,7 @@ pub enum Value {
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Value::Void(_) => write!(f, "void"),
+            Value::Void(_) => write!(f, "<Void>"),
 
             Value::Number(num) =>
                 write!(f, "{}", num),
@@ -99,9 +104,6 @@ impl fmt::Display for Value {
 }
 
 impl Value {
-    pub fn empty() -> Value {
-        Value::Number(Number::Empty)
-    }
     pub fn get_i64(&self) -> Result<i64, ()> {
         let Value::Number(num) = self else {
             println!("Target value is not a valid number value.");

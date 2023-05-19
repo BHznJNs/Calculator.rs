@@ -20,26 +20,6 @@ fn call(
         }
     }
 
-    // let node_count = function.body.len();
-    // let mut index = 0;
-    // while index < node_count {
-    //     let mut node = function.body[index];
-    //     let sequence_result =
-    //         sequence::resolve(&mut node, scope)?;
-
-    //     // when encount keyword `brk` | `break`,
-    //     // function end with current sequence result.
-    //     if let Value::Void(Some(val)) = sequence_result {
-    //         return Ok(val.unwrap())
-    //     }
-
-    //     if index == node_count - 1 {
-    //         // when last sequence of function
-    //         // return the value of the sequence.
-    //         return Ok(sequence_result)
-    //     }
-    //     index += 1;
-    // }
     Ok(Value::Void(None))
 }
 

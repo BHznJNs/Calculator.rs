@@ -6,7 +6,6 @@ use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::compile_time::keywords::Keywords;
 use crate::public::error::{syntax_error, import_error};
 use crate::public::run_time::scope::Scope;
-use crate::public::value::number::Number;
 use crate::public::value::value::Value;
 
 use super::sequence;
@@ -22,13 +21,13 @@ pub fn resolve(
     match statement_node.keyword {
         Keywords::Out => {
             let output_value =
-            if let ASTNode::Expression(expression_node) = &body[0] {
+            if let Some(ASTNode::Expression(expression_node)) = body.get(0) {
                 expression::resolve(expression_node.clone(), scope)?
             } else {
-                Value::empty()
+                Value::Void(None)
             };
             println!("{}", output_value);
-            Value::empty()
+            Value::Void(None)
         },
         Keywords::For => {
             let loop_count_expression =
@@ -37,14 +36,18 @@ pub fn resolve(
                 expression::resolve(loop_count_expression.into(), scope)?;
 
             let is_inf_loop;
-            let loop_count = match loop_count_value {
+            let loop_count;
+            match loop_count_value {
                 Value::Number(num) => {
-                    is_inf_loop =
-                        num == Number::Empty;
-                    num.int_value()
+                    is_inf_loop = false;
+                    loop_count  = num.int_value();
+                },
+                Value::Void(None) => {
+                    is_inf_loop = true;
+                    loop_count  = 0;
                 },
                 _ => return Err(syntax_error("invalid loop count for 'for' statement")?)
-            };
+            }
 
             let mut count = 0;
             loop {
@@ -83,7 +86,7 @@ pub fn resolve(
                 }
             }
 
-            Value::empty()
+            Value::Void(None)
         },
         Keywords::If => {
             let condition_struct =
@@ -106,17 +109,18 @@ pub fn resolve(
                 }
             }
 
-            Value::empty()
+            Value::Void(None)
         },
 
         Keywords::Continue => Value::Void(None),
         Keywords::Break => {
-            let ASTNode::Expression(expression_node) = &body[0] else {
-                return Err(syntax_error("invalid return statement, expected expression returned")?)
-            };
-            let expression_res =
-                expression::resolve(expression_node.clone(), scope)?;
-            Value::Void(Some(Rc::new(expression_res)))
+            if let Some(ASTNode::Expression(expression_node)) = body.get(0) {
+                let expression_res =
+                    expression::resolve(expression_node.clone(), scope)?;
+                Value::Void(Some(Rc::new(expression_res)))
+            } else {
+                Value::Void(None)
+            }
         },
         Keywords::Import => {
             let module_node = &body[0];
@@ -129,9 +133,9 @@ pub fn resolve(
                 return Err(import_error("invalid import statement for wrong param type")?)
             }
 
-            Value::empty()
+            Value::Void(None)
         },
-        _ => Value::empty()
+        _ => Value::Void(None)
     };
     Ok(result)
 }
