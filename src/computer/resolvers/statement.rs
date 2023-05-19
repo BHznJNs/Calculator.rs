@@ -92,11 +92,12 @@ pub fn resolve(
             let condition_struct =
                 expression::resolve(condition.unwrap().into(), scope)?;
             let condition_value = match condition_struct {
-                Value::Number(num) => num.int_value(),
+                Value::Boolean(val)  => val,
+                Value::Number(num) => num.int_value() != 0,
                 _ => return Err(syntax_error("invalid condition for 'if' statement")?)
             };
 
-            if condition_value == 1 {
+            if condition_value {
                 for sequence in body {
                     let sequence_clone =
                         sequence.clone();

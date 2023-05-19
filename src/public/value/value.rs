@@ -13,6 +13,7 @@ use super::oop::object::{Object, self};
 pub enum ValueType {
     Void, // all value type
 
+    Boolean,
     Number,
     String,
     Array,
@@ -22,8 +23,9 @@ pub enum ValueType {
     Class,
     Object,
 }
-pub const VALUE_TYPE_ARR: [&'static str; 7] = [
+pub const VALUE_TYPE_ARR: [&'static str; 8] = [
     "_",
+    "Bool",
     "Number",
     "String",
     "Array",
@@ -32,8 +34,9 @@ pub const VALUE_TYPE_ARR: [&'static str; 7] = [
     "Function",
     "Object",
 ];
-pub const VALUE_TYPE_ENUM: [ValueType; 7] = [
+pub const VALUE_TYPE_ENUM: [ValueType; 8] = [
     ValueType::Void,
+    ValueType::Boolean,
     ValueType::Number,
     ValueType::String,
     ValueType::Array,
@@ -46,14 +49,15 @@ pub const VALUE_TYPE_ENUM: [ValueType; 7] = [
 impl fmt::Display for ValueType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ValueType::Void   => write!(f, "Void"),
-            ValueType::Number => write!(f, "Number"),
-            ValueType::String => write!(f, "String"),
-            ValueType::Array  => write!(f, "Array"),
+            ValueType::Void           => write!(f, "Void"),
+            ValueType::Boolean        => write!(f, "Boolean"),
+            ValueType::Number         => write!(f, "Number"),
+            ValueType::String         => write!(f, "String"),
+            ValueType::Array          => write!(f, "Array"),
             ValueType::LazyExpression => write!(f, "LazyExpression"),
-            ValueType::Function => write!(f, "Function"),
-            ValueType::Class  => write!(f, "Class"),
-            ValueType::Object => write!(f, "Object"),
+            ValueType::Function       => write!(f, "Function"),
+            ValueType::Class          => write!(f, "Class"),
+            ValueType::Object         => write!(f, "Object"),
         }
     }
 }
@@ -69,6 +73,7 @@ pub enum Value {
 
     Void(Option<Rc<Value>>),
 
+    Boolean(bool),
     Number(Number),
     String(Rc<RefCell<String>>),
     Array(Rc<RefCell<ArrayLiteral>>),
@@ -82,8 +87,11 @@ pub enum Value {
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Value::Void(_) => write!(f, "<Void>"),
+            Value::Void(_) =>
+                write!(f, "<Void>"),
 
+            Value::Boolean(bool_val) =>
+                write!(f, "{}", bool_val),
             Value::Number(num) =>
                 write!(f, "{}", num),
             Value::String(str) =>
@@ -98,7 +106,7 @@ impl fmt::Display for Value {
             Value::Class(cls) =>
                 write!(f, "{}", cls),
             Value::Object(obj) =>
-                Ok(object::display(obj.clone(), 1))
+                Ok(object::display(obj.clone(), 1)),
         }
     }
 }
@@ -153,16 +161,17 @@ impl Value {
 
     pub fn get_type(&self) -> ValueType {
         match self {
-            Value::Void(_)   => ValueType::Void,
+            Value::Void(_)           => ValueType::Void,
 
-            Value::Number(_) => ValueType::Number,
-            Value::String(_) => ValueType::String,
-            Value::Array(_)  => ValueType::Array,
+            Value::Boolean(_)        => ValueType::Boolean,
+            Value::Number(_)         => ValueType::Number,
+            Value::String(_)         => ValueType::String,
+            Value::Array(_)          => ValueType::Array,
             Value::LazyExpression(_) => ValueType::LazyExpression,
 
-            Value::Function(_) => ValueType::Function,
-            Value::Class(_)    => ValueType::Class,
-            Value::Object(_)   => ValueType::Object,
+            Value::Function(_)       => ValueType::Function,
+            Value::Class(_)          => ValueType::Class,
+            Value::Object(_)         => ValueType::Object,
         }
     }
     pub fn check_type(&self, target_type: ValueType) -> bool {
@@ -180,6 +189,11 @@ pub trait Overload<T> {
     fn create(value: T) -> Self;
 }
 
+impl Overload<bool> for Value {
+    fn create(value: bool) -> Self {
+        Value::Boolean(value)
+    }
+}
 impl Overload<i64> for Value {
     fn create(value: i64) -> Self {
         Value::Number(Number::Int(value))

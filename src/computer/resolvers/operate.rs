@@ -1,5 +1,4 @@
 use crate::public::error::syntax_error;
-use crate::public::value::number::Number;
 use crate::public::value::symbols::Symbols;
 use crate::public::value::value::{Value, Overload};
 
@@ -14,17 +13,17 @@ pub fn operate(
         let num1 = *num1_ref;
         let num2 = *num2_ref;
         match operator {
-            Symbols::Plus     => num1 + num2,
-            Symbols::Minus    => num1 - num2,
-            Symbols::Multiply => num1 * num2,
-            Symbols::Divide   => num1 / num2,
-            Symbols::Power    => num1.pow(num2),
-            Symbols::LessThan => Number::Int((num1 < num2) as i64),
-            Symbols::MoreThan => Number::Int((num1 > num2) as i64),
-            Symbols::NotEqual => Number::Int((num1 != num2) as i64),
-            Symbols::CompareEqual  => Number::Int((num1 == num2) as i64),
-            Symbols::LessThanEqual => Number::Int((num1 <= num2) as i64),
-            Symbols::MoreThanEqual => Number::Int((num1 >= num2) as i64),
+            Symbols::Plus     => Value::Number(num1 + num2),
+            Symbols::Minus    => Value::Number(num1 - num2),
+            Symbols::Multiply => Value::Number(num1 * num2),
+            Symbols::Divide   => Value::Number(num1 / num2),
+            Symbols::Power    => Value::Number(num1.pow(num2)),
+            Symbols::LessThan => Value::Boolean(num1 < num2),
+            Symbols::MoreThan => Value::Boolean(num1 > num2),
+            Symbols::NotEqual => Value::Boolean(num1 != num2),
+            Symbols::CompareEqual  => Value::Boolean(num1 == num2),
+            Symbols::LessThanEqual => Value::Boolean(num1 <= num2),
+            Symbols::MoreThanEqual => Value::Boolean(num1 >= num2),
             _ => {
                 println!("Unexpected symbol: '{}' at function 'operate'.", operator);
                 return Err(())
@@ -32,21 +31,21 @@ pub fn operate(
         }
     } else
     if let (Value::String(str1_ref), Value::String(str2_ref)) = (&val1, &val2) {
-        let str1 = str1_ref.as_ref().borrow_mut();
+        let str1 = str1_ref.as_ref().borrow();
         let str2 = str2_ref.as_ref().borrow();
         match operator {
             Symbols::Plus => {
                 let mut cloned = str1.clone();
                 cloned.push_str(&str2);
-                return Ok(Value::create(cloned))
+                Value::create(cloned)
             },
             Symbols::CompareEqual =>
-                Number::Int(str1.eq(&*str2) as i64),
+                Value::Boolean(str1.eq(&*str2)),
             _ => return Err(syntax_error("invalid string operating")?)
         }
     } else {
         println!("Invalid computing expression: Invalid computing token.");
         return Err(())
     };
-    Ok(Value::Number(result))
+    Ok(result)
 }

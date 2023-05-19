@@ -18,18 +18,4 @@ fn main() {
     let calc_env = Env::init(self_name);
 
     args::entry(args, calc_env, scope);
-
-    // match args.len() {
-    //     1 => {
-    //         // REPL mode
-    //         repl(&mut scope);
-    //     },
-    //     2 => {
-    //         // script mode
-    //         run_script(args[1].to_owned(), &mut scope);
-    //     },
-    //     _ => {
-    //         println!("Too many args.");
-    //     }
-    // }
 }

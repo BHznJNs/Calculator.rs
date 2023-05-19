@@ -50,8 +50,11 @@ pub fn constants() -> HashMap<String, Value> {
         (String::from("CLASS")    , Value::create(ValueType::Class  as i64)),
         (String::from("OBJECT")   , Value::create(ValueType::Object as i64)),
 
-        (String::from("EPS") , Value::Number(Number::Float(f64::EPSILON))),
-        (String::from("PI")  , Value::Number(Number::Float(PI))),
-        (String::from("E")   , Value::Number(Number::Float(E ))),
+        (String::from("EPS")      , Value::Number(Number::Float(f64::EPSILON))),
+        (String::from("PI")       , Value::Number(Number::Float(PI))),
+        (String::from("E")        , Value::Number(Number::Float(E ))),
+
+        (String::from("TRUE")     , Value::Boolean(true)),
+        (String::from("FALSE")    , Value::Boolean(false)),
     ])
 }
