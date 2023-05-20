@@ -16,7 +16,7 @@ An simple command-line calculator program writen with Rust.
 - Math functions support
 
 ```text
-> sin(1) 
+> Math.sin(1) 
 = 0.84147098
 ```
 
@@ -24,11 +24,14 @@ An simple command-line calculator program writen with Rust.
 
 ```text
 > a = 10
+= 10
 > b = 20
+= 20
 > sum = {a + b}
 > sum()
 = 30
 > a += 1
+= 11
 > sum()
 = 31
 ```
@@ -114,61 +117,3 @@ The release executable file will be at: `Calculator.rs/target/release`
 ## Tutorial
 
 See here: [Syntax Tutorial](./examples/syntax)
-
-## Build-ins
-
-- Functions
-  - Basic
-    - input
-    - type
-    - clone
-    - int
-    - float
-    - string
-    - ascii
-
-  - Array
-    - push
-    - pop
-    - shift
-    - unshift
-    - insert
-    - remove
-    - len
-
-  - Math
-    - sin
-    - cos
-    - tan
-    - asin
-    - acos
-    - atan
-    - sinh
-    - cosh
-    - tanh
-
-    - rad
-    - deg
-
-    - log10
-    - log2
-    - ln
-    - exp
-
-    - abs
-    - sqrt
-    - floor
-    - round
-
-- Constants
-  - PI
-  - E
-
-  - VOID
-  - NUM
-  - STR
-  - ARR
-  - LEXPR
-  - FUNC
-  - CLS
-  - OBJ
