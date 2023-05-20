@@ -4,8 +4,10 @@ pub mod array;
 pub mod string;
 pub mod file_system;
 
-// use crate::public::{value::value::Value, run_time::scope::Scope};
+use crate::public::value::value::Value;
+use crate::public::run_time::scope::Scope;
 
-// trait Call {
-//     fn call(&self, scope: &mut Scope) -> Result<Value, ()>;
-// }
+pub trait BuildInFnCall {
+    fn call(&self, scope: &mut Scope)
+        -> Result<Value, ()>;
+}

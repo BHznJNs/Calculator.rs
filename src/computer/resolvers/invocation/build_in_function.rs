@@ -4,6 +4,7 @@ use crate::computer::resolvers::expression;
 use crate::public::compile_time::ast::types::ExpressionNode;
 use crate::public::error::type_error;
 use crate::public::run_time::build_in::BuildInFnIdenti;
+use crate::public::std::modules::BuildInFnCall;
 use crate::public::value::function::BuildInFunction;
 use crate::public::run_time::scope::{Scope, LocalScope};
 use crate::public::value::value::Value;
@@ -19,18 +20,6 @@ fn call(
         BuildInFnIdenti::String(str_fn) => str_fn.call(scope),
         BuildInFnIdenti::FileSystem(_) => todo!(),
     }
-    // match function.lib {
-    //     StdModules::Basic =>
-    //         basic::implement(&function.body, scope),
-    //     StdModules::Math =>
-    //         math::implement(&function.body, scope),
-    //     StdModules::Array =>
-    //         array::implement(&function.body, scope),
-    //     StdModules::String =>
-    //         string::implement(&function.body, scope),
-    //     StdModules::FileSystem =>
-    //         todo!(),
-    // }
 }
 
 pub fn invoke(

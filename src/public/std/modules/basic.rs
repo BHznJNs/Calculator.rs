@@ -9,6 +9,7 @@ use crate::public::value::number::Number;
 use crate::public::value::value::{ValueType, Value, Overload};
 
 use super::super::utils::get_val::get_val;
+use super::BuildInFnCall;
 
 pub fn function_list() -> Vec<(String, Value)> {
     vec![
@@ -41,8 +42,8 @@ pub enum BasicFn {
     LEN,
 }
 
-impl BasicFn {
-    pub fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
+impl BuildInFnCall for BasicFn {
+    fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
         let result =
         match self {
             BasicFn::INPUT => {
@@ -205,6 +206,171 @@ impl BasicFn {
         Ok(result)
     }
 }
+
+// impl BasicFn {
+//     pub fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
+//         let result =
+//         match self {
+//             BasicFn::INPUT => {
+//                 let prompt =
+//                     get_val("prompt", scope)?;
+//                 // show prompt
+//                 if let Value::String(str) = prompt {
+//                     print!("{}", str.as_ref().borrow());
+//                     io::stdout().flush().unwrap();
+//                 }
+//                 // get input
+//                 let mut input = String::new();
+//                 io::stdin()
+//                     .read_line(&mut input)
+//                     .unwrap();
+
+//                 // remove the "\r\n" at the end of input
+//                 if input.ends_with('\n') {
+//                     input.pop();
+//                     if input.ends_with('\r') {
+//                         input.pop();
+//                     }
+//                 }
+
+//                 Value::create(input)
+//             },
+//             BasicFn::TYPE => {
+//                 let input =
+//                     get_val("input", scope)?;
+//                 let type_value =
+//                     input.get_type() as i64;
+//                 Value::create(type_value)
+//             },
+//             BasicFn::CLONE => {
+//                 let input =
+//                     get_val("input", scope)?;
+//                 input.deep_clone()?
+//             },
+    
+//             BasicFn::INT => {
+//                 let input =
+//                     get_val("input", scope)?;
+
+//                 if let Value::String(str) = input {
+//                     let refer =
+//                         str.as_ref().borrow();
+//                     let i = str_to_num::<i64>(refer)?;
+//                     Value::create(i)
+//                 } else
+//                 if let Value::Number(num) = input {
+//                     Value::Number(num.int())
+//                 } else {
+//                     println!("Invalid param type: expected String OR Number.");
+//                     return Err(())
+//                 }
+//             },
+//             BasicFn::FLOAT => {
+//                 let input =
+//                     get_val("input", scope)?;
+    
+//                 if let Value::String(str) = input {
+//                     let refer =
+//                         str.as_ref().borrow();
+//                     let f = str_to_num::<f64>(refer)?;
+//                     Value::create(f)
+//                 } else
+//                 if let Value::Number(num) = input {
+//                     Value::Number(num.float())
+//                 } else {
+//                     println!("Invalid param type: expected String OR Number.");
+//                     return Err(())
+//                 }
+//             },
+//             BasicFn::BOOLEAN => {
+//                 let input =
+//                     get_val("input", scope)?;
+                
+//                 let result_bool =
+//                 match input {
+//                     Value::Void(_) => false,
+//                     Value::Boolean(bool_val) => bool_val,
+//                     Value::Number(num) =>
+//                         num.int_value() != 0,
+//                     Value::String(str) =>
+//                         !str.as_ref().borrow().is_empty(),
+//                     Value::Array(arr) =>
+//                         !arr.as_ref().borrow().is_empty(),
+
+//                     Value::Class(_)    |
+//                     Value::Object(_)   |
+//                     Value::Function(_) |
+//                     Value::LazyExpression(_) => true,
+//                 };
+//                 Value::Boolean(result_bool)
+//             },
+//             BasicFn::STRING => {
+//                 let input =
+//                     get_val("input", scope)?;
+    
+//                 if let Value::Number(num) = input {
+//                     let str = num.to_string();
+//                     Value::create(str)
+//                 } else {
+//                     println!("Invalid param type: expected Number.");
+//                     return Err(())
+//                 }
+//             },
+//             BasicFn::ARRAY => {
+//                 let input =
+//                     get_val("input", scope)?;
+    
+//                 if let Value::Number(num) = input {
+//                     let size = num.int_value() as usize;
+//                     let arr_literal: ArrayLiteral =
+//                         vec![Value::create(0); size].into();
+//                     Value::create(arr_literal)
+//                 } else {
+//                     println!("Invalid param type: expected Number.");
+//                     return Err(())
+//                 }
+//             },
+//             BasicFn::ASCII => {
+//                 let input =
+//                     get_val("input", scope)?;
+    
+//                 if let Value::String(str) = input {
+//                     let temp = str.as_ref().borrow();
+//                     let option_first_char = temp.chars().next();
+//                     if let Some(char) = option_first_char {
+//                         if char.is_ascii() {
+//                             Value::create(char as i64)
+//                         } else {
+//                             println!("Invalid ASCII character");
+//                             return Err(())
+//                         }
+//                     } else {
+//                         println!("Invalid params to convert.");
+//                         return Err(())
+//                     }
+//                 } else {
+//                     println!("Invalid param type: expected String.");
+//                     return Err(())
+//                 }
+//             },
+//             BasicFn::LEN => {
+//                 let arr_value: Value = get_val("input", scope)?;
+    
+//                 if let Value::Array(arr) = arr_value {
+//                     let refer = arr.borrow();
+//                     Value::Number(Number::Int(refer.len() as i64))
+//                 } else
+//                 if let Value::String(str) = arr_value {
+//                     let refer = str.borrow();
+//                     Value::Number(Number::Int(refer.len() as i64))
+//                 } else {
+//                     Value::Void(None)
+//                 }
+//             },
+//         };
+//         Ok(result)
+//     }
+// }
 
 // --- --- --- --- --- ---
 
