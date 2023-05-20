@@ -5,7 +5,7 @@ use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::error::{syntax_error, type_error, internal_error, InternalComponent};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::symbols::Symbols;
-use crate::public::value::value::{Value, Overload, ValueType};
+use crate::public::value::value::{Value, Overload, ValueType, VoidSign};
 
 use super::class_definition;
 use super::{function_definition, array_literal, instantiation, assignment, composer::compose};
@@ -19,7 +19,7 @@ pub fn resolve(
         &node.elements;
 
     if elements.len() == 0 {
-        return Ok(Value::Void(None))
+        return Ok(Value::Void(VoidSign::Empty))
     }
 
     let mut value_stack = Vec::<Value>::new();

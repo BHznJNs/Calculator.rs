@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::public::compile_time::ast::ast_enum::ASTNode;
+use crate::public::{compile_time::ast::ast_enum::ASTNode, value::value::VoidSign};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
 
@@ -16,7 +16,7 @@ pub fn resolve(
             expression::resolve(expression_node.clone(), scope)?,
         ASTNode::Statement(statement_node) =>
             statement::resolve(statement_node.clone(), scope)?,
-        _ => Value::Void(None)
+        _ => Value::Void(VoidSign::Empty)
     };
 
     Ok(result)

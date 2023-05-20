@@ -6,7 +6,7 @@ use crate::public::std::utils::get_self_prop::get_self_prop;
 use crate::public::value::function::{BuildInParam, BuildInFunction, Function, Overload};
 use crate::public::value::oop::class::{Class, Property};
 use crate::public::value::oop::utils::data_storage::DataStoragePattern;
-use crate::public::value::value::{ValueType, Value};
+use crate::public::value::value::{ValueType, Value, VoidSign};
 
 use super::super::utils::get_val::get_val;
 use super::BuildInFnCall;
@@ -67,7 +67,7 @@ impl BuildInFnCall for ArrayFn {
                         return Ok(val)
                     }
                 }
-                Value::Void(None)
+                Value::Void(VoidSign::Empty)
             },
             ArrayFn::SHIFT => {
                 let self_value = get_val("self", scope)?;
@@ -81,7 +81,7 @@ impl BuildInFnCall for ArrayFn {
                         return Ok(val)
                     }
                 }
-                Value::Void(None)
+                Value::Void(VoidSign::Empty)
             },
             ArrayFn::UNSHIFT => {
                 let self_value = get_val("self", scope)?;
@@ -121,7 +121,7 @@ impl BuildInFnCall for ArrayFn {
                 }
                 match removed_element {
                     Some(val) => val,
-                    None => Value::Void(None)
+                    None => Value::Void(VoidSign::Empty)
                 }
             },
         };

@@ -3,7 +3,7 @@ use crate::public::compile_time::ast::types::ExpressionNode;
 use crate::public::error::{type_error, syntax_error};
 use crate::public::value::function::UserDefinedFunction;
 use crate::public::run_time::scope::{Scope, LocalScope};
-use crate::public::value::value::Value;
+use crate::public::value::value::{Value, VoidSign};
 
 fn call(
     function: &UserDefinedFunction,
@@ -14,13 +14,13 @@ fn call(
             node.clone();
         let sequence_result =
             sequence::resolve(node_clone.into(), scope)?;
-        
-        if let Value::Void(Some(val)) = sequence_result {
+
+        if let Value::Void(VoidSign::Break(val)) = sequence_result {
             return Ok(val.unwrap())
         }
     }
 
-    Ok(Value::Void(None))
+    Ok(Value::Void(VoidSign::Empty))
 }
 
 pub fn invoke(

@@ -6,7 +6,7 @@ use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::compile_time::keywords::Keywords;
 use crate::public::error::{syntax_error, import_error};
 use crate::public::run_time::scope::Scope;
-use crate::public::value::value::Value;
+use crate::public::value::value::{Value, VoidSign};
 
 use super::sequence;
 
@@ -24,10 +24,10 @@ pub fn resolve(
             if let Some(ASTNode::Expression(expression_node)) = body.get(0) {
                 expression::resolve(expression_node.clone(), scope)?
             } else {
-                Value::Void(None)
+                Value::Void(VoidSign::Empty)
             };
             println!("{}", output_value);
-            Value::Void(None)
+            Value::Void(VoidSign::Empty)
         },
         Keywords::For => {
             let loop_count_expression =
@@ -42,7 +42,7 @@ pub fn resolve(
                     is_inf_loop = false;
                     loop_count  = num.int_value();
                 },
-                Value::Void(None) => {
+                Value::Void(VoidSign::Empty) => {
                     is_inf_loop = true;
                     loop_count  = 0;
                 },
@@ -50,7 +50,7 @@ pub fn resolve(
             }
 
             let mut count = 0;
-            loop {
+            'outer: loop {
                 // these is used to control loop times
                 if !is_inf_loop {
                     if count == loop_count {
@@ -61,32 +61,26 @@ pub fn resolve(
 
                 // --- --- --- --- --- ---
 
-                let mut is_ended = false;
-
-                for sequence in body {
+                'inner: for sequence in body {
                     let sequence_clone =
                         sequence.clone();
                     let sequence_result =
                         sequence::resolve(sequence_clone.into(), scope)?;
 
-                    if let Value::Void(_) = sequence_result {
-                        // encount `break` | `brk`
-                        is_ended = true;
-                        break;
+                    if let Value::Void(sign) = sequence_result {
+                        if let VoidSign::Break(_) = sign {
+                            // encount `break` | `brk`
+                            break 'outer;
+                        }
+                        if sign == VoidSign::Continue {
+                            // encount `continue` | `ctn`
+                            break 'inner;
+                        }
                     }
-
-                    if let Value::Void(None) = sequence_result {
-                        // encount `continue` | `ctn`
-                        break;
-                    }
-                }
-
-                if is_ended {
-                    break;
                 }
             }
 
-            Value::Void(None)
+            Value::Void(VoidSign::Empty)
         },
         Keywords::If => {
             let condition_struct =
@@ -110,17 +104,17 @@ pub fn resolve(
                 }
             }
 
-            Value::Void(None)
+            Value::Void(VoidSign::Empty)
         },
 
-        Keywords::Continue => Value::Void(None),
+        Keywords::Continue => Value::Void(VoidSign::Continue),
         Keywords::Break => {
             if let Some(ASTNode::Expression(expression_node)) = body.get(0) {
                 let expression_res =
                     expression::resolve(expression_node.clone(), scope)?;
-                Value::Void(Some(Rc::new(expression_res)))
+                Value::Void(VoidSign::Break(expression_res.into()))
             } else {
-                Value::Void(None)
+                Value::Void(VoidSign::Empty)
             }
         },
         Keywords::Import => {
@@ -134,9 +128,9 @@ pub fn resolve(
                 return Err(import_error("invalid import statement for wrong param type")?)
             }
 
-            Value::Void(None)
+            Value::Void(VoidSign::Empty)
         },
-        _ => Value::Void(None)
+        _ => Value::Void(VoidSign::Empty)
     };
     Ok(result)
 }

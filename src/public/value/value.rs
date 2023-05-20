@@ -54,7 +54,12 @@ impl fmt::Display for ValueType {
 }
 
 // --- --- --- --- --- ---
-
+#[derive(PartialEq, Clone)]
+pub enum VoidSign {
+    Continue,
+    Break(Rc<Value>),
+    Empty,
+}
 #[derive(PartialEq, Clone)]
 pub enum Value {
     // Value::Void(None)
@@ -62,7 +67,7 @@ pub enum Value {
     // or blank line or
     // or return state for statement.
 
-    Void(Option<Rc<Value>>),
+    Void(VoidSign),
 
     Boolean(bool),
     Number(Number),
@@ -78,8 +83,12 @@ pub enum Value {
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Value::Void(_) =>
-                write!(f, "<Void>"),
+            Value::Void(option_val) =>
+                match option_val {
+                    VoidSign::Continue => write!(f, "Void(Continue)"),
+                    VoidSign::Break(val) => write!(f, "Void({})", val),
+                    VoidSign::Empty => write!(f, "<Void>"),
+                },
 
             Value::Boolean(bool_val) =>
                 write!(f, "{}", bool_val),
