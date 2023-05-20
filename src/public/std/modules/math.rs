@@ -2,152 +2,151 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use crate::public::run_time::build_in::BuildInFnEnum;
+use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::function::{BuildInParam, BuildInFunction};
 use crate::public::value::oop::object::Object;
 use crate::public::value::oop::utils::data_storage::DataStoragePattern;
 use crate::public::value::value::{ValueType, Value, Overload};
 
-use super::super::std::StdModules;
 use super::super::utils::get_val::get_val;
 
-pub fn implement(
-    func_body: &BuildInFnEnum,
-    scope: &mut Scope,
-) -> Result<Value, ()> {
-    let result = match func_body {
-        BuildInFnEnum::Sin => {
-            let input =
-                get_val("input", scope)?;
-            let f = input.get_f64()?;
-            f.sin()
-        },
-        BuildInFnEnum::Cos => {
-            let input =
-                get_val("input", scope)?;
-            let f = input.get_f64()?;
-            f.cos()
-        },
-        BuildInFnEnum::Tan => {
-            let input =
-                get_val("input", scope)?;
-            let f = input.get_f64()?;
-            f.tan()
-        },
-        BuildInFnEnum::Asin => {
-            let input =
-                get_val("input", scope)?;
-            let f = input.get_f64()?;
-            f.asin()
-        },
-        BuildInFnEnum::Acos => {
-            let input =
-                get_val("input", scope)?;
-            let f = input.get_f64()?;
-            f.acos()
-        },
-        BuildInFnEnum::Atan => {
-            let input =
-                get_val("input", scope)?;
-            let f = input.get_f64()?;
-            f.atan()
-        },
-        BuildInFnEnum::Sinh => {
-            let input =
-                get_val("input", scope)?;
-            let f = input.get_f64()?;
-            f.sinh()
-        },
-        BuildInFnEnum::Cosh => {
-            let input =
-                get_val("input", scope)?;
-            let f = input.get_f64()?;
-            f.cosh()
-        },
-        BuildInFnEnum::Tanh => {
-            let input =
-                get_val("input", scope)?;
-            let f = input.get_f64()?;
-            f.tanh()
-        },
-        BuildInFnEnum::Rad => {
-            let input =
-                get_val("input", scope)?;
-            let f = input.get_f64()?;
-            f.to_radians()
-        },
-        BuildInFnEnum::Deg => {
-            let input =
-                get_val("input", scope)?;
-            let f = input.get_f64()?;
-            f.to_degrees()
-        },
-        BuildInFnEnum::Log10 => {
-            let input =
-                get_val("input", scope)?;
-            let f = input.get_f64()?;
-            f.log10()
-        },
-        BuildInFnEnum::Log2 => {
-            let input =
-                get_val("input", scope)?;
-            let f = input.get_f64()?;
-            f.sin()
-        },
-        BuildInFnEnum::Log => {
-            let base =
-                get_val("base", scope)?;
-            let natural =
-                get_val("natural", scope)?;
+// pub fn implement(
+//     fn_body: &BuildInFnEnum,
+//     scope: &mut Scope,
+// ) -> Result<Value, ()> {
+//     let result = match fn_body {
+//         BuildInFnEnum::Sin => {
+//             let input =
+//                 get_val("input", scope)?;
+//             let f = input.get_f64()?;
+//             f.sin()
+//         },
+//         BuildInFnEnum::Cos => {
+//             let input =
+//                 get_val("input", scope)?;
+//             let f = input.get_f64()?;
+//             f.cos()
+//         },
+//         BuildInFnEnum::Tan => {
+//             let input =
+//                 get_val("input", scope)?;
+//             let f = input.get_f64()?;
+//             f.tan()
+//         },
+//         BuildInFnEnum::Asin => {
+//             let input =
+//                 get_val("input", scope)?;
+//             let f = input.get_f64()?;
+//             f.asin()
+//         },
+//         BuildInFnEnum::Acos => {
+//             let input =
+//                 get_val("input", scope)?;
+//             let f = input.get_f64()?;
+//             f.acos()
+//         },
+//         BuildInFnEnum::Atan => {
+//             let input =
+//                 get_val("input", scope)?;
+//             let f = input.get_f64()?;
+//             f.atan()
+//         },
+//         BuildInFnEnum::Sinh => {
+//             let input =
+//                 get_val("input", scope)?;
+//             let f = input.get_f64()?;
+//             f.sinh()
+//         },
+//         BuildInFnEnum::Cosh => {
+//             let input =
+//                 get_val("input", scope)?;
+//             let f = input.get_f64()?;
+//             f.cosh()
+//         },
+//         BuildInFnEnum::Tanh => {
+//             let input =
+//                 get_val("input", scope)?;
+//             let f = input.get_f64()?;
+//             f.tanh()
+//         },
+//         BuildInFnEnum::Rad => {
+//             let input =
+//                 get_val("input", scope)?;
+//             let f = input.get_f64()?;
+//             f.to_radians()
+//         },
+//         BuildInFnEnum::Deg => {
+//             let input =
+//                 get_val("input", scope)?;
+//             let f = input.get_f64()?;
+//             f.to_degrees()
+//         },
+//         BuildInFnEnum::Log10 => {
+//             let input =
+//                 get_val("input", scope)?;
+//             let f = input.get_f64()?;
+//             f.log10()
+//         },
+//         BuildInFnEnum::Log2 => {
+//             let input =
+//                 get_val("input", scope)?;
+//             let f = input.get_f64()?;
+//             f.sin()
+//         },
+//         BuildInFnEnum::Log => {
+//             let base =
+//                 get_val("base", scope)?;
+//             let natural =
+//                 get_val("natural", scope)?;
 
-            let base_f = base.get_f64()?;
-            let nature_f = natural.get_f64()?;
-            nature_f.log(base_f)
-        },
-        BuildInFnEnum::Ln => {
-            let input =
-                get_val("input", scope)?;
-            let f = input.get_f64()?;
-            f.ln()
-        },
-        BuildInFnEnum::Exp => {
-            let input =
-                get_val("input", scope)?;
-            let f = input.get_f64()?;
-            f.exp()
-        },
-        BuildInFnEnum::Abs => {
-            let input =
-                get_val("input", scope)?;
-            let f = input.get_f64()?;
-            f.abs()
-        },
-        BuildInFnEnum::Sqrt => {
-            let input =
-                get_val("input", scope)?;
-            let f = input.get_f64()?;
-            f.sqrt()
-        },
-        BuildInFnEnum::Floor => {
-            let input =
-                get_val("input", scope)?;
-            let f = input.get_f64()?;
-            f.floor()
-        },
-        BuildInFnEnum::Round => {
-            let input =
-                get_val("input", scope)?;
-            let f = input.get_f64()?;
-            f.round()
-        },
-        _ => {
-            println!("Unexpected function in math implement.");
-            return Err(())
-        }
-    };
-    Ok(Value::create(result))
-}
+//             let base_f = base.get_f64()?;
+//             let nature_f = natural.get_f64()?;
+//             nature_f.log(base_f)
+//         },
+//         BuildInFnEnum::Ln => {
+//             let input =
+//                 get_val("input", scope)?;
+//             let f = input.get_f64()?;
+//             f.ln()
+//         },
+//         BuildInFnEnum::Exp => {
+//             let input =
+//                 get_val("input", scope)?;
+//             let f = input.get_f64()?;
+//             f.exp()
+//         },
+//         BuildInFnEnum::Abs => {
+//             let input =
+//                 get_val("input", scope)?;
+//             let f = input.get_f64()?;
+//             f.abs()
+//         },
+//         BuildInFnEnum::Sqrt => {
+//             let input =
+//                 get_val("input", scope)?;
+//             let f = input.get_f64()?;
+//             f.sqrt()
+//         },
+//         BuildInFnEnum::Floor => {
+//             let input =
+//                 get_val("input", scope)?;
+//             let f = input.get_f64()?;
+//             f.floor()
+//         },
+//         BuildInFnEnum::Round => {
+//             let input =
+//                 get_val("input", scope)?;
+//             let f = input.get_f64()?;
+//             f.round()
+//         },
+//         _ => {
+//             println!("Unexpected function in math implement.");
+//             return Err(())
+//         }
+//     };
+//     Ok(Value::create(result))
+// }
 
 pub fn module_object() -> Object {
     Object {
@@ -181,6 +180,165 @@ pub fn module_object() -> Object {
     }
 }
 
+#[derive(PartialEq)]
+pub enum MathFn {
+    SIN,
+    COS,
+    TAN,
+    ASIN,
+    ACOS,
+    ATAN,
+    SINH,
+    COSH,
+    TANH,
+    RAD,
+    DEG,
+    LOG10,
+    LOG2,
+    LOG,
+    LN,
+    EXP,
+    ABS,
+    SQRT,
+    FLOOR,
+    ROUND,
+}
+
+impl MathFn {
+    pub fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
+        let result =
+        match self {
+            MathFn::SIN => {
+                let input =
+                    get_val("input", scope)?;
+                let f = input.get_f64()?;
+                f.sin()
+            },
+            MathFn::COS => {
+                let input =
+                    get_val("input", scope)?;
+                let f = input.get_f64()?;
+                f.cos()
+            },
+            MathFn::TAN => {
+                let input =
+                    get_val("input", scope)?;
+                let f = input.get_f64()?;
+                f.tan()
+            },
+            MathFn::ASIN => {
+                let input =
+                    get_val("input", scope)?;
+                let f = input.get_f64()?;
+                f.asin()
+            },
+            MathFn::ACOS => {
+                let input =
+                    get_val("input", scope)?;
+                let f = input.get_f64()?;
+                f.acos()
+            },
+            MathFn::ATAN => {
+                let input =
+                    get_val("input", scope)?;
+                let f = input.get_f64()?;
+                f.atan()
+            },
+            MathFn::SINH => {
+                let input =
+                    get_val("input", scope)?;
+                let f = input.get_f64()?;
+                f.sinh()
+            },
+            MathFn::COSH => {
+                let input =
+                    get_val("input", scope)?;
+                let f = input.get_f64()?;
+                f.cosh()
+            },
+            MathFn::TANH => {
+                let input =
+                    get_val("input", scope)?;
+                let f = input.get_f64()?;
+                f.tanh()
+            },
+            MathFn::RAD => {
+                let input =
+                    get_val("input", scope)?;
+                let f = input.get_f64()?;
+                f.to_radians()
+            },
+            MathFn::DEG => {
+                let input =
+                    get_val("input", scope)?;
+                let f = input.get_f64()?;
+                f.to_degrees()
+            },
+            MathFn::LOG10 => {
+                let input =
+                    get_val("input", scope)?;
+                let f = input.get_f64()?;
+                f.log10()
+            },
+            MathFn::LOG2 => {
+                let input =
+                    get_val("input", scope)?;
+                let f = input.get_f64()?;
+                f.sin()
+            },
+            MathFn::LOG => {
+                let base =
+                    get_val("base", scope)?;
+                let natural =
+                    get_val("natural", scope)?;
+    
+                let base_f = base.get_f64()?;
+                let nature_f = natural.get_f64()?;
+                nature_f.log(base_f)
+            },
+            MathFn::LN => {
+                let input =
+                    get_val("input", scope)?;
+                let f = input.get_f64()?;
+                f.ln()
+            },
+            MathFn::EXP => {
+                let input =
+                    get_val("input", scope)?;
+                let f = input.get_f64()?;
+                f.exp()
+            },
+            MathFn::ABS => {
+                let input =
+                    get_val("input", scope)?;
+                let f = input.get_f64()?;
+                f.abs()
+            },
+            MathFn::SQRT => {
+                let input =
+                    get_val("input", scope)?;
+                let f = input.get_f64()?;
+                f.sqrt()
+            },
+            MathFn::FLOOR => {
+                let input =
+                    get_val("input", scope)?;
+                let f = input.get_f64()?;
+                f.floor()
+            },
+            MathFn::ROUND => {
+                let input =
+                    get_val("input", scope)?;
+                let f = input.get_f64()?;
+                f.round()
+            },
+        };
+        Ok(Value::create(result))
+    }
+}
+
+// --- --- --- --- --- ---
+
 pub const SIN: BuildInFunction = BuildInFunction {
     params: [
         Some(BuildInParam {
@@ -191,8 +349,7 @@ pub const SIN: BuildInFunction = BuildInFunction {
             identi: "input"
         }), None, None,
     ],
-    lib: StdModules::Math, 
-    body: BuildInFnEnum::Sin,
+    identi: BuildInFnIdenti::Math(MathFn::SIN),
 };
 pub const COS: BuildInFunction = BuildInFunction {
     params: [
@@ -204,8 +361,7 @@ pub const COS: BuildInFunction = BuildInFunction {
             identi: "input"
         }), None, None,
     ],
-    lib: StdModules::Math,
-    body: BuildInFnEnum::Cos,
+    identi: BuildInFnIdenti::Math(MathFn::COS),
 };
 pub const TAN: BuildInFunction = BuildInFunction {
     params: [
@@ -217,8 +373,7 @@ pub const TAN: BuildInFunction = BuildInFunction {
             identi: "input"
         }), None, None,
     ],
-    lib: StdModules::Math,
-    body: BuildInFnEnum::Tan,
+    identi: BuildInFnIdenti::Math(MathFn::TAN),
 };
 
 pub const ASIN: BuildInFunction = BuildInFunction {
@@ -231,8 +386,7 @@ pub const ASIN: BuildInFunction = BuildInFunction {
             identi: "input"
         }), None, None,
     ],
-    lib: StdModules::Math,
-    body: BuildInFnEnum::Asin,
+    identi: BuildInFnIdenti::Math(MathFn::ASIN),
 };
 pub const ACOS: BuildInFunction = BuildInFunction {
     params: [
@@ -244,8 +398,7 @@ pub const ACOS: BuildInFunction = BuildInFunction {
             identi: "input"
         }), None, None,
     ],
-    lib: StdModules::Math,
-    body: BuildInFnEnum::Acos,
+    identi: BuildInFnIdenti::Math(MathFn::ACOS),
 };
 pub const ATAN: BuildInFunction = BuildInFunction {
     params: [
@@ -257,8 +410,7 @@ pub const ATAN: BuildInFunction = BuildInFunction {
             identi: "input"
         }), None, None,
     ],
-    lib: StdModules::Math,
-    body: BuildInFnEnum::Atan,
+    identi: BuildInFnIdenti::Math(MathFn::ATAN),
 };
 
 pub const SINH: BuildInFunction = BuildInFunction {
@@ -271,8 +423,7 @@ pub const SINH: BuildInFunction = BuildInFunction {
             identi: "input"
         }), None, None,
     ],
-    lib: StdModules::Math,
-    body: BuildInFnEnum::Sinh,
+    identi: BuildInFnIdenti::Math(MathFn::SINH),
 };
 pub const COSH: BuildInFunction = BuildInFunction {
     params: [
@@ -284,8 +435,7 @@ pub const COSH: BuildInFunction = BuildInFunction {
             identi: "input"
         }), None, None,
     ],
-    lib: StdModules::Math,
-    body: BuildInFnEnum::Cosh,
+    identi: BuildInFnIdenti::Math(MathFn::COSH),
 };
 pub const TANH: BuildInFunction = BuildInFunction {
     params: [
@@ -297,8 +447,7 @@ pub const TANH: BuildInFunction = BuildInFunction {
             identi: "input"
         }), None, None,
     ],
-    lib: StdModules::Math,
-    body: BuildInFnEnum::Tanh,
+    identi: BuildInFnIdenti::Math(MathFn::TANH),
 };
 
 pub const RAD: BuildInFunction = BuildInFunction {
@@ -311,8 +460,7 @@ pub const RAD: BuildInFunction = BuildInFunction {
             identi: "input"
         }), None, None,
     ],
-    lib: StdModules::Math,
-    body: BuildInFnEnum::Rad,
+    identi: BuildInFnIdenti::Math(MathFn::RAD),
 };
 pub const DEG: BuildInFunction = BuildInFunction {
     params: [
@@ -324,8 +472,7 @@ pub const DEG: BuildInFunction = BuildInFunction {
             identi: "input"
         }), None, None,
     ],
-    lib: StdModules::Math,
-    body: BuildInFnEnum::Deg,
+    identi: BuildInFnIdenti::Math(MathFn::DEG),
 };
 
 pub const LOG10: BuildInFunction = BuildInFunction {
@@ -338,8 +485,7 @@ pub const LOG10: BuildInFunction = BuildInFunction {
             identi: "input"
         }), None, None,
     ],
-    lib: StdModules::Math,
-    body: BuildInFnEnum::Log10,
+    identi: BuildInFnIdenti::Math(MathFn::LOG10),
 };
 pub const LOG2: BuildInFunction = BuildInFunction {
     params: [
@@ -351,8 +497,7 @@ pub const LOG2: BuildInFunction = BuildInFunction {
             identi: "input"
         }), None, None,
     ],
-    lib: StdModules::Math,
-    body: BuildInFnEnum::Log2,
+    identi: BuildInFnIdenti::Math(MathFn::LOG2),
 };
 pub const LOG: BuildInFunction = BuildInFunction {
     params: [
@@ -370,8 +515,7 @@ pub const LOG: BuildInFunction = BuildInFunction {
         }),
         None,
     ],
-    lib: StdModules::Math,
-    body: BuildInFnEnum::Log,
+    identi: BuildInFnIdenti::Math(MathFn::LOG),
 };
 pub const LN: BuildInFunction = BuildInFunction {
     params: [
@@ -383,8 +527,7 @@ pub const LN: BuildInFunction = BuildInFunction {
             identi: "input"
         }), None, None,
     ],
-    lib: StdModules::Math,
-    body: BuildInFnEnum::Ln,
+    identi: BuildInFnIdenti::Math(MathFn::LN),
 };
 pub const EXP: BuildInFunction = BuildInFunction {
     params: [
@@ -396,8 +539,7 @@ pub const EXP: BuildInFunction = BuildInFunction {
             identi: "input"
         }), None, None,
     ],
-    lib: StdModules::Math,
-    body: BuildInFnEnum::Exp,
+    identi: BuildInFnIdenti::Math(MathFn::EXP),
 };
 
 pub const ABS: BuildInFunction = BuildInFunction {
@@ -410,8 +552,7 @@ pub const ABS: BuildInFunction = BuildInFunction {
             identi: "input"
         }), None, None,
     ],
-    lib: StdModules::Math,
-    body: BuildInFnEnum::Abs,
+    identi: BuildInFnIdenti::Math(MathFn::ABS),
 };
 pub const SQRT: BuildInFunction = BuildInFunction {
     params: [
@@ -423,8 +564,7 @@ pub const SQRT: BuildInFunction = BuildInFunction {
             identi: "input"
         }), None, None,
     ],
-    lib: StdModules::Math,
-    body: BuildInFnEnum::Sqrt,
+    identi: BuildInFnIdenti::Math(MathFn::SQRT),
 };
 pub const FLOOR: BuildInFunction = BuildInFunction {
     params: [
@@ -436,8 +576,7 @@ pub const FLOOR: BuildInFunction = BuildInFunction {
             identi: "input"
         }), None, None,
     ],
-    lib: StdModules::Math,
-    body: BuildInFnEnum::Floor,
+    identi: BuildInFnIdenti::Math(MathFn::FLOOR),
 };
 pub const ROUND: BuildInFunction = BuildInFunction {
     params: [
@@ -449,6 +588,5 @@ pub const ROUND: BuildInFunction = BuildInFunction {
             identi: "input"
         }), None, None,
     ],
-    lib: StdModules::Math,
-    body: BuildInFnEnum::Round,
+    identi: BuildInFnIdenti::Math(MathFn::ROUND),
 };

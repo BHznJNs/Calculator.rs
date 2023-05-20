@@ -30,7 +30,7 @@ impl Class {
     pub const STORAGE_THRESHOLD: usize = 8;
 
     pub fn get_method(
-        &self, target_method: &String
+        &self, target_method: &str
     ) -> Result<Function, ()> {
         let result_target_method =
         getter::<Function>(

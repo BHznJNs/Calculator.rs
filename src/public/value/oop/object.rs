@@ -72,7 +72,7 @@ pub fn display(
 }
 
 impl Object {
-    pub fn get(&self, prop_name: &String) -> Result<Value, ()> {
+    pub fn get(&self, prop_name: &str) -> Result<Value, ()> {
         let target_value_result =
         getter::<Rc<RefCell<Value>>>(
             self.storage_pattern,

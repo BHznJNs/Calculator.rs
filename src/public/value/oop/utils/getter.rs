@@ -4,7 +4,7 @@ use super::data_storage::DataStoragePattern;
 
 pub fn getter<T: Clone>(
     storage_pattern: DataStoragePattern,
-    target_prop: &String,
+    target_prop: &str,
     list: &Option<Vec<(String, T)>>,
     map : &Option<HashMap<String, T>>,
 ) -> Result<T, String> {

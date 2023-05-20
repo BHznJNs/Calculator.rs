@@ -3,8 +3,7 @@ use std::rc::Rc;
 use crate::computer::resolvers::expression;
 use crate::public::compile_time::ast::types::ExpressionNode;
 use crate::public::error::type_error;
-use crate::public::std::modules::{math, array, basic, string};
-use crate::public::std::std::StdModules;
+use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::value::function::BuildInFunction;
 use crate::public::run_time::scope::{Scope, LocalScope};
 use crate::public::value::value::Value;
@@ -13,18 +12,25 @@ fn call(
     function: &BuildInFunction,
     scope: &mut Scope,
 ) -> Result<Value, ()> {
-    match function.lib {
-        StdModules::Basic =>
-            basic::implement(&function.body, scope),
-        StdModules::Math =>
-            math::implement(&function.body, scope),
-        StdModules::Array =>
-            array::implement(&function.body, scope),
-        StdModules::String =>
-            string::implement(&function.body, scope),
-        StdModules::FileSystem =>
-            todo!(),
+    match &function.identi {
+        BuildInFnIdenti::Basic(basic_fn) => basic_fn.call(scope),
+        BuildInFnIdenti::Math(math_fn)    => math_fn.call(scope),
+        BuildInFnIdenti::Array(arr_fn)   => arr_fn.call(scope),
+        BuildInFnIdenti::String(str_fn) => str_fn.call(scope),
+        BuildInFnIdenti::FileSystem(_) => todo!(),
     }
+    // match function.lib {
+    //     StdModules::Basic =>
+    //         basic::implement(&function.body, scope),
+    //     StdModules::Math =>
+    //         math::implement(&function.body, scope),
+    //     StdModules::Array =>
+    //         array::implement(&function.body, scope),
+    //     StdModules::String =>
+    //         string::implement(&function.body, scope),
+    //     StdModules::FileSystem =>
+    //         todo!(),
+    // }
 }
 
 pub fn invoke(
@@ -71,14 +77,16 @@ pub fn invoke(
     }
 
     // cached local scope
-    let mut local_scope_cached = scope.local.take();
+    let mut local_scope_cached =
+        scope.local.take();
 
     scope.local = Some(local_scope);
-    let func_result =
+    let fn_result =
         call(&function, scope)?;
     scope.local = None;
 
-    scope.local = local_scope_cached.take();
+    scope.local =
+        local_scope_cached.take();
 
-    Ok(func_result)
+    Ok(fn_result)
 }

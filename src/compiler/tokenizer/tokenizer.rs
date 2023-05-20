@@ -1,7 +1,7 @@
 use crate::compiler::tokenizer::char_converter::char_converter;
 use crate::public::compile_time::parens::Paren;
 use crate::public::error::{syntax_error, assignment_error};
-use crate::public::value::value::{VALUE_TYPE_ARR, VALUE_TYPE_ENUM};
+use crate::public::value::value::VALUE_TYPE_TUPLES;
 use crate::public::value::{number::Number, value::ValueType};
 use crate::public::value::symbols::Symbols;
 use crate::public::compile_time::keywords;
@@ -115,11 +115,11 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
                 let mut value_type: ValueType;
 
                 let mut index = 0;
-                while index < VALUE_TYPE_ARR.len() {
-                    let current = VALUE_TYPE_ARR[index];
-                    if value.eq(current) {
+                while index < VALUE_TYPE_TUPLES.len() {
+                    let current = VALUE_TYPE_TUPLES[index];
+                    if value.eq(current.0) {
                         is_valid_type = true;
-                        value_type = VALUE_TYPE_ENUM[index].clone();
+                        value_type = current.1.clone();
                         tokens.push_back(Token::Annotation(value_type))
                     }
                     index += 1;

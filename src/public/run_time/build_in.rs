@@ -1,42 +1,25 @@
 use std::collections::HashMap;
 use std::f64::consts::PI;
 use std::f64::consts::E;
-// use std::f64::EPSILON;
+
+use crate::public::std::modules::array::ArrayFn;
+use crate::public::std::modules::basic::BasicFn;
+use crate::public::std::modules::file_system::FileSysFn;
+use crate::public::std::modules::math::MathFn;
+use crate::public::std::modules::string::StringFn;
 
 use crate::public::value::number::Number;
 use crate::public::value::value::Overload;
 use crate::public::value::value::Value;
 use crate::public::value::value::ValueType;
 
-#[derive(PartialEq, Clone)]
-pub enum BuildInFnEnum {
-    // Basic
-    Input, Type, Len,
-    Int, Float, String, Array, Ascii,
-
-    // Math
-     Sin,  Cos,  Tan,
-    Asin, Acos, Atan,
-    Sinh, Cosh, Tanh,
-
-    Rad, Deg,
-
-    Log10, Log2, Log, Ln, Exp,
-
-    Abs, Sqrt, Floor, Round,
-
-    // Array
-    Push, Pop,
-    Shift, Unshift,
-    Insert, Remove,
-    Clone,
-
-    // String
-    Split, Replace, Repeat, Join,
-    StartWith, EndWith,
-
-    // // File system
-    // Read, Write
+#[derive(PartialEq)]
+pub enum BuildInFnIdenti {
+    Basic(BasicFn),
+    Math(MathFn),
+    Array(ArrayFn),
+    String(StringFn),
+    FileSystem(FileSysFn),
 }
 
 pub fn constants() -> HashMap<String, Value> {

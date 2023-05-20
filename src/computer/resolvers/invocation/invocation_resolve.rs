@@ -12,14 +12,14 @@ use crate::public::value::value::{Value, ValueType};
 use super::{build_in_function, lazy_expression, user_defined_function};
 
 fn variable_invoke(
-    func_name: &String,
+    fn_name: &String,
     params: &Vec<ExpressionNode>,
     scope: &mut Scope,
 ) -> Result<Value, ()> {
-    let func_value =
-        variable_reading::resolve(func_name, scope)?;
+    let fn_value =
+        variable_reading::resolve(fn_name, scope)?;
     let result =
-        function_invoke(func_value, params, scope)?;
+        function_invoke(fn_value, params, scope)?;
     Ok(result)
 }
 
@@ -32,8 +32,8 @@ fn function_invoke(
     match function_value {
         Value::LazyExpression(le) =>
             lazy_expression::invoke(le, scope)?,
-        Value::Function(func_enum) => {
-            match func_enum {
+        Value::Function(fn_enum) => {
+            match fn_enum {
                 Function::BuildIn(build_in_fn) => {
                     build_in_function::invoke(
                         build_in_fn.clone(),
@@ -66,7 +66,7 @@ pub fn resolve(
     let params =
         &node.params;
 
-    let func_result =
+    let fn_result =
     match &node.caller {
         ASTNode::Variable(sub_node) => {
             variable_invoke(&sub_node.name, params, scope)?
@@ -85,5 +85,5 @@ pub fn resolve(
             return Err(())
         }
     };
-    Ok(func_result)
+    Ok(fn_result)
 }

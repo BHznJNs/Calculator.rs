@@ -23,27 +23,18 @@ pub enum ValueType {
     Class,
     Object,
 }
-pub const VALUE_TYPE_ARR: [&'static str; 8] = [
-    "_",
-    "Bool",
-    "Number",
-    "String",
-    "Array",
-    "LazyExpr",
 
-    "Function",
-    "Object",
-];
-pub const VALUE_TYPE_ENUM: [ValueType; 8] = [
-    ValueType::Void,
-    ValueType::Boolean,
-    ValueType::Number,
-    ValueType::String,
-    ValueType::Array,
-    ValueType::LazyExpression,
+pub const VALUE_TYPE_TUPLES: [(&'static str, ValueType); 8] = [
+    ("_"        , ValueType::Void),
 
-    ValueType::Function,
-    ValueType::Object,
+    ("Bool"     , ValueType::Boolean),
+    ("Numb"     , ValueType::Number),
+    ("Str"      , ValueType::String),
+    ("Array"    , ValueType::Array),
+
+    ("LazyExpr" , ValueType::LazyExpression),
+    ("Func"     , ValueType::Function),
+    ("Obj"      , ValueType::Object),
 ];
 
 impl fmt::Display for ValueType {

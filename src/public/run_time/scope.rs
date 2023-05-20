@@ -3,7 +3,7 @@ use std::rc::Rc;
 
 use crate::exec::script;
 use crate::public::error::import_error;
-use crate::public::std::std::StdModules;
+use crate::public::std::StdModules;
 use crate::public::value::oop::module::{module_create, get_module_name};
 use crate::public::value::value::Overload;
 
@@ -40,7 +40,7 @@ pub struct Scope {
     module: HashMap<String, bool>,
     std_module_map: Rc<HashMap<&'static str, StdModules>>,
 }
-const STD_MODULE_DATA: [(&str, StdModules); 5] = [
+const STD_MODULE_DATA: [(&'static str, StdModules); 5] = [
     ("Basic" ,  StdModules::Basic),
     ("Math"  ,  StdModules::Math),
     ("Array" ,  StdModules::Array),

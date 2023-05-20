@@ -1,4 +1,4 @@
-use crate::public::std::std::StdModules;
+use crate::public::std::StdModules;
 use crate::public::std::modules::{basic, math, array, string};
 use crate::public::value::value::{Value, Overload};
 
@@ -10,9 +10,9 @@ pub fn resolve(
 ) {
     match target_module {
         StdModules::Basic => {
-            let func_list =
+            let fn_list =
                 basic::function_list();
-            scope.global.variables.extend(func_list);
+            scope.global.variables.extend(fn_list);
         },
         StdModules::Math => {
             let module_obj = math::module_object();

@@ -2,8 +2,7 @@ use std::rc::Rc;
 use std::fmt;
 
 use crate::public::compile_time::ast::ast_enum::ASTVec;
-use crate::public::run_time::build_in::BuildInFnEnum;
-use crate::public::std::std::StdModules;
+use crate::public::run_time::build_in::BuildInFnIdenti;
 
 use super::value::ValueType;
 
@@ -16,8 +15,7 @@ pub struct BuildInParam {
 #[derive(PartialEq)]
 pub struct BuildInFunction {
     pub params: [Option<BuildInParam>; 4],
-    pub lib: StdModules,
-    pub body: BuildInFnEnum,
+    pub identi: BuildInFnIdenti,
 }
 
 #[derive(PartialEq, Clone)]

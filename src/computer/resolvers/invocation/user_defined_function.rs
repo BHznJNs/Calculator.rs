@@ -73,10 +73,10 @@ pub fn invoke(
 
     // assign new scope
     scope.local = Some(local_scope);
-    let func_result =
+    let fn_result =
         call(&function, scope)?;
 
     scope.local = local_scope_cached.take();
 
-    Ok(func_result)
+    Ok(fn_result)
 }
