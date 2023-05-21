@@ -126,7 +126,7 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
                 }
 
                 if !is_valid_type {
-                    let msg = format!("Invalid type: '{}'.", value);
+                    let msg = format!("Invalid type '{}'", value);
                     return Err(syntax_error(&msg)?)
                 }
 
