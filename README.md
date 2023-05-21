@@ -1,5 +1,7 @@
 # Calculator.rs
 
+English | [简体中文](./README_cn.md)
+
 An simple command-line calculator program writen with Rust.
 
 ## Features
