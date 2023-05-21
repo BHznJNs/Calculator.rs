@@ -24,14 +24,15 @@ pub enum BuildInFnIdenti {
 
 pub fn constants() -> HashMap<String, Value> {
     HashMap::from([
-        (String::from("VOID")     , Value::create(ValueType::Void   as i64)),
-        (String::from("NUMBER")   , Value::create(ValueType::Number as i64)),
-        (String::from("STRING")   , Value::create(ValueType::String as i64)),
-        (String::from("ARRAY")    , Value::create(ValueType::Array  as i64)),
+        (String::from("VOID")     , Value::create(ValueType::Void    as i64)),
+        (String::from("BOOL")     , Value::create(ValueType::Boolean as i64)),
+        (String::from("NUMBE")    , Value::create(ValueType::Number  as i64)),
+        (String::from("STR")      , Value::create(ValueType::String  as i64)),
+        (String::from("ARRAY")    , Value::create(ValueType::Array   as i64)),
         (String::from("LAZYEXPR") , Value::create(ValueType::LazyExpression as i64)),
-        (String::from("FUNCTION") , Value::create(ValueType::Function as i64)),
-        (String::from("CLASS")    , Value::create(ValueType::Class  as i64)),
-        (String::from("OBJECT")   , Value::create(ValueType::Object as i64)),
+        (String::from("FUNC")     , Value::create(ValueType::Function as i64)),
+        (String::from("CLASS")    , Value::create(ValueType::Class    as i64)),
+        (String::from("OBJ")      , Value::create(ValueType::Object   as i64)),
 
         (String::from("EPS")      , Value::Number(Number::Float(f64::EPSILON))),
         (String::from("PI")       , Value::Number(Number::Float(PI))),

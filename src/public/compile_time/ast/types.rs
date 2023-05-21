@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::public::value::{function::Param, oop::class::Property};
-use crate::public::compile_time::keywords::Keywords;
+use crate::public::compile_time::keywords::Keyword;
 
 use super::ast_enum::{ASTNode, ASTVec};
 
@@ -38,7 +38,7 @@ pub struct InvocationNode {
 }
 #[derive(PartialEq, Clone)]
 pub struct StatementNode {
-    pub keyword: Keywords,
+    pub keyword: Keyword,
     pub condition: Option<ExpressionNode>,
     pub body: ASTVec,
 }

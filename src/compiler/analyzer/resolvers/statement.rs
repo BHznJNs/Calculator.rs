@@ -3,7 +3,7 @@ use std::rc::Rc;
 use crate::compiler::tokenizer::token::{TokenVec, Token};
 use crate::public::compile_time::ast::ast_enum::{ASTNode, ASTVec};
 use crate::public::compile_time::ast::types::{ExpressionNode, VariableNode};
-use crate::public::compile_time::{keywords::Keywords, ast::types::StatementNode};
+use crate::public::compile_time::{keywords::Keyword, ast::types::StatementNode};
 use crate::public::compile_time::parens::Paren;
 use crate::public::error::{import_error, syntax_error};
 
@@ -27,7 +27,7 @@ fn statement_condition_resolve(
 }
 
 pub fn resolve(
-    keyword: Keywords,
+    keyword: Keyword,
     tokens: &mut TokenVec
 ) -> Result<StatementNode, ()> {
     // remove the keyword token
@@ -38,7 +38,7 @@ pub fn resolve(
     // let mut params = ASTVec::new();
 
     match keyword {
-        Keywords::Out => {
+        Keyword::Out => {
             let output_expression =
                 expression::resolve(tokens)?;
             statement_condition = None;
@@ -46,15 +46,15 @@ pub fn resolve(
                 output_expression.into()
             )];
         },
-        Keywords::For => {
+        Keyword::For => {
             statement_condition = Some(statement_condition_resolve(tokens)?);
             statement_body = statement_block::resolve(tokens)?;
         },
-        Keywords::If => {
+        Keyword::If => {
             statement_condition = Some(statement_condition_resolve(tokens)?);
             statement_body = statement_block::resolve(tokens)?;
         },
-        Keywords::Import => {
+        Keyword::Import => {
             if tokens.len() == 0 {
                 return Err(import_error("module name missing")?)
             }
@@ -77,7 +77,7 @@ pub fn resolve(
             }
         },
 
-        Keywords::Break => {
+        Keyword::Break => {
             let return_expression =
                 expression::resolve(tokens)?;
             statement_condition = None;
@@ -85,7 +85,7 @@ pub fn resolve(
                 return_expression.into()
             )];
         },
-        Keywords::Continue => {
+        Keyword::Continue => {
             statement_condition = None;
             statement_body = ASTVec::new();
         }, // Do nothing

@@ -3,7 +3,7 @@ use std::rc::Rc;
 use crate::computer::resolvers::expression;
 use crate::public::compile_time::ast::types::StatementNode;
 use crate::public::compile_time::ast::ast_enum::ASTNode;
-use crate::public::compile_time::keywords::Keywords;
+use crate::public::compile_time::keywords::Keyword;
 use crate::public::error::{syntax_error, import_error};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::{Value, VoidSign};
@@ -19,7 +19,7 @@ pub fn resolve(
 
     let result =
     match statement_node.keyword {
-        Keywords::Out => {
+        Keyword::Out => {
             let output_value =
             if let Some(ASTNode::Expression(expression_node)) = body.get(0) {
                 expression::resolve(expression_node.clone(), scope)?
@@ -29,7 +29,7 @@ pub fn resolve(
             println!("{}", output_value);
             Value::Void(VoidSign::Empty)
         },
-        Keywords::For => {
+        Keyword::For => {
             let loop_count_expression =
                 condition.unwrap();
             let loop_count_value =
@@ -82,7 +82,7 @@ pub fn resolve(
 
             Value::Void(VoidSign::Empty)
         },
-        Keywords::If => {
+        Keyword::If => {
             let condition_struct =
                 expression::resolve(condition.unwrap().into(), scope)?;
             let condition_value = match condition_struct {
@@ -107,8 +107,9 @@ pub fn resolve(
             Value::Void(VoidSign::Empty)
         },
 
-        Keywords::Continue => Value::Void(VoidSign::Continue),
-        Keywords::Break => {
+        Keyword::Continue =>
+            Value::Void(VoidSign::Continue),
+        Keyword::Break => {
             if let Some(ASTNode::Expression(expression_node)) = body.get(0) {
                 let expression_res =
                     expression::resolve(expression_node.clone(), scope)?;
@@ -117,7 +118,7 @@ pub fn resolve(
                 Value::Void(VoidSign::Empty)
             }
         },
-        Keywords::Import => {
+        Keyword::Import => {
             let module_node = &body[0];
             if let ASTNode::Variable(var_node) = module_node {
                 scope.import_std(&var_node.name)?;

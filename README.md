@@ -28,6 +28,7 @@ An simple command-line calculator program writen with Rust.
 > b = 20
 = 20
 > sum = {a + b}
+= <Lazy-Expression>
 > sum()
 = 30
 > a += 1
@@ -61,7 +62,7 @@ An simple command-line calculator program writen with Rust.
 - Function defining support
 
 ```text
-> plus1 = fn(i $num) {i + 1} 
+> plus1 = fn(i $Numb) {i + 1} 
 > plus1(1) 
 = 2
 ```
@@ -75,15 +76,15 @@ calculator.exe script
 - OOP support
 
 ```text
-> Person = cls {age, name}
+> Person = cls {age $Numb, name $Str}
 = {
   name,
   age,
 }
-> inst = new Person["test", 10] 
+> inst = new Person(10, "test") 
 = {
-  name : 'test',
-  age : 10,
+  age: 10
+  name: test
 }
 ```
 

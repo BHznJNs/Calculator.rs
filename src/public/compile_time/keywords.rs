@@ -1,7 +1,7 @@
 use std::fmt;
 
 #[derive(PartialEq, PartialOrd, Clone, Copy)]
-pub enum Keywords {
+pub enum Keyword {
     Out,
 
     For,
@@ -16,50 +16,30 @@ pub enum Keywords {
     Class, New,
 }
 
-impl fmt::Display for Keywords {
+impl fmt::Display for Keyword {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Keywords::Out => write!(f, "out"),
-            Keywords::For => write!(f, "for"),
-            Keywords::If  => write!(f, "if" ),
-            Keywords::Continue => write!(f, "continue"),
-            Keywords::Break    => write!(f, "break"),
-            Keywords::Import   => write!(f, "import"),
-            Keywords::Function => write!(f, "function"),
-            Keywords::Class    => write!(f, "class"),
-            Keywords::New      => write!(f, "new"),
+            Keyword::Out => write!(f, "out"),
+            Keyword::For => write!(f, "for"),
+            Keyword::If  => write!(f, "if" ),
+            Keyword::Continue => write!(f, "continue"),
+            Keyword::Break    => write!(f, "break"),
+            Keyword::Import   => write!(f, "import"),
+            Keyword::Function => write!(f, "function"),
+            Keyword::Class    => write!(f, "class"),
+            Keyword::New      => write!(f, "new"),
         }
     }
 }
 
-pub const KEYWORDS_ENUM: [Keywords; 9] = [
-    Keywords::Out,
-
-    Keywords::For,
-    Keywords::If,
-
-    Keywords::Continue,
-    Keywords::Break,
-
-    Keywords::Import,
-
-    Keywords::Function,
-    Keywords::Class,
-    Keywords::New,
-];
-
-pub const KEYWORDS: [&str; 9] = [
-    "out",
-
-    "for",
-    "if",
-
-    "ctn",
-    "brk",
-
-    "import",
-
-    "fn",
-    "cl",
-    "new",
+pub const KEYWORD_PAIRS: [(&'static str, Keyword); 9] = [
+    ("out"    , Keyword::Out),
+    ("for"    , Keyword::For),
+    ("if"     , Keyword::If),
+    ("ctn"    , Keyword::Continue),
+    ("brk"    , Keyword::Break),
+    ("import" , Keyword::Import),
+    ("fn"     , Keyword::Function),
+    ("cl"     , Keyword::Class),
+    ("new"    , Keyword::New),
 ];

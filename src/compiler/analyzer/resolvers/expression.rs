@@ -1,7 +1,7 @@
 use crate::compiler::analyzer::resolvers::compose::compose;
 use crate::compiler::analyzer::resolvers::{function_definition, class_definition, instantiation};
 use crate::public::compile_time::ast::types::{ExpressionNode, VariableNode};
-use crate::public::compile_time::keywords::Keywords;
+use crate::public::compile_time::keywords::Keyword;
 use crate::public::compile_time::parens::Paren;
 use crate::public::error::syntax_error;
 use crate::public::value::symbols::Symbols;
@@ -70,7 +70,7 @@ pub fn resolve(
                 params.push(compose_node);
             },
 
-            Token::Keywords(Keywords::Function) => {
+            Token::Keywords(Keyword::Function) => {
                 // function definition
                 let function_definition =
                     function_definition::resolve(tokens)?;
@@ -78,7 +78,7 @@ pub fn resolve(
                     function_definition.into()
                 ));
             },
-            Token::Keywords(Keywords::Class) => {
+            Token::Keywords(Keyword::Class) => {
                 // class definition
                 let class_definition =
                     class_definition::resolve(tokens)?;
@@ -86,7 +86,7 @@ pub fn resolve(
                     class_definition.into()
                 ));
             },
-            Token::Keywords(Keywords::New) => {
+            Token::Keywords(Keyword::New) => {
                 // class instantiation
                 let instantiation_node =
                     instantiation::resolve(tokens)?;

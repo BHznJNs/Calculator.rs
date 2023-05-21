@@ -1,7 +1,7 @@
 use crate::compiler::tokenizer::char_converter::char_converter;
 use crate::public::compile_time::parens::Paren;
 use crate::public::error::{syntax_error, assignment_error};
-use crate::public::value::value::VALUE_TYPE_TUPLES;
+use crate::public::value::value::VALUE_TYPE_PAIRS;
 use crate::public::value::{number::Number, value::ValueType};
 use crate::public::value::symbols::Symbols;
 use crate::public::compile_time::keywords;
@@ -115,8 +115,8 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
                 let mut value_type: ValueType;
 
                 let mut index = 0;
-                while index < VALUE_TYPE_TUPLES.len() {
-                    let current = VALUE_TYPE_TUPLES[index];
+                while index < VALUE_TYPE_PAIRS.len() {
+                    let current = VALUE_TYPE_PAIRS[index];
                     if value.eq(current.0) {
                         is_valid_type = true;
                         value_type = current.1.clone();
@@ -133,16 +133,17 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
             } else {
                 // check is keyword
                 let mut is_keyword = false;
-                let keyword: keywords::Keywords;
+                let keyword: keywords::Keyword;
 
                 let mut index = 0;
-                while index < keywords::KEYWORDS.len() {
-                    let current = keywords::KEYWORDS[index];
-                    if value.eq(current) {
+                while index < keywords::KEYWORD_PAIRS.len() {
+                    let current = keywords::KEYWORD_PAIRS[index];
+
+                    if value.eq(current.0) {
                         is_keyword = true;
                         last_type = TokenTypes::Keywords;
 
-                        keyword = keywords::KEYWORDS_ENUM[index];
+                        keyword = current.1;
                         tokens.push_back(Token::Keywords(keyword));
                         break;
                     }

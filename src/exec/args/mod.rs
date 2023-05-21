@@ -1,7 +1,7 @@
 pub mod commands;
 mod help_msg;
 
-use std::collections::VecDeque;
+use std::{collections::VecDeque, process};
 
 use crate::public::{env::Env, run_time::scope::Scope};
 
@@ -38,11 +38,11 @@ fn args_resolve(
                     calc_env.timer = true,
                 CommandArg::Help    => {
                     help_msg::output();
-                    break;
+                    process::exit(0);
                 },
                 CommandArg::Version => {
                     calc_env.version_output();
-                    break;
+                    process::exit(0);
                 },
                 CommandArg::Headfile => {
                     // remaining args as headfile
@@ -52,7 +52,8 @@ fn args_resolve(
                 },
             }
         } else {
-            panic!("Invalid command: {}.", current_arg)
+            println!("Invalid command: {}.", current_arg);
+            process::exit(0);
         }
     }
 

@@ -4,7 +4,7 @@ use std::fmt;
 use crate::public::compile_time::parens::Paren;
 use crate::public::value::symbols::Symbols;
 use crate::public::value::number::Number;
-use crate::public::compile_time::keywords::Keywords;
+use crate::public::compile_time::keywords::Keyword;
 use crate::public::value::value::ValueType;
 
 #[derive(PartialEq, Clone, Copy)]
@@ -30,7 +30,7 @@ pub enum Token {
     Symbol(Symbols),
     Paren(Paren),
     Identi(String),
-    Keywords(Keywords),
+    Keywords(Keyword),
 
     Divider,
     Annotation(ValueType),
@@ -41,14 +41,14 @@ impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let token_display =
         match self {
-            Token::Number(num)     => format!("Number: {}", num),
-            Token::String(str)     => format!("String: {}", str),
-            Token::Symbol(sym)    => format!("Symbol: {}", sym),
-            Token::Paren(par)      => format!("Paren: {:#?}", par),
-            Token::Identi(ide)     => format!("Identifier: {}", ide),
-            Token::Keywords(key) => format!("Keywords: {}", key),
-            Token::Divider                  => format!("Divider"),
-            Token::Annotation(typ)  => format!("Annotation: {}", typ),
+            Token::Number(num)           => format!("Number: {}", num),
+            Token::String(str)           => format!("String: {}", str),
+            Token::Symbol(sym)          => format!("Symbol: {}", sym),
+            Token::Paren(par)             => format!("Paren: {:#?}", par),
+            Token::Identi(ide)           => format!("Identifier: {}", ide),
+            Token::Keywords(key)        => format!("Keywords: {}", key),
+            Token::Divider                        => format!("Divider"),
+            Token::Annotation(type__) => format!("Annotation: {}", type__),
         };
         write!(f, "Token({})", token_display)
     }
