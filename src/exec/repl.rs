@@ -2,7 +2,6 @@ use std::io::{self, Write};
 use std::time::Instant;
 
 use super::attempt::attempt;
-use crate::public::colored_output::STRING_COLORED;
 use crate::public::env::Env;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
@@ -50,7 +49,7 @@ pub fn repl(scope: &mut Scope, calc_env: Env) -> ! {
                 continue;
             } else
             if let Value::String(_) = val {
-                println!("= {}", STRING_COLORED.output(format!("\"{}\"", val)));
+                println!("= {}", val.str_format());
             } else {
                 println!("= {}", val);
             }

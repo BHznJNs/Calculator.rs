@@ -34,6 +34,8 @@ pub fn display(
 
         // print value
         match value_ref.unwrap() {
+            Value::String(_) =>
+                print!("{}", value_ref.str_format()),
             Value::Array(arr) =>
                 array::display(arr, level + 1),
             Value::Object(obj) =>

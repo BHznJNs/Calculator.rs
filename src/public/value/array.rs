@@ -24,6 +24,8 @@ pub fn display(
 
         // print elements
         match element {
+            Value::String(_) =>
+                print!("{}", element.str_format()),
             Value::Array(arr) =>
                 display(arr.clone(), level + 1),
             Value::Object(obj) =>

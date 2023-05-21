@@ -2,7 +2,7 @@ use std::cell::RefCell;
 use std::fmt;
 use std::rc::Rc;
 
-use crate::public::colored_output::{NUMBER_COLORED, BOOLEAN_COLORED, INTERNAL_COLORED};
+use crate::public::colored_output::{NUMBER_COLORED, BOOLEAN_COLORED, INTERNAL_COLORED, STRING_COLORED};
 
 use super::array::{ArrayLiteral, self};
 use super::number::Number;
@@ -114,6 +114,10 @@ impl fmt::Display for Value {
 }
 
 impl Value {
+    pub fn str_format(&self) -> String {
+        STRING_COLORED.output(format!("\"{}\"", self))
+    }
+
     pub fn get_i64(&self) -> Result<i64, ()> {
         let Value::Number(num) = self else {
             println!("Target value is not a valid number value.");
