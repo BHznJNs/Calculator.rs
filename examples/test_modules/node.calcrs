@@ -1,0 +1,4 @@
+Node = cl {:
+    data $_;:
+    next $_;:
+}

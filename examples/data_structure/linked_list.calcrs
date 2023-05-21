@@ -1,0 +1,42 @@
+# 类定义
+Node = cls {data, next}
+List = cls {:
+    head;:
+    peak;:
+    push = fn(self $obj, data $_) {:
+        new_node = new Node[data, 0];:
+        self.peak.next = new_node;:
+        self.peak = new_node;:
+    };:
+}
+
+# 实例化
+head = new Node[0, 0]
+list = new List[head, head]
+
+list.push(1)
+list.push(2)
+list.push(10)
+
+# 输出链表实例
+out list
+
+# {
+#   head: {
+#     data: 0
+#     next: {
+#       data: 1
+#       next: {
+#         data: 2
+#         next: {
+#           data: 10
+#           next: 0
+#         }
+#       }
+#     }
+#   }
+#   peak: {
+#     data: 10
+#     next: 0
+#   }
+# }

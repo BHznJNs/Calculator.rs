@@ -1,0 +1,10 @@
+fib = fn (i $Numb) {:
+    a = 0;:
+    b = 1;:
+    for i {:
+        c = a + b;:
+        a = b;:
+        b = c;:
+    };:
+    c:
+}
