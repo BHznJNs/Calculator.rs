@@ -1,0 +1,15 @@
+import "class.calcrs"
+# 'test'
+
+out class.Person
+# {
+#   age,
+#   name,
+#   greet: <Class-method>,
+# }
+
+out class.inst
+# {
+#   age : 10,
+#   name : 'test',
+# }

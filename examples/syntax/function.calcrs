@@ -1,0 +1,20 @@
+add1 = fn (i $Numb) {:
+    #        ^^^^   ^
+    #  param-type   multi-line statements need this symbol
+
+    # param-type list:
+    # AnyType         -> $_       
+    # Boolean         -> $Bool
+    # Number          -> $Numb
+    # String          -> $Str
+    # Array           -> $Array
+    # Lazy-Expression -> $LazyExpr
+    # Function        -> $Func
+    # Object          -> $Obj
+
+    # use `brk` to return value
+    # from function.
+    brk i + 1:
+}
+
+out add1(10) # 11

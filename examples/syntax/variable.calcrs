@@ -1,0 +1,17 @@
+# common variable assignment
+a = 1
+
+# variable assignment has a result of
+# right-hand value.
+out b = 1 # 1
+
+# thus, you can assign two variables
+# within one expression.
+c = d = 1
+out c # 1
+out d # 1
+
+# invalid left-hand value
+10 = 20
+# Invalid variable / lazy-expression assignment.
+# Error occured at line 15

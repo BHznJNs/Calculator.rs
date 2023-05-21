@@ -1,0 +1,15 @@
+test = fn (i $Numb) {:
+    if i == 5 {:
+        brk i;:
+    };:
+    out i;:
+    test(i + 1);:
+}
+
+test(0)
+
+# 0
+# 1
+# 2
+# 3
+# 4
