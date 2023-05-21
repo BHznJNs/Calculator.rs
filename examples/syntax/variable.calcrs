@@ -13,5 +13,5 @@ out d # 1
 
 # invalid left-hand value
 10 = 20
-# Invalid variable / lazy-expression assignment.
+# AssignmentError: invalid left-hand value.
 # Error occured at line 15

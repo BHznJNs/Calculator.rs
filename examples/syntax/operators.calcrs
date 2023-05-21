@@ -12,12 +12,12 @@ out 10!   # 0
 out  0!   # 1
 
 # comparing operator
-out 1 > 2 # 0
-out 1 < 2 # 1
-out 1 >= 2 # 0
-out 1 <= 2 # 1
-out 1 == 2 # 0
-out 1 != 2 # 1
+out 1 > 2 # false
+out 1 < 2 # true
+out 1 >= 2 # false
+out 1 <= 2 # true
+out 1 == 2 # false
+out 1 != 2 # true
 
 # assignment operator
 out t = 10 # 10
