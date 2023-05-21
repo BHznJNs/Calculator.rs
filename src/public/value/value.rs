@@ -114,6 +114,7 @@ impl fmt::Display for Value {
 }
 
 impl Value {
+    // formater for string typed value
     pub fn str_format(&self) -> String {
         STRING_COLORED.output(format!("\"{}\"", self))
     }
