@@ -19,7 +19,7 @@ pub fn resolve(
     if right_hand_node.elements.len() == 0 {
         // example:
         // var =
-        return Err(assignment_error("missing right-hand value.")?);
+        return Err(assignment_error("missing right-hand value")?);
     }
 
     if equal_symbol != Symbols::Equal {
