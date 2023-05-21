@@ -1,11 +1,9 @@
 use crate::compiler::analyzer::resolvers::sequence;
-use crate::compiler::tokenizer::token::{TokenVec, Token};
+use crate::compiler::tokenizer::token::{Token, TokenVec};
 use crate::public::compile_time::ast::ast_enum::ASTVec;
 use crate::public::compile_time::parens::Paren;
 
-pub fn resolve(
-    tokens: &mut TokenVec,
-) -> Result<ASTVec, ()> {
+pub fn resolve(tokens: &mut TokenVec) -> Result<ASTVec, ()> {
     // statement body sequence resolve
     // without LeftBrace
     // template: `{ ...; ... }`
@@ -27,24 +25,20 @@ pub fn resolve(
     while first_index < tokens.len() {
         let current = tokens.pop_front().unwrap();
 
-        let is_divider =
-            current == Token::Divider;
-        let is_left_paren =
-            current == Token::Paren(Paren::LeftBrace) ||
-            current == Token::Paren(Paren::LeftParen) ||
-            current == Token::Paren(Paren::LeftBracket);
-        let is_right_paren =
-            current == Token::Paren(Paren::RightBrace) ||
-            current == Token::Paren(Paren::RightParen) ||
-            current == Token::Paren(Paren::RightBracket);
+        let is_divider = current == Token::Divider;
+        let is_left_paren = current == Token::Paren(Paren::LeftBrace)
+            || current == Token::Paren(Paren::LeftParen)
+            || current == Token::Paren(Paren::LeftBracket);
+        let is_right_paren = current == Token::Paren(Paren::RightBrace)
+            || current == Token::Paren(Paren::RightParen)
+            || current == Token::Paren(Paren::RightBracket);
 
         if is_left_paren {
             state = State::Inner;
             paren_count += 1;
         }
         if is_divider && (state == State::Outer) {
-            let sub_sequence_node =
-                sequence::resolve(&mut sub_tokens)?;
+            let sub_sequence_node = sequence::resolve(&mut sub_tokens)?;
             sub_tokens.clear();
             result_params.push(sub_sequence_node);
             continue;
@@ -55,8 +49,7 @@ pub fn resolve(
                 state = State::Outer;
             }
             if paren_count == 0 {
-                let sub_sequence_node =
-                    sequence::resolve(&mut sub_tokens)?;
+                let sub_sequence_node = sequence::resolve(&mut sub_tokens)?;
                 sub_tokens.clear();
                 result_params.push(sub_sequence_node);
                 break;

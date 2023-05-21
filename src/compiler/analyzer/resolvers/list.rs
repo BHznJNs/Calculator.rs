@@ -1,13 +1,10 @@
 use crate::compiler::analyzer::resolvers::expression;
-use crate::compiler::tokenizer::token::{TokenVec, Token};
+use crate::compiler::tokenizer::token::{Token, TokenVec};
 use crate::public::compile_time::ast::types::ExpressionNode;
 use crate::public::compile_time::parens::Paren;
 use crate::public::error::syntax_error;
 
-pub fn resolve(
-    tokens: &mut TokenVec,
-    identi_paren: Paren,
-) -> Result<Vec<ExpressionNode>, ()> {
+pub fn resolve(tokens: &mut TokenVec, identi_paren: Paren) -> Result<Vec<ExpressionNode>, ()> {
     // examples:
     // 1, 2)
     // a, 1)
@@ -25,8 +22,7 @@ pub fn resolve(
         elements: &mut Vec<ExpressionNode>,
     ) -> Result<(), ()> {
         if sub_tokens.len() > 0 {
-            let element =
-                expression::resolve(sub_tokens)?;
+            let element = expression::resolve(sub_tokens)?;
             sub_tokens.clear();
             elements.push(element);
         }
@@ -40,25 +36,19 @@ pub fn resolve(
 
     loop {
         if tokens.len() == 0 {
-            return Err(syntax_error("Unmatched parentheses")?)
+            return Err(syntax_error("Unmatched parentheses")?);
         }
 
-        let current =
-            tokens.pop_front().unwrap();
+        let current = tokens.pop_front().unwrap();
 
-        let is_divider =
-            current == Token::Divider;
-        let is_identi_paren =
-            current == Token::Paren(identi_paren);
-        let is_left_paren =
-            current == Token::Paren(Paren::LeftBrace) ||
-            current == Token::Paren(Paren::LeftParen) ||
-            current == Token::Paren(Paren::LeftBracket);
-        let is_right_paren =
-            current == Token::Paren(Paren::RightBrace) ||
-            current == Token::Paren(Paren::RightParen) ||
-            current == Token::Paren(Paren::RightBracket);
-
+        let is_divider = current == Token::Divider;
+        let is_identi_paren = current == Token::Paren(identi_paren);
+        let is_left_paren = current == Token::Paren(Paren::LeftBrace)
+            || current == Token::Paren(Paren::LeftParen)
+            || current == Token::Paren(Paren::LeftBracket);
+        let is_right_paren = current == Token::Paren(Paren::RightBrace)
+            || current == Token::Paren(Paren::RightParen)
+            || current == Token::Paren(Paren::RightBracket);
 
         if is_left_paren {
             state = State::Inner;

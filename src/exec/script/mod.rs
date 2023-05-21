@@ -1,19 +1,15 @@
-pub mod readlines;
 mod pre_processer;
+pub mod readlines;
 
 use std::time::Instant;
 
-use crate::public::run_time::scope::Scope;
 use crate::public::env::Env;
+use crate::public::run_time::scope::Scope;
 
 use super::attempt::attempt;
 
-pub fn env_resolve(
-    calc_env: Env,
-    scope: &mut Scope,
-) {
-    let script_path =
-        calc_env.script_path.unwrap();
+pub fn env_resolve(calc_env: Env, scope: &mut Scope) {
+    let script_path = calc_env.script_path.unwrap();
 
     if calc_env.timer {
         let now = Instant::now();
@@ -26,10 +22,7 @@ pub fn env_resolve(
     }
 }
 
-pub fn run(
-    path: String,
-    scope: &mut Scope,
-) {
+pub fn run(path: String, scope: &mut Scope) {
     let Ok(mut script_lines) = readlines::resolve(path) else {
         println!("Invalid script file.");
         return
@@ -42,8 +35,7 @@ pub fn run(
             Some(item) => {
                 line_count += 1;
 
-                let mut script_line =
-                if let Ok(line) = item {
+                let mut script_line = if let Ok(line) = item {
                     pre_processer::process(line)
                 } else {
                     String::new()
@@ -76,8 +68,7 @@ pub fn run(
                         current_line = &cached_multiline;
                     }
                     // execuse the line
-                    let line_result =
-                        attempt(current_line, scope);
+                    let line_result = attempt(current_line, scope);
 
                     if line_result.is_err() {
                         println!("Error occured at line {}.", line_count);
@@ -91,7 +82,7 @@ pub fn run(
                         cached_multiline.clear();
                     }
                 }
-            },
+            }
             // if is the last line
             None => break,
         }

@@ -1,4 +1,5 @@
 #[derive(PartialEq, Clone, Copy)]
 pub enum DataStoragePattern {
-    List, Map
+    List,
+    Map,
 }

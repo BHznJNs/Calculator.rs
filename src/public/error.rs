@@ -7,17 +7,12 @@ use super::value::value::ValueType;
 
 type ErrorResult = Result<(), ()>;
 
-pub fn type_error(
-    param: Option<&str>,
-    expected: Vec<ValueType>,
-    found: ValueType,
-) -> ErrorResult {
+pub fn type_error(param: Option<&str>, expected: Vec<ValueType>, found: ValueType) -> ErrorResult {
     // Vec<ValueType> -> "{type}/{type} ..."
     fn join(mut type_vec: Vec<ValueType>) -> String {
         let mut res_string = String::new();
         loop {
-            let current =
-                type_vec.remove(0);
+            let current = type_vec.remove(0);
             res_string += &format!("{}", current);
 
             if type_vec.len() != 0 {
@@ -26,7 +21,7 @@ pub fn type_error(
                 break;
             }
         }
-        return res_string
+        return res_string;
     }
 
     print!("{}", ERROR_COLORED.output(" TypeError "));
@@ -37,11 +32,7 @@ pub fn type_error(
     Err(())
 }
 
-pub fn range_error<T: Display>(
-    param: &str,
-    expected: T,
-    found: usize,
-) -> ErrorResult {
+pub fn range_error<T: Display>(param: &str, expected: T, found: usize) -> ErrorResult {
     print!("{} for \"{}\"", ERROR_COLORED.output(" RangeError "), param);
     println!(": expected {}, found {}.", expected, found);
     Err(())
@@ -58,7 +49,11 @@ pub fn assignment_error(msg: &str) -> ErrorResult {
 }
 
 pub fn reference_error(var_name: &str) -> ErrorResult {
-    println!("{}: variable `{}` is not defined.", ERROR_COLORED.output(" ReferenceError "), var_name);
+    println!(
+        "{}: variable `{}` is not defined.",
+        ERROR_COLORED.output(" ReferenceError "),
+        var_name
+    );
     Err(())
 }
 
@@ -82,16 +77,18 @@ impl fmt::Display for InternalComponent {
             InternalComponent::Std => write!(f, "Standard-Library"),
 
             InternalComponent::Tokenizer => write!(f, "Tokenizer"),
-            InternalComponent::Analyzer  => write!(f, "Analyzer"),
-            InternalComponent::Computer  => write!(f, "Computer"),
+            InternalComponent::Analyzer => write!(f, "Analyzer"),
+            InternalComponent::Computer => write!(f, "Computer"),
         }
     }
 }
 
-pub fn internal_error(
-    from: InternalComponent,
-    msg: &str
-) -> ErrorResult {
-    println!("{} from {}: {}.", ERROR_COLORED.output(" InternalError "), from, msg);
+pub fn internal_error(from: InternalComponent, msg: &str) -> ErrorResult {
+    println!(
+        "{} from {}: {}.",
+        ERROR_COLORED.output(" InternalError "),
+        from,
+        msg
+    );
     Err(())
 }

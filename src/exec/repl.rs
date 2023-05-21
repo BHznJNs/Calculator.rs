@@ -6,13 +6,11 @@ use crate::public::env::Env;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
 
-fn import_all(
-    scope: &mut Scope
-) -> Result<(), ()> {
-    scope.import_std("Basic" )?;
-    scope.import_std("Math"  )?;
+fn import_all(scope: &mut Scope) -> Result<(), ()> {
+    scope.import_std("Basic")?;
+    scope.import_std("Math")?;
     scope.import_std("String")?;
-    scope.import_std("Array" )?;
+    scope.import_std("Array")?;
     Ok(())
 }
 
@@ -29,9 +27,7 @@ pub fn repl(scope: &mut Scope, calc_env: Env) -> ! {
         io::stdout().flush().unwrap();
 
         let mut input = String::new();
-        io::stdin()
-            .read_line(&mut input)
-            .unwrap();
+        io::stdin().read_line(&mut input).unwrap();
 
         let result: Result<Value, ()>;
         if calc_env.timer {
@@ -47,8 +43,7 @@ pub fn repl(scope: &mut Scope, calc_env: Env) -> ! {
         if let Ok(val) = result {
             if let Value::Void(_) = val {
                 continue;
-            } else
-            if let Value::String(_) = val {
+            } else if let Value::String(_) = val {
                 println!("= {}", val.str_format());
             } else {
                 println!("= {}", val);

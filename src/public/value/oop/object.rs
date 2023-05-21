@@ -1,6 +1,6 @@
-use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::rc::Rc;
 
 use crate::public::value::array;
 
@@ -14,32 +14,21 @@ pub struct Object {
 
     pub storage_pattern: DataStoragePattern,
     pub data_list: Option<Vec<(String, Rc<RefCell<Value>>)>>,
-    pub data_map : Option<HashMap<String, Rc<RefCell<Value>>>>,
+    pub data_map: Option<HashMap<String, Rc<RefCell<Value>>>>,
 }
 
-pub fn display(
-    obj: Rc<RefCell<Object>>,
-    level: usize,
-) {
-    fn display_item(
-        key: &String,
-        value: &Rc<RefCell<Value>>,
-        level: usize,
-    ) {
-        let value_ref =
-            value.as_ref().borrow();
+pub fn display(obj: Rc<RefCell<Object>>, level: usize) {
+    fn display_item(key: &String, value: &Rc<RefCell<Value>>, level: usize) {
+        let value_ref = value.as_ref().borrow();
 
         // print indent and key
         print!("{}{}: ", "  ".repeat(level), key);
 
         // print value
         match value_ref.unwrap() {
-            Value::String(_) =>
-                print!("{}", value_ref.str_format()),
-            Value::Array(arr) =>
-                array::display(arr, level + 1),
-            Value::Object(obj) =>
-                display(obj, level + 1),
+            Value::String(_) => print!("{}", value_ref.str_format()),
+            Value::Array(arr) => array::display(arr, level + 1),
+            Value::Object(obj) => display(obj, level + 1),
             _ => print!("{}", value_ref),
         }
 
@@ -47,36 +36,29 @@ pub fn display(
         println!();
     }
 
-    let obj_ref = obj.as_ref().borrow(); 
+    let obj_ref = obj.as_ref().borrow();
     println!("{{");
     match obj_ref.storage_pattern {
         DataStoragePattern::List => {
-            let list =
-                obj_ref.data_list
-                .as_ref()
-                .unwrap();
+            let list = obj_ref.data_list.as_ref().unwrap();
             for (k, v) in list {
                 display_item(k, v, level);
             }
-        },
+        }
         DataStoragePattern::Map => {
-            let map =
-                obj_ref.data_map
-                .as_ref()
-                .unwrap();
+            let map = obj_ref.data_map.as_ref().unwrap();
 
             for (k, v) in map {
                 display_item(k, v, level);
             }
-        },
+        }
     }
     print!("{}}}", "  ".repeat(level - 1));
 }
 
 impl Object {
     pub fn get(&self, prop_name: &str) -> Result<Value, ()> {
-        let target_value_result =
-        getter::<Rc<RefCell<Value>>>(
+        let target_value_result = getter::<Rc<RefCell<Value>>>(
             self.storage_pattern,
             prop_name,
             &self.data_list,
@@ -84,33 +66,24 @@ impl Object {
         );
         match target_value_result {
             Ok(target_rc) => {
-                let target_ref =
-                    target_rc.as_ref().borrow();
+                let target_ref = target_rc.as_ref().borrow();
                 Ok(target_ref.unwrap())
-            },
-            Err(_) => {
-                match &self.prototype {
-                    Some(Value::Class(proto)) => {
-                        let target_method =
-                            proto.get_method(prop_name)?;
-                        Ok(Value::Function(target_method.clone()))
-                    },
-                    _ => {
-                        println!("Property '{}' in object does not exist.", prop_name);
-                        Err(())
-                    }
+            }
+            Err(_) => match &self.prototype {
+                Some(Value::Class(proto)) => {
+                    let target_method = proto.get_method(prop_name)?;
+                    Ok(Value::Function(target_method.clone()))
+                }
+                _ => {
+                    println!("Property '{}' in object does not exist.", prop_name);
+                    Err(())
                 }
             },
         }
     }
 
-    pub fn set(
-        &self,
-        prop_name: &String,
-        value: Value
-    ) -> Result<(), ()> {
-        let result_target_rc =
-        getter::<Rc<RefCell<Value>>>(
+    pub fn set(&self, prop_name: &String, value: Value) -> Result<(), ()> {
+        let result_target_rc = getter::<Rc<RefCell<Value>>>(
             self.storage_pattern,
             prop_name,
             &self.data_list,
@@ -119,15 +92,14 @@ impl Object {
 
         match result_target_rc {
             Ok(target_rc) => {
-                let mut target_ref =
-                    target_rc.as_ref().borrow_mut();
+                let mut target_ref = target_rc.as_ref().borrow_mut();
                 *target_ref = value;
                 Ok(())
-            },
+            }
             Err(err_msg) => {
                 println!("{}", err_msg);
                 Err(())
-            },
+            }
         }
     }
 }

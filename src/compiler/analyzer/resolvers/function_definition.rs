@@ -1,4 +1,4 @@
-use crate::compiler::tokenizer::token::{TokenVec, Token};
+use crate::compiler::tokenizer::token::{Token, TokenVec};
 use crate::public::compile_time::ast::types::FunctionDefinitionNode;
 use crate::public::compile_time::parens::Paren;
 use crate::public::error::syntax_error;
@@ -7,9 +7,7 @@ use crate::public::value::function::Param;
 use super::statement_block;
 
 // refactor: params_resolve
-fn params_resolve(
-    tokens: &mut TokenVec
-) -> Result<Vec<Param>, ()> {
+fn params_resolve(tokens: &mut TokenVec) -> Result<Vec<Param>, ()> {
     // return function Vec<Param>
     // structure:
     // identi annotation) {function body ...}
@@ -28,14 +26,16 @@ fn params_resolve(
                     if let Token::Annotation(type__) = next {
                         params.push(Param { type__, identi })
                     } else {
-                        return Err(syntax_error("type annotation expected in function definition")?)
+                        return Err(syntax_error(
+                            "type annotation expected in function definition",
+                        )?);
                     }
-                },
+                }
                 Token::Divider => continue,
                 Token::Paren(Paren::RightParen) => break,
                 _ => {
                     let msg = format!("unexpected token {} in function param", current);
-                    return Err(syntax_error(&msg)?)
+                    return Err(syntax_error(&msg)?);
                 }
             }
         } else if tokens.len() > 0 {
@@ -43,38 +43,32 @@ fn params_resolve(
                 break;
             }
         } else {
-            return Err(syntax_error("invalid function definition")?)
+            return Err(syntax_error("invalid function definition")?);
         }
     }
 
     Ok(params)
 }
 
-pub fn resolve(
-    tokens: &mut TokenVec,
-) -> Result<FunctionDefinitionNode, ()> {
+pub fn resolve(tokens: &mut TokenVec) -> Result<FunctionDefinitionNode, ()> {
     // no `fn` keyword
     // example:
     // (param $_) {out param}
 
     if tokens.len() == 0 {
-        return Err(syntax_error("missing function definition")?)
+        return Err(syntax_error("missing function definition")?);
     }
 
-    let first_token =
-        tokens.pop_front().unwrap();
+    let first_token = tokens.pop_front().unwrap();
     if first_token == Token::Paren(Paren::LeftParen) {
-        let function_params =
-            params_resolve(tokens)?;
+        let function_params = params_resolve(tokens)?;
 
-        let next_token =
-            tokens.pop_front();
+        let next_token = tokens.pop_front();
         if next_token != Some(Token::Paren(Paren::LeftBrace)) {
-            return Err(syntax_error("missing function body, expected '{'")?)
+            return Err(syntax_error("missing function body, expected '{'")?);
         }
 
-        let function_body = 
-            statement_block::resolve(tokens)?;
+        let function_body = statement_block::resolve(tokens)?;
 
         Ok(FunctionDefinitionNode {
             params: function_params,
@@ -82,6 +76,8 @@ pub fn resolve(
             body: function_body,
         })
     } else {
-        Err(syntax_error("missing function param definition, expected '('")?)
+        Err(syntax_error(
+            "missing function param definition, expected '('",
+        )?)
     }
 }

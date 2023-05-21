@@ -7,8 +7,8 @@ mod assignment;
 mod variable_reading;
 
 mod array_literal;
-mod function_definition;
 mod class_definition;
+mod function_definition;
 mod instantiation;
 
 mod composer;
