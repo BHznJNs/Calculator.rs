@@ -13,7 +13,8 @@ pub enum Keyword {
     Import,
 
     Function,
-    Class, New,
+    Class,
+    New,
 }
 
 impl fmt::Display for Keyword {
@@ -21,25 +22,25 @@ impl fmt::Display for Keyword {
         match self {
             Keyword::Out => write!(f, "out"),
             Keyword::For => write!(f, "for"),
-            Keyword::If  => write!(f, "if" ),
+            Keyword::If => write!(f, "if"),
             Keyword::Continue => write!(f, "continue"),
-            Keyword::Break    => write!(f, "break"),
-            Keyword::Import   => write!(f, "import"),
+            Keyword::Break => write!(f, "break"),
+            Keyword::Import => write!(f, "import"),
             Keyword::Function => write!(f, "function"),
-            Keyword::Class    => write!(f, "class"),
-            Keyword::New      => write!(f, "new"),
+            Keyword::Class => write!(f, "class"),
+            Keyword::New => write!(f, "new"),
         }
     }
 }
 
 pub const KEYWORD_PAIRS: [(&'static str, Keyword); 9] = [
-    ("out"    , Keyword::Out),
-    ("for"    , Keyword::For),
-    ("if"     , Keyword::If),
-    ("ctn"    , Keyword::Continue),
-    ("brk"    , Keyword::Break),
-    ("import" , Keyword::Import),
-    ("fn"     , Keyword::Function),
-    ("cl"     , Keyword::Class),
-    ("new"    , Keyword::New),
+    ("out", Keyword::Out),
+    ("for", Keyword::For),
+    ("if", Keyword::If),
+    ("ctn", Keyword::Continue),
+    ("brk", Keyword::Break),
+    ("import", Keyword::Import),
+    ("fn", Keyword::Function),
+    ("cl", Keyword::Class),
+    ("new", Keyword::New),
 ];

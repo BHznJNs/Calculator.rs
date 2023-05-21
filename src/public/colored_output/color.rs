@@ -19,7 +19,7 @@ pub enum Color {
 }
 
 const COLOR_VALUE_PAIRS: [(&'static str, &'static str); 16] = [
-// front | background
+    // front | background
     ("30", "40"),
     ("31", "41"),
     ("32", "42"),

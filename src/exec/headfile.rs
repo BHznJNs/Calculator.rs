@@ -1,20 +1,15 @@
 use std::collections::VecDeque;
 
-use crate::public::run_time::{scope::Scope, build_in};
+use crate::public::run_time::{build_in, scope::Scope};
 
 use super::script;
 
-pub fn resolve(
-    headfiles: VecDeque<String>,
-    scope: &mut Scope,
-) {
-    let mut headfile_scope =
-        Scope::new(&scope);
-    
+pub fn resolve(headfiles: VecDeque<String>, scope: &mut Scope) {
+    let mut headfile_scope = Scope::new(&scope);
+
     for path in headfiles {
         script::run(path, &mut headfile_scope);
-        let headfile_vars =
-            headfile_scope.global.variables;
+        let headfile_vars = headfile_scope.global.variables;
 
         // init headfile_scope.global.variables
         headfile_scope.global.variables = build_in::constants();

@@ -4,11 +4,11 @@ use std::rc::Rc;
 use crate::exec::script;
 use crate::public::error::import_error;
 use crate::public::std::StdModules;
-use crate::public::value::oop::module::{module_create, get_module_name};
+use crate::public::value::oop::module::{get_module_name, module_create};
 use crate::public::value::value::Overload;
 
-use super::{build_in, module};
 use super::super::value::value::Value;
+use super::{build_in, module};
 
 pub struct GlobalScope {
     pub variables: HashMap<String, Value>,
@@ -27,7 +27,7 @@ pub struct LocalScope {
 impl LocalScope {
     pub fn init() -> LocalScope {
         LocalScope {
-            variables: HashMap::<String, Value>::new()
+            variables: HashMap::<String, Value>::new(),
         }
     }
 }
@@ -41,11 +41,11 @@ pub struct Scope {
     std_module_map: Rc<HashMap<&'static str, StdModules>>,
 }
 const STD_MODULE_DATA: [(&'static str, StdModules); 5] = [
-    ("Basic" ,  StdModules::Basic),
-    ("Math"  ,  StdModules::Math),
-    ("Array" ,  StdModules::Array),
-    ("String",  StdModules::String),
-    ("FS"    ,  StdModules::FileSystem),
+    ("Basic", StdModules::Basic),
+    ("Math", StdModules::Math),
+    ("Array", StdModules::Array),
+    ("String", StdModules::String),
+    ("FS", StdModules::FileSystem),
 ];
 impl Scope {
     pub fn init() -> Scope {
@@ -67,8 +67,7 @@ impl Scope {
     }
     // import STD module
     pub fn import_std(&mut self, module_name: &str) -> Result<(), ()> {
-        let std_module_map =
-            self.std_module_map.clone();
+        let std_module_map = self.std_module_map.clone();
         let Some(target_module) =
             std_module_map.get(module_name) else {
             let msg = format!("standard module '{}' does not exist", module_name);
@@ -81,20 +80,13 @@ impl Scope {
         }
         Ok(())
     }
-    pub fn import_from_path(
-        &mut self,
-        module_path: &str,
-    ) -> Result<(), ()>  {
+    pub fn import_from_path(&mut self, module_path: &str) -> Result<(), ()> {
         let mut module_scope = self.new();
-        let module_name =
-            get_module_name(module_path);
+        let module_name = get_module_name(module_path);
 
         if let None = self.module.get(module_name) {
             // execute the module file
-            script::run(
-                module_path.to_string(),
-                &mut module_scope
-            );
+            script::run(module_path.to_string(), &mut module_scope);
 
             // import modules that imported by module
             for (module, _) in module_scope.module {
@@ -106,21 +98,16 @@ impl Scope {
             }
 
             // regard the whole module as an Object
-            let module_obj =
-                module_create(module_scope.global);
+            let module_obj = module_create(module_scope.global);
             // insert the Object as a variable into
             // the global scope.
-            self.global.variables.insert(
-                module_name.to_string(),
-                Value::create(module_obj)
-            );
+            self.global
+                .variables
+                .insert(module_name.to_string(), Value::create(module_obj));
 
-            self.module.insert(
-                module_name.to_string(),
-                true
-            );
+            self.module.insert(module_name.to_string(), true);
         }
-        
+
         Ok(())
     }
 }

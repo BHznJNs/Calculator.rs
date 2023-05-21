@@ -1,14 +1,14 @@
-mod public;
 mod compiler;
 mod computer;
 mod exec;
+mod public;
 
 use std::collections::VecDeque;
 use std::env;
 
+use exec::args;
 use public::env::Env;
 use public::run_time::scope::Scope;
-use exec::args;
 
 fn main() {
     let scope = Scope::init();

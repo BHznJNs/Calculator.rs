@@ -6,10 +6,10 @@ use std::fmt::Display;
 use {color::Color, style::Style};
 
 pub struct ColoredString {
-    pub ft_color : Color,
+    pub ft_color: Color,
     // may use default bg-color
-    pub bg_color : Option<Color>,
-    pub style    : Style,
+    pub bg_color: Option<Color>,
+    pub style: Style,
 }
 
 impl ColoredString {
@@ -17,8 +17,7 @@ impl ColoredString {
         let ft_color_str = self.ft_color.get_fg_str();
         let style_str = self.style.get_str();
 
-        let bg_color_str =
-        match self.bg_color {
+        let bg_color_str = match self.bg_color {
             Some(bg) => format!("\x1b[{}m", bg.get_bg_str()),
             None => "".to_owned(),
         };
@@ -30,28 +29,28 @@ impl ColoredString {
 // --- --- --- --- --- ---
 
 pub const BOOLEAN_COLORED: ColoredString = ColoredString {
-    ft_color : Color::Yellow,
-    bg_color : None,
-    style    : Style::Normal,
+    ft_color: Color::Yellow,
+    bg_color: None,
+    style: Style::Normal,
 };
 pub const NUMBER_COLORED: ColoredString = ColoredString {
-    ft_color : Color::BrightYellow,
-    bg_color : None,
-    style    : Style::Normal,
+    ft_color: Color::BrightYellow,
+    bg_color: None,
+    style: Style::Normal,
 };
 pub const STRING_COLORED: ColoredString = ColoredString {
-    ft_color : Color::BrightGreen,
-    bg_color : None,
-    style    : Style::Normal,
+    ft_color: Color::BrightGreen,
+    bg_color: None,
+    style: Style::Normal,
 };
 pub const INTERNAL_COLORED: ColoredString = ColoredString {
-    ft_color : Color::Cyan,
-    bg_color : None,
-    style    : Style::Normal,
+    ft_color: Color::Cyan,
+    bg_color: None,
+    style: Style::Normal,
 };
 
 pub const ERROR_COLORED: ColoredString = ColoredString {
-    ft_color : Color::BrightWhite,
-    bg_color : Some(Color::BrightRed),
-    style    : Style::Bold,
+    ft_color: Color::BrightWhite,
+    bg_color: Some(Color::BrightRed),
+    style: Style::Bold,
 };

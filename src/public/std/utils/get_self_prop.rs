@@ -1,9 +1,6 @@
-use crate::public::value::{value::Value, oop::object::Object};
+use crate::public::value::{oop::object::Object, value::Value};
 
-pub fn get_self_prop(
-    self_value: Value,
-    prop_name: &str,
-) -> Result<Value, ()> {
+pub fn get_self_prop(self_value: Value, prop_name: &str) -> Result<Value, ()> {
     let Value::Object(obj) = self_value else {
         println!("Invalid array getter invocation.");
         return Err(())

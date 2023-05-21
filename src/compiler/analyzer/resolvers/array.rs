@@ -1,15 +1,12 @@
-use crate::public::compile_time::ast::ast_enum::ASTNode;
-use crate::public::compile_time::ast::types::{ArrayLiteralNode, ArrayElementReadingNode};
 use crate::compiler::tokenizer::token::{Token, TokenVec};
+use crate::public::compile_time::ast::ast_enum::ASTNode;
+use crate::public::compile_time::ast::types::{ArrayElementReadingNode, ArrayLiteralNode};
 use crate::public::compile_time::parens::Paren;
 
 use super::{expression, list};
 
-pub fn literal_resolve(
-    tokens: &mut TokenVec,
-) -> Result<ArrayLiteralNode, ()> {
-    let elements =
-        list::resolve(tokens, Paren::RightBracket)?;
+pub fn literal_resolve(tokens: &mut TokenVec) -> Result<ArrayLiteralNode, ()> {
+    let elements = list::resolve(tokens, Paren::RightBracket)?;
     Ok(ArrayLiteralNode { elements })
 }
 
@@ -61,7 +58,6 @@ pub fn literal_resolve(
 //             current == Token::Paren(Paren::RightParen) ||
 //             current == Token::Paren(Paren::RightBracket);
 
-
 //         if is_left_paren {
 //             state = State::Inner;
 //             paren_count += 1;
@@ -112,8 +108,7 @@ pub fn reading_resolve(
         }
         sub_tokens.push_back(current);
     }
-    let index_node =
-        expression::resolve(&mut sub_tokens)?;
+    let index_node = expression::resolve(&mut sub_tokens)?;
     Ok(ArrayElementReadingNode {
         array_node,
         index_node,

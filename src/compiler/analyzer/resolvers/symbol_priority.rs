@@ -6,9 +6,7 @@ const PRIORITY: [i8; 12] = [
     2, // Symbols::Multiply
     2, // Symbols::Divide
     3, // Symbols::Power
-
     5, // Symbols::Not
-
     4, // Symbols::LessThan
     4, // Symbols::MoreThan
     4, // Symbols::LessThanEqual
@@ -22,19 +20,16 @@ fn get_priority(symbol_node: &ASTNode) -> Result<i8, ()> {
         let symbol_index = *symbol as usize;
         if symbol_index >= PRIORITY.len() {
             println!("AnalyzerError: invalid symbol: `{}`.", symbol);
-            return Err(())
+            return Err(());
         }
         Ok(PRIORITY[symbol_index])
     } else {
         println!("Analyzer error from 'get_priority'.");
-        return Err(())
+        return Err(());
     }
 }
 
-pub fn compare(
-    symbol_node1: &ASTNode,
-    symbol_node2: &ASTNode,
-) -> Result<i8, ()> {
+pub fn compare(symbol_node1: &ASTNode, symbol_node2: &ASTNode) -> Result<i8, ()> {
     let priority1 = get_priority(symbol_node1)?;
     let priority2 = get_priority(symbol_node2)?;
 

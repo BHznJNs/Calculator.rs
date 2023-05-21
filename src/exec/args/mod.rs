@@ -5,7 +5,7 @@ use std::{collections::VecDeque, process};
 
 use crate::public::{env::Env, run_time::scope::Scope};
 
-use super::{repl::repl, script, headfile};
+use super::{headfile, repl::repl, script};
 use commands::CommandArg;
 
 enum Mode {
@@ -13,14 +13,8 @@ enum Mode {
     Script,
 }
 
-fn args_resolve(
-    mode: Mode,
-    mut args: VecDeque<String>,
-    mut calc_env: Env,
-    mut scope: Scope,
-) {
-    let command_map =
-        CommandArg::map();
+fn args_resolve(mode: Mode, mut args: VecDeque<String>, mut calc_env: Env, mut scope: Scope) {
+    let command_map = CommandArg::map();
 
     loop {
         // ensure index is not out of range
@@ -28,28 +22,24 @@ fn args_resolve(
             break;
         }
 
-        let current_arg =
-            args.pop_front().unwrap();
-        if let Some(command) =
-            command_map.get::<str>(&current_arg) {
-
+        let current_arg = args.pop_front().unwrap();
+        if let Some(command) = command_map.get::<str>(&current_arg) {
             match command {
-                CommandArg::Timer   =>
-                    calc_env.timer = true,
-                CommandArg::Help    => {
+                CommandArg::Timer => calc_env.timer = true,
+                CommandArg::Help => {
                     help_msg::output();
                     process::exit(0);
-                },
+                }
                 CommandArg::Version => {
                     calc_env.version_output();
                     process::exit(0);
-                },
+                }
                 CommandArg::Headfile => {
                     // remaining args as headfile
                     calc_env.headfiles = args.clone();
                     headfile::resolve(args, &mut scope);
                     break;
-                },
+                }
             }
         } else {
             println!("Invalid command: {}.", current_arg);
@@ -58,32 +48,24 @@ fn args_resolve(
     }
 
     match mode {
-        Mode::REPL =>
-            repl(&mut scope, calc_env),
-        Mode::Script =>
-            script::env_resolve(calc_env, &mut scope),
+        Mode::REPL => repl(&mut scope, calc_env),
+        Mode::Script => script::env_resolve(calc_env, &mut scope),
     }
 }
 
-pub fn entry(
-    mut args: VecDeque<String>,
-    mut calc_env: Env,
-    mut scope: Scope,
-) {
+pub fn entry(mut args: VecDeque<String>, mut calc_env: Env, mut scope: Scope) {
     if args.len() == 0 {
         // if no argument, enter REPL directly.
         repl(&mut scope, calc_env);
     }
 
     // consider execute mode
-    let mode =
-    if args[0].starts_with('-') || args[0].starts_with("--") {
+    let mode = if args[0].starts_with('-') || args[0].starts_with("--") {
         // REPL mode
         Mode::REPL
     } else {
         // first arg is script path
-        let script_path =
-            args.pop_front().unwrap();
+        let script_path = args.pop_front().unwrap();
         calc_env.script_path = Some(script_path);
         Mode::Script
     };

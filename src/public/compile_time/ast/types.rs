@@ -1,22 +1,22 @@
 use std::rc::Rc;
 
-use crate::public::value::{function::Param, oop::class::Property};
 use crate::public::compile_time::keywords::Keyword;
+use crate::public::value::{function::Param, oop::class::Property};
 
 use super::ast_enum::{ASTNode, ASTVec};
 
 #[derive(PartialEq, Clone)]
 pub struct VariableNode {
-    pub name: String
+    pub name: String,
 }
 #[derive(PartialEq, Clone)]
 pub struct AssignmentNode {
-    pub left_hand_node : ASTNode,
+    pub left_hand_node: ASTNode,
     pub right_hand_node: ExpressionNode,
 }
 #[derive(PartialEq, Clone)]
 pub struct ArrayLiteralNode {
-    pub elements: Vec<ExpressionNode>
+    pub elements: Vec<ExpressionNode>,
 }
 #[derive(PartialEq, Clone)]
 pub struct ArrayElementReadingNode {
@@ -25,11 +25,11 @@ pub struct ArrayElementReadingNode {
 }
 #[derive(PartialEq, Clone)]
 pub struct ExpressionNode {
-    pub elements: ASTVec
+    pub elements: ASTVec,
 }
 #[derive(PartialEq, Clone)]
 pub struct LazyExpressionNode {
-    pub sub_sequence: ASTNode
+    pub sub_sequence: ASTNode,
 }
 #[derive(PartialEq, Clone)]
 pub struct InvocationNode {

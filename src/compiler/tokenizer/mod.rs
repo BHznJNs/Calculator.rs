@@ -1,4 +1,4 @@
-pub mod tokenizer;
 pub mod token;
+pub mod tokenizer;
 
 mod char_converter;

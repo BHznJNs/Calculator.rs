@@ -9,12 +9,8 @@ use crate::public::value::value::{Value, ValueType};
 
 use super::{array_literal, variable_reading};
 
-pub fn resolve(
-    node:  Rc<InstantiationNode>,
-    scope: &mut Scope,
-) -> Result<Object, ()> {
-    let target_class_value =
-        variable_reading::resolve(&node.class, scope)?;
+pub fn resolve(node: Rc<InstantiationNode>, scope: &mut Scope) -> Result<Object, ()> {
+    let target_class_value = variable_reading::resolve(&node.class, scope)?;
     let Value::Class(target_class) =
         target_class_value else {
         return Err(type_error(
@@ -24,13 +20,8 @@ pub fn resolve(
         )?)
     };
 
-    let params_clone =
-        node.params.clone();
-    let instantiation_params =
-        array_literal::resolve(params_clone.into(), scope)?;
+    let params_clone = node.params.clone();
+    let instantiation_params = array_literal::resolve(params_clone.into(), scope)?;
 
-    Class::instantiate(
-        target_class.clone(),
-        instantiation_params,
-    )
+    Class::instantiate(target_class.clone(), instantiation_params)
 }

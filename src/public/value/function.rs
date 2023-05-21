@@ -1,5 +1,5 @@
-use std::rc::Rc;
 use std::fmt;
+use std::rc::Rc;
 
 use crate::public::compile_time::ast::ast_enum::ASTVec;
 use crate::public::run_time::build_in::BuildInFnIdenti;
@@ -41,10 +41,8 @@ pub enum Function {
 impl fmt::Display for Function {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Function::BuildIn(_) =>
-                write!(f, "<Build-in-Function>"),
-            Function::UserDefined(_) =>
-                write!(f, "<User-Defined-Function>"),
+            Function::BuildIn(_) => write!(f, "<Build-in-Function>"),
+            Function::UserDefined(_) => write!(f, "<User-Defined-Function>"),
         }
     }
 }

@@ -1,13 +1,12 @@
-pub mod basic;
-pub mod math;
 pub mod array;
-pub mod string;
+pub mod basic;
 pub mod file_system;
+pub mod math;
+pub mod string;
 
-use crate::public::value::value::Value;
 use crate::public::run_time::scope::Scope;
+use crate::public::value::value::Value;
 
 pub trait BuildInFnCall {
-    fn call(&self, scope: &mut Scope)
-        -> Result<Value, ()>;
+    fn call(&self, scope: &mut Scope) -> Result<Value, ()>;
 }
