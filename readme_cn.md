@@ -1,5 +1,7 @@
 # Calculator.rs
 
+[English](./README.md) | 简体中文
+
 这是一个用 Rust 编写的简单命令行计算器程序。
 
 ## 特性
