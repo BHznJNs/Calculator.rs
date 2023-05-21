@@ -2,6 +2,8 @@ use std::cell::RefCell;
 use std::fmt;
 use std::rc::Rc;
 
+use crate::public::colored_output::{NUMBER_COLORED, BOOLEAN_COLORED, INTERNAL_COLORED};
+
 use super::array::{ArrayLiteral, self};
 use super::number::Number;
 use super::super::compile_time::ast::ast_enum::ASTNode;
@@ -91,15 +93,15 @@ impl fmt::Display for Value {
                 },
 
             Value::Boolean(bool_val) =>
-                write!(f, "{}", bool_val),
+                write!(f, "{}", BOOLEAN_COLORED.output(bool_val)),
             Value::Number(num) =>
-                write!(f, "{}", num),
+                write!(f, "{}", NUMBER_COLORED.output(num)),
             Value::String(str) =>
                 write!(f, "{}", str.as_ref().borrow()),
             Value::LazyExpression(_) =>
-                write!(f, "<Lazy-Expression>"),
+                write!(f, "{}", INTERNAL_COLORED.output("<Lazy-Expression>")),
             Value::Function(func) =>
-                write!(f, "{}", func),
+                write!(f, "{}", INTERNAL_COLORED.output(func)),
             Value::Array(arr) =>
                 Ok(array::display(arr.clone(), 1)),
 

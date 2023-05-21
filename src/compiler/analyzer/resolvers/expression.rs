@@ -28,7 +28,7 @@ pub fn resolve(
                 params.push(ASTNode::StringLiteral(str)),
             Token::Symbol(sym) => {
                 if sym == Symbols::Equal {
-                    return Err(syntax_error("invalid assignment")?)
+                    return Err(syntax_error("invalid left-hand value")?)
                 }
                 params.push(ASTNode::SymbolLiteral(sym))
             },
