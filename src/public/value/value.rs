@@ -24,7 +24,7 @@ pub enum ValueType {
     Object,
 }
 
-pub const VALUE_TYPE_TUPLES: [(&'static str, ValueType); 8] = [
+pub const VALUE_TYPE_PAIRS: [(&'static str, ValueType); 8] = [
     ("_"        , ValueType::Void),
 
     ("Bool"     , ValueType::Boolean),
