@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use crate::computer::resolvers::expression;
 use crate::public::compile_time::ast::types::ExpressionNode;
-use crate::public::error::type_error;
+use crate::public::error::{type_error, range_error};
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::std::modules::BuildInFnCall;
 use crate::public::value::function::BuildInFunction;
@@ -37,8 +37,11 @@ pub fn invoke(
         match formal_param {
             Some(p) => {
                 if index >= params.len() {
-                    println!("Build-in function param missing.");
-                    return Err(())
+                    return Err(range_error(
+                        "Build-in function invocation",
+                        function.param_count(),
+                        params.len(),
+                    )?)
                 }
 
                 let actual_param_node =
@@ -54,8 +57,8 @@ pub fn invoke(
                     );
                 } else {
                     type_error(
-                        Some(p.identi),
-                        p.type__,
+                        Some(&format!("Build-in function param '{}'", p.identi)),
+                        vec![p.type__],
                         actual_param_value.get_type()
                     )?
                 }

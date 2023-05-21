@@ -1,7 +1,7 @@
 pub mod sequence;
 
 mod list;
-mod compose;
+mod composer;
 
 mod expression;
 mod lazy_expression;

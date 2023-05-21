@@ -1,5 +1,6 @@
 use std::io::{self, Write};
 
+use crate::public::error::type_error;
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::std::utils::str_to_num::str_to_num;
@@ -87,34 +88,52 @@ impl BuildInFnCall for BasicFn {
                 let input =
                     get_val("input", scope)?;
 
-                if let Value::String(str) = input {
-                    let refer =
-                        str.as_ref().borrow();
-                    let i = str_to_num::<i64>(refer)?;
-                    Value::create(i)
-                } else
-                if let Value::Number(num) = input {
-                    Value::Number(num.int())
-                } else {
-                    println!("Invalid param type: expected String OR Number.");
-                    return Err(())
+                match input {
+                    Value::Number(num) =>
+                        Value::Number(num.int()),
+                    Value::String(str) => {
+                        let refer =
+                            str.as_ref().borrow();
+                        let i = str_to_num::<i64>(refer)?;
+                        Value::create(i)
+                    },
+                    Value::Boolean(bool_val) =>
+                        Value::create(bool_val as i64),
+                    _ => return Err(type_error(
+                            Some("Build-in function 'int'"),
+                            vec![
+                                ValueType::Boolean,
+                                ValueType::Number,
+                                ValueType::String,
+                            ],
+                            input.get_type()
+                        )?),
                 }
             },
             BasicFn::FLOAT => {
                 let input =
                     get_val("input", scope)?;
-    
-                if let Value::String(str) = input {
-                    let refer =
-                        str.as_ref().borrow();
-                    let f = str_to_num::<f64>(refer)?;
-                    Value::create(f)
-                } else
-                if let Value::Number(num) = input {
-                    Value::Number(num.float())
-                } else {
-                    println!("Invalid param type: expected String OR Number.");
-                    return Err(())
+                
+                match input {
+                    Value::Number(num) =>
+                        Value::Number(num.float()),
+                    Value::String(str) => {
+                        let refer =
+                            str.as_ref().borrow();
+                        let f = str_to_num::<f64>(refer)?;
+                        Value::create(f)
+                    },
+                    Value::Boolean(bool_val) =>
+                        Value::create(bool_val as i64 as f64),
+                    _ => return Err(type_error(
+                            Some("Build-in function 'float'"),
+                            vec![
+                                ValueType::Boolean,
+                                ValueType::Number,
+                                ValueType::String,
+                            ],
+                            input.get_type()
+                        )?),
                 }
             },
             BasicFn::BOOLEAN => {
@@ -142,13 +161,25 @@ impl BuildInFnCall for BasicFn {
             BasicFn::STRING => {
                 let input =
                     get_val("input", scope)?;
-    
-                if let Value::Number(num) = input {
-                    let str = num.to_string();
-                    Value::create(str)
-                } else {
-                    println!("Invalid param type: expected Number.");
-                    return Err(())
+                
+
+                match input {
+                    Value::String(_) =>
+                        input.deep_clone()?,
+                    Value::Number(num) =>
+                        Value::create(num.to_string()),
+
+                    Value::Boolean(bool_val) =>
+                        Value::create(format!("{}", bool_val)),
+                    _ => return Err(type_error(
+                            Some("Build-in function 'string'"),
+                            vec![
+                                ValueType::Boolean,
+                                ValueType::Number,
+                                ValueType::String,
+                            ],
+                            input.get_type()
+                        )?),
                 }
             },
             BasicFn::ARRAY => {
@@ -161,8 +192,11 @@ impl BuildInFnCall for BasicFn {
                         vec![Value::create(0); size].into();
                     Value::create(arr_literal)
                 } else {
-                    println!("Invalid param type: expected Number.");
-                    return Err(())
+                    return Err(type_error(
+                        Some("Build-in function 'string'"),
+                        vec![ValueType::Number],
+                        input.get_type()
+                    )?)
                 }
             },
             BasicFn::ASCII => {

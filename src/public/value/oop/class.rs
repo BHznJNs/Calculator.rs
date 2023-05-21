@@ -79,7 +79,7 @@ impl Class {
                     if !val.check_type(current_prop.type__) {
                         return Err(type_error(
                             Some("class instantiation"),
-                            current_prop.type__,
+                            vec![current_prop.type__],
                             val.get_type()
                         )?)
                     }

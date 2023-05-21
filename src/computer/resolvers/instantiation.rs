@@ -19,7 +19,7 @@ pub fn resolve(
         target_class_value else {
         return Err(type_error(
             Some("instantiation"),
-            ValueType::Class,
+            vec![ValueType::Class],
             target_class_value.get_type()
         )?)
     };

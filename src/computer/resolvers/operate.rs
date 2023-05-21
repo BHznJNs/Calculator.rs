@@ -43,9 +43,15 @@ pub fn operate(
                 Value::Boolean(str1.eq(&*str2)),
             _ => return Err(syntax_error("invalid string operating")?)
         }
+    } else
+    if let (Value::Boolean(bool1), Value::Boolean(bool2)) = (&val1, &val2) {
+        if operator == Symbols::CompareEqual {
+            Value::Boolean(bool1 == bool2)
+        } else {
+            return Err(syntax_error("invalid boolean operating")?)
+        }
     } else {
-        println!("Invalid computing expression: Invalid computing token.");
-        return Err(())
+        return Err(syntax_error("invalid computing expression because of computing token")?)
     };
     Ok(result)
 }

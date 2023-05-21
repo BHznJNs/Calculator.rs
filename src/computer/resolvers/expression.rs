@@ -48,7 +48,7 @@ pub fn resolve(
                         let Value::Number(num) = val else {
                             return Err(type_error(
                                 Some("Not operator"),
-                                ValueType::Number,
+                                vec![ValueType::Number],
                                 val.get_type(),
                             )?)
                         };

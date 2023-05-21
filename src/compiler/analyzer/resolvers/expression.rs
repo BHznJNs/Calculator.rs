@@ -1,9 +1,9 @@
-use crate::compiler::analyzer::resolvers::compose::compose;
+use crate::compiler::analyzer::resolvers::composer::compose;
 use crate::compiler::analyzer::resolvers::{function_definition, class_definition, instantiation};
 use crate::public::compile_time::ast::types::{ExpressionNode, VariableNode};
 use crate::public::compile_time::keywords::Keyword;
 use crate::public::compile_time::parens::Paren;
-use crate::public::error::syntax_error;
+use crate::public::error::{syntax_error, assignment_error};
 use crate::public::value::symbols::Symbols;
 use crate::public::compile_time::ast::ast_enum::{ASTNode, ASTVec};
 use crate::compiler::tokenizer::token::{Token, TokenVec};
@@ -28,7 +28,7 @@ pub fn resolve(
                 params.push(ASTNode::StringLiteral(str)),
             Token::Symbol(sym) => {
                 if sym == Symbols::Equal {
-                    return Err(syntax_error("invalid left-hand value")?)
+                    return Err(assignment_error("invalid left-hand value")?)
                 }
                 params.push(ASTNode::SymbolLiteral(sym))
             },

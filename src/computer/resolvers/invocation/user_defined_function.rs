@@ -59,7 +59,7 @@ pub fn invoke(
         } else {
             type_error(
                 Some(&formal_param.identi),
-                formal_param.type__,
+                vec![formal_param.type__],
                 actual_param_value.get_type()
             )?
         }

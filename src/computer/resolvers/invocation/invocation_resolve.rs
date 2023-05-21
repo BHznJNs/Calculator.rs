@@ -4,7 +4,7 @@ use crate::computer::resolvers::composer::compose;
 use crate::computer::resolvers::variable_reading;
 use crate::public::compile_time::ast::types::{InvocationNode, ExpressionNode};
 use crate::public::compile_time::ast::ast_enum::ASTNode;
-use crate::public::error::type_error;
+use crate::public::error::{type_error, syntax_error};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::function::Function;
 use crate::public::value::value::{Value, ValueType};
@@ -51,7 +51,7 @@ fn function_invoke(
         _ => {
             return Err(type_error(
                 None,
-                ValueType::Function,
+                vec![ValueType::Function],
                 function_value.get_type()
             )?)
         }
@@ -80,10 +80,7 @@ pub fn resolve(
                 compose::resolve(caller_clone.into(), scope)?;
             function_invoke(function_value, params, scope)?
         },
-        _ => {
-            println!("Invalid callable target.");
-            return Err(())
-        }
+        _ => return Err(syntax_error("invalid callable target")?),
     };
     Ok(fn_result)
 }

@@ -1,4 +1,5 @@
 use core::fmt;
+use std::fmt::Display;
 
 use crate::public::colored_output::ERROR_COLORED;
 
@@ -8,13 +9,40 @@ type ErrorResult = Result<(), ()>;
 
 pub fn type_error(
     param: Option<&str>,
-    expected: ValueType,
+    expected: Vec<ValueType>,
     found: ValueType,
 ) -> ErrorResult {
+    // Vec<ValueType> -> "{type}/{type} ..."
+    fn join(mut type_vec: Vec<ValueType>) -> String {
+        let mut res_string = String::new();
+        loop {
+            let current =
+                type_vec.remove(0);
+            res_string += &format!("{}", current);
+
+            if type_vec.len() != 0 {
+                res_string.push('/');
+            } else {
+                break;
+            }
+        }
+        return res_string
+    }
+
     print!("{}", ERROR_COLORED.output(" TypeError "));
     if let Some(name) = param {
         print!(" for \"{}\"", name);
     }
+    println!(": expected {}, found {}.", join(expected), found);
+    Err(())
+}
+
+pub fn range_error<T: Display>(
+    param: &str,
+    expected: T,
+    found: usize,
+) -> ErrorResult {
+    print!("{} for \"{}\"", ERROR_COLORED.output(" RangeError "), param);
     println!(": expected {}, found {}.", expected, found);
     Err(())
 }
@@ -42,6 +70,8 @@ pub fn import_error(msg: &str) -> ErrorResult {
 // --- --- --- --- --- ---
 
 pub enum InternalComponent {
+    Std,
+
     Tokenizer,
     Analyzer,
     Computer,
@@ -49,9 +79,11 @@ pub enum InternalComponent {
 impl fmt::Display for InternalComponent {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            InternalComponent::Tokenizer => write!(f, "tokenizer"),
-            InternalComponent::Analyzer  => write!(f, "analyzer"),
-            InternalComponent::Computer  => write!(f, "computer"),
+            InternalComponent::Std => write!(f, "Standard-Library"),
+
+            InternalComponent::Tokenizer => write!(f, "Tokenizer"),
+            InternalComponent::Analyzer  => write!(f, "Analyzer"),
+            InternalComponent::Computer  => write!(f, "Computer"),
         }
     }
 }

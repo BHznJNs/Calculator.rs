@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::public::compile_time::ast::types::ExpressionNode;
-use crate::public::error::type_error;
+use crate::public::error::{type_error, range_error};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::number::Number;
 use crate::public::value::value::{Value, Overload, ValueType};
@@ -16,15 +16,18 @@ fn index_resolve(
         expression::resolve(expression_node, scope)?;
     if let Value::Number(num) = index_value {
         if num < Number::Int(0) {
-            println!("Index of an array should not be less than ZERO.");
-            return Err(())
+            return Err(range_error(
+                "array reading",
+                "> 0",
+                num.int_value() as usize,
+            )?)
         }
         Ok(num.int_value() as usize)
     } else {
         // index type error
         Err(type_error(
             Some("array index"),
-            ValueType::Number,
+            vec![ValueType::Number],
             index_value.get_type(),
         )?)
     }
@@ -35,8 +38,11 @@ fn check_outof_range(
     len: usize,
 ) -> Result<(), ()> {
     if index >= len {
-        println!("Array reading out of range, expected index < {}, found {}.", len, index);
-        Err(())
+        Err(range_error(
+            "Array reading",
+            format!("index < {}", len),
+            index
+        )?)
     } else {
         Ok(())
     }
@@ -67,7 +73,7 @@ pub fn assign(
         let Value::String(target) = value else {
             return Err(type_error(
                 Some("string assignment"),
-                ValueType::String,
+                vec![ValueType::String],
                 value.get_type(),
             )?)
         };

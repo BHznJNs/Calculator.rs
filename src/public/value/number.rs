@@ -1,8 +1,9 @@
 use std::f64::INFINITY;
+use std::cmp::PartialEq;
 use std::ops::{Add, Sub, Mul, Div};
 use std::fmt;
 
-#[derive(PartialEq, PartialOrd, Clone, Copy)]
+#[derive(PartialOrd, Clone, Copy)]
 pub enum Number {
     NotANumber,
 
@@ -193,5 +194,30 @@ impl Div for Number {
         } else {
             Number::NotANumber
         }
+    }
+}
+
+// --- --- --- --- --- ---
+
+const EPS: f64 = f64::EPSILON;
+impl PartialEq for Number {
+    fn eq(&self, other: &Self) -> bool {
+        match self {
+            Number::NotANumber => *other == Number::NotANumber,
+            Number::Int(num1) => match other {
+                Number::NotANumber => false,
+                Number::Int(num2) =>
+                    num1 == num2,
+                Number::Float(num2) =>
+                    (num2 - (*num1 as f64)).abs() <= EPS,
+            },
+            Number::Float(num1) => match other {
+                Number::NotANumber => false,
+                _ => (num1 - (other.float_value())).abs() <= EPS,
+            },
+        }
+    }
+    fn ne(&self, other: &Self) -> bool {
+        !(self == other)
     }
 }

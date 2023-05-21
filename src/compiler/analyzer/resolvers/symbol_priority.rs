@@ -9,12 +9,12 @@ const PRIORITY: [i8; 12] = [
 
     5, // Symbols::Not
 
-    4, // Symbols::LessThan
-    4, // Symbols::MoreThan
-    4, // Symbols::LessThanEqual
-    4, // Symbols::MoreThanEqual
-    4, // Symbols::CompareEqual
-    4, // Symbols::NotEqual
+    0, // Symbols::LessThan
+    0, // Symbols::MoreThan
+    0, // Symbols::LessThanEqual
+    0, // Symbols::MoreThanEqual
+    0, // Symbols::CompareEqual
+    0, // Symbols::NotEqual
 ];
 
 fn get_priority(symbol_node: &ASTNode) -> Result<i8, ()> {

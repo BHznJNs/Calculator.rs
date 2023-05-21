@@ -17,6 +17,18 @@ pub struct BuildInFunction {
     pub params: [Option<BuildInParam>; 4],
     pub identi: BuildInFnIdenti,
 }
+impl BuildInFunction {
+    pub fn param_count(&self) -> usize {
+        let mut count = 0;
+        for p in &self.params {
+            match p {
+                Some(_) => count += 1,
+                None => break,
+            }
+        }
+        return count
+    }
+}
 
 #[derive(PartialEq, Clone)]
 pub struct Param {
