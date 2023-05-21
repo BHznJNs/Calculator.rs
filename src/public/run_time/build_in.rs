@@ -38,7 +38,7 @@ pub fn constants() -> HashMap<String, Value> {
         (String::from("PI")       , Value::Number(Number::Float(PI))),
         (String::from("E")        , Value::Number(Number::Float(E ))),
 
-        (String::from("TRUE")     , Value::Boolean(true)),
-        (String::from("FALSE")    , Value::Boolean(false)),
+        (String::from("true")     , Value::Boolean(true)),
+        (String::from("false")    , Value::Boolean(false)),
     ])
 }
