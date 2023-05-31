@@ -1,24 +1,28 @@
 mod terminal;
 mod signal;
-mod candidate;
 mod tokenizer;
 mod line;
 
-use std::{io::{self, Read, Write}, fs::{OpenOptions, File}};
+mod candidate;
+mod history;
+
+use std::io::{self, Write};
+use std::fs::OpenOptions;
 
 use crossterm::{event::{KeyModifiers, KeyCode}};
 use terminal::Terminal;
 
-use self::line::Line;
-
+use line::Line;
+use history::History;
 pub use signal::Signal;
 // use candidate::Candidate;
 
 pub struct LineEditor {
     prompt: &'static str,
     terminal: Terminal,
-    line_count: usize,
+    history: History,
 
+    line_count: usize,
     overflow_left : usize,
     overflow_right: usize,
     visible_area_width: usize,
@@ -32,11 +36,11 @@ impl LineEditor {
         LineEditor {
             prompt,
             terminal,
-            line_count: 1,
+            history: History::new(),
 
+            line_count: 1,
             overflow_left : 0,
             overflow_right: 0,
-
             visible_area_width: term_width - prompt.len() - 2
             //                                              ^ this is initial label width
         }
@@ -179,7 +183,7 @@ impl LineEditor {
             let term_width = self.terminal.width();
             let prompt_len = self.prompt.len();
 
-            self.log(&format!("line content: {}, cursor pos: {}, terminal width: {}, visible_width: {}", line.content, cursor_pos.to_string(), term_width, self.visible_area_width))?;
+            // self.log(&format!("line content: {}, cursor pos: {}, terminal width: {}, visible_width: {}", line.content, cursor_pos.to_string(), term_width, self.visible_area_width))?;
             // visible left & right end
             let is_at_left_end  = cursor_pos == prompt_len;
             let is_at_right_end = cursor_pos == term_width - line.label_width;
@@ -190,6 +194,15 @@ impl LineEditor {
                 || (is_at_right_end && self.overflow_right == 0);
 
             match key.code {
+                // use with history
+                KeyCode::Up    => {
+                    // if let Some(last_line) = self.history.previous() {
+                    //     // let slice = last_line.as_str();
+                    //     line.reset_with(&last_line[..]);
+                    // }
+                },
+                KeyCode::Down  => todo!(),
+                
                 KeyCode::Left  => {
                     if is_at_line_start {
                         continue;
@@ -215,9 +228,6 @@ impl LineEditor {
                         continue;
                     }
                 },
-                // use with history
-                // KeyCode::Up    => todo!(),
-                // KeyCode::Down  => todo!(),
 
                 KeyCode::Enter => {
                     // println!("test: {}", self.terminal.width() - self.prompt.len() - line.label_width);
