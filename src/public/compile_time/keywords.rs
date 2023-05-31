@@ -17,6 +17,25 @@ pub enum Keyword {
     New,
 }
 
+impl Keyword {
+    pub fn is_keyword(word: &str) -> Option<Keyword> {
+        // check is keyword
+        let keyword: Keyword;
+
+        let mut index = 0;
+        while index < KEYWORD_PAIRS.len() {
+            let current = KEYWORD_PAIRS[index];
+
+            if word.eq(current.0) {
+                keyword = current.1;
+                return Some(keyword);
+            }
+            index += 1;
+        }
+        return None;
+    }
+}
+
 impl fmt::Display for Keyword {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {

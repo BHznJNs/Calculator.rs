@@ -1,7 +1,7 @@
 use core::fmt;
 use std::fmt::Display;
 
-use crate::public::colored_output::ERROR_COLORED;
+use crate::utils::coloring::ERROR_COLORED;
 
 use super::value::value::ValueType;
 

@@ -7,7 +7,7 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ASTNode, ()> {
     if tokens.len() == 0 {
         // blank line || line comment
         Ok(ASTNode::Comment)
-    } else if let Token::Keywords(keyword) = tokens[0] {
+    } else if let Token::Keyword(keyword) = tokens[0] {
         // if matches keyword,
         // regard the whole sequence as a statement
         let statement_nodes = statement::resolve(keyword, tokens)?;

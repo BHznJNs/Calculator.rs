@@ -56,17 +56,17 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ExpressionNode, ()> {
                 params.push(compose_node);
             }
 
-            Token::Keywords(Keyword::Function) => {
+            Token::Keyword(Keyword::Function) => {
                 // function definition
                 let function_definition = function_definition::resolve(tokens)?;
                 params.push(ASTNode::FunctionDefinition(function_definition.into()));
             }
-            Token::Keywords(Keyword::Class) => {
+            Token::Keyword(Keyword::Class) => {
                 // class definition
                 let class_definition = class_definition::resolve(tokens)?;
                 params.push(ASTNode::ClassDefinition(class_definition.into()));
             }
-            Token::Keywords(Keyword::New) => {
+            Token::Keyword(Keyword::New) => {
                 // class instantiation
                 let instantiation_node = instantiation::resolve(tokens)?;
                 params.push(ASTNode::Instantiation(instantiation_node.into()));

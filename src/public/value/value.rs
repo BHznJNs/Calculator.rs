@@ -2,7 +2,7 @@ use std::cell::RefCell;
 use std::fmt;
 use std::rc::Rc;
 
-use crate::public::colored_output::{
+use crate::utils::coloring::{
     BOOLEAN_COLORED, INTERNAL_COLORED, NUMBER_COLORED, STRING_COLORED,
 };
 

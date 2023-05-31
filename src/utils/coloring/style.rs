@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 #[derive(Clone, Copy)]
 pub enum Style {
     Normal,

@@ -8,7 +8,7 @@ use crate::public::value::symbols::Symbols;
 use crate::public::value::value::ValueType;
 
 #[derive(PartialEq, Clone, Copy)]
-pub enum TokenTypes {
+pub enum TokenType {
     Unknown,
 
     Number,
@@ -16,7 +16,7 @@ pub enum TokenTypes {
     Symbol,
     Identifier,
     Paren,
-    Keywords,
+    Keyword,
 
     Annotation,
 }
@@ -30,7 +30,7 @@ pub enum Token {
     Symbol(Symbols),
     Paren(Paren),
     Identi(String),
-    Keywords(Keyword),
+    Keyword(Keyword),
 
     Divider,
     Annotation(ValueType),
@@ -45,7 +45,7 @@ impl fmt::Display for Token {
             Token::Symbol(sym) => format!("Symbol: {}", sym),
             Token::Paren(par) => format!("Paren: {:#?}", par),
             Token::Identi(ide) => format!("Identifier: {}", ide),
-            Token::Keywords(key) => format!("Keywords: {}", key),
+            Token::Keyword(key) => format!("Keywords: {}", key),
             Token::Divider => format!("Divider"),
             Token::Annotation(type__) => format!("Annotation: {}", type__),
         };
