@@ -42,14 +42,14 @@ impl LineEditor {
         }
     }
 
-    // fn log(&self, content: &str) -> io::Result<()> {
-    //     let mut file = OpenOptions::new().write(true).open("log.txt")?;
+    fn log(&self, content: &str) -> io::Result<()> {
+        let mut file = OpenOptions::new().write(true).open("log.txt")?;
 
-    //     file.write(content.as_bytes())?;
-    //     file.flush()?;
+        file.write(content.as_bytes())?;
+        file.flush()?;
 
-    //     Ok(())
-    // }
+        Ok(())
+    }
 
     fn clear_line(&mut self) -> io::Result<()> {
         self.terminal.cursor.move_to_pos(self.prompt.len())?;
@@ -127,10 +127,7 @@ impl LineEditor {
             self.terminal.cursor_col()? - self.prompt.len() + self.overflow_left;
         line.insert(insert_pos, ch);
 
-        // if self.overflow_left == 0 {
-        //     self.terminal.cursor.right(1)?;
-        // }
-        if line.len() >= self.visible_area_width {
+        if line.len() - 1 >= self.visible_area_width {
             self.overflow_left += 1;
         } else {
             self.terminal.cursor.right(1)?;
@@ -182,7 +179,7 @@ impl LineEditor {
             let term_width = self.terminal.width();
             let prompt_len = self.prompt.len();
 
-            // self.log(&format!("line content: {}, cursor pos: {}, terminal width: {}", line.content, cursor_pos.to_string(), term_width))?;
+            self.log(&format!("line content: {}, cursor pos: {}, terminal width: {}, visible_width: {}", line.content, cursor_pos.to_string(), term_width, self.visible_area_width))?;
             // visible left & right end
             let is_at_left_end  = cursor_pos == prompt_len;
             let is_at_right_end = cursor_pos == term_width - line.label_width;
