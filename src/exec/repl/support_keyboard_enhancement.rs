@@ -1,6 +1,6 @@
 use std::io;
 
-use crossterm::event::{PushKeyboardEnhancementFlags, KeyboardEnhancementFlags};
+use crossterm::event::{KeyboardEnhancementFlags, PushKeyboardEnhancementFlags};
 use crossterm::queue;
 
 pub fn resolve() -> io::Result<()> {

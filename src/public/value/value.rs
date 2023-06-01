@@ -2,9 +2,7 @@ use std::cell::RefCell;
 use std::fmt;
 use std::rc::Rc;
 
-use crate::utils::coloring::{
-    BOOLEAN_COLORED, INTERNAL_COLORED, NUMBER_COLORED, STRING_COLORED,
-};
+use crate::utils::coloring::{BOOLEAN_COLORED, INTERNAL_COLORED, NUMBER_COLORED, STRING_COLORED};
 
 use super::super::compile_time::ast::ast_enum::ASTNode;
 use super::array::{self, ArrayLiteral};

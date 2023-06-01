@@ -3,7 +3,7 @@ mod support_keyboard_enhancement;
 use std::io;
 use std::time::Instant;
 
-use crossterm::terminal::{enable_raw_mode, disable_raw_mode};
+use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 
 use super::attempt::attempt;
 use crate::public::env::Env;
@@ -36,11 +36,10 @@ pub fn repl(scope: &mut Scope, calc_env: Env) -> io::Result<()> {
         support_keyboard_enhancement::resolve()?;
 
         let sig = rl.readline()?;
-        let line_content =
-        match sig {
+        let line_content = match sig {
             Signal::NewLine(line) => line + "\r\n",
             Signal::Interrupt => break,
-            Signal::NonASCII  => todo!(),
+            Signal::NonASCII => todo!(),
         };
 
         let result: Result<Value, ()>;

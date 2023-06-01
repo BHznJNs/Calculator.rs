@@ -1,5 +1,5 @@
-pub mod coloring;
 pub mod ascii;
+pub mod coloring;
 
-pub mod line_editor;
 pub mod completer;
+pub mod line_editor;

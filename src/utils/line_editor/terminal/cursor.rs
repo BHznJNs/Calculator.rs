@@ -1,6 +1,6 @@
 use std::io::{self, Stdout};
 
-use crossterm::{execute, cursor};
+use crossterm::{cursor, execute};
 
 pub struct Cursor {
     stdout: Stdout,

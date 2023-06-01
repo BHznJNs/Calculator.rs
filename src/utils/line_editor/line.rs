@@ -1,7 +1,7 @@
-use std::{rc::Rc, borrow::Borrow};
+use std::{borrow::Borrow, rc::Rc};
 
+use super::tokenizer::{tokenize, TokenVec};
 use crossterm::style::Stylize;
-use super::tokenizer::{TokenVec, tokenize};
 
 pub struct Line<'a> {
     content: &'a mut String,
@@ -13,10 +13,7 @@ pub struct Line<'a> {
 }
 
 impl<'a> Line<'a> {
-    pub fn new(
-        content: &'a mut String,
-        line_count: usize,
-    ) -> Self {
+    pub fn new(content: &'a mut String, line_count: usize) -> Self {
         let label_str = line_count.to_string();
         Line {
             content,

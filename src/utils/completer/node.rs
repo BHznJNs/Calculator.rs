@@ -33,7 +33,9 @@ impl CompleterNode {
             }
             None => {
                 for (ch, subnode) in &self.subnodes {
-                    if *ch == '\0' { continue };
+                    if *ch == '\0' {
+                        continue;
+                    };
                     subnode.collect(String::from(*ch), result);
                 }
             }

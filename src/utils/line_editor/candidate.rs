@@ -5,12 +5,15 @@ pub struct Candidate {
 
 impl Candidate {
     pub fn new() -> Self {
-        Candidate { list: vec![], index: 0 }
+        Candidate {
+            list: vec![],
+            index: 0,
+        }
     }
 
     pub fn set(&mut self, candidates: Vec<String>) {
         self.index = -1; // reset index
-        self.list  = candidates;
+        self.list = candidates;
     }
 
     pub fn current_hint<'a>(&'a self) -> Option<&'a str> {

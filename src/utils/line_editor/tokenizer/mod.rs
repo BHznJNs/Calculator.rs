@@ -1,38 +1,15 @@
 mod token;
 
-use crate::{utils::ascii::{
-    is_identi_ascii,
-    POINT_ASCII,
-
-    LEFT_PAREN_ASCII,
-    RIGHT_PAREN_ASCII,
-    LEFT_BRACKET_ASCII,
-    RIGHT_BRACKET_ASCII,
-    LEFT_BRACE_ASCII,
-    RIGHT_BRACE_ASCII,
-
-    PLUS_ASCII,
-    MINUS_ASCII,
-    MULTIPLY_ASCII,
-    DIVIDE_ASCII,
-    POWER_ASCII,
-
-    NOT_SYMBOL_ASCII,
-    LESS_THAN_ASCII,
-    MORE_THAN_ASCII,
-    EQUAL_ASCII,
-
-    SINGLE_QUOTE_ASCII,
-    DOUBLE_QUOTE_ASCII,
-    BACKSLASH_ASCII,
-
-    SEMICOLON_ASCII,
-    COMMA_ASCII,
-    DOLLAR_ASCII,
-    NUMBER_SIGN_ASCII,
-    SPACE_ASCII,
-    NULL_ASCII,
-}, public::compile_time::keywords::Keyword};
+use crate::{
+    public::compile_time::keywords::Keyword,
+    utils::ascii::{
+        is_identi_ascii, BACKSLASH_ASCII, COMMA_ASCII, DIVIDE_ASCII, DOLLAR_ASCII,
+        DOUBLE_QUOTE_ASCII, EQUAL_ASCII, LEFT_BRACE_ASCII, LEFT_BRACKET_ASCII, LEFT_PAREN_ASCII,
+        LESS_THAN_ASCII, MINUS_ASCII, MORE_THAN_ASCII, MULTIPLY_ASCII, NOT_SYMBOL_ASCII,
+        NULL_ASCII, NUMBER_SIGN_ASCII, PLUS_ASCII, POINT_ASCII, POWER_ASCII, RIGHT_BRACE_ASCII,
+        RIGHT_BRACKET_ASCII, RIGHT_PAREN_ASCII, SEMICOLON_ASCII, SINGLE_QUOTE_ASCII, SPACE_ASCII,
+    },
+};
 
 pub use token::{Token, TokenType, TokenVec};
 
@@ -107,20 +84,16 @@ pub fn tokenize(source: &str) -> TokenVec {
                 // Type annotation
                 tokens.push_back(Token::new(TextType::Annotation, value));
             } else {
-                let option_keyword =
-                    Keyword::is_keyword(&value);
-                
-                let is_keyword =
-                    option_keyword.is_some()
-                    || value.eq("true")
-                    || value.eq("false");
+                let option_keyword = Keyword::is_keyword(&value);
+
+                let is_keyword = option_keyword.is_some() || value.eq("true") || value.eq("false");
 
                 if is_keyword {
                     last_type = TokenType::Keyword;
-                    tokens.push_back(Token::new(TextType::Keyword,value));
+                    tokens.push_back(Token::new(TextType::Keyword, value));
                 } else {
                     last_type = TokenType::Identifier;
-                    tokens.push_back(Token::new(TextType::Variable,value));
+                    tokens.push_back(Token::new(TextType::Variable, value));
                 }
             }
             continue;
@@ -130,33 +103,18 @@ pub fn tokenize(source: &str) -> TokenVec {
 
         match current {
             // Parenthesis
-            LEFT_PAREN_ASCII
-            | RIGHT_PAREN_ASCII
-            | LEFT_BRACKET_ASCII
-            | RIGHT_BRACKET_ASCII
-            | LEFT_BRACE_ASCII
-            | RIGHT_BRACE_ASCII => {
+            LEFT_PAREN_ASCII | RIGHT_PAREN_ASCII | LEFT_BRACKET_ASCII | RIGHT_BRACKET_ASCII
+            | LEFT_BRACE_ASCII | RIGHT_BRACE_ASCII => {
                 last_type = TokenType::Paren;
-                tokens.push_back(Token::new(
-                    TextType::Didider,
-                    String::from(current as char)
-                ));
+                tokens.push_back(Token::new(TextType::Didider, String::from(current as char)));
             }
 
             // Computing symbols
-            PLUS_ASCII
-            | MINUS_ASCII
-            | MULTIPLY_ASCII
-            | DIVIDE_ASCII
-            | POWER_ASCII
-            | NOT_SYMBOL_ASCII
-            | LESS_THAN_ASCII
-            | MORE_THAN_ASCII
-            | EQUAL_ASCII
-            | POINT_ASCII => {
+            PLUS_ASCII | MINUS_ASCII | MULTIPLY_ASCII | DIVIDE_ASCII | POWER_ASCII
+            | NOT_SYMBOL_ASCII | LESS_THAN_ASCII | MORE_THAN_ASCII | EQUAL_ASCII | POINT_ASCII => {
                 last_type = TokenType::Symbol;
                 tokens.push_back(Token::new(TextType::Didider, String::from(current as char)));
-            },
+            }
 
             // String literal
             SINGLE_QUOTE_ASCII | DOUBLE_QUOTE_ASCII => {
@@ -168,8 +126,8 @@ pub fn tokenize(source: &str) -> TokenVec {
                 while index < source_len {
                     current = chars[index];
 
-                    if !is_escape_char &&
-                        (current == SINGLE_QUOTE_ASCII || current == DOUBLE_QUOTE_ASCII)
+                    if !is_escape_char
+                        && (current == SINGLE_QUOTE_ASCII || current == DOUBLE_QUOTE_ASCII)
                     {
                         value.push(current as char);
                         break;
@@ -178,8 +136,7 @@ pub fn tokenize(source: &str) -> TokenVec {
                     // switch escape character state
                     if is_escape_char {
                         is_escape_char = false;
-                    } else
-                    if current == BACKSLASH_ASCII {
+                    } else if current == BACKSLASH_ASCII {
                         is_escape_char = true;
                     }
 
@@ -194,9 +151,7 @@ pub fn tokenize(source: &str) -> TokenVec {
             }
 
             // Other symbols
-            BACKSLASH_ASCII
-            | COMMA_ASCII
-            | SEMICOLON_ASCII => {
+            BACKSLASH_ASCII | COMMA_ASCII | SEMICOLON_ASCII => {
                 last_type = TokenType::Divider;
                 tokens.push_back(Token::new(TextType::Didider, String::from(current as char)));
             }
@@ -207,14 +162,13 @@ pub fn tokenize(source: &str) -> TokenVec {
                 tokens.push_back(Token::new(TextType::Annotation, String::from('$')))
             }
 
-            SPACE_ASCII =>
-                tokens.push_back(Token::new(TextType::Didider, String::from(' '))),
+            SPACE_ASCII => tokens.push_back(Token::new(TextType::Didider, String::from(' '))),
 
             // comment symbol: # (Number Sign)
             NUMBER_SIGN_ASCII => {
                 last_type = TokenType::Comment;
                 comment.push('#');
-            },
+            }
 
             NULL_ASCII => break,
             _ => {}

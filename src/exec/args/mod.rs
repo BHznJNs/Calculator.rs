@@ -1,7 +1,7 @@
 pub mod commands;
 mod help_msg;
 
-use std::{collections::VecDeque, process, io};
+use std::{collections::VecDeque, io, process};
 
 use crate::public::{env::Env, run_time::scope::Scope};
 
@@ -13,7 +13,12 @@ enum Mode {
     Script,
 }
 
-fn args_resolve(mode: Mode, mut args: VecDeque<String>, mut calc_env: Env, mut scope: Scope) -> io::Result<()> {
+fn args_resolve(
+    mode: Mode,
+    mut args: VecDeque<String>,
+    mut calc_env: Env,
+    mut scope: Scope,
+) -> io::Result<()> {
     let command_map = CommandArg::map();
 
     loop {

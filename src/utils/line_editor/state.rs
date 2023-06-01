@@ -1,8 +1,8 @@
 pub struct LineState {
-    pub left_end   : bool,
-    pub right_end  : bool,
-    pub line_start : bool,
-    pub line_end   : bool,
+    pub left_end: bool,
+    pub right_end: bool,
+    pub line_start: bool,
+    pub line_end: bool,
 }
 
 impl LineState {

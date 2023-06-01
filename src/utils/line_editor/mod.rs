@@ -1,22 +1,22 @@
-mod terminal;
-mod signal;
-mod tokenizer;
 mod line;
+mod signal;
 mod state;
+mod terminal;
+mod tokenizer;
 
 mod candidate;
 mod history;
 
-use std::io::{self, Write};
 use std::fs::OpenOptions;
+use std::io::{self, Write};
 
-use crossterm::{event::{KeyModifiers, KeyCode}};
+use crossterm::event::{KeyCode, KeyModifiers};
 
-use terminal::Terminal;
-use line::Line;
 use history::History;
-use state::LineState;
+use line::Line;
 pub use signal::Signal;
+use state::LineState;
+use terminal::Terminal;
 // use candidate::Candidate;
 
 // output something into file
@@ -35,7 +35,7 @@ pub struct LineEditor {
     is_at: LineState,
 
     line_count: usize,
-    overflow_left : usize,
+    overflow_left: usize,
     overflow_right: usize,
     visible_area_width: usize,
 }
@@ -52,10 +52,9 @@ impl LineEditor {
             is_at: LineState::new(),
 
             line_count: 1,
-            overflow_left : 0,
+            overflow_left: 0,
             overflow_right: 0,
-            visible_area_width: term_width - prompt.len() - 2
-            //                                              ^ this is initial label width
+            visible_area_width: term_width - prompt.len() - 2, //                                              ^ this is initial label width
         }
     }
 
@@ -71,12 +70,11 @@ impl LineEditor {
         let prompt_len = self.prompt.len();
 
         // visible left & right end
-        self.is_at.left_end  = cursor_pos == prompt_len;
+        self.is_at.left_end = cursor_pos == prompt_len;
         self.is_at.right_end = cursor_pos == term_width - line.label_width;
         // virtual line left & right end
         self.is_at.line_start = self.is_at.left_end && (self.overflow_left == 0);
-        self.is_at.line_end =
-            ((cursor_pos - self.prompt.len()) == line.len())
+        self.is_at.line_end = ((cursor_pos - self.prompt.len()) == line.len())
             || (self.is_at.right_end && self.overflow_right == 0);
         Ok(())
     }
@@ -102,7 +100,8 @@ impl LineEditor {
                     // when a token is going to be overflow left side and right side
                     if actual_print_len > remain_space {
                         // print middle part of this token
-                        self.terminal.print(&token.content[offset..offset+remain_space], token.type__);
+                        self.terminal
+                            .print(&token.content[offset..offset + remain_space], token.type__);
                         break;
                     }
 
@@ -115,7 +114,8 @@ impl LineEditor {
                     remain_space -= token.len();
                     self.terminal.print(&token.content, token.type__);
                 } else {
-                    self.terminal.print(&token.content[..remain_space], token.type__);
+                    self.terminal
+                        .print(&token.content[..remain_space], token.type__);
                     remain_space = 0;
                 }
             }
@@ -128,20 +128,19 @@ impl LineEditor {
 
     fn scroll_left(&mut self) {
         if self.overflow_left > 0 {
-            self.overflow_left  -= 1;
+            self.overflow_left -= 1;
             self.overflow_right += 1;
         }
     }
     fn scroll_right(&mut self) {
         if self.overflow_right > 0 {
             self.overflow_right -= 1;
-            self.overflow_left  += 1;
+            self.overflow_left += 1;
         }
     }
 
     fn insert_edit(&mut self, ch: char, line: &mut Line) -> io::Result<()> {
-        let insert_pos =
-            self.terminal.cursor_col()? - self.prompt.len() + self.overflow_left;
+        let insert_pos = self.terminal.cursor_col()? - self.prompt.len() + self.overflow_left;
         line.insert(insert_pos, ch);
 
         if line.len() - 1 >= self.visible_area_width {
@@ -154,16 +153,14 @@ impl LineEditor {
     fn remove_edit(&mut self, line: &mut Line) -> io::Result<()> {
         let cursor_pos = self.terminal.cursor_col()?;
         if cursor_pos == 0 {
-            return Ok(())
+            return Ok(());
         }
 
-        let mut remove_pos =
-            cursor_pos - self.prompt.len() + self.overflow_left;
+        let mut remove_pos = cursor_pos - self.prompt.len() + self.overflow_left;
         if self.overflow_left > 0 {
             remove_pos -= 1;
             self.overflow_left -= 1;
-        } else
-        if self.overflow_right > 0 {
+        } else if self.overflow_right > 0 {
             self.overflow_right -= 1;
         }
 
@@ -176,10 +173,7 @@ impl LineEditor {
         self.terminal.flush()?;
 
         let mut line_content = String::new();
-        let mut line = Line::new(
-            &mut line_content,
-            self.line_count,
-        );
+        let mut line = Line::new(&mut line_content, self.line_count);
 
         let result = loop {
             let Some(key) = self.terminal.get_key() else {
@@ -199,7 +193,7 @@ impl LineEditor {
                     if let Some(last_line) = self.history.previous() {
                         line.use_history(last_line);
                     }
-                },
+                }
 
                 KeyCode::Down => {
                     if let Some(next_line) = self.history.next() {
@@ -207,12 +201,12 @@ impl LineEditor {
                     } else {
                         line.reset();
                     }
-                },
+                }
 
                 KeyCode::Tab => {
                     if let Some(new_content) = self.history.get_current() {
                         if new_content.len() > self.visible_area_width {
-                            self.overflow_left  = 0;
+                            self.overflow_left = 0;
                             self.overflow_right = new_content.len() - self.visible_area_width;
                         }
                         line.reset_with(new_content);
@@ -226,11 +220,11 @@ impl LineEditor {
             // when displaying history content, disable editing.
             if !line.is_history {
                 match key.code {
-                    KeyCode::Left  => {
+                    KeyCode::Left => {
                         if self.is_at.line_start {
                             continue;
                         }
-    
+
                         if self.is_at.left_end && self.overflow_left > 0 {
                             // println!("SCROLL_LEFT"); // LOG
                             self.scroll_left();
@@ -238,7 +232,7 @@ impl LineEditor {
                             self.terminal.cursor.left(1)?;
                             continue;
                         }
-                    },
+                    }
                     KeyCode::Right => {
                         if self.is_at.line_end {
                             continue;
@@ -250,62 +244,64 @@ impl LineEditor {
                             self.terminal.cursor.right(1)?;
                             continue;
                         }
-                    },
-    
+                    }
+
                     KeyCode::Enter => {
                         self.line_count += 1;
-                        self.overflow_left  = 0;
+                        self.overflow_left = 0;
                         self.overflow_right = 0;
-    
+
                         self.terminal.new_line();
                         self.history.append(line_content.clone());
                         break Signal::NewLine(line_content);
-                    },
+                    }
                     KeyCode::Tab => {
                         if self.is_at.line_end {}
                         // continue;
-                    },
+                    }
                     KeyCode::Backspace => {
                         if self.is_at.line_start {
                             continue;
                         }
-    
+
                         if self.overflow_left == 0 {
                             self.terminal.cursor.left(1)?;
                         }
-    
+
                         if self.is_at.line_end {
                             line.pop();
-                            self.overflow_left =
-                            if line.len() > self.visible_area_width {
+                            self.overflow_left = if line.len() > self.visible_area_width {
                                 line.len() - self.visible_area_width
-                            } else { 0 };
+                            } else {
+                                0
+                            };
                         } else {
                             self.remove_edit(&mut line)?;
                         }
-                    },
-    
+                    }
+
                     KeyCode::Char(ch) => {
                         if !ch.is_ascii() {
                             // avoid Non-ASCII character
                             self.terminal.new_line();
                             break Signal::NonASCII;
                         }
-    
+
                         if self.is_at.line_end {
                             if !self.is_at.right_end {
                                 self.terminal.cursor.right(1)?;
                             }
-    
+
                             line.push(ch);
-                            self.overflow_left =
-                            if line.len() > self.visible_area_width {
+                            self.overflow_left = if line.len() > self.visible_area_width {
                                 line.len() - self.visible_area_width
-                            } else { 0 };
+                            } else {
+                                0
+                            };
                         } else {
                             self.insert_edit(ch, &mut line)?;
                         }
-                    },
+                    }
                     _ => {}
                 }
             }

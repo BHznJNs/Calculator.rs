@@ -2,14 +2,14 @@ use std::rc::Rc;
 
 pub struct History {
     index: usize,
-    content_list: Vec<Rc<String>>
+    content_list: Vec<Rc<String>>,
 }
 
 impl History {
     pub fn new() -> Self {
         History {
             index: 0,
-            content_list: vec![]
+            content_list: vec![],
         }
     }
 
@@ -37,12 +37,10 @@ impl History {
     }
 
     pub fn get_current(&self) -> Option<String> {
-        let (index, content_list) =
-            (self.index, &self.content_list);
+        let (index, content_list) = (self.index, &self.content_list);
 
         if index != 0 {
-            let current_candidate_ref =
-                content_list[content_list.len() - index].as_ref();
+            let current_candidate_ref = content_list[content_list.len() - index].as_ref();
             Some(current_candidate_ref.clone())
         } else {
             None

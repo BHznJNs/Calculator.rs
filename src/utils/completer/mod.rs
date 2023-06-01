@@ -9,7 +9,9 @@ pub struct Completer {
 
 impl Completer {
     pub fn new() -> Self {
-        Completer { root: CompleterNode::new() }
+        Completer {
+            root: CompleterNode::new(),
+        }
     }
     pub fn insert(&mut self, word: &str) {
         self.root.insert(word.chars());
