@@ -2,7 +2,7 @@ use std::cell::RefCell;
 use std::fmt;
 use std::rc::Rc;
 
-use crate::utils::coloring::{BOOLEAN_COLORED, INTERNAL_COLORED, NUMBER_COLORED, STRING_COLORED};
+use crossterm::style::{StyledContent, Stylize};
 
 use super::super::compile_time::ast::ast_enum::ASTNode;
 use super::array::{self, ArrayLiteral};
@@ -90,13 +90,11 @@ impl fmt::Display for Value {
                 VoidSign::Empty => write!(f, "<Void>"),
             },
 
-            Value::Boolean(bool_val) => write!(f, "{}", BOOLEAN_COLORED.output(bool_val)),
-            Value::Number(num) => write!(f, "{}", NUMBER_COLORED.output(num)),
+            Value::Boolean(bool_val) => write!(f, "{}", bool_val.to_string().dark_yellow()),
+            Value::Number(num) => write!(f, "{}", num.to_string().yellow()),
             Value::String(str) => write!(f, "{}", str.as_ref().borrow()),
-            Value::LazyExpression(_) => {
-                write!(f, "{}", INTERNAL_COLORED.output("<Lazy-Expression>"))
-            }
-            Value::Function(func) => write!(f, "{}", INTERNAL_COLORED.output(func)),
+            Value::LazyExpression(_) => write!(f, "{}", "<Lazy-Expression>".cyan()),
+            Value::Function(func) => write!(f, "{}", format!("{}", func).cyan()),
             Value::Array(arr) => Ok(array::display(arr.clone(), 1)),
 
             Value::Class(cls) => write!(f, "{}", cls),
@@ -107,8 +105,8 @@ impl fmt::Display for Value {
 
 impl Value {
     // formater for string typed value
-    pub fn str_format(&self) -> String {
-        STRING_COLORED.output(format!("\"{}\"", self))
+    pub fn str_format(&self) -> StyledContent<String> {
+        format!("\"{}\"", self).green()
     }
 
     pub fn get_i64(&self) -> Result<i64, ()> {

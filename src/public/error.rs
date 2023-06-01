@@ -1,12 +1,17 @@
 use core::fmt;
 use std::fmt::Display;
 
-use crate::utils::coloring::ERROR_COLORED;
+use crossterm::style::{StyledContent, Stylize};
 
 use super::value::value::ValueType;
 
 type ErrorResult = Result<(), ()>;
 
+fn error_name_output(name: &str) -> StyledContent<&str> {
+    name.white().on_red().bold()
+}
+
+const TYPE_ERROR_NAME: &'static str = " TypeError ";
 pub fn type_error(param: Option<&str>, expected: Vec<ValueType>, found: ValueType) -> ErrorResult {
     // Vec<ValueType> -> "{type}/{type} ..."
     fn join(mut type_vec: Vec<ValueType>) -> String {
@@ -24,7 +29,7 @@ pub fn type_error(param: Option<&str>, expected: Vec<ValueType>, found: ValueTyp
         return res_string;
     }
 
-    print!("{}", ERROR_COLORED.output(" TypeError "));
+    print!("{}", error_name_output(TYPE_ERROR_NAME));
     if let Some(name) = param {
         print!(" for \"{}\"", name);
     }
@@ -32,33 +37,38 @@ pub fn type_error(param: Option<&str>, expected: Vec<ValueType>, found: ValueTyp
     Err(())
 }
 
+const RANGE_ERROR_NAME: &'static str = " RangeError ";
 pub fn range_error<T: Display>(param: &str, expected: T, found: usize) -> ErrorResult {
-    print!("{} for \"{}\"", ERROR_COLORED.output(" RangeError "), param);
+    print!("{} for \"{}\"", error_name_output(RANGE_ERROR_NAME), param);
     println!(": expected {}, found {}.", expected, found);
     Err(())
 }
 
+const SYNTAX_ERROR_NAME: &'static str = " SyntaxError ";
 pub fn syntax_error(msg: &str) -> ErrorResult {
-    println!("{}: {}.", ERROR_COLORED.output(" SyntaxError "), msg);
+    println!("{}: {}.", error_name_output(SYNTAX_ERROR_NAME), msg);
     Err(())
 }
 
+const ASSIGNMENT_ERROR_NAME: &'static str = " SyntaxError ";
 pub fn assignment_error(msg: &str) -> ErrorResult {
-    println!("{}: {}.", ERROR_COLORED.output(" AssignmentError "), msg);
+    println!("{}: {}.", error_name_output(ASSIGNMENT_ERROR_NAME), msg);
     Err(())
 }
 
+const REFERENCE_ERROR_NAME: &'static str = " ReferenceError ";
 pub fn reference_error(var_name: &str) -> ErrorResult {
     println!(
         "{}: variable `{}` is not defined.",
-        ERROR_COLORED.output(" ReferenceError "),
+        error_name_output(REFERENCE_ERROR_NAME),
         var_name
     );
     Err(())
 }
 
+const IMPORT_ERROR_NAME: &'static str = " ImportError ";
 pub fn import_error(msg: &str) -> ErrorResult {
-    println!("{}: {}.", ERROR_COLORED.output(" ImportError "), msg);
+    println!("{}: {}.", error_name_output(IMPORT_ERROR_NAME), msg);
     Err(())
 }
 
@@ -83,10 +93,11 @@ impl fmt::Display for InternalComponent {
     }
 }
 
+const INTERNAL_ERROR_NAME: &'static str = " InternalError ";
 pub fn internal_error(from: InternalComponent, msg: &str) -> ErrorResult {
     println!(
         "{} from {}: {}.",
-        ERROR_COLORED.output(" InternalError "),
+        error_name_output(INTERNAL_ERROR_NAME),
         from,
         msg
     );
