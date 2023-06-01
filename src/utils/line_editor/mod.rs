@@ -2,6 +2,7 @@ mod terminal;
 mod signal;
 mod tokenizer;
 mod line;
+mod state;
 
 mod candidate;
 mod history;
@@ -9,11 +10,13 @@ mod history;
 use std::io::{self, Write};
 use std::fs::OpenOptions;
 
+use crossterm::event::KeyEvent;
 use crossterm::{event::{KeyModifiers, KeyCode}};
-use terminal::Terminal;
 
+use terminal::Terminal;
 use line::Line;
 use history::History;
+use state::LineState;
 pub use signal::Signal;
 // use candidate::Candidate;
 
@@ -21,6 +24,7 @@ pub struct LineEditor {
     prompt: &'static str,
     terminal: Terminal,
     history: History,
+    is_at: LineState,
 
     line_count: usize,
     overflow_left : usize,
@@ -37,6 +41,7 @@ impl LineEditor {
             prompt,
             terminal,
             history: History::new(),
+            is_at: LineState::new(),
 
             line_count: 1,
             overflow_left : 0,
@@ -61,13 +66,20 @@ impl LineEditor {
         Ok(())
     }
 
-    fn refresh(&mut self, line: &Line) {
-        let total_width = self.prompt.len() + line.len() + line.label_width;
+    fn refresh(&mut self, line: &Line) -> io::Result<()> {
+        let cursor_pos = self.terminal.cursor_col()?;
         let term_width = self.terminal.width();
+        let prompt_len = self.prompt.len();
 
-        self.overflow_left = if total_width > term_width {
-            total_width - term_width
-        } else { 0 };
+        // visible left & right end
+        self.is_at.left_end  = cursor_pos == prompt_len;
+        self.is_at.right_end = cursor_pos == term_width - line.label_width;
+        // virtual line left & right end
+        self.is_at.line_start = self.is_at.left_end && (self.overflow_left == 0);
+        self.is_at.line_end =
+            ((cursor_pos - self.prompt.len()) == line.len())
+            || (self.is_at.right_end && self.overflow_right == 0);
+        Ok(())
     }
     fn render(&mut self, line: &Line) -> io::Result<()> {
         self.terminal.cursor.hide()?;
@@ -82,13 +94,15 @@ impl LineEditor {
 
             if offset > 0 {
                 if offset >= token.len() {
+                    // token is out of visible area
                     offset -= token.len();
                 } else {
-                    // offset < token.len()
+                    // token has part in unvisible area
                     let actual_print_len = token.len() - offset;
 
-                    // when a token is going to be overflow
+                    // when a token is going to be overflow left side and right side
                     if actual_print_len > remain_space {
+                        // print middle part of this token
                         self.terminal.print(&token.content[offset..offset+remain_space], token.type__);
                         break;
                     }
@@ -144,18 +158,17 @@ impl LineEditor {
             return Ok(())
         }
 
-        let mut remove_pos = cursor_pos - self.prompt.len() + self.overflow_left;
+        let mut remove_pos =
+            cursor_pos - self.prompt.len() + self.overflow_left;
         if self.overflow_left > 0 {
             remove_pos -= 1;
-        }
-        line.remove(remove_pos);
-
-        if self.overflow_left > 0 {
             self.overflow_left -= 1;
         } else
         if self.overflow_right > 0 {
             self.overflow_right -= 1;
         }
+
+        line.remove(remove_pos);
         Ok(())
     }
 
@@ -179,118 +192,125 @@ impl LineEditor {
                 break Signal::Interrupt;
             }
 
-            let cursor_pos = self.terminal.cursor_col()?;
-            let term_width = self.terminal.width();
-            let prompt_len = self.prompt.len();
+            self.refresh(&line)?;
 
-            // self.log(&format!("line content: {}, cursor pos: {}, terminal width: {}, visible_width: {}", line.content, cursor_pos.to_string(), term_width, self.visible_area_width))?;
-            // visible left & right end
-            let is_at_left_end  = cursor_pos == prompt_len;
-            let is_at_right_end = cursor_pos == term_width - line.label_width;
-            // virtual line left & right end
-            let is_at_line_start = is_at_left_end && (self.overflow_left == 0);
-            let is_at_line_end =
-                ((cursor_pos - self.prompt.len()) == line.len())
-                || (is_at_right_end && self.overflow_right == 0);
-
+            // control to display history
             match key.code {
-                // use with history
-                KeyCode::Up    => {
-                    // if let Some(last_line) = self.history.previous() {
-                    //     // let slice = last_line.as_str();
-                    //     line.reset_with(&last_line[..]);
-                    // }
-                },
-                KeyCode::Down  => todo!(),
-                
-                KeyCode::Left  => {
-                    if is_at_line_start {
-                        continue;
+                KeyCode::Up => {
+                    if let Some(last_line) = self.history.previous() {
+                        line.use_history(last_line);
                     }
+                },
 
-                    if is_at_left_end && self.overflow_left > 0 {
-                        // println!("SCROLL_LEFT"); // LOG
-                        self.scroll_left();
+                KeyCode::Down => {
+                    if let Some(next_line) = self.history.next() {
+                        line.use_history(next_line);
                     } else {
-                        self.terminal.cursor.left(1)?;
-                        continue;
-                    }
-                },
-                KeyCode::Right => {
-                    if is_at_line_end {
-                        continue;
-                    }
-
-                    if is_at_right_end {
-                        self.scroll_right();
-                    } else {
-                        self.terminal.cursor.right(1)?;
-                        continue;
+                        line.reset();
                     }
                 },
 
-                KeyCode::Enter => {
-                    // println!("test: {}", self.terminal.width() - self.prompt.len() - line.label_width);
-                    // println!("overflow_left: {}", self.overflow_left);
-                    // println!("\nis_left_end  : {is_at_left_end}, is_right_end: {is_at_right_end}");
-                    // println!("\nis_line_start: {is_at_line_start}, is_line_end: {is_at_line_end}");
-
-                    self.line_count += 1;
-                    self.overflow_left  = 0;
-                    self.overflow_right = 0;
-                    self.terminal.new_line();
-                    break Signal::NewLine(line_content);
-                },
                 KeyCode::Tab => {
-                    // if is_at_right_end {
-                    //     self.display_hint()?;
-                    // }
-                    // continue;
-                },
-                KeyCode::Backspace => {
-                    if is_at_line_start {
-                        continue;
-                    }
-
-                    if self.overflow_left == 0 {
-                        self.terminal.cursor.left(1)?;
-                    }
-
-                    if is_at_line_end {
-                        line.pop();
-                        self.refresh(&line);
-                    } else {
-                        self.remove_edit(&mut line)?;
-                    }
-                },
-
-                KeyCode::Char(ch) => {
-                    if !ch.is_ascii() {
-                        // avoid Non-ASCII character
-                        self.terminal.new_line();
-                        break Signal::NonASCII;
-                    }
-
-                    if is_at_line_end {
-                        if !is_at_right_end {
-                            self.terminal.cursor.right(1)?;
+                    if let Some(new_content) = self.history.get_current() {
+                        if new_content.len() > self.visible_area_width {
+                            self.overflow_left  = 0;
+                            self.overflow_right = new_content.len() - self.visible_area_width;
                         }
-
-                        line.push(ch);
-                        self.refresh(&line);
-                    } else {
-                        self.insert_edit(ch, &mut line)?;
+                        line.reset_with(new_content);
                     }
+                }
 
-                    // if is_at_right_end {
-                    //     line.push(ch);
-                    // } else {
-                    //     self.insert_edit(&mut line, ch)?;
-                    //     continue;
-                    // }
-                },
+                // else: do nothing and continue execute
                 _ => {}
             }
+
+            // when displaying history content, disable editing.
+            if !line.is_history {
+                match key.code {
+                    KeyCode::Left  => {
+                        if self.is_at.line_start {
+                            continue;
+                        }
+    
+                        if self.is_at.left_end && self.overflow_left > 0 {
+                            // println!("SCROLL_LEFT"); // LOG
+                            self.scroll_left();
+                        } else {
+                            self.terminal.cursor.left(1)?;
+                            continue;
+                        }
+                    },
+                    KeyCode::Right => {
+                        if self.is_at.line_end {
+                            continue;
+                        }
+
+                        if self.is_at.right_end {
+                            self.scroll_right();
+                        } else {
+                            self.terminal.cursor.right(1)?;
+                            continue;
+                        }
+                    },
+    
+                    KeyCode::Enter => {
+                        self.line_count += 1;
+                        self.overflow_left  = 0;
+                        self.overflow_right = 0;
+    
+                        self.terminal.new_line();
+                        self.history.append(line_content.clone());
+                        break Signal::NewLine(line_content);
+                    },
+                    KeyCode::Tab => {
+                        if self.is_at.line_end {}
+                        // continue;
+                    },
+                    KeyCode::Backspace => {
+                        if self.is_at.line_start {
+                            continue;
+                        }
+    
+                        if self.overflow_left == 0 {
+                            self.terminal.cursor.left(1)?;
+                        }
+    
+                        if self.is_at.line_end {
+                            line.pop();
+                            self.overflow_left =
+                            if line.len() > self.visible_area_width {
+                                line.len() - self.visible_area_width
+                            } else { 0 };
+                        } else {
+                            self.remove_edit(&mut line)?;
+                        }
+                    },
+    
+                    KeyCode::Char(ch) => {
+                        if !ch.is_ascii() {
+                            // avoid Non-ASCII character
+                            self.terminal.new_line();
+                            break Signal::NonASCII;
+                        }
+    
+                        if self.is_at.line_end {
+                            if !self.is_at.right_end {
+                                self.terminal.cursor.right(1)?;
+                            }
+    
+                            line.push(ch);
+                            self.overflow_left =
+                            if line.len() > self.visible_area_width {
+                                line.len() - self.visible_area_width
+                            } else { 0 };
+                        } else {
+                            self.insert_edit(ch, &mut line)?;
+                        }
+                    },
+                    _ => {}
+                }
+            }
+
             self.terminal.cursor.save_pos()?;
             self.render(&line)?;
             self.terminal.cursor.restore_pos()?;

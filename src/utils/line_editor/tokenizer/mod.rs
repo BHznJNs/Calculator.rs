@@ -38,7 +38,7 @@ pub use token::{Token, TokenType, TokenVec};
 
 use super::terminal::TextType;
 
-pub fn tokenize(source: &String) -> TokenVec {
+pub fn tokenize(source: &str) -> TokenVec {
     let mut index = 0;
 
     // is used for check is number minus OR
