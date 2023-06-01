@@ -72,10 +72,12 @@ impl LineEditor {
         // visible left & right end
         self.is_at.left_end = cursor_pos == prompt_len;
         self.is_at.right_end = cursor_pos == term_width - line.label_width;
+
         // virtual line left & right end
         self.is_at.line_start = self.is_at.left_end && (self.overflow_left == 0);
-        self.is_at.line_end = ((cursor_pos - self.prompt.len()) == line.len())
+        self.is_at.line_end = ((cursor_pos - prompt_len) == line.len())
             || (self.is_at.right_end && self.overflow_right == 0);
+
         Ok(())
     }
     fn render(&mut self, line: &Line) -> io::Result<()> {
