@@ -10,7 +10,6 @@ mod history;
 use std::io::{self, Write};
 use std::fs::OpenOptions;
 
-use crossterm::event::KeyEvent;
 use crossterm::{event::{KeyModifiers, KeyCode}};
 
 use terminal::Terminal;
@@ -19,6 +18,15 @@ use history::History;
 use state::LineState;
 pub use signal::Signal;
 // use candidate::Candidate;
+
+// output something into file
+// this function is used to debug.
+// fn log(content: &str) -> io::Result<()> {
+//     let mut file = OpenOptions::new().write(true).open("log.txt")?;
+//     file.write(content.as_bytes())?;
+//     file.flush()?;
+//     Ok(())
+// }
 
 pub struct LineEditor {
     prompt: &'static str,
@@ -49,15 +57,6 @@ impl LineEditor {
             visible_area_width: term_width - prompt.len() - 2
             //                                              ^ this is initial label width
         }
-    }
-
-    fn log(&self, content: &str) -> io::Result<()> {
-        let mut file = OpenOptions::new().write(true).open("log.txt")?;
-
-        file.write(content.as_bytes())?;
-        file.flush()?;
-
-        Ok(())
     }
 
     fn clear_line(&mut self) -> io::Result<()> {
