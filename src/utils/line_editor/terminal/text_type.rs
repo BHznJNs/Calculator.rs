@@ -27,7 +27,7 @@ impl TextType {
             TextType::Annotation => format!("{}", text.red()),
 
             TextType::Didider => format!("{}", text.white()),
-            TextType::Comment => format!("{}", text.dark_green()),
+            TextType::Comment => format!("{}", text.green().dim()),
 
             TextType::NumberLiteral => format!("{}", text.yellow()),
             TextType::StringLiteral => format!("{}", text.dark_yellow()),

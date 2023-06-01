@@ -1,14 +1,10 @@
 mod cursor;
 mod text_type;
 
-use std::{
-    fmt::Display,
-    io::{self, Stdout, Write},
-};
+use std::io::{self, Stdout, Write};
 
 use crossterm::{
     event::{self, Event, KeyEvent, KeyEventKind},
-    style::Stylize,
     terminal::size,
 };
 
@@ -18,7 +14,6 @@ pub use text_type::TextType;
 pub struct Terminal {
     pub stdout: Stdout,
     pub cursor: Cursor,
-    // pub width: u16,
 }
 
 const BACKSPACE: &'static str = "\x1B[K";
@@ -63,17 +58,9 @@ impl Terminal {
 
     // --- --- --- --- --- ---
 
-    pub fn back(&mut self) -> io::Result<()> {
-        self.cursor.left(1)?;
-        self.clear_after_cursor();
-        self.stdout.flush()
-    }
-
     pub fn new_line(&self) {
         println!();
     }
-
-    // --- --- --- --- --- ---
 
     pub fn clear_after_cursor(&mut self) {
         print!("{}", BACKSPACE);
