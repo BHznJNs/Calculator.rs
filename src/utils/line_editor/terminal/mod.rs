@@ -45,21 +45,13 @@ impl Terminal {
 
     // --- --- --- --- --- ---
 
-    // print char, &str, String
-    pub fn print(&mut self, text: &str, text_type: TextType) {
-        let colored_text = TextType::match_tx_type(text, text_type);
-        print!("{}", colored_text);
+    pub fn new_line(&self) {
+        println!();
     }
 
     pub fn flush(&mut self) -> io::Result<()> {
         self.stdout.flush()?;
         Ok(())
-    }
-
-    // --- --- --- --- --- ---
-
-    pub fn new_line(&self) {
-        println!();
     }
 
     pub fn clear_after_cursor(&mut self) {

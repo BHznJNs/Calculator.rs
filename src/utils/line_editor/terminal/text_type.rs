@@ -1,6 +1,4 @@
-use std::fmt::Display;
-
-use crossterm::style::Stylize;
+use crossterm::style::{Stylize, StyledContent};
 
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum TextType {
@@ -18,19 +16,19 @@ pub enum TextType {
 }
 
 impl TextType {
-    pub fn match_tx_type(text: &str, type__: TextType) -> String {
+    pub fn match_tx_type(text: &str, type__: TextType) -> StyledContent<&str> {
         match type__ {
-            TextType::Hint => format!("{}", text.dim()),
+            TextType::Hint => text.dim(),
 
-            TextType::Variable => format!("{}", text.underlined()),
-            TextType::Keyword => format!("{}", text.dark_cyan()),
-            TextType::Annotation => format!("{}", text.red()),
+            TextType::Variable => text.underlined(),
+            TextType::Keyword => text.dark_cyan(),
+            TextType::Annotation => text.red(),
 
-            TextType::Didider => format!("{}", text.white()),
-            TextType::Comment => format!("{}", text.green().dim()),
+            TextType::Didider => text.white(),
+            TextType::Comment => text.green().dim(),
 
-            TextType::NumberLiteral => format!("{}", text.yellow()),
-            TextType::StringLiteral => format!("{}", text.dark_yellow()),
+            TextType::NumberLiteral => text.yellow(),
+            TextType::StringLiteral => text.dark_yellow(),
         }
     }
 }

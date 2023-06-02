@@ -9,13 +9,15 @@ mod history;
 
 use std::io;
 
-use crossterm::event::{KeyCode, KeyModifiers};
+use crossterm::{event::{KeyCode, KeyModifiers}, style::Stylize};
 
 use history::History;
 use line::Line;
 pub use signal::Signal;
 use state::LineState;
 use terminal::Terminal;
+
+use crate::utils::line_editor::terminal::TextType;
 // use candidate::Candidate;
 
 // output something into file
@@ -100,11 +102,19 @@ impl LineEditor {
         Ok(())
     }
     fn render(&mut self, line: &Line) -> io::Result<()> {
+        #[inline]
+        fn buffer_extend_colored(buffer: &mut String, text: &str, type__: TextType) {
+            let colored=
+                TextType::match_tx_type(text, type__);
+            buffer.extend(colored.to_string().chars());
+        }
+
         self.terminal.cursor.hide()?;
         self.clear_line()?;
 
         let mut offset = self.overflow_left;
         let mut remain_space = self.visible_area_width;
+        let mut buffer = String::new();
         for token in &line.tokens {
             if remain_space == 0 {
                 break;
@@ -121,28 +131,49 @@ impl LineEditor {
                     // when a token is going to be overflow left side and right side
                     if actual_print_len > remain_space {
                         // print middle part of this token
-                        self.terminal
-                            .print(&token.content[offset..offset + remain_space], token.type__);
+                        buffer_extend_colored(&mut buffer, &token.content[offset..offset + remain_space], token.type__);
+                        // let colored=
+                        //     TextType::match_tx_type(, token.type__);
+                        // buffer.extend(colored.to_string().chars());
+                        // self.terminal
+                        //     .print(&token.content[offset..offset + remain_space], token.type__);
                         break;
                     }
 
                     remain_space -= token.len() - offset;
-                    self.terminal.print(&token.content[offset..], token.type__);
+                    buffer_extend_colored(&mut buffer, &token.content[offset..], token.type__);
+                    // let colored=
+                    //     TextType::match_tx_type(&token.content[offset..], token.type__);
+                    // buffer.extend(colored.to_string().chars());
+                    // self.terminal.print(&token.content[offset..], token.type__);
                     offset = 0;
                 }
             } else {
                 if remain_space >= token.len() {
                     remain_space -= token.len();
-                    self.terminal.print(&token.content, token.type__);
+                    buffer_extend_colored(&mut buffer, &token.content, token.type__);
+                    // let colored=
+                    //     TextType::match_tx_type(&token.content, token.type__);
+                    // buffer.extend(colored.to_string().chars());
+                    // self.terminal.print(&token.content, token.type__);
                 } else {
-                    self.terminal
-                        .print(&token.content[..remain_space], token.type__);
+                    buffer_extend_colored(&mut buffer, &token.content[..remain_space], token.type__);
+                    // let colored=
+                    //     TextType::match_tx_type();
+                    // buffer.extend(colored.to_string().chars());
+                    // self.terminal
+                    //     .print(&token.content[..remain_space], token.type__);
                     remain_space = 0;
                 }
             }
         }
+        
+        if line.is_history {
+            print!("{}{}", buffer.dim(), &line.label);
+        } else {
+            print!("{}{}", buffer, &line.label);
+        }
 
-        print!("{}", &line.label);
         self.terminal.flush()?;
         self.terminal.cursor.show()
     }
@@ -166,12 +197,14 @@ impl LineEditor {
 
     fn insert_edit(&mut self, ch: char, line: &mut Line) -> io::Result<()> {
         let insert_pos = self.terminal.cursor_col()? - self.prompt.len() + self.overflow_left;
-        line.insert(insert_pos, ch);
+        let is_allowed_char = line.insert(insert_pos, ch);
 
-        if line.len() - 1 >= self.visible_area_width {
-            self.overflow_left += 1;
-        } else {
-            self.terminal.cursor.right(1)?;
+        if is_allowed_char {
+            if line.len() - 1 >= self.visible_area_width {
+                self.overflow_left += 1;
+            } else {
+                self.terminal.cursor.right(1)?;
+            }
         }
         Ok(())
     }
@@ -302,17 +335,19 @@ impl LineEditor {
                         }
 
                         if self.is_at.line_end {
-                            if !self.is_at.right_end {
-                                self.terminal.cursor.right(1)?;
-                            }
+                            let is_allowed_char = line.push(ch);
 
-                            line.push(ch);
-                            if line.len() > self.visible_area_width {
-                                self.overflow_left =
-                                    line.len() - self.visible_area_width;
-                            } else {
-                                self.overflow_left = 0;
-                            };
+                            if is_allowed_char {
+                                if !self.is_at.right_end {
+                                    self.terminal.cursor.right(1)?;
+                                }
+                                if line.len() > self.visible_area_width {
+                                    self.overflow_left =
+                                        line.len() - self.visible_area_width;
+                                } else {
+                                    self.overflow_left = 0;
+                                };
+                            }
                         } else {
                             self.insert_edit(ch, &mut line)?;
                         }
