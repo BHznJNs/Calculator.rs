@@ -3,7 +3,7 @@ pub mod readlines;
 
 use std::time::Instant;
 
-use crate::public::env::Env;
+use crate::public::env::{Env, ENV_OPTION};
 use crate::public::run_time::scope::Scope;
 
 use super::attempt::attempt;
@@ -11,7 +11,7 @@ use super::attempt::attempt;
 pub fn env_resolve(calc_env: Env, scope: &mut Scope) {
     let script_path = calc_env.script_path.unwrap();
 
-    if calc_env.timer {
+    if unsafe { ENV_OPTION.timer } {
         let now = Instant::now();
         run(script_path, scope);
         let elapsed_time = now.elapsed();

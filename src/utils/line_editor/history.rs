@@ -36,6 +36,12 @@ impl History {
         }
     }
 
+    // --- --- --- --- --- ---
+
+    pub fn reset_index(&mut self) {
+        self.index = 0;
+    }
+
     pub fn get_current(&self) -> Option<String> {
         let (index, content_list) = (self.index, &self.content_list);
 

@@ -1,6 +1,8 @@
 use std::rc::Rc;
 
 use crossterm::style::Stylize;
+use crate::public::env::ENV_OPTION;
+
 use super::tokenizer::{tokenize, TokenVec};
 
 // 32 ~ 125 | ' ' ~ '}'
@@ -113,12 +115,19 @@ pub struct Line<'a> {
 impl<'a> Line<'a> {
     pub fn new(content: &'a mut String, line_count: usize) -> Self {
         let label_str = line_count.to_string();
+        let label_fmted_width = label_str.len() + 1; // `1` is space width
+        let label_fmted = if unsafe { ENV_OPTION.support_ansi } {
+            format!(" {}", label_str.black().on_white())
+        } else {
+            format!(" {}", label_str)
+        };
+
         Line {
             content,
 
             is_history: false,
-            label_width: label_str.len() + 1, // `3` is space width
-            label: format!(" {}", label_str.black().on_white()),
+            label_width: label_fmted_width, 
+            label: label_fmted,
             tokens: TokenVec::new(),
         }
     }
@@ -174,7 +183,8 @@ impl<'a> Line<'a> {
     // return to use self content
     pub fn reset(&mut self) {
         self.is_history = false;
-        self.tokens = tokenize(self.content);
+        // self.tokens = tokenize(self.content);
+        self.refresh();
     }
     // use history content to replace self content
     pub fn reset_with(&mut self, mut new_content: String) {

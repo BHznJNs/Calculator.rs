@@ -18,6 +18,7 @@ use state::LineState;
 use terminal::Terminal;
 
 use crate::utils::line_editor::terminal::TextType;
+use crate::public::env::ENV_OPTION;
 // use candidate::Candidate;
 
 // output something into file
@@ -104,9 +105,13 @@ impl LineEditor {
     fn render(&mut self, line: &Line) -> io::Result<()> {
         #[inline]
         fn buffer_extend_colored(buffer: &mut String, text: &str, type__: TextType) {
-            let colored=
-                TextType::match_tx_type(text, type__);
-            buffer.extend(colored.to_string().chars());
+            if unsafe { ENV_OPTION.support_ansi } {
+                let colored=
+                    TextType::match_tx_type(text, type__);
+                buffer.extend(colored.to_string().chars());
+            } else {
+                *buffer += text;
+            }
         }
 
         self.terminal.cursor.hide()?;
@@ -132,43 +137,25 @@ impl LineEditor {
                     if actual_print_len > remain_space {
                         // print middle part of this token
                         buffer_extend_colored(&mut buffer, &token.content[offset..offset + remain_space], token.type__);
-                        // let colored=
-                        //     TextType::match_tx_type(, token.type__);
-                        // buffer.extend(colored.to_string().chars());
-                        // self.terminal
-                        //     .print(&token.content[offset..offset + remain_space], token.type__);
                         break;
                     }
 
                     remain_space -= token.len() - offset;
                     buffer_extend_colored(&mut buffer, &token.content[offset..], token.type__);
-                    // let colored=
-                    //     TextType::match_tx_type(&token.content[offset..], token.type__);
-                    // buffer.extend(colored.to_string().chars());
-                    // self.terminal.print(&token.content[offset..], token.type__);
                     offset = 0;
                 }
             } else {
                 if remain_space >= token.len() {
                     remain_space -= token.len();
                     buffer_extend_colored(&mut buffer, &token.content, token.type__);
-                    // let colored=
-                    //     TextType::match_tx_type(&token.content, token.type__);
-                    // buffer.extend(colored.to_string().chars());
-                    // self.terminal.print(&token.content, token.type__);
                 } else {
                     buffer_extend_colored(&mut buffer, &token.content[..remain_space], token.type__);
-                    // let colored=
-                    //     TextType::match_tx_type();
-                    // buffer.extend(colored.to_string().chars());
-                    // self.terminal
-                    //     .print(&token.content[..remain_space], token.type__);
                     remain_space = 0;
                 }
             }
         }
-        
-        if line.is_history {
+
+        if line.is_history && unsafe { ENV_OPTION.support_ansi } {
             print!("{}{}", buffer.dim(), &line.label);
         } else {
             print!("{}{}", buffer, &line.label);
@@ -269,6 +256,7 @@ impl LineEditor {
                             self.overflow_left = 0;
                             self.overflow_right = new_content.len() - self.visible_area_width;
                         }
+                        self.history.reset_index();
                         line.reset_with(new_content);
                     }
                 }
@@ -285,12 +273,11 @@ impl LineEditor {
                             continue;
                         }
 
-                        if self.is_at.left_end && self.overflow_left > 0 {
-                            // println!("SCROLL_LEFT"); // LOG
+                        if self.is_at.left_end {
                             self.scroll_left();
                         } else {
                             self.terminal.cursor.left(1)?;
-                            continue;
+                            continue; // skip rerender
                         }
                     }
                     KeyCode::Right => {
@@ -303,7 +290,7 @@ impl LineEditor {
                             self.scroll_right();
                         } else {
                             self.terminal.cursor.right(1)?;
-                            continue;
+                            continue; // skip rerender
                         }
                     }
 

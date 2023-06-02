@@ -3,10 +3,12 @@ mod support_keyboard_enhancement;
 use std::io;
 use std::time::Instant;
 
+use crossterm::ansi_support;
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 
 use super::attempt::attempt;
-use crate::public::env::Env;
+use crate::public::env::{Env, ENV_OPTION};
+use crate::public::error::import_error;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
 use crate::utils::line_editor::{LineEditor, Signal};
@@ -26,10 +28,12 @@ pub fn repl(scope: &mut Scope, calc_env: Env) -> io::Result<()> {
     println!("Calculator.rs v{}", calc_env.version);
     // import stantard libraries
     if import_all(scope).is_err() {
-        println!("Standard module import error.");
+        import_error("standard module import error").unwrap_err();
+        panic!()
     }
 
     enable_raw_mode()?;
+    unsafe { ENV_OPTION.support_ansi = ansi_support::supports_ansi() }
 
     let mut rl = LineEditor::new(PROMPT);
     loop {
@@ -43,7 +47,7 @@ pub fn repl(scope: &mut Scope, calc_env: Env) -> io::Result<()> {
         };
 
         let result: Result<Value, ()>;
-        if calc_env.timer {
+        if unsafe { ENV_OPTION.timer } {
             let now = Instant::now();
             result = attempt(&line_content, scope);
             let elapsed_time = now.elapsed();

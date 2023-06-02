@@ -2,7 +2,9 @@ use std::cell::RefCell;
 use std::fmt;
 use std::rc::Rc;
 
-use crossterm::style::{StyledContent, Stylize};
+use crossterm::style::Stylize;
+
+use crate::public::env::ENV_OPTION;
 
 use super::super::compile_time::ast::ast_enum::ASTNode;
 use super::array::{self, ArrayLiteral};
@@ -90,23 +92,42 @@ impl fmt::Display for Value {
                 VoidSign::Empty => write!(f, "<Void>"),
             },
 
-            Value::Boolean(bool_val) => write!(f, "{}", bool_val.to_string().dark_yellow()),
-            Value::Number(num) => write!(f, "{}", num.to_string().yellow()),
             Value::String(str) => write!(f, "{}", str.as_ref().borrow()),
-            Value::LazyExpression(_) => write!(f, "{}", "<Lazy-Expression>".cyan()),
-            Value::Function(func) => write!(f, "{}", format!("{}", func).cyan()),
             Value::Array(arr) => Ok(array::display(arr.clone(), 1)),
-
             Value::Class(cls) => write!(f, "{}", cls),
             Value::Object(obj) => Ok(object::display(obj.clone(), 1)),
+
+            _ => {
+                if unsafe { ENV_OPTION.support_ansi } {
+                    match self {
+                        Value::Boolean(bool_val) => write!(f, "{}", bool_val.to_string().dark_yellow()),
+                        Value::Number(num) => write!(f, "{}", num.to_string().yellow()),
+                        Value::LazyExpression(_) => write!(f, "{}", "<Lazy-Expression>".cyan()),
+                        Value::Function(func) => write!(f, "{}", format!("{}", func).cyan()),
+                        _ => unreachable!()
+                    }
+                } else {
+                    match self {
+                        Value::Boolean(bool_val) => write!(f, "{}", bool_val),
+                        Value::Number(num) => write!(f, "{}", num),
+                        Value::LazyExpression(_) => write!(f, "{}", "<Lazy-Expression>"),
+                        Value::Function(func) => write!(f, "{}", func),
+                        _ => unreachable!()
+                    }
+                }
+            }
         }
     }
 }
 
 impl Value {
     // formater for string typed value
-    pub fn str_format(&self) -> StyledContent<String> {
-        format!("\"{}\"", self).green()
+    pub fn str_format(&self) -> String {
+        if unsafe { ENV_OPTION.support_ansi } {
+            format!("\"{}\"", self.to_string().green())
+        } else {
+            format!("\"{}\"", self)
+        }
     }
 
     pub fn get_i64(&self) -> Result<i64, ()> {

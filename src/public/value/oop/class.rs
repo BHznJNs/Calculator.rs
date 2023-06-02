@@ -3,6 +3,9 @@ use std::collections::HashMap;
 use std::fmt;
 use std::rc::Rc;
 
+use crossterm::style::Stylize;
+
+use crate::public::env::ENV_OPTION;
 use crate::public::error::type_error;
 use crate::public::value::array::ArrayLiteral;
 use crate::public::value::function::Function;
@@ -106,24 +109,31 @@ impl Class {
     }
 }
 
+const CLASS_METHOD_DISP_STR: &'static str = "<Class-Method>";
 impl fmt::Display for Class {
     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
         println!("{{");
         for prop in &self.properties {
             println!("  {},", prop.identi);
         }
+
+        let class_method_disp = if unsafe { ENV_OPTION.support_ansi } {
+            CLASS_METHOD_DISP_STR.cyan().to_string()
+        } else {
+            String::from(CLASS_METHOD_DISP_STR)
+        };
         match self.method_storage {
             DataStoragePattern::List => {
                 let list = self.method_list.as_ref().unwrap();
                 for method in list {
-                    println!("  {}: <Class-Method>,", method.0);
+                    println!("  {}: {},", method.0, class_method_disp);
                 }
             }
             DataStoragePattern::Map => {
                 let map = self.method_map.as_ref().unwrap();
 
                 for (key, _) in map {
-                    println!("  {}: <Class-Method>,", key);
+                    println!("  {}: {},", key, class_method_disp);
                 }
             }
         }
