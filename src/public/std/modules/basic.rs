@@ -1,5 +1,7 @@
 use std::io::{self, Write};
 
+use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
+
 use crate::public::error::type_error;
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
@@ -55,7 +57,9 @@ impl BuildInFnCall for BasicFn {
                 }
                 // get input
                 let mut input = String::new();
+                disable_raw_mode().unwrap();
                 io::stdin().read_line(&mut input).unwrap();
+                enable_raw_mode().unwrap();
 
                 // remove the "\r\n" at the end of input
                 if input.ends_with('\n') {
