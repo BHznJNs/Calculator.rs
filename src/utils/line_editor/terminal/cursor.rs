@@ -13,12 +13,17 @@ impl Cursor {
         }
     }
 
-    pub fn position(&self) -> io::Result<usize> {
-        Ok(cursor::position()?.0 as usize)
+    // return current cursor col
+    pub fn position(&self) -> io::Result<(usize, usize)> {
+        let (col, row) = cursor::position()?;
+        Ok((col as usize, row as usize))
     }
 
-    pub fn move_to_pos(&mut self, target_pos: usize) -> io::Result<()> {
-        execute!(self.stdout, cursor::MoveToColumn(target_pos as u16))
+    pub fn move_to_col(&mut self, target_col: usize) -> io::Result<()> {
+        execute!(self.stdout, cursor::MoveToColumn(target_col as u16))
+    }
+    pub fn move_to_row(&mut self, target_row: usize) -> io::Result<()> {
+        execute!(self.stdout, cursor::MoveToRow(target_row as u16))
     }
 
     pub fn left(&mut self, cell: usize) -> io::Result<()> {

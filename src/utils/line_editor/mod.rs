@@ -17,7 +17,7 @@ pub use signal::Signal;
 use state::LineState;
 use terminal::Terminal;
 
-use crate::utils::line_editor::terminal::TextType;
+use crate::utils::{line_editor::terminal::TextType, output::print_line};
 use crate::public::env::ENV_OPTION;
 // use candidate::Candidate;
 
@@ -80,7 +80,7 @@ impl LineEditor {
     }
 
     fn clear_line(&mut self) -> io::Result<()> {
-        self.terminal.cursor.move_to_pos(self.prompt.len())?;
+        self.terminal.cursor.move_to_col(self.prompt.len())?;
         self.terminal.clear_after_cursor();
         Ok(())
     }
@@ -104,10 +104,18 @@ impl LineEditor {
     }
     fn render(&mut self, line: &Line) -> io::Result<()> {
         #[inline]
-        fn buffer_extend_colored(buffer: &mut String, text: &str, type__: TextType) {
+        fn buffer_extend_colored(
+            buffer: &mut String,
+            is_history: bool,
+            text: &str,
+            type__: TextType,
+        ) {
             if unsafe { ENV_OPTION.support_ansi } {
-                let colored=
+                let mut colored=
                     TextType::match_tx_type(text, type__);
+                // if is history, line text will be darken
+                if is_history { colored = colored.dim(); }
+
                 buffer.extend(colored.to_string().chars());
             } else {
                 *buffer += text;
@@ -136,31 +144,26 @@ impl LineEditor {
                     // when a token is going to be overflow left side and right side
                     if actual_print_len > remain_space {
                         // print middle part of this token
-                        buffer_extend_colored(&mut buffer, &token.content[offset..offset + remain_space], token.type__);
+                        buffer_extend_colored(&mut buffer, line.is_history, &token.content[offset..offset + remain_space], token.type__);
                         break;
                     }
 
                     remain_space -= token.len() - offset;
-                    buffer_extend_colored(&mut buffer, &token.content[offset..], token.type__);
+                    buffer_extend_colored(&mut buffer, line.is_history, &token.content[offset..], token.type__);
                     offset = 0;
                 }
             } else {
                 if remain_space >= token.len() {
                     remain_space -= token.len();
-                    buffer_extend_colored(&mut buffer, &token.content, token.type__);
+                    buffer_extend_colored(&mut buffer, line.is_history, &token.content, token.type__);
                 } else {
-                    buffer_extend_colored(&mut buffer, &token.content[..remain_space], token.type__);
+                    buffer_extend_colored(&mut buffer, line.is_history, &token.content[..remain_space], token.type__);
                     remain_space = 0;
                 }
             }
         }
 
-        if line.is_history && unsafe { ENV_OPTION.support_ansi } {
-            print!("{}{}", buffer.dim(), &line.label);
-        } else {
-            print!("{}{}", buffer, &line.label);
-        }
-
+        print!("{}{}", buffer, &line.label);
         self.terminal.flush()?;
         self.terminal.cursor.show()
     }
@@ -228,7 +231,7 @@ impl LineEditor {
             };
             // ctrl + c -> Interrupt
             if key.modifiers == KeyModifiers::CONTROL && key.code == KeyCode::Char('c') {
-                println!("\nKeyboard Interrupt");
+                print_line(&mut self.terminal.stdout, "\nKeyboard Interrupt");
                 break Signal::Interrupt;
             }
 
@@ -299,7 +302,7 @@ impl LineEditor {
                         self.overflow_left = 0;
                         self.overflow_right = 0;
 
-                        self.terminal.new_line();
+                        print_line(&mut self.terminal.stdout, "");
                         self.history.append(line_content.clone());
                         break Signal::NewLine(line_content);
                     }
@@ -317,7 +320,7 @@ impl LineEditor {
                     KeyCode::Char(ch) => {
                         if !ch.is_ascii() {
                             // avoid Non-ASCII character
-                            self.terminal.new_line();
+                            print_line(&mut self.terminal.stdout, "");
                             break Signal::NonASCII;
                         }
 

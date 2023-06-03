@@ -1,8 +1,10 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::io::{Stdout, self};
 use std::rc::Rc;
 
 use crate::public::value::array;
+use crate::utils::output::print_line;
 
 use super::super::value::Value;
 use super::utils::data_storage::DataStoragePattern;
@@ -18,7 +20,7 @@ pub struct Object {
 }
 
 pub fn display(obj: Rc<RefCell<Object>>, level: usize) {
-    fn display_item(key: &String, value: &Rc<RefCell<Value>>, level: usize) {
+    fn display_item(stdout: &mut Stdout, key: &String, value: &Rc<RefCell<Value>>, level: usize) {
         let value_ref = value.as_ref().borrow();
 
         // print indent and key
@@ -26,30 +28,35 @@ pub fn display(obj: Rc<RefCell<Object>>, level: usize) {
 
         // print value
         match value_ref.unwrap() {
-            Value::String(_) => print!("{}", value_ref.str_format()),
-            Value::Array(arr) => array::display(arr, level + 1),
-            Value::Object(obj) => display(obj, level + 1),
+            Value::String(_) =>
+                print!("{}", value_ref.str_format()),
+            Value::Array(arr) =>
+                array::display(arr, level + 1),
+            Value::Object(obj) =>
+                display(obj, level + 1),
             _ => print!("{}", value_ref),
         }
 
         // next line
-        println!();
+        print_line(stdout, "");
     }
 
     let obj_ref = obj.as_ref().borrow();
-    println!("{{");
+    let mut stdout = io::stdout();
+
+    print_line(&mut stdout, '{');
     match obj_ref.storage_pattern {
         DataStoragePattern::List => {
             let list = obj_ref.data_list.as_ref().unwrap();
             for (k, v) in list {
-                display_item(k, v, level);
+                display_item(&mut stdout, k, v, level);
             }
         }
         DataStoragePattern::Map => {
             let map = obj_ref.data_map.as_ref().unwrap();
 
             for (k, v) in map {
-                display_item(k, v, level);
+                display_item(&mut stdout, k, v, level);
             }
         }
     }
@@ -75,6 +82,7 @@ impl Object {
                     Ok(Value::Function(target_method.clone()))
                 }
                 _ => {
+                    // todo: replace with reference_error
                     println!("Property '{}' in object does not exist.", prop_name);
                     Err(())
                 }
@@ -97,6 +105,7 @@ impl Object {
                 Ok(())
             }
             Err(err_msg) => {
+                // todo: replace with reference_error
                 println!("{}", err_msg);
                 Err(())
             }

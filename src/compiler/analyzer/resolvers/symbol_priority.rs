@@ -19,11 +19,13 @@ fn get_priority(symbol_node: &ASTNode) -> Result<i8, ()> {
     if let ASTNode::SymbolLiteral(symbol) = symbol_node {
         let symbol_index = *symbol as usize;
         if symbol_index >= PRIORITY.len() {
+            // todo
             println!("AnalyzerError: invalid symbol: `{}`.", symbol);
             return Err(());
         }
         Ok(PRIORITY[symbol_index])
     } else {
+        // todo
         println!("Analyzer error from 'get_priority'.");
         return Err(());
     }

@@ -11,6 +11,7 @@ use crate::public::error::import_error;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
 use crate::utils::line_editor::{LineEditor, Signal};
+use crate::utils::output::print_line;
 
 const PROMPT: &'static str = "> ";
 
@@ -47,6 +48,7 @@ pub fn repl(scope: &mut Scope, calc_env: Env) -> io::Result<()> {
     enable_raw_mode()?;
 
     let mut rl = LineEditor::new(PROMPT);
+    let mut stdout = io::stdout();
     loop {
         support_keyboard_enhancement::resolve()?;
 
@@ -63,7 +65,7 @@ pub fn repl(scope: &mut Scope, calc_env: Env) -> io::Result<()> {
             result = attempt(&line_content, scope);
             let elapsed_time = now.elapsed();
             let elapsed_second = elapsed_time.as_secs_f64();
-            println!("Executed in: {}s.", elapsed_second);
+            print_line(&mut stdout, format!("Executed in: {}s.", elapsed_second));
         } else {
             result = attempt(&line_content, scope);
         }
@@ -72,9 +74,11 @@ pub fn repl(scope: &mut Scope, calc_env: Env) -> io::Result<()> {
             if let Value::Void(_) = val {
                 continue;
             } else if let Value::String(_) = val {
-                println!("= {}", val.str_format());
+                print!("= ");
+                print_line(&mut stdout, val.str_format());
             } else {
-                println!("= {}", val);
+                print!("= ");
+                print_line(&mut stdout, val);
             }
         }
     }

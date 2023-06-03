@@ -35,6 +35,7 @@ impl Symbols {
         //    -> Symbols::PlusEqual
 
         if *self != Symbols::Equal {
+            // todo: replace with internal_error
             println!("TokenizerError: only Symbole::Equal can call the Symbols::combine.");
             return Err(());
         }
@@ -50,6 +51,7 @@ impl Symbols {
             Symbols::Not => Symbols::NotEqual,
             Symbols::Equal => Symbols::CompareEqual,
             _ => {
+                // todo: replace with internal_error
                 println!(
                     "TokenizerError: Invalid symbol {} for symbol combination.",
                     other

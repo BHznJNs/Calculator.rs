@@ -1,6 +1,6 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::fmt;
+use std::{fmt, io};
 use std::rc::Rc;
 
 use crossterm::style::Stylize;
@@ -10,6 +10,7 @@ use crate::public::error::type_error;
 use crate::public::value::array::ArrayLiteral;
 use crate::public::value::function::Function;
 use crate::public::value::value::{Value, ValueType};
+use crate::utils::output::print_line;
 
 use super::object::Object;
 use super::utils::data_storage::DataStoragePattern;
@@ -43,6 +44,7 @@ impl Class {
         match result_target_method {
             Ok(target_method) => Ok(target_method),
             Err(err_msg) => {
+                // todo: replace with reference_error
                 println!("{}", err_msg);
                 Err(())
             }
@@ -112,9 +114,12 @@ impl Class {
 const CLASS_METHOD_DISP_STR: &'static str = "<Class-Method>";
 impl fmt::Display for Class {
     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        println!("{{");
+        let mut stdout = io::stdout();
+
+        print_line(&mut stdout, '{');
         for prop in &self.properties {
-            println!("  {},", prop.identi);
+            // todo: display property indentifier and type
+            print_line(&mut stdout, format!("  {},", prop.identi));
         }
 
         let class_method_disp = if unsafe { ENV_OPTION.support_ansi } {
@@ -126,14 +131,14 @@ impl fmt::Display for Class {
             DataStoragePattern::List => {
                 let list = self.method_list.as_ref().unwrap();
                 for method in list {
-                    println!("  {}: {},", method.0, class_method_disp);
+                    print_line(&mut stdout, format!("  {}: {},", method.0, class_method_disp));
                 }
             }
             DataStoragePattern::Map => {
                 let map = self.method_map.as_ref().unwrap();
 
                 for (key, _) in map {
-                    println!("  {}: {},", key, class_method_disp);
+                    print_line(&mut stdout, format!("  {}: {},", key, class_method_disp));
                 }
             }
         }

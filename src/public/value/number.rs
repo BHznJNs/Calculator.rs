@@ -3,6 +3,8 @@ use std::f64::INFINITY;
 use std::fmt;
 use std::ops::{Add, Div, Mul, Sub};
 
+use crate::utils::output::print_line__;
+
 #[derive(PartialOrd, Clone, Copy)]
 pub enum Number {
     NotANumber,
@@ -164,7 +166,7 @@ impl Div for Number {
 
         if let (Number::Float(num1__), Number::Float(num2__)) = (num1, num2) {
             if num2__ == 0.0 {
-                println!("The dividend should not to be ZERO!");
+                print_line__("The dividend should not to be ZERO!");
                 let inf = if num1__ >= 0.0 { INFINITY } else { -INFINITY };
                 return Number::Float(inf);
             }

@@ -40,14 +40,19 @@ impl Terminal {
     }
 
     pub fn cursor_col(&self) -> io::Result<usize> {
-        Ok(self.cursor.position()?)
+        Ok(self.cursor.position()?.0)
     }
 
     // --- --- --- --- --- ---
 
-    pub fn new_line(&self) {
-        println!();
-    }
+    // pub fn new_line(&mut self, content: Option<String>) -> io::Result<()> {
+    //     match content {
+    //         Some(text) => write!(self.stdout, "{}\n", text)?,
+    //         None => write!(self.stdout, "\n")?,
+    //     }
+    //     self.cursor.move_to_col(0)?;
+    //     self.flush()
+    // }
 
     pub fn flush(&mut self) -> io::Result<()> {
         self.stdout.flush()?;

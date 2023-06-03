@@ -132,6 +132,7 @@ impl Value {
 
     pub fn get_i64(&self) -> Result<i64, ()> {
         let Value::Number(num) = self else {
+            // todo: replace with type_error
             println!("Target value is not a valid number value.");
             return Err(())
         };
@@ -139,6 +140,7 @@ impl Value {
     }
     pub fn get_f64(&self) -> Result<f64, ()> {
         let Value::Number(num) = self else {
+            // todo: replace with type_error
             println!("Target value is not a valid number value.");
             return Err(())
         };
@@ -165,6 +167,7 @@ impl Value {
                 Ok(Value::create(cloned_obj))
             }
             _ => {
+                // todo: replace with type_error
                 println!("Invalid clone type.");
                 Err(())
             }

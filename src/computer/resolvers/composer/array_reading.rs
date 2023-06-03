@@ -70,6 +70,7 @@ pub fn assign(
         let char_str = &target.as_ref().borrow();
         str.replace_range(index_value..index_value + 1, char_str);
     } else {
+        // todo: replace with range_error
         println!("Invalid array reading.");
         return Err(());
     }
@@ -95,6 +96,7 @@ pub fn resolve(
         let slice = &str[index_value..index_value + 1];
         Ok(Value::create(slice.to_string()))
     } else {
+        // todo: replace with range_error
         println!("Invalid indexing.");
         Err(())
     }

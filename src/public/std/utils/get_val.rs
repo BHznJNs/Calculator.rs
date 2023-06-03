@@ -7,6 +7,7 @@ pub fn get_val(val_name: &str, scope: &mut Scope) -> Result<Value, ()> {
     match option_value {
         Some(val) => Ok(val.clone()),
         None => {
+            // todo: replace with syntax_error
             println!("Input for function is missing.");
             Err(())
         }

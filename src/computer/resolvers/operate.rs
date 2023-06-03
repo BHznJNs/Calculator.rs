@@ -20,6 +20,7 @@ pub fn operate(val1: Value, val2: Value, operator: Symbols) -> Result<Value, ()>
             Symbols::LessThanEqual => Value::Boolean(num1 <= num2),
             Symbols::MoreThanEqual => Value::Boolean(num1 >= num2),
             _ => {
+                // todo
                 println!("Unexpected symbol: '{}' at function 'operate'.", operator);
                 return Err(());
             }

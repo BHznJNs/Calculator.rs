@@ -5,6 +5,7 @@ pub fn str_to_num<T: FromStr>(str: Ref<String>) -> Result<T, ()> {
     match str.parse::<T>() {
         Ok(val) => Ok(val),
         Err(_) => {
+            // todo: replace with type_error
             println!("Invalid string coverting to number.");
             return Err(());
         }

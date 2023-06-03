@@ -1,3 +1,4 @@
+use std::io::stdout;
 use std::rc::Rc;
 
 use crate::computer::resolvers::expression;
@@ -7,6 +8,7 @@ use crate::public::compile_time::keywords::Keyword;
 use crate::public::error::{import_error, syntax_error};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::{Value, VoidSign};
+use crate::utils::output::print_line;
 
 use super::sequence;
 
@@ -23,7 +25,9 @@ pub fn resolve(statement_node: Rc<StatementNode>, scope: &mut Scope) -> Result<V
             } else {
                 Value::Void(VoidSign::Empty)
             };
-            println!("{}", output_value);
+            
+            print_line(&mut stdout(), output_value);
+            // println!("{}", output_value);
             Value::Void(VoidSign::Empty)
         }
         Keyword::For => {
