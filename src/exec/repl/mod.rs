@@ -3,7 +3,6 @@ mod support_keyboard_enhancement;
 use std::io;
 use std::time::Instant;
 
-use crossterm::ansi_support;
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 
 use super::attempt::attempt;
@@ -13,6 +12,8 @@ use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
 use crate::utils::line_editor::{LineEditor, Signal};
 
+const PROMPT: &'static str = "> ";
+
 fn import_all(scope: &mut Scope) -> Result<(), ()> {
     scope.import_std("Basic")?;
     scope.import_std("Math")?;
@@ -21,11 +22,22 @@ fn import_all(scope: &mut Scope) -> Result<(), ()> {
     Ok(())
 }
 
-const PROMPT: &'static str = "> ";
+#[cfg(windows)]
+fn is_ansi_supported_setter() {
+    use crossterm::ansi_support::supports_ansi;
+    unsafe { ENV_OPTION.support_ansi = supports_ansi() };
+}
+
+#[cfg(not(windows))]
+fn is_ansi_supported_setter() {
+    unsafe { ENV_OPTION.support_ansi = true };
+}
 
 pub fn repl(scope: &mut Scope, calc_env: Env) -> io::Result<()> {
     // print program name and version
     println!("Calculator.rs v{}", calc_env.version);
+    // set is terminal support ANSI
+    is_ansi_supported_setter();
     // import stantard libraries
     if import_all(scope).is_err() {
         import_error("standard module import error").unwrap_err();
@@ -33,7 +45,6 @@ pub fn repl(scope: &mut Scope, calc_env: Env) -> io::Result<()> {
     }
 
     enable_raw_mode()?;
-    unsafe { ENV_OPTION.support_ansi = ansi_support::supports_ansi() }
 
     let mut rl = LineEditor::new(PROMPT);
     loop {
