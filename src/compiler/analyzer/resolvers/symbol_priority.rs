@@ -1,4 +1,4 @@
-use crate::public::compile_time::ast::ast_enum::ASTNode;
+use crate::public::{compile_time::ast::ast_enum::ASTNode, error::{internal_error, InternalComponent}};
 
 const PRIORITY: [i8; 12] = [
     1, // Symbols::Plus
@@ -19,15 +19,13 @@ fn get_priority(symbol_node: &ASTNode) -> Result<i8, ()> {
     if let ASTNode::SymbolLiteral(symbol) = symbol_node {
         let symbol_index = *symbol as usize;
         if symbol_index >= PRIORITY.len() {
-            // todo
-            println!("AnalyzerError: invalid symbol: `{}`.", symbol);
-            return Err(());
+            let msg = format!("invalid symbol `{}`", symbol);
+            return Err(internal_error(InternalComponent::Analyzer, &msg)?);
         }
         Ok(PRIORITY[symbol_index])
     } else {
-        // todo
-        println!("Analyzer error from 'get_priority'.");
-        return Err(());
+        let msg = format!("invalid ASTNode for `get_priority`: {}", symbol_node);
+        return Err(internal_error(InternalComponent::Analyzer, &msg)?);
     }
 }
 

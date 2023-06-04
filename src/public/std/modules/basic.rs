@@ -78,7 +78,7 @@ impl BuildInFnCall for BasicFn {
             }
             BasicFn::CLONE => {
                 let input = get_val("input", scope)?;
-                input.deep_clone()?
+                input.shallow_clone()?
             }
 
             BasicFn::INT => {
@@ -142,7 +142,7 @@ impl BuildInFnCall for BasicFn {
                 let input = get_val("input", scope)?;
 
                 match input {
-                    Value::String(_) => input.deep_clone()?,
+                    Value::String(_) => input.shallow_clone()?,
                     Value::Number(num) => Value::create(num.to_string()),
 
                     Value::Boolean(bool_val) => Value::create(format!("{}", bool_val)),

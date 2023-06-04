@@ -7,7 +7,7 @@ use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 
 use super::attempt::attempt;
 use crate::public::env::{Env, ENV_OPTION};
-use crate::public::error::import_error;
+use crate::public::error::{import_error, syntax_error};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
 use crate::utils::line_editor::{LineEditor, Signal};
@@ -56,7 +56,10 @@ pub fn repl(scope: &mut Scope, calc_env: Env) -> io::Result<()> {
         let line_content = match sig {
             Signal::NewLine(line) => line + "\r\n",
             Signal::Interrupt => break,
-            Signal::NonASCII => todo!(),
+            Signal::NonASCII => {
+                syntax_error("non-ASCII character").unwrap_err();
+                continue;
+            },
         };
 
         let result: Result<Value, ()>;

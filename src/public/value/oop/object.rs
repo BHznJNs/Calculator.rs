@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use std::io::{Stdout, self};
 use std::rc::Rc;
 
+use crate::public::error::{reference_error, ReferenceType};
 use crate::public::value::array;
 use crate::utils::output::print_line;
 
@@ -76,16 +77,12 @@ impl Object {
                 let target_ref = target_rc.as_ref().borrow();
                 Ok(target_ref.unwrap())
             }
-            Err(_) => match &self.prototype {
+            Err(()) => match &self.prototype {
                 Some(Value::Class(proto)) => {
                     let target_method = proto.get_method(prop_name)?;
                     Ok(Value::Function(target_method.clone()))
                 }
-                _ => {
-                    // todo: replace with reference_error
-                    println!("Property '{}' in object does not exist.", prop_name);
-                    Err(())
-                }
+                _ => Err(reference_error(ReferenceType::Property, prop_name)?),
             },
         }
     }
@@ -104,11 +101,8 @@ impl Object {
                 *target_ref = value;
                 Ok(())
             }
-            Err(err_msg) => {
-                // todo: replace with reference_error
-                println!("{}", err_msg);
-                Err(())
-            }
+            Err(()) =>
+                Err(reference_error(ReferenceType::Property, prop_name)?)
         }
     }
 }

@@ -32,7 +32,7 @@ fn index_resolve(expression_node: Rc<ExpressionNode>, scope: &mut Scope) -> Resu
 fn check_outof_range(index: usize, len: usize) -> Result<(), ()> {
     if index >= len {
         Err(range_error(
-            "Array reading",
+            "indexing reading",
             format!("index < {}", len),
             index,
         )?)
@@ -70,9 +70,11 @@ pub fn assign(
         let char_str = &target.as_ref().borrow();
         str.replace_range(index_value..index_value + 1, char_str);
     } else {
-        // todo: replace with range_error
-        println!("Invalid array reading.");
-        return Err(());
+        return Err(type_error(
+            Some("indexing assignment"),
+            vec![ValueType::String, ValueType::Array],
+            array_value.get_type()
+        )?)
     }
     Ok(())
 }
@@ -96,8 +98,10 @@ pub fn resolve(
         let slice = &str[index_value..index_value + 1];
         Ok(Value::create(slice.to_string()))
     } else {
-        // todo: replace with range_error
-        println!("Invalid indexing.");
-        Err(())
+        Err(type_error(
+            Some("indexing"),
+            vec![ValueType::String, ValueType::Array],
+            array_value.get_type()
+        )?)
     }
 }

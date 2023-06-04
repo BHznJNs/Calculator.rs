@@ -1,5 +1,7 @@
 use std::fmt;
 
+use crate::public::error::{internal_error, InternalComponent};
+
 #[derive(PartialEq, Clone, Copy)]
 pub enum Symbols {
     // math symbols
@@ -16,8 +18,8 @@ pub enum Symbols {
     MoreThanEqual,
     CompareEqual,
     NotEqual,
-    Equal,
 
+    Equal,
     PlusEqual,
     MinusEqual,
     MultiplyEqual,
@@ -34,10 +36,12 @@ impl Symbols {
         //    equal_symbol.combine(Symbols::Plus);
         //    -> Symbols::PlusEqual
 
+        // only `Symbole::Equal` can call the internal function `Symbols::combine`
         if *self != Symbols::Equal {
-            // todo: replace with internal_error
-            println!("TokenizerError: only Symbole::Equal can call the Symbols::combine.");
-            return Err(());
+            return Err(internal_error(
+                InternalComponent::InternalFn,
+                "invalid `Symbols::combine` invocation",
+            )?)
         }
 
         let result_symbol = match other {
@@ -51,12 +55,8 @@ impl Symbols {
             Symbols::Not => Symbols::NotEqual,
             Symbols::Equal => Symbols::CompareEqual,
             _ => {
-                // todo: replace with internal_error
-                println!(
-                    "TokenizerError: Invalid symbol {} for symbol combination.",
-                    other
-                );
-                return Err(());
+                let msg = format!("invalid symbol `{}` for symbol combination", other);
+                return Err(internal_error(InternalComponent::Tokenizer, &msg)?)
             }
         };
         Ok(result_symbol)

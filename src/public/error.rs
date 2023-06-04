@@ -59,11 +59,19 @@ pub fn assignment_error(msg: &str) -> ErrorResult {
 }
 
 const REFERENCE_ERROR_NAME: &'static str = " ReferenceError ";
-pub fn reference_error(var_name: &str) -> ErrorResult {
+pub enum ReferenceType {
+    Variable,
+    Property,
+}
+pub fn reference_error(type__: ReferenceType, target_name: &str) -> ErrorResult {
     print_line__(format!(
-        "{}: variable `{}` is not defined.",
+        "{}: {} `{}` is not defined.",
+        match type__ {
+            ReferenceType::Variable => "variable",
+            ReferenceType::Property => "property"
+        },
         error_name_output(REFERENCE_ERROR_NAME),
-        var_name
+        target_name,
     ));
     Err(())
 }
@@ -78,6 +86,7 @@ pub fn import_error(msg: &str) -> ErrorResult {
 
 pub enum InternalComponent {
     Std,
+    InternalFn,
 
     Tokenizer,
     Analyzer,
@@ -87,6 +96,7 @@ impl fmt::Display for InternalComponent {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             InternalComponent::Std => write!(f, "Standard-Library"),
+            InternalComponent::InternalFn => write!(f, "Internal-Function"),
 
             InternalComponent::Tokenizer => write!(f, "Tokenizer"),
             InternalComponent::Analyzer => write!(f, "Analyzer"),

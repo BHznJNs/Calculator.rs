@@ -6,7 +6,7 @@ use std::rc::Rc;
 use crossterm::style::Stylize;
 
 use crate::public::env::ENV_OPTION;
-use crate::public::error::type_error;
+use crate::public::error::{type_error, ReferenceType, reference_error};
 use crate::public::value::array::ArrayLiteral;
 use crate::public::value::function::Function;
 use crate::public::value::value::{Value, ValueType};
@@ -43,11 +43,8 @@ impl Class {
 
         match result_target_method {
             Ok(target_method) => Ok(target_method),
-            Err(err_msg) => {
-                // todo: replace with reference_error
-                println!("{}", err_msg);
-                Err(())
-            }
+            Err(()) =>
+                Err(reference_error(ReferenceType::Property, target_method)?),
         }
     }
 

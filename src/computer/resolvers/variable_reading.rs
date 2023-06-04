@@ -1,4 +1,4 @@
-use crate::public::error::reference_error;
+use crate::public::error::{reference_error, ReferenceType};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
 
@@ -12,6 +12,6 @@ pub fn resolve(var_name: &String, scope: &mut Scope) -> Result<Value, ()> {
 
     match scope.global.variables.get(var_name) {
         Some(val) => Ok(val.clone()),
-        None => Err(reference_error(var_name)?),
+        None => Err(reference_error(ReferenceType::Variable, var_name)?),
     }
 }

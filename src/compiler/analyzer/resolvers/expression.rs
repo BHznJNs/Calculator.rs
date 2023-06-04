@@ -5,7 +5,7 @@ use crate::public::compile_time::ast::ast_enum::{ASTNode, ASTVec};
 use crate::public::compile_time::ast::types::{ExpressionNode, VariableNode};
 use crate::public::compile_time::keywords::Keyword;
 use crate::public::compile_time::parens::Paren;
-use crate::public::error::{assignment_error, syntax_error};
+use crate::public::error::{assignment_error, syntax_error, internal_error, InternalComponent};
 use crate::public::value::symbols::Symbols;
 
 use super::symbol_priority::compare;
@@ -128,18 +128,19 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ExpressionNode, ()> {
                 }
             }
             _ => {
-                // todo
-                println!("Invalid expression: unexpected ASTNodeType: {}.", node);
-                return Err(());
+                let msg = format!("invalid expression: unexpected ASTNodeType: {}", node);
+                return Err(internal_error(InternalComponent::Analyzer, &msg)?);
             }
         }
     }
+
     // pop the remain elements in the symbol_stack
     // and push them into the result_stack
     while symbol_stack.len() > 0 {
         let last_symbol_node = symbol_stack.pop().unwrap();
         result_stack.push(last_symbol_node);
     }
+
     Ok(ExpressionNode {
         elements: result_stack,
     })

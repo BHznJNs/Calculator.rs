@@ -7,7 +7,7 @@ pub fn getter<T: Clone>(
     target_prop: &str,
     list: &Option<Vec<(String, T)>>,
     map: &Option<HashMap<String, T>>,
-) -> Result<T, String> {
+) -> Result<T, ()> {
     match storage_pattern {
         DataStoragePattern::List => {
             let data_list = list.as_ref().unwrap();
@@ -18,14 +18,14 @@ pub fn getter<T: Clone>(
                     return Ok(target_value.clone());
                 }
             }
-            Err(format!("Property '{}' does not exist.", target_prop))
+            Err(())
         }
         DataStoragePattern::Map => {
             let data_map = map.as_ref().unwrap();
 
             match data_map.get(target_prop) {
                 Some(target_value) => Ok(target_value.clone()),
-                None => Err(format!("Property '{}' does not exist.", target_prop)),
+                None => Err(()),
             }
         }
     }

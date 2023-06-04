@@ -5,6 +5,7 @@ use std::rc::Rc;
 use crossterm::style::Stylize;
 
 use crate::public::env::ENV_OPTION;
+use crate::public::error::{internal_error, InternalComponent, type_error};
 
 use super::super::compile_time::ast::ast_enum::ASTNode;
 use super::array::{self, ArrayLiteral};
@@ -131,18 +132,22 @@ impl Value {
     }
 
     pub fn get_i64(&self) -> Result<i64, ()> {
+        // expected Number typed value to call this method
         let Value::Number(num) = self else {
-            // todo: replace with type_error
-            println!("Target value is not a valid number value.");
-            return Err(())
+            return Err(internal_error(
+                InternalComponent::InternalFn,
+                "invalid `Value::get_i64` invocation"
+            )?)
         };
         Ok(num.int_value())
     }
     pub fn get_f64(&self) -> Result<f64, ()> {
+        // expected Number typed value to call this method
         let Value::Number(num) = self else {
-            // todo: replace with type_error
-            println!("Target value is not a valid number value.");
-            return Err(())
+            return Err(internal_error(
+                InternalComponent::InternalFn,
+                "invalid `Value::get_f64` invocation"
+            )?)
         };
         Ok(num.float_value())
     }
@@ -151,26 +156,25 @@ impl Value {
         // Rc<Value> -> Value
         self.clone()
     }
-    pub fn deep_clone(&self) -> Result<Value, ()> {
+    pub fn shallow_clone(&self) -> Result<Value, ()> {
         match self {
-            Value::Number(_) => Ok(self.clone()),
             Value::String(str) => {
                 let cloned_str = str.as_ref().borrow().clone();
                 Ok(Value::create(cloned_str))
-            }
+            },
             Value::Array(arr) => {
                 let cloned_arr = arr.as_ref().borrow().clone();
                 Ok(Value::create(cloned_arr))
-            }
+            },
             Value::Object(obj) => {
                 let cloned_obj = obj.as_ref().borrow().clone();
                 Ok(Value::create(cloned_obj))
-            }
-            _ => {
-                // todo: replace with type_error
-                println!("Invalid clone type.");
-                Err(())
-            }
+            },
+            _ => Err(type_error(
+                Some("value cloning"),
+                vec![ValueType::String, ValueType::Array, ValueType::Object],
+                self.get_type(),
+            )?),
         }
     }
 
