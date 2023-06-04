@@ -1,4 +1,5 @@
 use std::io::{self, Write};
+use std::process;
 
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 
@@ -16,16 +17,17 @@ use super::BuildInFnCall;
 
 pub fn function_list() -> Vec<(String, Value)> {
     vec![
-        (String::from("input"), Value::create(INPUT)),
-        (String::from("type"), Value::create(TYPE)),
-        (String::from("clone"), Value::create(CLONE)),
-        (String::from("int"), Value::create(INT)),
-        (String::from("float"), Value::create(FLOAT)),
-        (String::from("bool"), Value::create(BOOLEAN)),
+        (String::from("input"),  Value::create(INPUT)),
+        (String::from("type"),   Value::create(TYPE)),
+        (String::from("clone"),  Value::create(CLONE)),
+        (String::from("int"),    Value::create(INT)),
+        (String::from("float"),  Value::create(FLOAT)),
+        (String::from("bool"),   Value::create(BOOLEAN)),
         (String::from("string"), Value::create(STRING)),
-        (String::from("array"), Value::create(ARRAY)),
-        (String::from("ascii"), Value::create(ASCII)),
-        (String::from("len"), Value::create(LEN)),
+        (String::from("array"),  Value::create(ARRAY)),
+        (String::from("ascii"),  Value::create(ASCII)),
+        (String::from("len"),    Value::create(LEN)),
+        (String::from("exit"),   Value::create(EXIT)),
     ]
 }
 
@@ -43,6 +45,8 @@ pub enum BasicFn {
     ARRAY,
     ASCII,
     LEN,
+
+    EXIT,
 }
 
 impl BuildInFnCall for BasicFn {
@@ -205,6 +209,7 @@ impl BuildInFnCall for BasicFn {
                     Value::Void(VoidSign::Empty)
                 }
             }
+            BasicFn::EXIT => process::exit(0),
         };
         Ok(result)
     }
@@ -336,4 +341,14 @@ const LEN: BuildInFunction = BuildInFunction {
         None,
     ],
     identi: BuildInFnIdenti::Basic(BasicFn::LEN),
+};
+
+const EXIT: BuildInFunction = BuildInFunction {
+    params: [
+        None,
+        None,
+        None,
+        None,
+    ],
+    identi: BuildInFnIdenti::Basic(BasicFn::EXIT),
 };
