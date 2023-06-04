@@ -116,7 +116,11 @@ impl fmt::Display for Class {
         print_line(&mut stdout, '{');
         for prop in &self.properties {
             // todo: display property indentifier and type
-            print_line(&mut stdout, format!("  {},", prop.identi));
+            print_line(&mut stdout, format!(
+                "  {}: {},",
+                prop.identi,
+                prop.type__.to_string().red(),
+            ));
         }
 
         let class_method_disp = if unsafe { ENV_OPTION.support_ansi } {
