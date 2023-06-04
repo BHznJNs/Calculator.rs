@@ -154,28 +154,44 @@ impl Value {
 
     pub fn unwrap(&self) -> Value {
         // Rc<Value> -> Value
+        // Ref<Value> -> Value
         self.clone()
     }
-    pub fn shallow_clone(&self) -> Result<Value, ()> {
+    pub fn deep_clone(&self) -> Value {
+        let result =
         match self {
+            // Boolean and Number is primitive type,
+            // can be directly cloned.
+            Value::Boolean(_)
+            | Value::Number(_)
+            // Function and Class can not be modified,
+            // can just clone their Rc.
+            | Value::Function(_)
+            | Value::Class(_) => self.clone(),
+
             Value::String(str) => {
                 let cloned_str = str.as_ref().borrow().clone();
-                Ok(Value::create(cloned_str))
+                Value::create(cloned_str)
             },
-            Value::Array(arr) => {
-                let cloned_arr = arr.as_ref().borrow().clone();
-                Ok(Value::create(cloned_arr))
+
+            // for `Array` and `Object` the two complex type,
+            // recursive clone is needed.
+            Value::Array(arr) =>
+                array::deep_clone(arr.clone()),
+            Value::Object(obj) => 
+                object::deep_clone(obj.clone()),
+
+            Value::LazyExpression(l_expr) => {
+                let cloned_l_expr = l_expr.as_ref().clone();
+                Value::create(cloned_l_expr)
             },
-            Value::Object(obj) => {
-                let cloned_obj = obj.as_ref().borrow().clone();
-                Ok(Value::create(cloned_obj))
-            },
-            _ => Err(type_error(
-                Some("value cloning"),
-                vec![ValueType::String, ValueType::Array, ValueType::Object],
-                self.get_type(),
-            )?),
-        }
+
+            // variable type can not be `void`,
+            // so that it need not to implement
+            // `deep_clone`.
+            Value::Void(_) => unreachable!(),
+        };
+        return result;
     }
 
     pub fn get_type(&self) -> ValueType {

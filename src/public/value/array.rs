@@ -2,9 +2,25 @@ use std::{cell::RefCell, collections::VecDeque, rc::Rc, io};
 
 use crate::{public::value::oop::object, utils::output::print_line};
 
-use super::value::Value;
+use super::value::{Value, Overload};
 
 pub type ArrayLiteral = VecDeque<Value>;
+
+// recursively clone array elements
+pub fn deep_clone(arr: Rc<RefCell<ArrayLiteral>>) -> Value {
+    let mut new_array = ArrayLiteral::new();
+
+    for i in &*(arr.as_ref().borrow()) {
+        let element =
+        if let Value::Array(arr) = i {
+            deep_clone(arr.clone())
+        } else {
+            i.deep_clone()
+        };
+        new_array.push_back(element);
+    }
+    return Value::create(new_array);
+}
 
 pub fn display(arr: Rc<RefCell<ArrayLiteral>>, level: usize) {
     const LINE_COUNT: i8 = 5;
