@@ -9,7 +9,7 @@ pub enum FileSysFn {
 }
 
 impl BuildInFnCall for FileSysFn {
-    fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
+    fn call(&self, _scope: &mut Scope) -> Result<Value, ()> {
         todo!()
     }
 }

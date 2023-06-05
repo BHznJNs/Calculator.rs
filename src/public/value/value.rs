@@ -5,7 +5,7 @@ use std::rc::Rc;
 use crossterm::style::Stylize;
 
 use crate::public::env::ENV_OPTION;
-use crate::public::error::{internal_error, InternalComponent, type_error};
+use crate::public::error::{internal_error, InternalComponent};
 
 use super::super::compile_time::ast::ast_enum::ASTNode;
 use super::array::{self, ArrayLiteral};

@@ -22,9 +22,9 @@ impl Cursor {
     pub fn move_to_col(&mut self, target_col: usize) -> io::Result<()> {
         execute!(self.stdout, cursor::MoveToColumn(target_col as u16))
     }
-    pub fn move_to_row(&mut self, target_row: usize) -> io::Result<()> {
-        execute!(self.stdout, cursor::MoveToRow(target_row as u16))
-    }
+    // pub fn move_to_row(&mut self, target_row: usize) -> io::Result<()> {
+    //     execute!(self.stdout, cursor::MoveToRow(target_row as u16))
+    // }
 
     pub fn left(&mut self, cell: usize) -> io::Result<()> {
         execute!(self.stdout, cursor::MoveLeft(cell as u16))
