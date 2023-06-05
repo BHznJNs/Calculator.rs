@@ -42,10 +42,11 @@ pub enum ArrayFn {
 
 impl BuildInFnCall for ArrayFn {
     fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
+        let self_value = get_val("self", scope)?;
+        let arr_value = get_self_prop(self_value, "v")?;
+
         let result = match self {
             ArrayFn::PUSH => {
-                let self_value = get_val("self", scope)?;
-                let arr_value = get_self_prop(self_value, "v")?;
                 let element_value = get_val("element", scope)?;
 
                 if let Value::Array(arr) = arr_value {
@@ -55,9 +56,6 @@ impl BuildInFnCall for ArrayFn {
                 element_value
             }
             ArrayFn::POP => {
-                let self_value = get_val("self", scope)?;
-                let arr_value = get_self_prop(self_value, "v")?;
-
                 if let Value::Array(arr) = arr_value {
                     let mut refer = arr.borrow_mut();
                     // return poped value
@@ -69,9 +67,6 @@ impl BuildInFnCall for ArrayFn {
                 Value::Void(VoidSign::Empty)
             }
             ArrayFn::SHIFT => {
-                let self_value = get_val("self", scope)?;
-                let arr_value = get_self_prop(self_value, "v")?;
-
                 if let Value::Array(arr) = arr_value {
                     let mut refer = arr.borrow_mut();
                     // return shifted value
@@ -83,10 +78,8 @@ impl BuildInFnCall for ArrayFn {
                 Value::Void(VoidSign::Empty)
             }
             ArrayFn::UNSHIFT => {
-                let self_value = get_val("self", scope)?;
                 let element_value = get_val("element", scope)?;
 
-                let arr_value = get_self_prop(self_value, "v")?;
                 if let Value::Array(arr) = arr_value {
                     let mut refer = arr.borrow_mut();
                     refer.push_front(element_value.clone());
@@ -94,12 +87,10 @@ impl BuildInFnCall for ArrayFn {
                 element_value
             }
             ArrayFn::INSERT => {
-                let self_value = get_val("self", scope)?;
                 let index_value = get_val("index", scope)?;
                 let element_value = get_val("element", scope)?;
 
                 let index = index_value.get_i64()? as usize;
-                let arr_value = get_self_prop(self_value, "v")?;
                 if let Value::Array(arr) = arr_value {
                     let mut refer = arr.borrow_mut();
                     refer.insert(index, element_value.clone());
@@ -107,12 +98,10 @@ impl BuildInFnCall for ArrayFn {
                 element_value
             }
             ArrayFn::REMOVE => {
-                let self_value = get_val("self", scope)?;
                 let index_value = get_val("index", scope)?;
 
                 let index = index_value.get_i64()? as usize;
                 let mut removed_element: Option<Value> = None;
-                let arr_value = get_self_prop(self_value, "v")?;
 
                 if let Value::Array(arr) = arr_value {
                     let mut refer = arr.borrow_mut();
