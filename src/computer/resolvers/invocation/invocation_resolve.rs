@@ -1,7 +1,6 @@
 use std::rc::Rc;
 
 use crate::computer::resolvers::composer::compose;
-use crate::computer::resolvers::variable_reading;
 use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::compile_time::ast::types::{ExpressionNode, InvocationNode};
 use crate::public::error::{syntax_error, type_error};
@@ -16,7 +15,7 @@ fn variable_invoke(
     params: &Vec<ExpressionNode>,
     scope: &mut Scope,
 ) -> Result<Value, ()> {
-    let fn_value = variable_reading::resolve(fn_name, scope)?;
+    let fn_value = scope.read_var(fn_name)?;
     let result = function_invoke(fn_value, params, scope)?;
     Ok(result)
 }

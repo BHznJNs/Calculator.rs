@@ -9,63 +9,15 @@ use crate::public::value::value::Value;
 use super::composer::{array_reading, compose, object_reading};
 use super::expression;
 
-// fn right_hand_resolve(
-//     node: &ASTNode,
-//     scope: &mut Scope,
-// ) -> Result<Value, ()> {
-//     let result = match &node.type__ {
-//         ASTNodeTypes::Expression =>
-//             expression::resolve(node, scope)?,
-//         ASTNodeTypes::LazyExpression =>
-//             Value::create(node.clone()),
-
-//         ASTNodeTypes::ArrayLiteral => {
-//             let array_elements =
-//                 array_literal::resolve(node, scope)?;
-//             Value::create(array_elements)
-//         },
-//         ASTNodeTypes::FunctionDefinition(_) =>
-//             Value::create(function_definition::resolve(node)?),
-//         ASTNodeTypes::ClassDefinition => {
-//             let class_definition =
-//                 class::resolve(&node)?;
-//             Value::create(class_definition)
-//         },
-//         ASTNodeTypes::Instantiation(_) => {
-//             let inst =
-//                 instantiation::resolve(node, scope)?;
-//             Value::create(inst)
-//         },
-//         _ => {
-//             return Err(assignment_error("invalid right-hand value")?)
-//         }
-//     };
-//     Ok(result)
-// }
-
 pub fn resolve(node: Rc<AssignmentNode>, scope: &mut Scope) -> Result<Value, ()> {
     let left_hand_node = &node.left_hand_node;
     let right_hand_clone = node.right_hand_node.clone();
     let right_hand_value = expression::resolve(right_hand_clone.into(), scope)?;
 
     match left_hand_node {
-        ASTNode::Variable(sub_node) => {
-            // if local-scope, assign variable to
-            // the local-scope is preferred.
-            match &mut scope.local {
-                Some(local_scope) =>
-                // usually in a function invocation.
-                {
-                    local_scope
-                        .variables
-                        .insert(sub_node.name.to_owned(), right_hand_value.clone())
-                }
-                None => scope
-                    .global
-                    .variables
-                    .insert(sub_node.name.to_owned(), right_hand_value.clone()),
-            };
-        }
+        ASTNode::Variable(sub_node) =>
+            scope.assign(sub_node.name.to_owned(), right_hand_value.clone()),
+
         ASTNode::ArrayElementReading(sub_node) => {
             let array_clone = sub_node.array_node.clone();
             let array_value = compose::resolve(array_clone.into(), scope)?;

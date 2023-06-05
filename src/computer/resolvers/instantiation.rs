@@ -7,10 +7,10 @@ use crate::public::value::oop::class::Class;
 use crate::public::value::oop::object::Object;
 use crate::public::value::value::{Value, ValueType};
 
-use super::{array_literal, variable_reading};
+use super::array_literal;
 
 pub fn resolve(node: Rc<InstantiationNode>, scope: &mut Scope) -> Result<Object, ()> {
-    let target_class_value = variable_reading::resolve(&node.class, scope)?;
+    let target_class_value = scope.read_var(&node.class)?;
     let Value::Class(target_class) =
         target_class_value else {
         return Err(type_error(

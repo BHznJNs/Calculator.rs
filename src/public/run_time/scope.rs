@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::rc::Rc;
 
 use crate::exec::script;
-use crate::public::error::import_error;
+use crate::public::error::{import_error, reference_error, ReferenceType};
 use crate::public::std::StdModules;
 use crate::public::value::oop::module::{get_module_name, module_create};
 use crate::public::value::value::Overload;
@@ -65,6 +65,36 @@ impl Scope {
             std_module_map: self.std_module_map.clone(),
         }
     }
+
+    pub fn assign(&mut self, var_name: String, value: Value) {
+        // if local-scope, assigning variable to
+        // the local-scope is preferred.
+        match &mut self.local {
+            Some(local_scope) =>
+            // usually in a function invocation.
+                local_scope
+                    .variables
+                    .insert(var_name, value),
+            None => self
+                .global
+                .variables
+                .insert(var_name, value),
+        };
+    }
+    pub fn read_var(&self, var_name: &str) -> Result<Value, ()> {
+            // use local-scope preferer
+        if let Some(local_scope) = &self.local {
+            if let Some(val) = local_scope.variables.get(var_name) {
+                return Ok(val.clone());
+            }
+        };
+
+        match self.global.variables.get(var_name) {
+            Some(val) => Ok(val.clone()),
+            None => Err(reference_error(ReferenceType::Variable, var_name)?),
+        }
+    }
+
     // import STD module
     pub fn import_std(&mut self, module_name: &str) -> Result<(), ()> {
         let std_module_map = self.std_module_map.clone();

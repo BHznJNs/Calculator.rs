@@ -1,6 +1,5 @@
 use std::rc::Rc;
 
-use crate::computer::resolvers::variable_reading;
 use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::error::InternalComponent;
 use crate::public::run_time::scope::Scope;
@@ -23,7 +22,7 @@ pub fn resolve(node: Rc<ASTNode>, scope: &mut Scope) -> Result<Value, ()> {
             let obj_value = resolve(obj_clone.into(), scope)?;
             object_reading::resolve(obj_value, &sub_node.property)?
         }
-        ASTNode::Variable(sub_node) => variable_reading::resolve(&sub_node.name, scope)?,
+        ASTNode::Variable(sub_node) => scope.read_var(&sub_node.name)?,
         _ => {
             let msg = format!("unexpected ASTNode {} in compose", node);
             return Err(internal_error(InternalComponent::Computer, &msg)?);
