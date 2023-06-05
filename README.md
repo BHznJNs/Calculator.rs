@@ -92,13 +92,19 @@ calculator.exe script
 
 ## Installation
 
-### Windows
+### Windows-x86_64 (tested on Windows11)
 
-Go to the [release page](https://github.com/BHznJNs/Calculator.rs/releases) and download the latest released .exe file
+Please go to the [release page](https://github.com/BHznJNs/Calculator.rs/releases) and download the latest released `.exe` file
 
 Then just execuse it.
 
-### Other OS
+### Linux-x86_64 (tested on Debian11-bullseye)
+
+Please go to the [release page](https://github.com/BHznJNs/Calculator.rs/releases) and download the latest released `-x86_64-Linux` file
+
+Then just execuse it.
+
+### Other OS && Platform
 
 You need to install the Rust (version >= 1.60).
 
