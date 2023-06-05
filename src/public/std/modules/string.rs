@@ -45,21 +45,25 @@ pub enum StringFn {
 
 impl BuildInFnCall for StringFn {
     fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
+        let self_value = get_val("self", scope)?;
+        let str_value = get_self_prop(self_value, "v")?;
+        let Value::String(str_ref) = str_value else {
+            return Ok(Value::create(String::new()));
+        };
+
         let result = match self {
             StringFn::SPLIT => {
-                let self_value = get_val("self", scope)?;
-                let str_value = get_self_prop(self_value, "v")?;
                 let divider_value = get_val("divider", scope)?;
 
-                if let (Value::String(str), Value::String(div)) = (str_value, divider_value) {
-                    let str_refer = str.borrow();
-                    let div_refer = div.borrow();
+                if let Value::String(div) = divider_value {
+                    let str_ref = str_ref.borrow();
+                    let div_ref = div.borrow();
                     // splited chars
-                    let res_split = if div_refer.is_empty() {
-                        str_refer.split(' ')
+                    let res_split = if div_ref.is_empty() {
+                        str_ref.split(' ')
                     } else {
-                        let first_ch = div_refer.chars().next().unwrap();
-                        str_refer.split(first_ch)
+                        let first_ch = div_ref.chars().next().unwrap();
+                        str_ref.split(first_ch)
                     };
                     // convert splited to Vec<String>
                     let mut res_vec = VecDeque::<Value>::new();
@@ -71,8 +75,22 @@ impl BuildInFnCall for StringFn {
                 } else {
                     Value::create(ArrayLiteral::new())
                 }
-            }
-            StringFn::REPLACE => todo!(),
+            },
+            StringFn::REPLACE => {
+                let from_value  = get_val("from", scope)?;
+                let to_value  = get_val("to", scope)?;
+
+                let str_ref = str_ref.borrow_mut();
+                if let (Value::String(from_str), Value::String(to_str)) = (from_value, to_value) {
+                    let from_ref = &*(from_str.borrow());
+                    let to_ref = &*(to_str.borrow());
+
+                    let replaced_str = str_ref.replace(from_ref, to_ref);
+                    Value::create(replaced_str)
+                } else {
+                    Value::create(String::new())
+                }
+            },
             StringFn::REPEAT => todo!(),
             StringFn::JOIN => todo!(),
             StringFn::STARTWITH => todo!(),
