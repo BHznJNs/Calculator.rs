@@ -13,19 +13,21 @@ pub fn env_resolve(calc_env: Env, scope: &mut Scope) {
 
     if unsafe { ENV_OPTION.timer } {
         let now = Instant::now();
-        run(script_path, scope);
-        let elapsed_time = now.elapsed();
-        let elapsed_second = elapsed_time.as_secs_f64();
-        println!("Executed in: {}s.", elapsed_second);
+
+        if let Ok(_) = run(script_path, scope) {
+            let elapsed_time = now.elapsed();
+            let elapsed_second = elapsed_time.as_secs_f64();
+            println!("Executed in: {}s.", elapsed_second);
+        }
     } else {
-        run(script_path, scope);
+        let _ = run(script_path, scope);
     }
 }
 
-pub fn run(path: String, scope: &mut Scope) {
+pub fn run(path: String, scope: &mut Scope) -> Result<(), ()> {
     let Ok(mut script_lines) = readlines::resolve(path) else {
         println!("Invalid script file.");
-        return
+        return Err(())
     };
 
     let mut cached_multiline = String::new();
@@ -52,7 +54,7 @@ pub fn run(path: String, scope: &mut Scope) {
 
                     if cached_multiline.is_empty() {
                         // out of multi-line statement
-                        script_line += "\r\n";
+                        script_line.push('\0');
                         current_line = &script_line;
                     } else {
                         // the last line of multi-line statement
@@ -61,21 +63,21 @@ pub fn run(path: String, scope: &mut Scope) {
                             // skip the blank line and line comment
                             continue;
                         }
-                        // add reture sign to current line
-                        script_line += "\r\n";
+                        // add end sign to current line
+                        script_line.push('\0');
 
                         cached_multiline += &script_line;
                         current_line = &cached_multiline;
                     }
+
                     // execuse the line
                     let line_result = attempt(current_line, scope);
 
                     if line_result.is_err() {
                         println!("Error occured at line {}.", line_count);
-
                         // print error code
                         println!("Code: `{}`.", current_line);
-                        break;
+                        break Err(());
                     }
 
                     if !cached_multiline.is_empty() {
@@ -84,7 +86,7 @@ pub fn run(path: String, scope: &mut Scope) {
                 }
             }
             // if is the last line
-            None => break,
+            None => break Ok(()),
         }
     }
 }

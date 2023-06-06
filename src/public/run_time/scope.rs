@@ -116,7 +116,7 @@ impl Scope {
 
         if let None = self.module.get(module_name) {
             // execute the module file
-            script::run(module_path.to_string(), &mut module_scope);
+            script::run(module_path.to_string(), &mut module_scope)?;
 
             // import modules that imported by module
             for (module, _) in module_scope.module {
