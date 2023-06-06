@@ -66,11 +66,11 @@ pub enum ReferenceType {
 pub fn reference_error(type__: ReferenceType, target_name: &str) -> ErrorResult {
     print_line__(format!(
         "{}: {} `{}` is not defined.",
+        error_name_output(REFERENCE_ERROR_NAME),
         match type__ {
             ReferenceType::Variable => "variable",
             ReferenceType::Property => "property"
         },
-        error_name_output(REFERENCE_ERROR_NAME),
         target_name,
     ));
     Err(())
