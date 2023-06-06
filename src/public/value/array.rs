@@ -1,8 +1,8 @@
-use std::{cell::RefCell, collections::VecDeque, rc::Rc, io};
+use std::{cell::RefCell, collections::VecDeque, io, rc::Rc};
 
 use crate::{public::value::oop::object, utils::output::print_line};
 
-use super::value::{Value, Overload};
+use super::value::{Overload, Value};
 
 pub type ArrayLiteral = VecDeque<Value>;
 
@@ -11,8 +11,7 @@ pub fn deep_clone(arr: Rc<RefCell<ArrayLiteral>>) -> Value {
     let mut new_array = ArrayLiteral::new();
 
     for i in &*(arr.as_ref().borrow()) {
-        let element =
-        if let Value::Array(arr) = i {
+        let element = if let Value::Array(arr) = i {
             deep_clone(arr.clone())
         } else {
             i.deep_clone()
@@ -38,12 +37,9 @@ pub fn display(arr: Rc<RefCell<ArrayLiteral>>, level: usize) {
 
         // print elements
         match element {
-            Value::String(_) =>
-                print!("{}", element.str_format()),
-            Value::Array(arr) =>
-                display(arr.clone(), level + 1),
-            Value::Object(obj) =>
-                object::display(obj.clone(), level + 1),
+            Value::String(_) => print!("{}", element.str_format()),
+            Value::Array(arr) => display(arr.clone(), level + 1),
+            Value::Object(obj) => object::display(obj.clone(), level + 1),
             _ => print!("{}", element),
         }
 

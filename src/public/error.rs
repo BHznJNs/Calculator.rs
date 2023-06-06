@@ -48,13 +48,21 @@ pub fn range_error<T: Display>(param: &str, expected: T, found: usize) -> ErrorR
 
 const SYNTAX_ERROR_NAME: &'static str = " SyntaxError ";
 pub fn syntax_error(msg: &str) -> ErrorResult {
-    print_line__(format!("{}: {}.\r", error_name_output(SYNTAX_ERROR_NAME), msg));
+    print_line__(format!(
+        "{}: {}.\r",
+        error_name_output(SYNTAX_ERROR_NAME),
+        msg
+    ));
     Err(())
 }
 
 const ASSIGNMENT_ERROR_NAME: &'static str = " SyntaxError ";
 pub fn assignment_error(msg: &str) -> ErrorResult {
-    print_line__(format!("{}: {}.", error_name_output(ASSIGNMENT_ERROR_NAME), msg));
+    print_line__(format!(
+        "{}: {}.",
+        error_name_output(ASSIGNMENT_ERROR_NAME),
+        msg
+    ));
     Err(())
 }
 
@@ -69,7 +77,7 @@ pub fn reference_error(type__: ReferenceType, target_name: &str) -> ErrorResult 
         error_name_output(REFERENCE_ERROR_NAME),
         match type__ {
             ReferenceType::Variable => "variable",
-            ReferenceType::Property => "property"
+            ReferenceType::Property => "property",
         },
         target_name,
     ));
@@ -78,7 +86,11 @@ pub fn reference_error(type__: ReferenceType, target_name: &str) -> ErrorResult 
 
 const IMPORT_ERROR_NAME: &'static str = " ImportError ";
 pub fn import_error(msg: &str) -> ErrorResult {
-    print_line__(format!("{}: {}.", error_name_output(IMPORT_ERROR_NAME), msg));
+    print_line__(format!(
+        "{}: {}.",
+        error_name_output(IMPORT_ERROR_NAME),
+        msg
+    ));
     Err(())
 }
 

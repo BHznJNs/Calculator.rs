@@ -46,7 +46,7 @@ impl ValueType {
     pub fn is_valid_type(identi: &String) -> Option<ValueType> {
         for (type_name, type__) in VALUE_TYPE_PAIRS {
             if identi.eq(type_name) {
-                return Some(type__)
+                return Some(type__);
             }
         }
         None
@@ -112,11 +112,13 @@ impl fmt::Display for Value {
             _ => {
                 if unsafe { ENV_OPTION.support_ansi } {
                     match self {
-                        Value::Boolean(bool_val) => write!(f, "{}", bool_val.to_string().dark_yellow()),
+                        Value::Boolean(bool_val) => {
+                            write!(f, "{}", bool_val.to_string().dark_yellow())
+                        }
                         Value::Number(num) => write!(f, "{}", num.to_string().yellow()),
                         Value::LazyExpression(_) => write!(f, "{}", "<Lazy-Expression>".cyan()),
                         Value::Function(func) => write!(f, "{}", format!("{}", func).cyan()),
-                        _ => unreachable!()
+                        _ => unreachable!(),
                     }
                 } else {
                     match self {
@@ -124,7 +126,7 @@ impl fmt::Display for Value {
                         Value::Number(num) => write!(f, "{}", num),
                         Value::LazyExpression(_) => write!(f, "{}", "<Lazy-Expression>"),
                         Value::Function(func) => write!(f, "{}", func),
-                        _ => unreachable!()
+                        _ => unreachable!(),
                     }
                 }
             }
@@ -169,8 +171,7 @@ impl Value {
         self.clone()
     }
     pub fn deep_clone(&self) -> Value {
-        let result =
-        match self {
+        let result = match self {
             // Boolean and Number is primitive type,
             // can be directly cloned.
             Value::Boolean(_)
@@ -189,7 +190,7 @@ impl Value {
             // recursive clone is needed.
             Value::Array(arr) =>
                 array::deep_clone(arr.clone()),
-            Value::Object(obj) => 
+            Value::Object(obj) =>
                 object::deep_clone(obj.clone()),
 
             Value::LazyExpression(l_expr) => {

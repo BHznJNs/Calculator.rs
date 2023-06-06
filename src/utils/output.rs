@@ -1,4 +1,7 @@
-use std::{fmt::Display, io::{Stdout, stdout}};
+use std::{
+    fmt::Display,
+    io::{stdout, Stdout},
+};
 
 use crossterm::{cursor, execute};
 

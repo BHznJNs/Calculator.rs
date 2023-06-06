@@ -1,106 +1,45 @@
 use std::rc::Rc;
 
-use crossterm::style::Stylize;
 use crate::public::env::ENV_OPTION;
+use crossterm::style::Stylize;
 
 use super::tokenizer::{tokenize, TokenVec};
 
 // 32 ~ 125 | ' ' ~ '}'
 const ALLOWED_CHAR_MAP: [bool; 94] = [
-    true,  // ' '
-    true,  // '!'
-    true,  // '"'
-    true,  // '#'
-    true,  // '$'
-    false,
-    false,
-    true,  // '\''
-    true,  // '('
-    true,  // ')'
-    true,  // '*'
-    true,  // '+'
-    true,  // ','
-    true,  // '-'
-    true,  // '.'
-    true,  // '/'
-    true,  // '0'
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,  // '9'
-    true,
-    true,  // ';'
-    true,  // '<'
-    true,  // '='
-    true,  // '>'
-    false,
-    false,
-    true,  // 'A'
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,  // 'Z'
-    true,  // '['
-    true,  // '\'
-    true,  // ']'
-    true,  // '^'
-    true,  // '_'
-    false,
-    true,  // 'a'
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,  // 'z'
-    true,  // '{'
-    false,
-    true,  // '}'
+    true, // ' '
+    true, // '!'
+    true, // '"'
+    true, // '#'
+    true, // '$'
+    false, false, true, // '\''
+    true, // '('
+    true, // ')'
+    true, // '*'
+    true, // '+'
+    true, // ','
+    true, // '-'
+    true, // '.'
+    true, // '/'
+    true, // '0'
+    true, true, true, true, true, true, true, true, true, // '9'
+    true, true, // ';'
+    true, // '<'
+    true, // '='
+    true, // '>'
+    false, false, true, // 'A'
+    true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+    true, true, true, true, true, true, true, true, true, // 'Z'
+    true, // '['
+    true, // '\'
+    true, // ']'
+    true, // '^'
+    true, // '_'
+    false, true, // 'a'
+    true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+    true, true, true, true, true, true, true, true, true, // 'z'
+    true, // '{'
+    false, true, // '}'
 ];
 
 pub struct Line<'a> {
@@ -126,7 +65,7 @@ impl<'a> Line<'a> {
             content,
 
             is_history: false,
-            label_width: label_fmted_width, 
+            label_width: label_fmted_width,
             label: label_fmted,
             tokens: TokenVec::new(),
         }

@@ -1,4 +1,7 @@
-use crate::public::{compile_time::ast::ast_enum::ASTNode, error::{internal_error, InternalComponent}};
+use crate::public::{
+    compile_time::ast::ast_enum::ASTNode,
+    error::{internal_error, InternalComponent},
+};
 
 const PRIORITY: [i8; 12] = [
     1, // Symbols::Plus

@@ -75,10 +75,10 @@ impl BuildInFnCall for StringFn {
                 } else {
                     Value::create(ArrayLiteral::new())
                 }
-            },
+            }
             StringFn::REPLACE => {
-                let from_value  = get_val("from", scope)?;
-                let to_value  = get_val("to", scope)?;
+                let from_value = get_val("from", scope)?;
+                let to_value = get_val("to", scope)?;
 
                 let str_ref = str_ref.borrow_mut();
                 if let (Value::String(from_str), Value::String(to_str)) = (from_value, to_value) {
@@ -90,7 +90,7 @@ impl BuildInFnCall for StringFn {
                 } else {
                     Value::create(String::new())
                 }
-            },
+            }
             StringFn::REPEAT => todo!(),
             StringFn::JOIN => todo!(),
             StringFn::STARTWITH => todo!(),

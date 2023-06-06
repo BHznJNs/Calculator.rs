@@ -1,12 +1,12 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::{fmt, io};
 use std::rc::Rc;
+use std::{fmt, io};
 
 use crossterm::style::Stylize;
 
 use crate::public::env::ENV_OPTION;
-use crate::public::error::{type_error, ReferenceType, reference_error};
+use crate::public::error::{reference_error, type_error, ReferenceType};
 use crate::public::value::array::ArrayLiteral;
 use crate::public::value::function::Function;
 use crate::public::value::value::{Value, ValueType};
@@ -43,8 +43,7 @@ impl Class {
 
         match result_target_method {
             Ok(target_method) => Ok(target_method),
-            Err(()) =>
-                Err(reference_error(ReferenceType::Property, target_method)?),
+            Err(()) => Err(reference_error(ReferenceType::Property, target_method)?),
         }
     }
 
@@ -116,11 +115,10 @@ impl fmt::Display for Class {
         print_line(&mut stdout, '{');
         for prop in &self.properties {
             // todo: display property indentifier and type
-            print_line(&mut stdout, format!(
-                "  {}: {},",
-                prop.identi,
-                prop.type__.to_string().red(),
-            ));
+            print_line(
+                &mut stdout,
+                format!("  {}: {},", prop.identi, prop.type__.to_string().red(),),
+            );
         }
 
         let class_method_disp = if unsafe { ENV_OPTION.support_ansi } {
@@ -132,7 +130,10 @@ impl fmt::Display for Class {
             DataStoragePattern::List => {
                 let list = self.method_list.as_ref().unwrap();
                 for method in list {
-                    print_line(&mut stdout, format!("  {}: {},", method.0, class_method_disp));
+                    print_line(
+                        &mut stdout,
+                        format!("  {}: {},", method.0, class_method_disp),
+                    );
                 }
             }
             DataStoragePattern::Map => {

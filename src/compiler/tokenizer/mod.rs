@@ -1,5 +1,5 @@
-pub mod token;
 mod char_converter;
+pub mod token;
 
 use crate::compiler::tokenizer::char_converter::char_converter;
 use crate::public::compile_time::keywords::Keyword;
@@ -10,10 +10,10 @@ use crate::public::value::{number::Number, value::ValueType};
 use crate::utils::ascii::{
     ascii_to_num, is_identi_ascii, BACKSLASH_ASCII, COMMA_ASCII, DIVIDE_ASCII, DOLLAR_ASCII,
     DOUBLE_QUOTE_ASCII, EQUAL_ASCII, LEFT_BRACE_ASCII, LEFT_BRACKET_ASCII, LEFT_PAREN_ASCII,
-    LESS_THAN_ASCII, MINUS_ASCII, MORE_THAN_ASCII, MULTIPLY_ASCII,
-    NOT_SYMBOL_ASCII, NUMBER_SIGN_ASCII, PLUS_ASCII, POINT_ASCII, POWER_ASCII,
-    RIGHT_BRACE_ASCII, RIGHT_BRACKET_ASCII, RIGHT_PAREN_ASCII, SEMICOLON_ASCII, SINGLE_QUOTE_ASCII,
-    SPACE_ASCII, TAB_ASCII, NULL_ASCII,
+    LESS_THAN_ASCII, MINUS_ASCII, MORE_THAN_ASCII, MULTIPLY_ASCII, NOT_SYMBOL_ASCII, NULL_ASCII,
+    NUMBER_SIGN_ASCII, PLUS_ASCII, POINT_ASCII, POWER_ASCII, RIGHT_BRACE_ASCII,
+    RIGHT_BRACKET_ASCII, RIGHT_PAREN_ASCII, SEMICOLON_ASCII, SINGLE_QUOTE_ASCII, SPACE_ASCII,
+    TAB_ASCII,
 };
 
 use token::{Token, TokenType, TokenVec};
@@ -116,11 +116,11 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
                     Some(type__) => {
                         last_type = TokenType::Annotation;
                         tokens.push_back(Token::Annotation(type__));
-                    },
+                    }
                     None => {
                         let msg = format!("Invalid type '{}'", value);
                         return Err(syntax_error(&msg)?);
-                    },
+                    }
                 }
             } else {
                 // check is keyword
@@ -128,11 +128,11 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
                     Some(keyword) => {
                         last_type = TokenType::Keyword;
                         tokens.push_back(Token::Keyword(keyword));
-                    },
+                    }
                     None => {
                         last_type = TokenType::Identifier;
                         tokens.push_back(Token::Identi(value));
-                    },
+                    }
                 }
             }
             continue;

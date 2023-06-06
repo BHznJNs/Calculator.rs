@@ -73,8 +73,8 @@ pub fn assign(
         return Err(type_error(
             Some("indexing assignment"),
             vec![ValueType::String, ValueType::Array],
-            array_value.get_type()
-        )?)
+            array_value.get_type(),
+        )?);
     }
     Ok(())
 }
@@ -101,7 +101,7 @@ pub fn resolve(
         Err(type_error(
             Some("indexing"),
             vec![ValueType::String, ValueType::Array],
-            array_value.get_type()
+            array_value.get_type(),
         )?)
     }
 }

@@ -1,4 +1,4 @@
-use crate::public::error::{syntax_error, internal_error, InternalComponent};
+use crate::public::error::{internal_error, syntax_error, InternalComponent};
 use crate::public::value::symbols::Symbols;
 use crate::public::value::value::{Overload, Value};
 
@@ -21,7 +21,7 @@ pub fn operate(val1: Value, val2: Value, operator: Symbols) -> Result<Value, ()>
             Symbols::MoreThanEqual => Value::Boolean(num1 >= num2),
             _ => {
                 let msg = format!("unexpected symbol `{}` for operating", operator);
-                return Err(internal_error(InternalComponent::Computer, &msg)?)
+                return Err(internal_error(InternalComponent::Computer, &msg)?);
             }
         }
     } else if let (Value::String(str1_ref), Value::String(str2_ref)) = (&val1, &val2) {

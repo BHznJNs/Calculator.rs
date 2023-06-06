@@ -70,19 +70,15 @@ impl Scope {
         // if local-scope, assigning variable to
         // the local-scope is preferred.
         match &mut self.local {
-            Some(local_scope) =>
-            // usually in a function invocation.
-                local_scope
-                    .variables
-                    .insert(var_name, value),
-            None => self
-                .global
-                .variables
-                .insert(var_name, value),
+            Some(local_scope) => {
+                // usually in a function invocation.
+                local_scope.variables.insert(var_name, value)
+            }
+            None => self.global.variables.insert(var_name, value),
         };
     }
     pub fn read_var(&self, var_name: &str) -> Result<Value, ()> {
-            // use local-scope preferer
+        // use local-scope preferer
         if let Some(local_scope) = &self.local {
             if let Some(val) = local_scope.variables.get(var_name) {
                 return Ok(val.clone());

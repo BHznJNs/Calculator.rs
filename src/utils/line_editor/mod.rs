@@ -9,7 +9,10 @@ mod history;
 
 use std::io;
 
-use crossterm::{event::{KeyCode, KeyModifiers}, style::Stylize};
+use crossterm::{
+    event::{KeyCode, KeyModifiers},
+    style::Stylize,
+};
 
 use history::History;
 use line::Line;
@@ -17,8 +20,8 @@ pub use signal::Signal;
 use state::LineState;
 use terminal::Terminal;
 
-use crate::utils::{line_editor::terminal::TextType, output::print_line};
 use crate::public::env::ENV_OPTION;
+use crate::utils::{line_editor::terminal::TextType, output::print_line};
 // use candidate::Candidate;
 
 // output something into file
@@ -68,8 +71,7 @@ impl LineEditor {
         if self.is_at.line_end {
             line.pop();
             if line.len() > self.visible_area_width {
-                self.overflow_left =
-                    line.len() - self.visible_area_width;
+                self.overflow_left = line.len() - self.visible_area_width;
             } else {
                 self.overflow_left = 0;
             };
@@ -116,10 +118,11 @@ impl LineEditor {
             type__: TextType,
         ) {
             if unsafe { ENV_OPTION.support_ansi } {
-                let mut colored=
-                    TextType::match_tx_type(text, type__);
+                let mut colored = TextType::match_tx_type(text, type__);
                 // if is history, line text will be darken
-                if is_history { colored = colored.dim(); }
+                if is_history {
+                    colored = colored.dim();
+                }
 
                 buffer.extend(colored.to_string().chars());
             } else {
@@ -149,20 +152,40 @@ impl LineEditor {
                     // when a token is going to be overflow left side and right side
                     if actual_print_len > remain_space {
                         // print middle part of this token
-                        buffer_extend_colored(&mut buffer, line.is_history, &token.content[offset..offset + remain_space], token.type__);
+                        buffer_extend_colored(
+                            &mut buffer,
+                            line.is_history,
+                            &token.content[offset..offset + remain_space],
+                            token.type__,
+                        );
                         break;
                     }
 
                     remain_space -= token.len() - offset;
-                    buffer_extend_colored(&mut buffer, line.is_history, &token.content[offset..], token.type__);
+                    buffer_extend_colored(
+                        &mut buffer,
+                        line.is_history,
+                        &token.content[offset..],
+                        token.type__,
+                    );
                     offset = 0;
                 }
             } else {
                 if remain_space >= token.len() {
                     remain_space -= token.len();
-                    buffer_extend_colored(&mut buffer, line.is_history, &token.content, token.type__);
+                    buffer_extend_colored(
+                        &mut buffer,
+                        line.is_history,
+                        &token.content,
+                        token.type__,
+                    );
                 } else {
-                    buffer_extend_colored(&mut buffer, line.is_history, &token.content[..remain_space], token.type__);
+                    buffer_extend_colored(
+                        &mut buffer,
+                        line.is_history,
+                        &token.content[..remain_space],
+                        token.type__,
+                    );
                     remain_space = 0;
                 }
             }
@@ -340,8 +363,7 @@ impl LineEditor {
                                     self.terminal.cursor.right(1)?;
                                 }
                                 if line.len() > self.visible_area_width {
-                                    self.overflow_left =
-                                        line.len() - self.visible_area_width;
+                                    self.overflow_left = line.len() - self.visible_area_width;
                                 } else {
                                     self.overflow_left = 0;
                                 };

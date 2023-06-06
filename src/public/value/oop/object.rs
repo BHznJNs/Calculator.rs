@@ -1,9 +1,9 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::io::{Stdout, self};
+use std::io::{self, Stdout};
 use std::rc::Rc;
 
-use crate::public::error::{reference_error, ReferenceType, internal_error, InternalComponent};
+use crate::public::error::{internal_error, reference_error, InternalComponent, ReferenceType};
 use crate::public::value::array::{self, ArrayLiteral};
 use crate::public::value::oop::class::Class;
 use crate::public::value::value::Overload;
@@ -43,7 +43,7 @@ pub fn deep_clone(obj: Rc<RefCell<Object>>) -> Value {
                         prop_value_resolve(v, &mut instantiation_params);
                     }
                 }
-            },
+            }
             DataStoragePattern::Map => {
                 if let Some(map) = &obj_ref.data_map {
                     for (_, v) in map {
@@ -56,16 +56,14 @@ pub fn deep_clone(obj: Rc<RefCell<Object>>) -> Value {
         // the object has passed the type check,
         // thus with properties of the object,
         // the instantiation must pass the type check.
-        let res_object = Class::instantiate(
-            class.clone(), 
-            instantiation_params,
-        ).unwrap();
+        let res_object = Class::instantiate(class.clone(), instantiation_params).unwrap();
         Value::create(res_object)
     } else {
         internal_error(
             InternalComponent::Std,
             "build-in object cloning is not allowed",
-        ).unwrap_err();
+        )
+        .unwrap_err();
         Value::Object(obj.clone())
     }
 }
@@ -79,12 +77,9 @@ pub fn display(obj: Rc<RefCell<Object>>, level: usize) {
 
         // print value
         match value_ref.unwrap() {
-            Value::String(_) =>
-                print!("{}", value_ref.str_format()),
-            Value::Array(arr) =>
-                array::display(arr, level + 1),
-            Value::Object(obj) =>
-                display(obj, level + 1),
+            Value::String(_) => print!("{}", value_ref.str_format()),
+            Value::Array(arr) => array::display(arr, level + 1),
+            Value::Object(obj) => display(obj, level + 1),
             _ => print!("{}", value_ref),
         }
 
@@ -151,8 +146,7 @@ impl Object {
                 *target_ref = value;
                 Ok(())
             }
-            Err(()) =>
-                Err(reference_error(ReferenceType::Property, prop_name)?)
+            Err(()) => Err(reference_error(ReferenceType::Property, prop_name)?),
         }
     }
 }

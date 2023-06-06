@@ -5,7 +5,7 @@ use crate::public::compile_time::ast::ast_enum::{ASTNode, ASTVec};
 use crate::public::compile_time::ast::types::{ExpressionNode, VariableNode};
 use crate::public::compile_time::keywords::Keyword;
 use crate::public::compile_time::parens::Paren;
-use crate::public::error::{assignment_error, syntax_error, internal_error, InternalComponent};
+use crate::public::error::{assignment_error, internal_error, syntax_error, InternalComponent};
 use crate::public::value::symbols::Symbols;
 
 use super::symbol_priority::compare;

@@ -59,7 +59,7 @@ pub fn repl(scope: &mut Scope, calc_env: Env) -> io::Result<()> {
             Signal::NonASCII => {
                 syntax_error("non-ASCII character").unwrap_err();
                 continue;
-            },
+            }
         };
 
         let result: Result<Value, ()>;

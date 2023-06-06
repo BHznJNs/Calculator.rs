@@ -15,8 +15,9 @@ pub fn resolve(node: Rc<AssignmentNode>, scope: &mut Scope) -> Result<Value, ()>
     let right_hand_value = expression::resolve(right_hand_clone.into(), scope)?;
 
     match left_hand_node {
-        ASTNode::Variable(sub_node) =>
-            scope.assign(sub_node.name.to_owned(), right_hand_value.clone()),
+        ASTNode::Variable(sub_node) => {
+            scope.assign(sub_node.name.to_owned(), right_hand_value.clone())
+        }
 
         ASTNode::ArrayElementReading(sub_node) => {
             let array_clone = sub_node.array_node.clone();

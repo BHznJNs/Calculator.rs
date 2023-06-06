@@ -41,7 +41,7 @@ impl Symbols {
             return Err(internal_error(
                 InternalComponent::InternalFn,
                 "invalid `Symbols::combine` invocation",
-            )?)
+            )?);
         }
 
         let result_symbol = match other {
@@ -56,7 +56,7 @@ impl Symbols {
             Symbols::Equal => Symbols::CompareEqual,
             _ => {
                 let msg = format!("invalid symbol `{}` for symbol combination", other);
-                return Err(internal_error(InternalComponent::Tokenizer, &msg)?)
+                return Err(internal_error(InternalComponent::Tokenizer, &msg)?);
             }
         };
         Ok(result_symbol)

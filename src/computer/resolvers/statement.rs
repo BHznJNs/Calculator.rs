@@ -25,7 +25,7 @@ pub fn resolve(statement_node: Rc<StatementNode>, scope: &mut Scope) -> Result<V
             } else {
                 Value::Void(VoidSign::Empty)
             };
-            
+
             print_line(&mut stdout(), output_value);
             // println!("{}", output_value);
             Value::Void(VoidSign::Empty)

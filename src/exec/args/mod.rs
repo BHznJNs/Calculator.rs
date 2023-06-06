@@ -3,7 +3,10 @@ mod help_msg;
 
 use std::{collections::VecDeque, io, process};
 
-use crate::public::{env::{Env, ENV_OPTION}, run_time::scope::Scope};
+use crate::public::{
+    env::{Env, ENV_OPTION},
+    run_time::scope::Scope,
+};
 
 use super::{headfile, repl::repl, script};
 use commands::CommandArg;
@@ -30,8 +33,7 @@ fn args_resolve(
         let current_arg = args.pop_front().unwrap();
         if let Some(command) = command_map.get::<str>(&current_arg) {
             match command {
-                CommandArg::Timer =>
-                    unsafe { ENV_OPTION.timer = true },
+                CommandArg::Timer => unsafe { ENV_OPTION.timer = true },
                 CommandArg::Help => {
                     help_msg::output();
                     process::exit(0);
