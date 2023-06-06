@@ -1,0 +1,5 @@
+import Math
+
+sin = Math.sin
+cos = Math.cos
+tan = Math.tan
