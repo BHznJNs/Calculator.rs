@@ -13,7 +13,7 @@ pub const COMMANDS: [[&'static str; 2]; COMMAND_COUNT] = [
     ["-v", "--version"],
     ["-h", "--help"],
     ["-t", "--timer"],
-    ["-hd", "--headfile"],
+    ["-hf", "--headfile"],
 ];
 pub const COMMAND_DESCRIPTIONS: [&'static str; COMMAND_COUNT] = [
     "print current executable file version and exit.",
