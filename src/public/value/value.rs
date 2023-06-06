@@ -42,6 +42,17 @@ pub const VALUE_TYPE_PAIRS: [(&'static str, ValueType); 8] = [
     ("Obj", ValueType::Object),
 ];
 
+impl ValueType {
+    pub fn is_valid_type(identi: &String) -> Option<ValueType> {
+        for (type_name, type__) in VALUE_TYPE_PAIRS {
+            if identi.eq(type_name) {
+                return Some(type__)
+            }
+        }
+        None
+    }
+}
+
 impl fmt::Display for ValueType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {

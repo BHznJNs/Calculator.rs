@@ -79,8 +79,13 @@ impl LineEditor {
         Ok(())
     }
 
+    #[inline]
+    fn move_cursor_to_prompt(&mut self) -> io::Result<()> {
+        self.terminal.cursor.move_to_col(self.prompt.len())
+    }
+    #[inline]
     fn clear_line(&mut self) -> io::Result<()> {
-        self.terminal.cursor.move_to_col(self.prompt.len())?;
+        self.move_cursor_to_prompt()?;
         self.terminal.clear_after_cursor();
         Ok(())
     }
@@ -241,12 +246,14 @@ impl LineEditor {
             match key.code {
                 KeyCode::Up => {
                     if let Some(last_line) = self.history.previous() {
+                        self.move_cursor_to_prompt()?;
                         line.use_history(last_line);
                     }
                 }
 
                 KeyCode::Down => {
                     if let Some(next_line) = self.history.next() {
+                        self.move_cursor_to_prompt()?;
                         line.use_history(next_line);
                     } else {
                         line.reset();
@@ -304,6 +311,7 @@ impl LineEditor {
 
                         print_line(&mut self.terminal.stdout, "");
                         self.history.append(line_content.clone());
+                        line_content.push('\0');
                         break Signal::NewLine(line_content);
                     }
                     KeyCode::Tab => {

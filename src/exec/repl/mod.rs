@@ -54,7 +54,7 @@ pub fn repl(scope: &mut Scope, calc_env: Env) -> io::Result<()> {
 
         let sig = rl.readline()?;
         let line_content = match sig {
-            Signal::NewLine(line) => line + "\r\n",
+            Signal::NewLine(line) => line,
             Signal::Interrupt => break,
             Signal::NonASCII => {
                 syntax_error("non-ASCII character").unwrap_err();
