@@ -1,3 +1,4 @@
+// a-z A-Z _
 pub fn is_identi_ascii(ascii: u8) -> bool {
     const UNDERLINE_ASCII: u8 = 95;
     return ascii.is_ascii_alphabetic() || ascii == UNDERLINE_ASCII;
