@@ -2,38 +2,23 @@ use std::fmt;
 use std::rc::Rc;
 
 use crate::public::compile_time::ast::ast_enum::ASTVec;
+use crate::public::compile_time::ast::types::ExpressionNode;
+use crate::public::error::{range_error, type_error};
 use crate::public::run_time::build_in::BuildInFnIdenti;
+use crate::public::run_time::scope::{LocalScope, Scope};
 
-use super::value::ValueType;
+use super::value::{ValueType, Value};
 
-#[derive(PartialEq)]
-pub struct BuildInParam {
+#[derive(PartialEq, Clone)]
+pub struct Param {
     pub type__: ValueType,
     pub identi: &'static str,
 }
 
 #[derive(PartialEq)]
 pub struct BuildInFunction {
-    pub params: [Option<BuildInParam>; 4],
+    pub params: Vec<Param>,
     pub identi: BuildInFnIdenti,
-}
-impl BuildInFunction {
-    pub fn param_count(&self) -> usize {
-        let mut count = 0;
-        for p in &self.params {
-            match p {
-                Some(_) => count += 1,
-                None => break,
-            }
-        }
-        return count;
-    }
-}
-
-#[derive(PartialEq, Clone)]
-pub struct Param {
-    pub type__: ValueType,
-    pub identi: String,
 }
 
 #[derive(PartialEq)]
@@ -48,6 +33,50 @@ pub struct UserDefinedFunction {
 pub enum Function {
     BuildIn(Rc<BuildInFunction>),
     UserDefined(Rc<UserDefinedFunction>),
+}
+
+impl Function {
+    pub fn param_check(
+        formal_params: &Vec<Param>,
+        actual_params: &Vec<ExpressionNode>,
+        whole_scope: &mut Scope,
+        local_scope: &mut LocalScope,
+        expr_resolver: fn(Rc<ExpressionNode>, &mut Scope) -> Result<Value, ()>,
+    ) -> Result<(), ()> {
+        if actual_params.len() < formal_params.len() {
+            // if param missing
+            return Err(range_error(
+                "function invocation",
+                formal_params.len(),
+                actual_params.len(),
+            )?);
+        }
+
+        let mut index = 0;
+        while index < formal_params.len() {
+            let formal_param = &formal_params[index];
+
+            // compute actual_param_value
+            let actual_param_node = (&actual_params[index]).clone();
+            let actual_param_value = expr_resolver(actual_param_node.into(), whole_scope)?;
+
+            // param type check
+            if actual_param_value.check_type(formal_param.type__) {
+                local_scope
+                    .variables
+                    .insert(formal_param.identi.to_string(), actual_param_value);
+            } else {
+                type_error(
+                    Some(&formal_param.identi),
+                    vec![formal_param.type__],
+                    actual_param_value.get_type(),
+                )?
+            }
+
+            index += 1;
+        }
+        Ok(())
+    }
 }
 
 impl fmt::Display for Function {

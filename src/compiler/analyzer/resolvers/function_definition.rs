@@ -24,7 +24,10 @@ fn params_resolve(tokens: &mut TokenVec) -> Result<Vec<Param>, ()> {
                 Token::Identi(identi) => {
                     let next = tokens.pop_front().unwrap();
                     if let Token::Annotation(type__) = next {
-                        params.push(Param { type__, identi })
+                        params.push(Param {
+                            type__,
+                            identi: Box::leak(Box::new(identi))
+                        })
                     } else {
                         return Err(syntax_error(
                             "type annotation expected in function definition",

@@ -39,7 +39,5 @@ pub const DOLLAR_ASCII: u8 = 36; // $
 pub const NUMBER_SIGN_ASCII: u8 = 35; // #
 pub const SPACE_ASCII: u8 = 32; // ' '
 pub const TAB_ASCII: u8 = 9; // '\t'
-pub const NEW_LINE_ASCII: u8 = 10; // '\n'
-pub const RETURN_ASCII: u8 = 13; // '\r'
 
 pub const NULL_ASCII: u8 = 0; // '\0'

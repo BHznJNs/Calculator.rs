@@ -2,11 +2,10 @@ use std::rc::Rc;
 
 use crate::computer::resolvers::expression;
 use crate::public::compile_time::ast::types::ExpressionNode;
-use crate::public::error::{range_error, type_error};
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::{LocalScope, Scope};
 use crate::public::std::modules::BuildInFnCall;
-use crate::public::value::function::BuildInFunction;
+use crate::public::value::function::{BuildInFunction, Function};
 use crate::public::value::value::Value;
 
 fn call(function: &BuildInFunction, scope: &mut Scope) -> Result<Value, ()> {
@@ -15,7 +14,7 @@ fn call(function: &BuildInFunction, scope: &mut Scope) -> Result<Value, ()> {
         BuildInFnIdenti::Math(math_fn) => math_fn.call(scope),
         BuildInFnIdenti::Array(arr_fn) => arr_fn.call(scope),
         BuildInFnIdenti::String(str_fn) => str_fn.call(scope),
-        BuildInFnIdenti::FileSystem(_) => todo!(),
+        BuildInFnIdenti::FileSystem(fs_fn) => fs_fn.call(scope),
     }
 }
 
@@ -25,43 +24,16 @@ pub fn invoke(
     scope: &mut Scope,
 ) -> Result<Value, ()> {
     let mut local_scope = LocalScope::init();
-    let mut index = 0;
 
-    while index < function.params.len() {
-        let formal_param = &function.params[index];
+    Function::param_check(
+        &function.params,
+        params,
+        scope,
+        &mut local_scope,
+        expression::resolve,
+    )?;
 
-        match formal_param {
-            Some(p) => {
-                if index >= params.len() {
-                    return Err(range_error(
-                        "Build-in function invocation",
-                        function.param_count(),
-                        params.len(),
-                    )?);
-                }
-
-                let actual_param_node = (&params[index]).clone();
-                let actual_param_value = expression::resolve(actual_param_node.into(), scope)?;
-
-                // param type check
-                if actual_param_value.check_type(p.type__) {
-                    local_scope
-                        .variables
-                        .insert(p.identi.to_string(), actual_param_value);
-                } else {
-                    type_error(
-                        Some(&format!("Build-in function param '{}'", p.identi)),
-                        vec![p.type__],
-                        actual_param_value.get_type(),
-                    )?
-                }
-            }
-            None => break,
-        }
-        index += 1;
-    }
-
-    // cached local scope
+    // cache local scope
     let mut local_scope_cached = scope.local.take();
 
     scope.local = Some(local_scope);

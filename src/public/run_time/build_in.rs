@@ -30,7 +30,7 @@ pub fn constants() -> HashMap<String, Value> {
             Value::create(ValueType::Boolean as i64),
         ),
         (
-            String::from("NUMBE"),
+            String::from("NUMB"),
             Value::create(ValueType::Number as i64),
         ),
         (String::from("STR"), Value::create(ValueType::String as i64)),

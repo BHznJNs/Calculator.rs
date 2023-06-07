@@ -8,7 +8,7 @@ use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::std::utils::str_to_num::str_to_num;
 use crate::public::value::array::ArrayLiteral;
-use crate::public::value::function::{BuildInFunction, BuildInParam};
+use crate::public::value::function::{BuildInFunction, Param};
 use crate::public::value::number::Number;
 use crate::public::value::value::{Overload, Value, ValueType, VoidSign};
 
@@ -16,18 +16,117 @@ use super::super::utils::get_val::get_val;
 use super::BuildInFnCall;
 
 pub fn function_list() -> Vec<(String, Value)> {
+    let input = BuildInFunction {
+        params: vec![
+            Param {
+                type__: ValueType::String,
+                identi: "prompt",
+            },
+        ],
+        identi: BuildInFnIdenti::Basic(BasicFn::INPUT),
+    };
+    // get value type
+    let type__ = BuildInFunction {
+        params: vec![
+            Param {
+                type__: ValueType::Void,
+                identi: "input",
+            },
+        ],
+        identi: BuildInFnIdenti::Basic(BasicFn::TYPE),
+    };
+    // deep clone value
+    let clone = BuildInFunction {
+        params: vec![
+            Param {
+                type__: ValueType::Void,
+                identi: "input",
+            },
+        ],
+        identi: BuildInFnIdenti::Basic(BasicFn::CLONE),
+    };
+
+    // Type converters
+    let int = BuildInFunction {
+        params: vec![
+            Param {
+                type__: ValueType::Void,
+                identi: "input",
+            },
+        ],
+        identi: BuildInFnIdenti::Basic(BasicFn::INT),
+    };
+    let float = BuildInFunction {
+        params: vec![
+            Param {
+                type__: ValueType::Void,
+                identi: "input",
+            },
+        ],
+        identi: BuildInFnIdenti::Basic(BasicFn::FLOAT),
+    };
+    let boolean = BuildInFunction {
+        params: vec![
+            Param {
+                type__: ValueType::Void,
+                identi: "input",
+            },
+        ],
+        identi: BuildInFnIdenti::Basic(BasicFn::BOOLEAN),
+    };
+    let string = BuildInFunction {
+        params: vec![
+            Param {
+                type__: ValueType::Number,
+                identi: "input",
+            },
+        ],
+        identi: BuildInFnIdenti::Basic(BasicFn::STRING),
+    };
+    let array = BuildInFunction {
+        params: vec![
+            Param {
+                type__: ValueType::Number,
+                identi: "input",
+            },
+        ],
+        identi: BuildInFnIdenti::Basic(BasicFn::ARRAY),
+    };
+    let ascii = BuildInFunction {
+        params: vec![
+            Param {
+                type__: ValueType::String,
+                identi: "input",
+            },
+        ],
+        identi: BuildInFnIdenti::Basic(BasicFn::ASCII),
+    };
+    let len = BuildInFunction {
+        params: vec![
+            Param {
+                type__: ValueType::Void,
+                identi: "input",
+            },
+        ],
+        identi: BuildInFnIdenti::Basic(BasicFn::LEN),
+    };
+    let exit = BuildInFunction {
+        params: vec![],
+        identi: BuildInFnIdenti::Basic(BasicFn::EXIT),
+    };
+
     vec![
-        (String::from("input"),  Value::create(INPUT)),
-        (String::from("type"),   Value::create(TYPE)),
-        (String::from("clone"),  Value::create(CLONE)),
-        (String::from("int"),    Value::create(INT)),
-        (String::from("float"),  Value::create(FLOAT)),
-        (String::from("bool"),   Value::create(BOOLEAN)),
-        (String::from("string"), Value::create(STRING)),
-        (String::from("array"),  Value::create(ARRAY)),
-        (String::from("ascii"),  Value::create(ASCII)),
-        (String::from("len"),    Value::create(LEN)),
-        (String::from("exit"),   Value::create(EXIT)),
+        (String::from("input"),  Value::create(input)),
+        (String::from("type"),   Value::create(type__)),
+        (String::from("clone"),  Value::create(clone)),
+        (String::from("int"),    Value::create(int)),
+        (String::from("float"),  Value::create(float)),
+        (String::from("bool"),   Value::create(boolean)),
+        (String::from("string"), Value::create(string)),
+        (String::from("array"),  Value::create(array)),
+        (String::from("ascii"),  Value::create(ascii)),
+        (String::from("len"),    Value::create(len)),
+        (String::from("exit"),   Value::create(exit)),
     ]
 }
 
@@ -214,141 +313,3 @@ impl BuildInFnCall for BasicFn {
         Ok(result)
     }
 }
-
-// --- --- --- --- --- ---
-
-const INPUT: BuildInFunction = BuildInFunction {
-    params: [
-        Some(BuildInParam {
-            type__: ValueType::String,
-            identi: "prompt",
-        }),
-        None,
-        None,
-        None,
-    ],
-    identi: BuildInFnIdenti::Basic(BasicFn::INPUT),
-};
-// get value type
-const TYPE: BuildInFunction = BuildInFunction {
-    params: [
-        Some(BuildInParam {
-            type__: ValueType::Void,
-            identi: "input",
-        }),
-        None,
-        None,
-        None,
-    ],
-    identi: BuildInFnIdenti::Basic(BasicFn::TYPE),
-};
-// deep clone value
-const CLONE: BuildInFunction = BuildInFunction {
-    params: [
-        Some(BuildInParam {
-            type__: ValueType::Void,
-            identi: "input",
-        }),
-        None,
-        None,
-        None,
-    ],
-    identi: BuildInFnIdenti::Basic(BasicFn::CLONE),
-};
-
-// Type converters
-const INT: BuildInFunction = BuildInFunction {
-    params: [
-        Some(BuildInParam {
-            type__: ValueType::Void,
-            identi: "input",
-        }),
-        None,
-        None,
-        None,
-    ],
-    identi: BuildInFnIdenti::Basic(BasicFn::INT),
-};
-const FLOAT: BuildInFunction = BuildInFunction {
-    params: [
-        Some(BuildInParam {
-            type__: ValueType::Void,
-            identi: "input",
-        }),
-        None,
-        None,
-        None,
-    ],
-    identi: BuildInFnIdenti::Basic(BasicFn::FLOAT),
-};
-const BOOLEAN: BuildInFunction = BuildInFunction {
-    params: [
-        Some(BuildInParam {
-            type__: ValueType::Void,
-            identi: "input",
-        }),
-        None,
-        None,
-        None,
-    ],
-    identi: BuildInFnIdenti::Basic(BasicFn::BOOLEAN),
-};
-const STRING: BuildInFunction = BuildInFunction {
-    params: [
-        Some(BuildInParam {
-            type__: ValueType::Number,
-            identi: "input",
-        }),
-        None,
-        None,
-        None,
-    ],
-    identi: BuildInFnIdenti::Basic(BasicFn::STRING),
-};
-const ARRAY: BuildInFunction = BuildInFunction {
-    params: [
-        Some(BuildInParam {
-            type__: ValueType::Number,
-            identi: "input",
-        }),
-        None,
-        None,
-        None,
-    ],
-    identi: BuildInFnIdenti::Basic(BasicFn::ARRAY),
-};
-const ASCII: BuildInFunction = BuildInFunction {
-    params: [
-        Some(BuildInParam {
-            type__: ValueType::String,
-            identi: "input",
-        }),
-        None,
-        None,
-        None,
-    ],
-    identi: BuildInFnIdenti::Basic(BasicFn::ASCII),
-};
-
-const LEN: BuildInFunction = BuildInFunction {
-    params: [
-        Some(BuildInParam {
-            type__: ValueType::Void,
-            identi: "input",
-        }),
-        None,
-        None,
-        None,
-    ],
-    identi: BuildInFnIdenti::Basic(BasicFn::LEN),
-};
-
-const EXIT: BuildInFunction = BuildInFunction {
-    params: [
-        None,
-        None,
-        None,
-        None,
-    ],
-    identi: BuildInFnIdenti::Basic(BasicFn::EXIT),
-};

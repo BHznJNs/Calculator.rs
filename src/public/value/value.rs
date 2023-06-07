@@ -95,6 +95,12 @@ pub enum Value {
     Object(Rc<RefCell<Object>>),
 }
 
+impl Into<Rc<RefCell<Value>>> for Value {
+    fn into(self) -> Rc<RefCell<Value>> {
+        Rc::new(RefCell::new(self))
+    }
+}
+
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {

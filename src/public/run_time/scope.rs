@@ -102,7 +102,7 @@ impl Scope {
 
         if let None = self.module.get(module_name) {
             self.module.insert(module_name.to_string(), true);
-            module::resolve(target_module, self);
+            module::std_resolve(self, target_module, module_name);
         }
         Ok(())
     }
