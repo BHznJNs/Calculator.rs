@@ -1,6 +1,8 @@
-use std::collections::VecDeque;
+use std::{collections::VecDeque, ops::Range};
 
-use crate::utils::line_editor::terminal::TextType;
+use crossterm::style::{Stylize, StyledContent};
+
+// use crate::utils::line_editor::terminal::TextType;
 
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum TokenType {
@@ -18,6 +20,21 @@ pub enum TokenType {
     Comment,
 }
 
+#[derive(PartialEq, Debug, Clone, Copy)]
+pub enum TextType {
+    Hint,
+
+    Variable,
+    Keyword,
+    Annotation,
+
+    Didider,
+    Comment,
+
+    NumberLiteral,
+    StringLiteral,
+}
+
 #[derive(PartialEq, Debug)]
 pub struct Token {
     pub type__: TextType,
@@ -32,5 +49,23 @@ impl Token {
     }
     pub fn len(&self) -> usize {
         self.content.len()
+    }
+
+    pub fn colored(&self, range: Range<usize>) -> StyledContent<&str> {
+        let text = &self.content[range];
+
+        match self.type__ {
+            TextType::Hint => text.dim(),
+
+            TextType::Variable => text.underlined(),
+            TextType::Keyword => text.dark_cyan(),
+            TextType::Annotation => text.red(),
+
+            TextType::Didider => text.white(),
+            TextType::Comment => text.green().dim(),
+
+            TextType::NumberLiteral => text.yellow(),
+            TextType::StringLiteral => text.dark_yellow(),
+        }
     }
 }

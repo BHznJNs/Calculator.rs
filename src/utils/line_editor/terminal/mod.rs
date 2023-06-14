@@ -1,5 +1,4 @@
 mod cursor;
-mod text_type;
 
 use std::io::{self, Stdout, Write};
 
@@ -9,7 +8,6 @@ use crossterm::{
 };
 
 pub use cursor::Cursor;
-pub use text_type::TextType;
 
 pub struct Terminal {
     pub stdout: Stdout,

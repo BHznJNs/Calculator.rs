@@ -11,9 +11,7 @@ use crate::{
     },
 };
 
-pub use token::{Token, TokenType, TokenVec};
-
-use super::terminal::TextType;
+pub use token::{Token, TokenType, TextType, TokenVec};
 
 pub fn tokenize(source: &str) -> TokenVec {
     let mut index = 0;
@@ -103,15 +101,27 @@ pub fn tokenize(source: &str) -> TokenVec {
 
         match current {
             // Parenthesis
-            LEFT_PAREN_ASCII | RIGHT_PAREN_ASCII | LEFT_BRACKET_ASCII | RIGHT_BRACKET_ASCII
-            | LEFT_BRACE_ASCII | RIGHT_BRACE_ASCII => {
+            LEFT_PAREN_ASCII 
+            | RIGHT_PAREN_ASCII 
+            | LEFT_BRACKET_ASCII 
+            | RIGHT_BRACKET_ASCII
+            | LEFT_BRACE_ASCII 
+            | RIGHT_BRACE_ASCII => {
                 last_type = TokenType::Paren;
                 tokens.push_back(Token::new(TextType::Didider, String::from(current as char)));
             }
 
             // Computing symbols
-            PLUS_ASCII | MINUS_ASCII | MULTIPLY_ASCII | DIVIDE_ASCII | POWER_ASCII
-            | NOT_SYMBOL_ASCII | LESS_THAN_ASCII | MORE_THAN_ASCII | EQUAL_ASCII | POINT_ASCII => {
+            PLUS_ASCII
+            | MINUS_ASCII 
+            | MULTIPLY_ASCII 
+            | DIVIDE_ASCII 
+            | POWER_ASCII
+            | NOT_SYMBOL_ASCII 
+            | LESS_THAN_ASCII 
+            | MORE_THAN_ASCII 
+            | EQUAL_ASCII 
+            | POINT_ASCII => {
                 last_type = TokenType::Symbol;
                 tokens.push_back(Token::new(TextType::Didider, String::from(current as char)));
             }

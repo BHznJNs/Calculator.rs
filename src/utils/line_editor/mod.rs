@@ -7,7 +7,7 @@ mod tokenizer;
 mod candidate;
 mod history;
 
-use std::io;
+use std::{io, ops::Range};
 
 use crossterm::{
     event::{KeyCode, KeyModifiers},
@@ -20,8 +20,8 @@ pub use signal::Signal;
 use state::LineState;
 use terminal::Terminal;
 
-use crate::public::env::ENV_OPTION;
-use crate::utils::{line_editor::terminal::TextType, output::print_line};
+use crate::{public::env::ENV_OPTION, utils::line_editor::tokenizer::Token};
+use crate::utils::output::print_line;
 // use candidate::Candidate;
 
 // output something into file
@@ -59,7 +59,7 @@ impl LineEditor {
             line_count: 1,
             overflow_left: 0,
             overflow_right: 0,
-            visible_area_width: term_width - prompt.len() - 2, //                                              ^ this is initial label width
+            visible_area_width: term_width - prompt.len() - 2,
         }
     }
 
@@ -98,6 +98,9 @@ impl LineEditor {
         let term_width = self.terminal.width();
         let prompt_len = self.prompt.len();
 
+        // refresh `self.visible_area_width`
+        self.visible_area_width = term_width - prompt_len - 2;
+
         // visible left & right end
         self.is_at.left_end = cursor_pos == prompt_len;
         self.is_at.right_end = cursor_pos == term_width - line.label_width;
@@ -114,11 +117,11 @@ impl LineEditor {
         fn buffer_extend_colored(
             buffer: &mut String,
             is_history: bool,
-            text: &str,
-            type__: TextType,
+            token: &Token,
+            range: Range<usize>,
         ) {
             if unsafe { ENV_OPTION.support_ansi } {
-                let mut colored = TextType::match_tx_type(text, type__);
+                let mut colored = token.colored(range);
                 // if is history, line text will be darken
                 if is_history {
                     colored = colored.dim();
@@ -126,7 +129,7 @@ impl LineEditor {
 
                 buffer.extend(colored.to_string().chars());
             } else {
-                *buffer += text;
+                *buffer += &token.content;
             }
         }
 
@@ -155,8 +158,8 @@ impl LineEditor {
                         buffer_extend_colored(
                             &mut buffer,
                             line.is_history,
-                            &token.content[offset..offset + remain_space],
-                            token.type__,
+                            token,
+                            offset..offset + remain_space
                         );
                         break;
                     }
@@ -165,8 +168,8 @@ impl LineEditor {
                     buffer_extend_colored(
                         &mut buffer,
                         line.is_history,
-                        &token.content[offset..],
-                        token.type__,
+                        token,
+                        offset..token.len(),
                     );
                     offset = 0;
                 }
@@ -176,15 +179,15 @@ impl LineEditor {
                     buffer_extend_colored(
                         &mut buffer,
                         line.is_history,
-                        &token.content,
-                        token.type__,
+                        token,
+                        0..token.len(),
                     );
                 } else {
                     buffer_extend_colored(
                         &mut buffer,
                         line.is_history,
-                        &token.content[..remain_space],
-                        token.type__,
+                        token,
+                        0..remain_space
                     );
                     remain_space = 0;
                 }
