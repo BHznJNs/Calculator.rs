@@ -2,18 +2,18 @@ use crate::compiler::tokenizer::token::{Token, TokenVec};
 use crate::public::compile_time::ast::types::FunctionDefinitionNode;
 use crate::public::compile_time::parens::Paren;
 use crate::public::error::syntax_error;
-use crate::public::value::function::Param;
+use crate::public::value::function::UserDefinedFnParam;
 
 use super::statement_block;
 
 // refactor: params_resolve
-fn params_resolve(tokens: &mut TokenVec) -> Result<Vec<Param>, ()> {
+fn params_resolve(tokens: &mut TokenVec) -> Result<Vec<UserDefinedFnParam>, ()> {
     // return function Vec<Param>
     // structure:
     // identi annotation) {function body ...}
 
     let first_index = 0;
-    let mut params = Vec::<Param>::new();
+    let mut params = Vec::<UserDefinedFnParam>::new();
 
     while first_index < tokens.len() {
         let current = tokens.pop_front().unwrap();
@@ -24,9 +24,11 @@ fn params_resolve(tokens: &mut TokenVec) -> Result<Vec<Param>, ()> {
                 Token::Identi(identi) => {
                     let next = tokens.pop_front().unwrap();
                     if let Token::Annotation(type__) = next {
-                        params.push(Param {
+                        // let temp = Box::leak(Box::new(identi)).as_str();
+                        // temp.
+                        params.push(UserDefinedFnParam {
                             type__,
-                            identi: Box::leak(Box::new(identi))
+                            identi,
                         })
                     } else {
                         return Err(syntax_error(

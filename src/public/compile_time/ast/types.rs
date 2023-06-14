@@ -1,7 +1,8 @@
 use std::rc::Rc;
 
 use crate::public::compile_time::keywords::Keyword;
-use crate::public::value::{function::Param, oop::class::Property};
+use crate::public::value::function::UserDefinedFnParam;
+use crate::public::value::oop::class::Property;
 
 use super::ast_enum::{ASTNode, ASTVec};
 
@@ -44,7 +45,7 @@ pub struct StatementNode {
 }
 #[derive(PartialEq, Clone)]
 pub struct FunctionDefinitionNode {
-    pub params: Vec<Param>,
+    pub params: Vec<UserDefinedFnParam>,
     pub name: Option<String>,
     pub body: ASTVec,
 }

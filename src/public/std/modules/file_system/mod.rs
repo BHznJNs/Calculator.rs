@@ -9,7 +9,7 @@ use crate::public::std::modules::file_system::file_ops::{file_read, file_write};
 use crate::public::std::utils::get_self_prop::get_self_prop;
 use crate::public::std::utils::get_val::get_val;
 use crate::public::value::array::ArrayLiteral;
-use crate::public::value::function::{BuildInFunction, Param, Function, Overload};
+use crate::public::value::function::{BuildInFunction, BuildInFnParam, Function, Overload};
 use crate::public::value::oop::class::{Class, Property};
 use crate::public::value::oop::object::Object;
 use crate::public::value::oop::utils::data_storage::DataStoragePattern;
@@ -31,36 +31,23 @@ static mut FILE_CLASS: Option<Rc<Class>> = None;
 
 fn static_class_setter() {
     let read = BuildInFunction {
-        params: vec![Param {
-            type__: ValueType::Object,
-            identi: "self",
-        }],
+        params: vec![
+            BuildInFnParam (ValueType::Object, "self")
+        ],
         identi: BuildInFnIdenti::FileSystem(FileSysFn::Read),
     };
 
     let write = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::String,
-                identi: "content",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::String, "content"),
         ],
         identi: BuildInFnIdenti::FileSystem(FileSysFn::Write),
     };
     let append = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::String,
-                identi: "content",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::String, "content"),
         ],
         identi: BuildInFnIdenti::FileSystem(FileSysFn::Append),
     };
@@ -101,14 +88,8 @@ pub fn module_object() -> Object {
 
     let open = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::String,
-                identi: "path",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::String, "path"),
         ],
         identi: BuildInFnIdenti::FileSystem(FileSysFn::Open),
     };

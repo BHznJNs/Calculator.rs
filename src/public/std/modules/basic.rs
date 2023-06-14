@@ -8,7 +8,7 @@ use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::std::utils::str_to_num::str_to_num;
 use crate::public::value::array::ArrayLiteral;
-use crate::public::value::function::{BuildInFunction, Param};
+use crate::public::value::function::{BuildInFunction, BuildInFnParam};
 use crate::public::value::number::Number;
 use crate::public::value::value::{Overload, Value, ValueType, VoidSign};
 
@@ -18,30 +18,21 @@ use super::BuildInFnCall;
 pub fn function_list() -> Vec<(String, Value)> {
     let input = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::String,
-                identi: "prompt",
-            },
+            BuildInFnParam (ValueType::String, "prompt")
         ],
         identi: BuildInFnIdenti::Basic(BasicFn::INPUT),
     };
     // get value type
     let type__ = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Void,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Void, "input")
         ],
         identi: BuildInFnIdenti::Basic(BasicFn::TYPE),
     };
     // deep clone value
     let clone = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Void,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Void, "input")
         ],
         identi: BuildInFnIdenti::Basic(BasicFn::CLONE),
     };
@@ -49,64 +40,43 @@ pub fn function_list() -> Vec<(String, Value)> {
     // Type converters
     let int = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Void,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Void, "input")
         ],
         identi: BuildInFnIdenti::Basic(BasicFn::INT),
     };
     let float = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Void,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Void, "input")
         ],
         identi: BuildInFnIdenti::Basic(BasicFn::FLOAT),
     };
     let boolean = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Void,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Void, "input")
         ],
         identi: BuildInFnIdenti::Basic(BasicFn::BOOLEAN),
     };
     let string = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Number,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Number, "input")
         ],
         identi: BuildInFnIdenti::Basic(BasicFn::STRING),
     };
     let array = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Number,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Number, "input")
         ],
         identi: BuildInFnIdenti::Basic(BasicFn::ARRAY),
     };
     let ascii = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::String,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::String, "input")
         ],
         identi: BuildInFnIdenti::Basic(BasicFn::ASCII),
     };
     let len = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Void,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Void, "input")
         ],
         identi: BuildInFnIdenti::Basic(BasicFn::LEN),
     };

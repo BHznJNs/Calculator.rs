@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::std::utils::get_self_prop::get_self_prop;
-use crate::public::value::function::{BuildInFunction, Param, Function, Overload};
+use crate::public::value::function::{BuildInFunction, BuildInFnParam, Function, Overload};
 use crate::public::value::oop::class::{Class, Property};
 use crate::public::value::oop::utils::data_storage::DataStoragePattern;
 use crate::public::value::value::{Value, ValueType, VoidSign};
@@ -11,78 +11,49 @@ use crate::public::value::value::{Value, ValueType, VoidSign};
 use super::super::utils::get_val::get_val;
 use super::BuildInFnCall;
 
-static SELF_STR: &str= "self";
+// static SELF_STR: &str= "self";
 
 pub fn module_class() -> Class {
     let push = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: SELF_STR,
-            },
-            Param {
-                type__: ValueType::Void,
-                identi: "element",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Void, "element"),
         ],
         identi: BuildInFnIdenti::Array(ArrayFn::PUSH),
     };
     
     let pop = BuildInFunction {
-        params: vec![Param {
-            type__: ValueType::Object,
-            identi: SELF_STR,
-        }],
+        params: vec![
+            BuildInFnParam (ValueType::Object, "self")
+        ],
         identi: BuildInFnIdenti::Array(ArrayFn::POP),
     };
     
     let shift: BuildInFunction = BuildInFunction {
-        params: vec![Param {
-            type__: ValueType::Object,
-            identi: SELF_STR,
-        }],
+        params: vec![
+            BuildInFnParam (ValueType::Object, "self")
+        ],
         identi: BuildInFnIdenti::Array(ArrayFn::SHIFT),
     };
     let unshift: BuildInFunction = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: SELF_STR,
-            },
-            Param {
-                type__: ValueType::Void,
-                identi: "element",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Void, "element"),
         ],
         identi: BuildInFnIdenti::Array(ArrayFn::UNSHIFT),
     };
     let insert = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: SELF_STR,
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "index",
-            },
-            Param {
-                type__: ValueType::Void,
-                identi: "element",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Number, "index"),
+            BuildInFnParam (ValueType::Void, "element"),
         ],
         identi: BuildInFnIdenti::Array(ArrayFn::INSERT),
     };
     let remove: BuildInFunction = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: SELF_STR,
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "index",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Number, "index"),
         ],
         identi: BuildInFnIdenti::Array(ArrayFn::REMOVE),
     };

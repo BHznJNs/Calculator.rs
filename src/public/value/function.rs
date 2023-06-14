@@ -9,22 +9,52 @@ use crate::public::run_time::scope::{LocalScope, Scope};
 
 use super::value::{ValueType, Value};
 
+// #[derive(PartialEq, Clone)]
+// pub struct Param {
+//     pub type__: ValueType,
+//     pub identi: &'static str,
+// }
+
 #[derive(PartialEq, Clone)]
-pub struct Param {
-    pub type__: ValueType,
-    pub identi: &'static str,
+pub struct BuildInFnParam(pub ValueType, pub &'static str);
+
+impl Param for BuildInFnParam {
+    fn type__(&self) -> ValueType {
+        self.0
+    }
+    fn identi(&self) -> &str {
+        self.1
+    }
 }
 
 #[derive(PartialEq)]
 pub struct BuildInFunction {
-    pub params: Vec<Param>,
+    pub params: Vec<BuildInFnParam>,
     pub identi: BuildInFnIdenti,
 }
 
+#[derive(PartialEq, Clone)]
+pub struct UserDefinedFnParam {
+    pub type__: ValueType,
+    pub identi: String,
+}
+impl Param for UserDefinedFnParam {
+    fn type__(&self) -> ValueType {
+        self.type__
+    }
+    fn identi(&self) -> &str {
+        &self.identi
+    }
+}
 #[derive(PartialEq)]
 pub struct UserDefinedFunction {
-    pub params: Vec<Param>,
+    pub params: Vec<UserDefinedFnParam>,
     pub body: ASTVec,
+}
+
+pub trait Param {
+    fn type__(&self) -> ValueType;
+    fn identi(&self) -> &str;
 }
 
 // --- --- --- --- --- ---
@@ -37,7 +67,7 @@ pub enum Function {
 
 impl Function {
     pub fn param_check(
-        formal_params: &Vec<Param>,
+        formal_params: &Vec<impl Param>,
         actual_params: &Vec<ExpressionNode>,
         whole_scope: &mut Scope,
         local_scope: &mut LocalScope,
@@ -61,14 +91,14 @@ impl Function {
             let actual_param_value = expr_resolver(actual_param_node.into(), whole_scope)?;
 
             // param type check
-            if actual_param_value.check_type(formal_param.type__) {
+            if actual_param_value.check_type(formal_param.type__()) {
                 local_scope
                     .variables
-                    .insert(formal_param.identi.to_string(), actual_param_value);
+                    .insert(formal_param.identi().to_string(), actual_param_value);
             } else {
                 type_error(
-                    Some(&formal_param.identi),
-                    vec![formal_param.type__],
+                    Some(&formal_param.identi()),
+                    vec![formal_param.type__()],
                     actual_param_value.get_type(),
                 )?
             }

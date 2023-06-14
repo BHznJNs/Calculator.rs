@@ -2,8 +2,6 @@ use std::{collections::VecDeque, ops::Range};
 
 use crossterm::style::{Stylize, StyledContent};
 
-// use crate::utils::line_editor::terminal::TextType;
-
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum TokenType {
     Unknown,

@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
-use crate::public::value::function::{BuildInFunction, Param};
+use crate::public::value::function::{BuildInFunction, BuildInFnParam};
 use crate::public::value::oop::object::Object;
 use crate::public::value::oop::utils::data_storage::DataStoragePattern;
 use crate::public::value::value::{Overload, Value, ValueType};
@@ -37,270 +37,147 @@ pub enum MathFn {
 pub fn module_object() -> Object {
     let sin = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::SIN),
     };
     let cos = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::COS),
     };
     let tan = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::TAN),
     };
 
     let asin = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::ASIN),
     };
     let acos = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::ACOS),
     };
     let atan = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::ATAN),
     };
 
     let sinh = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::SINH),
     };
     let cosh = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::COSH),
     };
     let tanh = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::TANH),
     };
 
     let rad = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::RAD),
     };
     let deg = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::DEG),
     };
 
     let log10 = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::LOG10),
     };
     let log2 = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::LOG2),
     };
     let log = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "base",
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "natural",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Number, "base"),
+            BuildInFnParam (ValueType::Number, "natural"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::LOG),
     };
     let ln = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::LN),
     };
     let exp = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::EXP),
     };
 
     let abs = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::ABS),
     };
     let sqrt = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::SQRT),
     };
     let floor = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::FLOOR),
     };
     let round = BuildInFunction {
         params: vec![
-            Param {
-                type__: ValueType::Object,
-                identi: "self",
-            },
-            Param {
-                type__: ValueType::Number,
-                identi: "input",
-            },
+            BuildInFnParam (ValueType::Object, "self"),
+            BuildInFnParam (ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::ROUND),
     };
@@ -397,71 +274,6 @@ pub fn module_object() -> Object {
 impl BuildInFnCall for MathFn {
     fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
         let result = match self {
-            MathFn::SIN => {
-                let input = get_val("input", scope)?;
-                let f = input.get_f64()?;
-                f.sin()
-            }
-            MathFn::COS => {
-                let input = get_val("input", scope)?;
-                let f = input.get_f64()?;
-                f.cos()
-            }
-            MathFn::TAN => {
-                let input = get_val("input", scope)?;
-                let f = input.get_f64()?;
-                f.tan()
-            }
-            MathFn::ASIN => {
-                let input = get_val("input", scope)?;
-                let f = input.get_f64()?;
-                f.asin()
-            }
-            MathFn::ACOS => {
-                let input = get_val("input", scope)?;
-                let f = input.get_f64()?;
-                f.acos()
-            }
-            MathFn::ATAN => {
-                let input = get_val("input", scope)?;
-                let f = input.get_f64()?;
-                f.atan()
-            }
-            MathFn::SINH => {
-                let input = get_val("input", scope)?;
-                let f = input.get_f64()?;
-                f.sinh()
-            }
-            MathFn::COSH => {
-                let input = get_val("input", scope)?;
-                let f = input.get_f64()?;
-                f.cosh()
-            }
-            MathFn::TANH => {
-                let input = get_val("input", scope)?;
-                let f = input.get_f64()?;
-                f.tanh()
-            }
-            MathFn::RAD => {
-                let input = get_val("input", scope)?;
-                let f = input.get_f64()?;
-                f.to_radians()
-            }
-            MathFn::DEG => {
-                let input = get_val("input", scope)?;
-                let f = input.get_f64()?;
-                f.to_degrees()
-            }
-            MathFn::LOG10 => {
-                let input = get_val("input", scope)?;
-                let f = input.get_f64()?;
-                f.log10()
-            }
-            MathFn::LOG2 => {
-                let input = get_val("input", scope)?;
-                let f = input.get_f64()?;
-                f.sin()
-            }
             MathFn::LOG => {
                 let base = get_val("base", scope)?;
                 let natural = get_val("natural", scope)?;
@@ -470,35 +282,32 @@ impl BuildInFnCall for MathFn {
                 let nature_f = natural.get_f64()?;
                 nature_f.log(base_f)
             }
-            MathFn::LN => {
+            _ => {
                 let input = get_val("input", scope)?;
                 let f = input.get_f64()?;
-                f.ln()
-            }
-            MathFn::EXP => {
-                let input = get_val("input", scope)?;
-                let f = input.get_f64()?;
-                f.exp()
-            }
-            MathFn::ABS => {
-                let input = get_val("input", scope)?;
-                let f = input.get_f64()?;
-                f.abs()
-            }
-            MathFn::SQRT => {
-                let input = get_val("input", scope)?;
-                let f = input.get_f64()?;
-                f.sqrt()
-            }
-            MathFn::FLOOR => {
-                let input = get_val("input", scope)?;
-                let f = input.get_f64()?;
-                f.floor()
-            }
-            MathFn::ROUND => {
-                let input = get_val("input", scope)?;
-                let f = input.get_f64()?;
-                f.round()
+
+                match self {
+                    MathFn::SIN => f.sin(),
+                    MathFn::COS => f.cos(),
+                    MathFn::TAN => f.tan(),
+                    MathFn::ASIN => f.asin(),
+                    MathFn::ACOS => f.acos(),
+                    MathFn::ATAN => f.atan(),
+                    MathFn::SINH => f.sinh(),
+                    MathFn::COSH => f.cosh(),
+                    MathFn::TANH => f.tanh(),
+                    MathFn::RAD => f.to_radians(),
+                    MathFn::DEG => f.to_degrees(),
+                    MathFn::LOG10 => f.log10(),
+                    MathFn::LOG2 => f.log2(),
+                    MathFn::LN => f.ln(),
+                    MathFn::EXP => f.exp(),
+                    MathFn::ABS => f.abs(),
+                    MathFn::SQRT => f.sqrt(),
+                    MathFn::FLOOR => f.floor(),
+                    MathFn::ROUND => f.round(),
+                    _ => unreachable!()
+                }
             }
         };
         Ok(Value::create(result))
