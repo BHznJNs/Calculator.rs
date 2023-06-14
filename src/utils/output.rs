@@ -5,9 +5,11 @@ use std::{
 
 use crossterm::{cursor, execute};
 
-// this function is used to
-// to be compatible with Unix OS
+// these function is used for being compatible in Unix-like OS
 // when is in raw_mode of readline
+
+// When there is `stdout` handler in the context of the caller,
+// use `print_line`; otherwise, use `print_line__`
 pub fn print_line<T: Display>(stdout: &mut Stdout, content: T) {
     println!("{}", content);
     execute!(stdout, cursor::MoveToColumn(0)).unwrap();

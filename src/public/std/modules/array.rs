@@ -120,7 +120,7 @@ pub enum ArrayFn {
 impl BuildInFnCall for ArrayFn {
     fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
         let self_value = get_val("self", scope)?;
-        let arr_value = get_self_prop(self_value, "v")?;
+        let arr_value = get_self_prop(&self_value, "v")?;
 
         let result = match self {
             ArrayFn::PUSH => {

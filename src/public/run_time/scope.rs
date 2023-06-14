@@ -91,7 +91,7 @@ impl Scope {
         }
     }
 
-    // import STD module
+    // import standard module
     pub fn import_std(&mut self, module_name: &str) -> Result<(), ()> {
         let std_module_map = self.std_module_map.clone();
         let Some(target_module) =

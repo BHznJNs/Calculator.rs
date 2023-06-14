@@ -129,7 +129,7 @@ pub fn module_class() -> Class {
 impl BuildInFnCall for StringFn {
     fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
         let self_value = get_val("self", scope)?;
-        let str_value = get_self_prop(self_value, "v")?;
+        let str_value = get_self_prop(&self_value, "v")?;
         let Value::String(str_ref) = str_value else {
             return Ok(Value::create(String::new()));
         };
