@@ -7,7 +7,7 @@ use crate::public::error::{range_error, type_error};
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::{LocalScope, Scope};
 
-use super::value::{ValueType, Value};
+use super::value::{Value, ValueType};
 
 // #[derive(PartialEq, Clone)]
 // pub struct Param {

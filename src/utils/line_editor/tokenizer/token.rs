@@ -1,6 +1,6 @@
 use std::{collections::VecDeque, ops::Range};
 
-use crossterm::style::{Stylize, StyledContent};
+use crossterm::style::{StyledContent, Stylize};
 
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum TokenType {

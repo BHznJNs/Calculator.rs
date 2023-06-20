@@ -5,7 +5,7 @@ use crate::public::run_time::scope::Scope;
 use crate::public::std::utils::get_self_prop::get_self_prop;
 use crate::public::value::array::ArrayLiteral;
 use crate::public::value::function::{
-    BuildInFunction, BuildInFnParam, Function, Overload as FunctionOverLoad,
+    BuildInFnParam, BuildInFunction, Function, Overload as FunctionOverLoad,
 };
 use crate::public::value::oop::class::{Class, Property};
 use crate::public::value::oop::utils::data_storage::DataStoragePattern;
@@ -27,44 +27,44 @@ pub enum StringFn {
 pub fn module_class() -> Class {
     let split = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::String, "divider"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::String, "divider"),
         ],
         identi: BuildInFnIdenti::String(StringFn::SPLIT),
     };
     let replace = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::Void, "from"),
-            BuildInFnParam (ValueType::Void, "to"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::Void, "from"),
+            BuildInFnParam(ValueType::Void, "to"),
         ],
         identi: BuildInFnIdenti::String(StringFn::REPLACE),
     };
     let repeat = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::Void, "num"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::Void, "num"),
         ],
         identi: BuildInFnIdenti::String(StringFn::REPEAT),
     };
     let join = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::String, "divider"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::String, "divider"),
         ],
         identi: BuildInFnIdenti::String(StringFn::JOIN),
     };
     let start_with = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::String, "str"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::String, "str"),
         ],
         identi: BuildInFnIdenti::String(StringFn::STARTWITH),
     };
     let end_with = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::String, "str"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::String, "str"),
         ],
         identi: BuildInFnIdenti::String(StringFn::ENDWITH),
     };

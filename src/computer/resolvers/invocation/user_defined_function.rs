@@ -1,7 +1,7 @@
 use crate::computer::resolvers::{expression, sequence};
 use crate::public::compile_time::ast::types::ExpressionNode;
 use crate::public::run_time::scope::{LocalScope, Scope};
-use crate::public::value::function::{UserDefinedFunction, Function};
+use crate::public::value::function::{Function, UserDefinedFunction};
 use crate::public::value::value::{Value, VoidSign};
 
 fn call(function: &UserDefinedFunction, scope: &mut Scope) -> Result<Value, ()> {

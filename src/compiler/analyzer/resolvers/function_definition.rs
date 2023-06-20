@@ -26,10 +26,7 @@ fn params_resolve(tokens: &mut TokenVec) -> Result<Vec<UserDefinedFnParam>, ()> 
                     if let Token::Annotation(type__) = next {
                         // let temp = Box::leak(Box::new(identi)).as_str();
                         // temp.
-                        params.push(UserDefinedFnParam {
-                            type__,
-                            identi,
-                        })
+                        params.push(UserDefinedFnParam { type__, identi })
                     } else {
                         return Err(syntax_error(
                             "type annotation expected in function definition",

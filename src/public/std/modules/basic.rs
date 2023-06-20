@@ -8,7 +8,7 @@ use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::std::utils::str_to_num::str_to_num;
 use crate::public::value::array::ArrayLiteral;
-use crate::public::value::function::{BuildInFunction, BuildInFnParam};
+use crate::public::value::function::{BuildInFnParam, BuildInFunction};
 use crate::public::value::number::Number;
 use crate::public::value::value::{Overload, Value, ValueType, VoidSign};
 
@@ -17,67 +17,47 @@ use super::BuildInFnCall;
 
 pub fn function_list() -> Vec<(String, Value)> {
     let input = BuildInFunction {
-        params: vec![
-            BuildInFnParam (ValueType::String, "prompt")
-        ],
+        params: vec![BuildInFnParam(ValueType::String, "prompt")],
         identi: BuildInFnIdenti::Basic(BasicFn::INPUT),
     };
     // get value type
     let type__ = BuildInFunction {
-        params: vec![
-            BuildInFnParam (ValueType::Void, "input")
-        ],
+        params: vec![BuildInFnParam(ValueType::Void, "input")],
         identi: BuildInFnIdenti::Basic(BasicFn::TYPE),
     };
     // deep clone value
     let clone = BuildInFunction {
-        params: vec![
-            BuildInFnParam (ValueType::Void, "input")
-        ],
+        params: vec![BuildInFnParam(ValueType::Void, "input")],
         identi: BuildInFnIdenti::Basic(BasicFn::CLONE),
     };
 
     // Type converters
     let int = BuildInFunction {
-        params: vec![
-            BuildInFnParam (ValueType::Void, "input")
-        ],
+        params: vec![BuildInFnParam(ValueType::Void, "input")],
         identi: BuildInFnIdenti::Basic(BasicFn::INT),
     };
     let float = BuildInFunction {
-        params: vec![
-            BuildInFnParam (ValueType::Void, "input")
-        ],
+        params: vec![BuildInFnParam(ValueType::Void, "input")],
         identi: BuildInFnIdenti::Basic(BasicFn::FLOAT),
     };
     let boolean = BuildInFunction {
-        params: vec![
-            BuildInFnParam (ValueType::Void, "input")
-        ],
+        params: vec![BuildInFnParam(ValueType::Void, "input")],
         identi: BuildInFnIdenti::Basic(BasicFn::BOOLEAN),
     };
     let string = BuildInFunction {
-        params: vec![
-            BuildInFnParam (ValueType::Number, "input")
-        ],
+        params: vec![BuildInFnParam(ValueType::Number, "input")],
         identi: BuildInFnIdenti::Basic(BasicFn::STRING),
     };
     let array = BuildInFunction {
-        params: vec![
-            BuildInFnParam (ValueType::Number, "input")
-        ],
+        params: vec![BuildInFnParam(ValueType::Number, "input")],
         identi: BuildInFnIdenti::Basic(BasicFn::ARRAY),
     };
     let ascii = BuildInFunction {
-        params: vec![
-            BuildInFnParam (ValueType::String, "input")
-        ],
+        params: vec![BuildInFnParam(ValueType::String, "input")],
         identi: BuildInFnIdenti::Basic(BasicFn::ASCII),
     };
     let len = BuildInFunction {
-        params: vec![
-            BuildInFnParam (ValueType::Void, "input")
-        ],
+        params: vec![BuildInFnParam(ValueType::Void, "input")],
         identi: BuildInFnIdenti::Basic(BasicFn::LEN),
     };
     let exit = BuildInFunction {
@@ -86,17 +66,17 @@ pub fn function_list() -> Vec<(String, Value)> {
     };
 
     vec![
-        (String::from("input"),  Value::create(input)),
-        (String::from("type"),   Value::create(type__)),
-        (String::from("clone"),  Value::create(clone)),
-        (String::from("int"),    Value::create(int)),
-        (String::from("float"),  Value::create(float)),
-        (String::from("bool"),   Value::create(boolean)),
+        (String::from("input"), Value::create(input)),
+        (String::from("type"), Value::create(type__)),
+        (String::from("clone"), Value::create(clone)),
+        (String::from("int"), Value::create(int)),
+        (String::from("float"), Value::create(float)),
+        (String::from("bool"), Value::create(boolean)),
         (String::from("string"), Value::create(string)),
-        (String::from("array"),  Value::create(array)),
-        (String::from("ascii"),  Value::create(ascii)),
-        (String::from("len"),    Value::create(len)),
-        (String::from("exit"),   Value::create(exit)),
+        (String::from("array"), Value::create(array)),
+        (String::from("ascii"), Value::create(ascii)),
+        (String::from("len"), Value::create(len)),
+        (String::from("exit"), Value::create(exit)),
     ]
 }
 

@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
-use crate::public::value::function::{BuildInFunction, BuildInFnParam};
+use crate::public::value::function::{BuildInFnParam, BuildInFunction};
 use crate::public::value::oop::object::Object;
 use crate::public::value::oop::utils::data_storage::DataStoragePattern;
 use crate::public::value::value::{Overload, Value, ValueType};
@@ -37,147 +37,147 @@ pub enum MathFn {
 pub fn module_object() -> Object {
     let sin = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::Number, "input"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::SIN),
     };
     let cos = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::Number, "input"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::COS),
     };
     let tan = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::Number, "input"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::TAN),
     };
 
     let asin = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::Number, "input"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::ASIN),
     };
     let acos = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::Number, "input"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::ACOS),
     };
     let atan = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::Number, "input"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::ATAN),
     };
 
     let sinh = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::Number, "input"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::SINH),
     };
     let cosh = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::Number, "input"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::COSH),
     };
     let tanh = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::Number, "input"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::TANH),
     };
 
     let rad = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::Number, "input"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::RAD),
     };
     let deg = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::Number, "input"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::DEG),
     };
 
     let log10 = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::Number, "input"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::LOG10),
     };
     let log2 = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::Number, "input"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::LOG2),
     };
     let log = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::Number, "base"),
-            BuildInFnParam (ValueType::Number, "natural"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::Number, "base"),
+            BuildInFnParam(ValueType::Number, "natural"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::LOG),
     };
     let ln = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::Number, "input"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::LN),
     };
     let exp = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::Number, "input"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::EXP),
     };
 
     let abs = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::Number, "input"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::ABS),
     };
     let sqrt = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::Number, "input"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::SQRT),
     };
     let floor = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::Number, "input"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::FLOOR),
     };
     let round = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::Number, "input"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::Number, "input"),
         ],
         identi: BuildInFnIdenti::Math(MathFn::ROUND),
     };
@@ -187,86 +187,26 @@ pub fn module_object() -> Object {
         storage_pattern: DataStoragePattern::Map,
         data_list: None,
         data_map: Some(HashMap::from([
-            (
-                String::from("sin"),
-                Value::create(sin).into(),
-            ),
-            (
-                String::from("cos"),
-                Value::create(cos).into(),
-            ),
-            (
-                String::from("tan"),
-                Value::create(tan).into(),
-            ),
-            (
-                String::from("asin"),
-                Value::create(asin).into(),
-            ),
-            (
-                String::from("acos"),
-                Value::create(acos).into(),
-            ),
-            (
-                String::from("atan"),
-                Value::create(atan).into(),
-            ),
-            (
-                String::from("sinh"),
-                Value::create(sinh).into(),
-            ),
-            (
-                String::from("cosh"),
-                Value::create(cosh).into(),
-            ),
-            (
-                String::from("tanh"),
-                Value::create(tanh).into(),
-            ),
-            (
-                String::from("rad"),
-                Value::create(rad).into(),
-            ),
-            (
-                String::from("deg"),
-                Value::create(deg).into(),
-            ),
-            (
-                String::from("log10"),
-                Value::create(log10).into(),
-            ),
-            (
-                String::from("log2"),
-                Value::create(log2).into(),
-            ),
-            (
-                String::from("log"),
-                Value::create(log).into(),
-            ),
-            (
-                String::from("ln"),
-                Value::create(ln).into(),
-            ),
-            (
-                String::from("exp"),
-                Value::create(exp).into(),
-            ),
-            (
-                String::from("abs"),
-                Value::create(abs).into(),
-            ),
-            (
-                String::from("sqrt"),
-                Value::create(sqrt).into(),
-            ),
-            (
-                String::from("floor"),
-                Value::create(floor).into(),
-            ),
-            (
-                String::from("round"),
-                Value::create(round).into(),
-            ),
+            (String::from("sin"), Value::create(sin).into()),
+            (String::from("cos"), Value::create(cos).into()),
+            (String::from("tan"), Value::create(tan).into()),
+            (String::from("asin"), Value::create(asin).into()),
+            (String::from("acos"), Value::create(acos).into()),
+            (String::from("atan"), Value::create(atan).into()),
+            (String::from("sinh"), Value::create(sinh).into()),
+            (String::from("cosh"), Value::create(cosh).into()),
+            (String::from("tanh"), Value::create(tanh).into()),
+            (String::from("rad"), Value::create(rad).into()),
+            (String::from("deg"), Value::create(deg).into()),
+            (String::from("log10"), Value::create(log10).into()),
+            (String::from("log2"), Value::create(log2).into()),
+            (String::from("log"), Value::create(log).into()),
+            (String::from("ln"), Value::create(ln).into()),
+            (String::from("exp"), Value::create(exp).into()),
+            (String::from("abs"), Value::create(abs).into()),
+            (String::from("sqrt"), Value::create(sqrt).into()),
+            (String::from("floor"), Value::create(floor).into()),
+            (String::from("round"), Value::create(round).into()),
         ])),
     }
 }
@@ -306,7 +246,7 @@ impl BuildInFnCall for MathFn {
                     MathFn::SQRT => f.sqrt(),
                     MathFn::FLOOR => f.floor(),
                     MathFn::ROUND => f.round(),
-                    _ => unreachable!()
+                    _ => unreachable!(),
                 }
             }
         };

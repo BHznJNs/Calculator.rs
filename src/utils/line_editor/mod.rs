@@ -20,8 +20,8 @@ pub use signal::Signal;
 use state::LineState;
 use terminal::Terminal;
 
-use crate::{public::env::ENV_OPTION, utils::line_editor::tokenizer::Token};
 use crate::utils::output::print_line;
+use crate::{public::env::ENV_OPTION, utils::line_editor::tokenizer::Token};
 // use candidate::Candidate;
 
 // output something into file
@@ -159,36 +159,21 @@ impl LineEditor {
                             &mut buffer,
                             line.is_history,
                             token,
-                            offset..offset + remain_space
+                            offset..offset + remain_space,
                         );
                         break;
                     }
 
                     remain_space -= token.len() - offset;
-                    buffer_extend_colored(
-                        &mut buffer,
-                        line.is_history,
-                        token,
-                        offset..token.len(),
-                    );
+                    buffer_extend_colored(&mut buffer, line.is_history, token, offset..token.len());
                     offset = 0;
                 }
             } else {
                 if remain_space >= token.len() {
                     remain_space -= token.len();
-                    buffer_extend_colored(
-                        &mut buffer,
-                        line.is_history,
-                        token,
-                        0..token.len(),
-                    );
+                    buffer_extend_colored(&mut buffer, line.is_history, token, 0..token.len());
                 } else {
-                    buffer_extend_colored(
-                        &mut buffer,
-                        line.is_history,
-                        token,
-                        0..remain_space
-                    );
+                    buffer_extend_colored(&mut buffer, line.is_history, token, 0..remain_space);
                     remain_space = 0;
                 }
             }

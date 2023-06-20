@@ -1,13 +1,19 @@
-use std::{fs::{File, self, OpenOptions}, io::{Read, Write}};
+use std::{
+    fs::{self, File, OpenOptions},
+    io::{Read, Write},
+};
 
-use crate::public::{value::{value::{Value, Overload}, array::ArrayLiteral}, error::{internal_error, InternalComponent}};
+use crate::public::{
+    error::{internal_error, InternalComponent},
+    value::{
+        array::ArrayLiteral,
+        value::{Overload, Value},
+    },
+};
 
 const TRUE_VALUE: Value = Value::Boolean(true);
 
-pub fn file_read(
-    file_path: &str,
-    file_info: (Value, Value, Value)
-) -> Result<Value, ()> {
+pub fn file_read(file_path: &str, file_info: (Value, Value, Value)) -> Result<Value, ()> {
     let (exist, is_dir, is_file) = file_info;
 
     if exist == TRUE_VALUE {
@@ -46,7 +52,7 @@ pub fn file_write(
     file_path: &str,
     content_value: Value,
     file_info: (Value, Value, Value),
-) -> Result<(), ()>  {
+) -> Result<(), ()> {
     let Value::String(content_ref) = content_value else {
         unreachable!()
     };
@@ -90,10 +96,7 @@ pub fn file_append(
 
     let (exist, _, is_file) = file_info;
     if exist == TRUE_VALUE && is_file == TRUE_VALUE {
-        let mut file = OpenOptions::new()
-            .append(true)
-            .open(file_path)
-            .unwrap();
+        let mut file = OpenOptions::new().append(true).open(file_path).unwrap();
 
         match file.write_all(content.as_bytes()) {
             Ok(_) => Ok(()),

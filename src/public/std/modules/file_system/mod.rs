@@ -9,11 +9,11 @@ use crate::public::std::modules::file_system::file_ops::{file_read, file_write};
 use crate::public::std::utils::get_self_prop::get_self_prop;
 use crate::public::std::utils::get_val::get_val;
 use crate::public::value::array::ArrayLiteral;
-use crate::public::value::function::{BuildInFunction, BuildInFnParam, Function, Overload};
+use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function, Overload};
 use crate::public::value::oop::class::{Class, Property};
 use crate::public::value::oop::object::Object;
 use crate::public::value::oop::utils::data_storage::DataStoragePattern;
-use crate::public::value::value::{Value, ValueType, Overload as ValueOverload, VoidSign};
+use crate::public::value::value::{Overload as ValueOverload, Value, ValueType, VoidSign};
 
 use self::file_ops::file_append;
 
@@ -31,23 +31,21 @@ static mut FILE_CLASS: Option<Rc<Class>> = None;
 
 fn static_class_setter() {
     let read = BuildInFunction {
-        params: vec![
-            BuildInFnParam (ValueType::Object, "self")
-        ],
+        params: vec![BuildInFnParam(ValueType::Object, "self")],
         identi: BuildInFnIdenti::FileSystem(FileSysFn::Read),
     };
 
     let write = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::String, "content"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::String, "content"),
         ],
         identi: BuildInFnIdenti::FileSystem(FileSysFn::Write),
     };
     let append = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::String, "content"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::String, "content"),
         ],
         identi: BuildInFnIdenti::FileSystem(FileSysFn::Append),
     };
@@ -88,8 +86,8 @@ pub fn module_object() -> Object {
 
     let open = BuildInFunction {
         params: vec![
-            BuildInFnParam (ValueType::Object, "self"),
-            BuildInFnParam (ValueType::String, "path"),
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::String, "path"),
         ],
         identi: BuildInFnIdenti::FileSystem(FileSysFn::Open),
     };
@@ -99,9 +97,7 @@ pub fn module_object() -> Object {
     Object {
         prototype: None,
         storage_pattern: DataStoragePattern::List,
-        data_list: Some(vec![
-            (String::from("open"), Value::create(open).into()),
-        ]),
+        data_list: Some(vec![(String::from("open"), Value::create(open).into())]),
         data_map: None,
     }
 }
@@ -113,7 +109,7 @@ impl BuildInFnCall for FileSysFn {
                 let path_value = get_val("path", scope)?;
 
                 let Value::String(str) = path_value.clone() else {
-                    unreachable!() 
+                    unreachable!()
                 };
 
                 let str_ref = str.borrow();
@@ -124,16 +120,17 @@ impl BuildInFnCall for FileSysFn {
                 let path_is_dir = path.is_dir();
                 let path_is_file = path.is_file();
 
-                let file_obj =
-                    unsafe { Class::instantiate(
+                let file_obj = unsafe {
+                    Class::instantiate(
                         FILE_CLASS.as_ref().unwrap().clone(),
                         ArrayLiteral::from([
                             path_value,
                             Value::Boolean(path_exist),
                             Value::Boolean(path_is_dir),
                             Value::Boolean(path_is_file),
-                        ])
-                    )? };
+                        ]),
+                    )?
+                };
 
                 Value::create(file_obj)
             }
@@ -155,19 +152,18 @@ impl BuildInFnCall for FileSysFn {
                 let file_path = path_str_temp.as_str();
 
                 match self {
-                    FileSysFn::Read =>
-                        file_read(file_path, file_info)?,
+                    FileSysFn::Read => file_read(file_path, file_info)?,
                     FileSysFn::Write => {
                         let content_value = get_val("content", scope)?;
                         file_write(file_path, content_value, file_info)?;
                         Value::Void(VoidSign::Empty)
-                    },
+                    }
                     FileSysFn::Append => {
                         let content_value = get_val("content", scope)?;
                         file_append(file_path, content_value, file_info)?;
                         Value::Void(VoidSign::Empty)
-                    },
-                    _ => unreachable!()
+                    }
+                    _ => unreachable!(),
                 }
             }
         };
