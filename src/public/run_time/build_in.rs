@@ -13,7 +13,7 @@ use crate::public::value::value::Overload;
 use crate::public::value::value::Value;
 use crate::public::value::value::ValueType;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub enum BuildInFnIdenti {
     Basic(BasicFn),
     Math(MathFn),

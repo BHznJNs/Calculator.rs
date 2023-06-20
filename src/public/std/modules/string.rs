@@ -14,7 +14,7 @@ use crate::public::value::value::{Overload as ValueOverload, Value, ValueType};
 use super::super::utils::get_val::get_val;
 use super::BuildInFnCall;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub enum StringFn {
     SPLIT,
     REPLACE,

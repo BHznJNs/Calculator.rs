@@ -1,3 +1,4 @@
+mod fs_ops;
 mod file_ops;
 
 use std::path::Path;
@@ -16,12 +17,16 @@ use crate::public::value::oop::utils::data_storage::DataStoragePattern;
 use crate::public::value::value::{Overload as ValueOverload, Value, ValueType, VoidSign};
 
 use self::file_ops::file_append;
+use self::fs_ops::{file_create, dir_create, dir_delete, file_delete};
 
 use super::BuildInFnCall;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub enum FileSysFn {
     Open,
+    Create,
+    Delete,
+
     Read,
     Write,
     Append,
@@ -84,20 +89,30 @@ fn static_class_setter() {
 pub fn module_object() -> Object {
     static_class_setter();
 
-    let open = BuildInFunction {
+    let fs_method_template = BuildInFunction {
         params: vec![
             BuildInFnParam(ValueType::Object, "self"),
             BuildInFnParam(ValueType::String, "path"),
         ],
         identi: BuildInFnIdenti::FileSystem(FileSysFn::Open),
     };
+    let open = fs_method_template.clone();
+    let mut create = fs_method_template.clone();
+    let mut delete = fs_method_template.clone();
+
+    create.identi = BuildInFnIdenti::FileSystem(FileSysFn::Create);
+    delete.identi = BuildInFnIdenti::FileSystem(FileSysFn::Delete);
 
     // --- --- --- --- --- ---
 
     Object {
         prototype: None,
         storage_pattern: DataStoragePattern::List,
-        data_list: Some(vec![(String::from("open"), Value::create(open).into())]),
+        data_list: Some(vec![
+            (String::from("open"), Value::create(open).into()),
+            (String::from("create"), Value::create(create).into()),
+            (String::from("delete"), Value::create(delete).into())
+        ]),
         data_map: None,
     }
 }
@@ -107,7 +122,6 @@ impl BuildInFnCall for FileSysFn {
         let result = match self {
             FileSysFn::Open => {
                 let path_value = get_val("path", scope)?;
-
                 let Value::String(str) = path_value.clone() else {
                     unreachable!()
                 };
@@ -133,6 +147,39 @@ impl BuildInFnCall for FileSysFn {
                 };
 
                 Value::create(file_obj)
+            }
+            FileSysFn::Create => {
+                let path_value = get_val("path", scope)?;
+                let Value::String(str) = path_value.clone() else {
+                    unreachable!()
+                };
+
+                let path_ref = str.borrow();
+                let path_str = path_ref.as_str();
+                if path_str.ends_with('/') || path_str.ends_with('\\') {
+                    dir_create(path_str)?;
+                } else {
+                    file_create(path_str)?;
+                }
+
+                FileSysFn::Open.call(scope)?
+            }
+            FileSysFn::Delete => {
+                let path_value = get_val("path", scope)?;
+                let Value::String(str) = path_value.clone() else {
+                    unreachable!()
+                };
+
+                let path_ref = str.borrow();
+                let path_str = path_ref.as_str();
+                let path = Path::new(path_str);
+                if path.is_dir() {
+                    dir_delete(path_str)?;
+                } else {
+                    file_delete(path_str)?;
+                }
+
+                Value::Void(VoidSign::Empty)
             }
             _ => {
                 // the code following is used as the method of class `File`.

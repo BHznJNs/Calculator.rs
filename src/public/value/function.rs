@@ -27,7 +27,7 @@ impl Param for BuildInFnParam {
     }
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub struct BuildInFunction {
     pub params: Vec<BuildInFnParam>,
     pub identi: BuildInFnIdenti,

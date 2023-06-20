@@ -80,7 +80,7 @@ pub fn function_list() -> Vec<(String, Value)> {
     ]
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub enum BasicFn {
     INPUT,
     TYPE,

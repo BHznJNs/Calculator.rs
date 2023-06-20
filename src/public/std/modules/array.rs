@@ -74,7 +74,7 @@ pub fn module_class() -> Class {
     }
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub enum ArrayFn {
     PUSH,
     POP,
