@@ -77,20 +77,32 @@ impl<'a> Line<'a> {
         self.tokens = tokenize(self.content);
         self.content.pop();
     }
-    fn is_allowed_char(ch: char) -> bool {
+    pub fn is_allowed_char(ch: char) -> bool {
         const OFFSET: usize = 32;
         ALLOWED_CHAR_MAP[(ch as usize) - OFFSET]
     }
 
     // push / pop
-    pub fn push(&mut self, ch: char) -> bool {
-        if Self::is_allowed_char(ch) {
-            self.content.push(ch);
-            self.refresh();
-            true
-        } else {
-            false
+    pub fn push(&mut self, ch: char) {
+        // in: '('; pushed: "()"
+        // in: '['; pushed: "[]"
+        // in: '#'; pushed: '#'
+
+        // if character is to paired
+        let paired_ch = match ch {
+            '(' => ')',
+            '[' => ']',
+            '{' => '}',
+            '\'' | '\"' => ch,
+            _ => '\0'
+        };
+        self.content.push(ch);
+
+        // output this character with paired
+        if paired_ch != '\0' {
+            self.content.push(paired_ch);
         }
+        self.refresh();
     }
     pub fn pop(&mut self) {
         self.content.pop();

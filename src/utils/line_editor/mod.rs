@@ -358,19 +358,18 @@ impl LineEditor {
                             break Signal::NonASCII;
                         }
 
-                        if self.is_at.line_end {
-                            let is_allowed_char = line.push(ch);
+                        let is_allowed_char = Line::is_allowed_char(ch);
+                        if self.is_at.line_end && is_allowed_char {
+                            line.push(ch);
 
-                            if is_allowed_char {
-                                if !self.is_at.right_end {
-                                    self.terminal.cursor.right(1)?;
-                                }
-                                if line.len() > self.visible_area_width {
-                                    self.overflow_left = line.len() - self.visible_area_width;
-                                } else {
-                                    self.overflow_left = 0;
-                                };
+                            if !self.is_at.right_end {
+                                self.terminal.cursor.right(1)?;
                             }
+                            if line.len() > self.visible_area_width {
+                                self.overflow_left = line.len() - self.visible_area_width;
+                            } else {
+                                self.overflow_left = 0;
+                            };
                         } else {
                             self.insert_edit(ch, &mut line)?;
                         }
