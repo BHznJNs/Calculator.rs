@@ -246,7 +246,9 @@ impl LineEditor {
                 continue;
             };
             // ctrl + c -> Interrupt
-            if key.modifiers == KeyModifiers::CONTROL && key.code == KeyCode::Char('c') {
+            if key.modifiers == KeyModifiers::CONTROL
+                && (key.code == KeyCode::Char('c') || key.code == KeyCode::Char('d'))
+            {
                 print_line(&mut self.terminal.stdout, "\nKeyboard Interrupt");
                 break Signal::Interrupt;
             }
