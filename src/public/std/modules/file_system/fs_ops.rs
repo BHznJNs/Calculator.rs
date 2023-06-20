@@ -1,6 +1,6 @@
-use std::fs::{File, self};
+use std::fs::{self, File};
 
-use crate::public::error::{InternalComponent, internal_error};
+use crate::public::error::{internal_error, InternalComponent};
 
 pub fn file_create(path: &str) -> Result<(), ()> {
     match File::create(path) {
@@ -8,7 +8,7 @@ pub fn file_create(path: &str) -> Result<(), ()> {
         Err(_) => {
             let msg = format!("file '{}' create error", path);
             internal_error(InternalComponent::Std, &msg)
-        },
+        }
     }
 }
 pub fn dir_create(path: &str) -> Result<(), ()> {
@@ -17,7 +17,7 @@ pub fn dir_create(path: &str) -> Result<(), ()> {
         Err(_) => {
             let msg = format!("folder '{}' create error", path);
             internal_error(InternalComponent::Std, &msg)
-        },
+        }
     }
 }
 
@@ -27,7 +27,7 @@ pub fn dir_delete(path: &str) -> Result<(), ()> {
         Err(_) => {
             let msg = format!("folder '{}' delete error", path);
             internal_error(InternalComponent::Std, &msg)
-        },
+        }
     }
 }
 pub fn file_delete(path: &str) -> Result<(), ()> {
@@ -36,6 +36,6 @@ pub fn file_delete(path: &str) -> Result<(), ()> {
         Err(_) => {
             let msg = format!("file '{}' delete error", path);
             internal_error(InternalComponent::Std, &msg)
-        },
+        }
     }
 }

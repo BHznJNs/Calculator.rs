@@ -1,5 +1,5 @@
-mod fs_ops;
 mod file_ops;
+mod fs_ops;
 
 use std::path::Path;
 use std::rc::Rc;
@@ -17,7 +17,7 @@ use crate::public::value::oop::utils::data_storage::DataStoragePattern;
 use crate::public::value::value::{Overload as ValueOverload, Value, ValueType, VoidSign};
 
 use self::file_ops::file_append;
-use self::fs_ops::{file_create, dir_create, dir_delete, file_delete};
+use self::fs_ops::{dir_create, dir_delete, file_create, file_delete};
 
 use super::BuildInFnCall;
 
@@ -111,7 +111,7 @@ pub fn module_object() -> Object {
         data_list: Some(vec![
             (String::from("open"), Value::create(open).into()),
             (String::from("create"), Value::create(create).into()),
-            (String::from("delete"), Value::create(delete).into())
+            (String::from("delete"), Value::create(delete).into()),
         ]),
         data_map: None,
     }
