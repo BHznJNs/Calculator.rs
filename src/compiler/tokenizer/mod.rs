@@ -249,7 +249,7 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
                 current = chars[index];
 
                 while is_escape_char
-                    || (current != SINGLE_QUOTE_ASCII && current != DOUBLE_QUOTE_ASCII)
+                    || (current != SINGLE_QUOTE_ASCII && current != DOUBLE_QUOTE_ASCII && current != NULL_ASCII)
                 {
                     if index == chars.len() - 2 {
                         let msg = format!("Unmatched quote symbol at index {}.", index);

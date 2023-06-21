@@ -11,7 +11,9 @@ pub fn resolve(sequence_node: Rc<ASTNode>, scope: &mut Scope) -> Result<Value, (
         ASTNode::Expression(expression_node) => {
             expression::resolve(expression_node.clone(), scope)?
         }
-        ASTNode::Statement(statement_node) => statement::resolve(statement_node.clone(), scope)?,
+        ASTNode::Statement(statement_node) => {
+            statement::resolve(statement_node.clone(), scope)?
+        }
         _ => Value::Void(VoidSign::Empty),
     };
 

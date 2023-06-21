@@ -14,17 +14,17 @@ pub fn env_resolve(calc_env: Env, scope: &mut Scope) {
     if unsafe { ENV_OPTION.timer } {
         let now = Instant::now();
 
-        if let Ok(_) = run(script_path, scope) {
+        if let Ok(_) = run(&script_path, scope) {
             let elapsed_time = now.elapsed();
             let elapsed_second = elapsed_time.as_secs_f64();
             println!("Executed in: {}s.", elapsed_second);
         }
     } else {
-        let _ = run(script_path, scope);
+        let _ = run(&script_path, scope);
     }
 }
 
-pub fn run(path: String, scope: &mut Scope) -> Result<(), ()> {
+pub fn run(path: &str, scope: &mut Scope) -> Result<(), ()> {
     let Ok(mut script_lines) = readlines::resolve(path) else {
         println!("Invalid script file.");
         return Err(())

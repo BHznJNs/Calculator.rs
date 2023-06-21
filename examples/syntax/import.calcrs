@@ -1,4 +1,4 @@
-import "class.calcrs"
+class = import "class.calcrs"
 # 'test'
 
 out class.Person

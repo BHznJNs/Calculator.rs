@@ -5,7 +5,7 @@ use crate::computer::resolvers::expression;
 use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::compile_time::ast::types::StatementNode;
 use crate::public::compile_time::keywords::Keyword;
-use crate::public::error::{import_error, syntax_error};
+use crate::public::error::syntax_error;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::{Value, VoidSign};
 use crate::utils::output::print_line;
@@ -109,20 +109,6 @@ pub fn resolve(statement_node: Rc<StatementNode>, scope: &mut Scope) -> Result<V
             } else {
                 Value::Void(VoidSign::Empty)
             }
-        }
-        Keyword::Import => {
-            let module_node = &body[0];
-            if let ASTNode::Variable(var_node) = module_node {
-                scope.import_std(&var_node.name)?;
-            } else if let ASTNode::StringLiteral(module_path) = module_node {
-                scope.import_from_path(&module_path)?;
-            } else {
-                return Err(import_error(
-                    "invalid import statement for wrong param type",
-                )?);
-            }
-
-            Value::Void(VoidSign::Empty)
         }
         _ => Value::Void(VoidSign::Empty),
     };

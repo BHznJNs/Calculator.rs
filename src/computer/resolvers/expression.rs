@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::public::compile_time::ast::ast_enum::ASTNode;
-use crate::public::compile_time::ast::types::ExpressionNode;
+use crate::public::compile_time::ast::types::{ExpressionNode, ModuleType};
 use crate::public::error::{internal_error, syntax_error, type_error, InternalComponent};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::symbols::Symbols;
@@ -29,6 +29,18 @@ pub fn resolve(node: Rc<ExpressionNode>, scope: &mut Scope) -> Result<Value, ()>
 
             ASTNode::LazyExpression(node) => {
                 Value::LazyExpression(node.sub_sequence.clone().into())
+            }
+
+            ASTNode::ImportStatement(node) => {
+                match node.type__ {
+                    ModuleType::BuildIn => {
+                        scope.import_std(&node.target)?;
+                        Value::Void(VoidSign::Empty)
+                    }
+                    ModuleType::UserDefined => {
+                        scope.import_from_path(&node.target)?
+                    }
+                }
             }
             ASTNode::FunctionDefinition(node) => {
                 Value::create(function_definition::resolve(node.clone())?)
@@ -74,7 +86,9 @@ pub fn resolve(node: Rc<ExpressionNode>, scope: &mut Scope) -> Result<Value, ()>
             ASTNode::Instantiation(node) => {
                 Value::create(instantiation::resolve(node.clone(), scope)?)
             }
-            ASTNode::Assignment(node) => assignment::resolve(node.clone(), scope)?,
+            ASTNode::Assignment(node) => {
+                assignment::resolve(node.clone(), scope)?
+            }
 
             ASTNode::Variable(_)
             | ASTNode::ObjectReading(_)

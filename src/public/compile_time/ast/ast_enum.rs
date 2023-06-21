@@ -6,7 +6,7 @@ use crate::public::value::{number::Number, symbols::Symbols};
 use super::types::{
     ArrayElementReadingNode, ArrayLiteralNode, AssignmentNode, ClassDefinitionNode, ExpressionNode,
     FunctionDefinitionNode, InstantiationNode, InvocationNode, LazyExpressionNode,
-    ObjectReadingNode, StatementNode, VariableNode,
+    ObjectReadingNode, StatementNode, VariableNode, ImportNode,
 };
 
 pub struct RootNode {
@@ -31,6 +31,7 @@ pub enum ASTNode {
     Invocation(Rc<InvocationNode>),
     Statement(Rc<StatementNode>),
 
+    ImportStatement(Rc<ImportNode>),
     FunctionDefinition(Rc<FunctionDefinitionNode>),
     ClassDefinition(Rc<ClassDefinitionNode>),
     Instantiation(Rc<InstantiationNode>),
@@ -54,6 +55,7 @@ impl fmt::Display for ASTNode {
             ASTNode::LazyExpression(_) => "LazyExpression",
             ASTNode::Invocation(_) => "Invocation",
             ASTNode::Statement(_) => "Statement",
+            ASTNode::ImportStatement(_) => "ImportStatement",
             ASTNode::FunctionDefinition(_) => "FunctionDefinition",
             ASTNode::ClassDefinition(_) => "ClassDefinition",
             ASTNode::Instantiation(_) => "Instantiation",

@@ -1,4 +1,4 @@
-import "test_modules/node.calcrs"
+node = import "test_modules/node.calcrs"
 
 node_cls  = node.self
 node_inst = new node_cls[1, 0]

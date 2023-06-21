@@ -38,11 +38,29 @@ pub struct InvocationNode {
     pub params: Vec<ExpressionNode>,
 }
 #[derive(PartialEq, Clone)]
+pub struct ObjectReadingNode {
+    pub obj_node: ASTNode,
+    pub property: String,
+}
+
+#[derive(PartialEq, Clone)]
 pub struct StatementNode {
     pub keyword: Keyword,
     pub condition: Option<ExpressionNode>,
     pub body: ASTVec,
 }
+
+#[derive(PartialEq, Clone)]
+pub enum ModuleType {
+    BuildIn,
+    UserDefined,
+}
+#[derive(PartialEq, Clone)]
+pub struct ImportNode {
+    pub type__: ModuleType,
+    pub target: String,
+}
+
 #[derive(PartialEq, Clone)]
 pub struct FunctionDefinitionNode {
     pub params: Vec<UserDefinedFnParam>,
@@ -58,9 +76,4 @@ pub struct ClassDefinitionNode {
 pub struct InstantiationNode {
     pub class: String,
     pub params: ArrayLiteralNode,
-}
-#[derive(PartialEq, Clone)]
-pub struct ObjectReadingNode {
-    pub obj_node: ASTNode,
-    pub property: String,
 }

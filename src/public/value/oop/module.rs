@@ -9,15 +9,7 @@ use crate::public::value::value::Value;
 
 use super::object::Object;
 
-pub fn get_module_name(module_path: &str) -> &str {
-    // example:
-    // "./test.calcrs" -> "test.calcrs"
-    let file_name_with_ext = module_path.split("/").last().unwrap();
-
-    // "test.calcrs" -> "test"
-    file_name_with_ext.split(".").next().unwrap()
-}
-
+// convert module scope to Object
 pub fn module_create(module_props: GlobalScope) -> Object {
     let prop_count = module_props.variables.len();
     let storage_pattern = if prop_count > Class::STORAGE_THRESHOLD {

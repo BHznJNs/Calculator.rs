@@ -4,8 +4,8 @@ use std::rc::Rc;
 use crate::exec::script;
 use crate::public::error::{import_error, reference_error, ReferenceType};
 use crate::public::std::StdModules;
-use crate::public::value::oop::module::{get_module_name, module_create};
-use crate::public::value::value::Overload;
+use crate::public::value::oop::module::module_create;
+use crate::public::value::value::{VoidSign, Overload};
 
 use super::super::value::value::Value;
 use super::{build_in, module};
@@ -106,13 +106,14 @@ impl Scope {
         }
         Ok(())
     }
-    pub fn import_from_path(&mut self, module_path: &str) -> Result<(), ()> {
+    // import user defined module
+    pub fn import_from_path(&mut self, module_path: &str) -> Result<Value, ()> {
         let mut module_scope = self.new();
-        let module_name = get_module_name(module_path);
 
-        if let None = self.module.get(module_name) {
+        // if module has not been imported
+        if self.module.get(module_path) == None {
             // execute the module file
-            script::run(module_path.to_string(), &mut module_scope)?;
+            script::run(module_path, &mut module_scope)?;
 
             // import modules that imported by module
             for (module, _) in module_scope.module {
@@ -122,18 +123,12 @@ impl Scope {
                     self.import_from_path(&module)?;
                 }
             }
-
-            // regard the whole module as an Object
+            // identify this path as imported
+            self.module.insert(String::from(module_path), true);
             let module_obj = module_create(module_scope.global);
-            // insert the Object as a variable into
-            // the global scope.
-            self.global
-                .variables
-                .insert(module_name.to_string(), Value::create(module_obj));
-
-            self.module.insert(module_name.to_string(), true);
+            Ok(Value::create(module_obj))
+        } else {
+            Ok(Value::Void(VoidSign::Empty))
         }
-
-        Ok(())
     }
 }

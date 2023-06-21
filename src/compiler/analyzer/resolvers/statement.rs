@@ -1,11 +1,9 @@
-use std::rc::Rc;
-
 use crate::compiler::tokenizer::token::{Token, TokenVec};
 use crate::public::compile_time::ast::ast_enum::{ASTNode, ASTVec};
-use crate::public::compile_time::ast::types::{ExpressionNode, VariableNode};
+use crate::public::compile_time::ast::types::ExpressionNode;
 use crate::public::compile_time::parens::Paren;
 use crate::public::compile_time::{ast::types::StatementNode, keywords::Keyword};
-use crate::public::error::{import_error, syntax_error};
+use crate::public::error::syntax_error;
 
 use super::{expression, statement_block};
 
@@ -31,7 +29,6 @@ pub fn resolve(keyword: Keyword, tokens: &mut TokenVec) -> Result<StatementNode,
 
     let statement_condition;
     let statement_body;
-    // let mut params = ASTVec::new();
 
     match keyword {
         Keyword::Out => {
@@ -46,23 +43,6 @@ pub fn resolve(keyword: Keyword, tokens: &mut TokenVec) -> Result<StatementNode,
         Keyword::If => {
             statement_condition = Some(statement_condition_resolve(tokens)?);
             statement_body = statement_block::resolve(tokens)?;
-        }
-        Keyword::Import => {
-            if tokens.len() == 0 {
-                return Err(import_error("module name missing")?);
-            }
-            statement_condition = None;
-
-            let next_token = tokens.pop_front().unwrap();
-            if let Token::Identi(module_name) = next_token {
-                statement_body = vec![ASTNode::Variable(Rc::new(VariableNode {
-                    name: module_name,
-                }))]
-            } else if let Token::String(module_path) = next_token {
-                statement_body = vec![ASTNode::StringLiteral(module_path)]
-            } else {
-                return Err(import_error("invalid module name")?);
-            }
         }
 
         Keyword::Break => {
