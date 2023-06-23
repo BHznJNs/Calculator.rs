@@ -1,6 +1,5 @@
 use std::borrow::Borrow;
 use std::io::stdout;
-use std::rc::Rc;
 
 use crate::computer::resolvers::expression;
 use crate::public::compile_time::ast::ast_enum::ASTNode;
@@ -13,7 +12,7 @@ use crate::utils::output::print_line;
 
 use super::sequence;
 
-pub fn resolve(statement_node: Rc<StatementNode>, scope: &mut Scope) -> Result<Value, ()> {
+pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> Result<Value, ()> {
     let (condition, body) = (
         statement_node.condition.clone().take(),
         &statement_node.body,
@@ -22,7 +21,7 @@ pub fn resolve(statement_node: Rc<StatementNode>, scope: &mut Scope) -> Result<V
     let result = match statement_node.keyword {
         Keyword::Out => {
             let output_value = if let Some(ASTNode::Expression(expression_node)) = body.get(0) {
-                expression::resolve(expression_node.borrow(), scope)?
+                expression::resolve(expression_node, scope)?
             } else {
                 Value::Void(VoidSign::Empty)
             };
@@ -61,7 +60,6 @@ pub fn resolve(statement_node: Rc<StatementNode>, scope: &mut Scope) -> Result<V
                 // --- --- --- --- --- ---
 
                 'inner: for sequence in body {
-                    // let sequence_clone = sequence.clone();
                     let sequence_result = sequence::resolve(sequence, scope)?;
 
                     if let Value::Void(sign) = sequence_result {
