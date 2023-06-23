@@ -1,3 +1,4 @@
+use std::borrow::Borrow;
 use std::fmt;
 use std::rc::Rc;
 
@@ -71,7 +72,7 @@ impl Function {
         actual_params: &Vec<ExpressionNode>,
         whole_scope: &mut Scope,
         local_scope: &mut LocalScope,
-        expr_resolver: fn(Rc<ExpressionNode>, &mut Scope) -> Result<Value, ()>,
+        expr_resolver: fn(&ExpressionNode, &mut Scope) -> Result<Value, ()>,
     ) -> Result<(), ()> {
         if actual_params.len() < formal_params.len() {
             // if param missing
@@ -88,7 +89,7 @@ impl Function {
 
             // compute actual_param_value
             let actual_param_node = (&actual_params[index]).clone();
-            let actual_param_value = expr_resolver(actual_param_node.into(), whole_scope)?;
+            let actual_param_value = expr_resolver(actual_param_node.borrow(), whole_scope)?;
 
             // param type check
             if actual_param_value.check_type(formal_param.type__()) {

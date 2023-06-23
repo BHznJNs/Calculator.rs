@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::compile_time::ast::types::{ExpressionNode, ModuleType};
 use crate::public::error::{internal_error, syntax_error, type_error, InternalComponent};
@@ -11,7 +9,7 @@ use super::class_definition;
 use super::operate::operate;
 use super::{array_literal, assignment, composer::compose, function_definition, instantiation};
 
-pub fn resolve(node: Rc<ExpressionNode>, scope: &mut Scope) -> Result<Value, ()> {
+pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> Result<Value, ()> {
     let elements = &node.elements;
     if elements.len() == 0 {
         return Ok(Value::Void(VoidSign::Empty));
@@ -21,10 +19,10 @@ pub fn resolve(node: Rc<ExpressionNode>, scope: &mut Scope) -> Result<Value, ()>
 
     for current_node in elements {
         let current_value = match current_node {
-            ASTNode::Expression(node) => resolve(node.clone(), scope)?,
+            ASTNode::Expression(node) => resolve(node, scope)?,
 
-            ASTNode::NumberLiteral(num) => Value::Number(*num),
-            ASTNode::StringLiteral(str) => Value::create(str.to_owned()),
+            ASTNode::NumberLiteral(num) => Value::Number(num.clone()),
+            ASTNode::StringLiteral(str) => Value::create(str.clone()),
 
             ASTNode::LazyExpression(node) => {
                 Value::LazyExpression(node.sub_sequence.clone().into())

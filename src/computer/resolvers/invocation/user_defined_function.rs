@@ -6,8 +6,7 @@ use crate::public::value::value::{Value, VoidSign};
 
 fn call(function: &UserDefinedFunction, scope: &mut Scope) -> Result<Value, ()> {
     for node in &function.body {
-        let node_clone = node.clone();
-        let sequence_result = sequence::resolve(node_clone.into(), scope)?;
+        let sequence_result = sequence::resolve(node, scope)?;
 
         if let Value::Void(VoidSign::Break(val)) = sequence_result {
             return Ok(val.unwrap());

@@ -1,3 +1,4 @@
+use std::borrow::Borrow;
 use std::io::stdout;
 use std::rc::Rc;
 
@@ -21,7 +22,7 @@ pub fn resolve(statement_node: Rc<StatementNode>, scope: &mut Scope) -> Result<V
     let result = match statement_node.keyword {
         Keyword::Out => {
             let output_value = if let Some(ASTNode::Expression(expression_node)) = body.get(0) {
-                expression::resolve(expression_node.clone(), scope)?
+                expression::resolve(expression_node.borrow(), scope)?
             } else {
                 Value::Void(VoidSign::Empty)
             };
@@ -31,7 +32,7 @@ pub fn resolve(statement_node: Rc<StatementNode>, scope: &mut Scope) -> Result<V
         }
         Keyword::For => {
             let loop_count_expression = condition.unwrap();
-            let loop_count_value = expression::resolve(loop_count_expression.into(), scope)?;
+            let loop_count_value = expression::resolve(&loop_count_expression, scope)?;
 
             let is_inf_loop;
             let loop_count;
@@ -60,8 +61,8 @@ pub fn resolve(statement_node: Rc<StatementNode>, scope: &mut Scope) -> Result<V
                 // --- --- --- --- --- ---
 
                 'inner: for sequence in body {
-                    let sequence_clone = sequence.clone();
-                    let sequence_result = sequence::resolve(sequence_clone.into(), scope)?;
+                    // let sequence_clone = sequence.clone();
+                    let sequence_result = sequence::resolve(sequence, scope)?;
 
                     if let Value::Void(sign) = sequence_result {
                         if let VoidSign::Break(_) = sign {
@@ -79,7 +80,7 @@ pub fn resolve(statement_node: Rc<StatementNode>, scope: &mut Scope) -> Result<V
             Value::Void(VoidSign::Empty)
         }
         Keyword::If => {
-            let condition_struct = expression::resolve(condition.unwrap().into(), scope)?;
+            let condition_struct = expression::resolve(condition.unwrap().borrow(), scope)?;
             let condition_value = match condition_struct {
                 Value::Boolean(val) => val,
                 Value::Number(num) => num.int_value() != 0,
@@ -88,8 +89,7 @@ pub fn resolve(statement_node: Rc<StatementNode>, scope: &mut Scope) -> Result<V
 
             if condition_value {
                 for sequence in body {
-                    let sequence_clone = sequence.clone();
-                    let sequence_result = sequence::resolve(sequence_clone.into(), scope)?;
+                    let sequence_result = sequence::resolve(sequence, scope)?;
 
                     if let Value::Void(_) = sequence_result {
                         return Ok(sequence_result);
@@ -114,7 +114,7 @@ pub fn resolve(statement_node: Rc<StatementNode>, scope: &mut Scope) -> Result<V
         Keyword::Continue => Value::Void(VoidSign::Continue),
         Keyword::Break => {
             if let Some(ASTNode::Expression(expression_node)) = body.get(0) {
-                let expression_res = expression::resolve(expression_node.clone(), scope)?;
+                let expression_res = expression::resolve(expression_node, scope)?;
                 Value::Void(VoidSign::Break(expression_res.into()))
             } else {
                 Value::Void(VoidSign::Empty)

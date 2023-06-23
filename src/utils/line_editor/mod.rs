@@ -239,8 +239,8 @@ impl LineEditor {
         print!("{}", self.prompt);
         self.terminal.flush()?;
 
-        let mut line_content = String::new();
-        let mut line = Line::new(&mut line_content, self.line_count);
+        // let mut line_content = String::new();
+        let mut line = Line::new(self.line_count);
 
         let result = loop {
             let Some(key) = self.terminal.get_key() else {
@@ -324,6 +324,9 @@ impl LineEditor {
                         self.overflow_right = 0;
 
                         print_line(&mut self.terminal.stdout, "");
+                        let line_content = line.content;
+                        line.content = String::new();
+
                         self.history.append(line_content.clone());
                         break Signal::NewLine(line_content);
                     }

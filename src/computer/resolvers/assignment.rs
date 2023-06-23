@@ -1,3 +1,4 @@
+use std::borrow::Borrow;
 use std::rc::Rc;
 
 use crate::public::compile_time::ast::ast_enum::ASTNode;
@@ -12,7 +13,7 @@ use super::expression;
 pub fn resolve(node: Rc<AssignmentNode>, scope: &mut Scope) -> Result<Value, ()> {
     let left_hand_node = &node.left_hand_node;
     let right_hand_clone = node.right_hand_node.clone();
-    let right_hand_value = expression::resolve(right_hand_clone.into(), scope)?;
+    let right_hand_value = expression::resolve(right_hand_clone.borrow(), scope)?;
 
     match left_hand_node {
         ASTNode::Variable(sub_node) => {

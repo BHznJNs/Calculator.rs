@@ -1,3 +1,4 @@
+use std::borrow::Borrow;
 use std::rc::Rc;
 
 use super::expression;
@@ -9,7 +10,7 @@ pub fn resolve(node: Rc<ArrayLiteralNode>, scope: &mut Scope) -> Result<ArrayLit
     let mut elements = ArrayLiteral::new();
 
     for element in &node.elements {
-        let expression_value = expression::resolve(element.clone().into(), scope)?;
+        let expression_value = expression::resolve(element.borrow(), scope)?;
         elements.push_back(expression_value)
     }
 

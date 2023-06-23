@@ -6,13 +6,7 @@ use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
 
 pub fn invoke(le_body: Rc<ASTNode>, scope: &mut Scope) -> Result<Value, ()> {
-    // let params = le_body
-    //     .params
-    //     .as_ref()
-    //     .unwrap();
-    // let expression_node = &params[0];
-    let le_sequence = le_body.clone();
-    let result = sequence::resolve(le_sequence, scope)?;
-
+    // le -> lazy_expression
+    let result = sequence::resolve(&le_body, scope)?;
     Ok(result)
 }

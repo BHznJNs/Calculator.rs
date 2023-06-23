@@ -1,3 +1,4 @@
+use std::borrow::Borrow;
 use std::rc::Rc;
 
 use crate::public::compile_time::ast::types::ExpressionNode;
@@ -9,7 +10,7 @@ use crate::public::value::value::{Overload, Value, ValueType};
 use super::super::expression;
 
 fn index_resolve(expression_node: Rc<ExpressionNode>, scope: &mut Scope) -> Result<usize, ()> {
-    let index_value = expression::resolve(expression_node, scope)?;
+    let index_value = expression::resolve(expression_node.borrow(), scope)?;
     if let Value::Number(num) = index_value {
         if num < Number::Int(0) {
             return Err(range_error(

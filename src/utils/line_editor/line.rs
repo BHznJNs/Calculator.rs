@@ -42,8 +42,8 @@ const ALLOWED_CHAR_MAP: [bool; 94] = [
     false, true, // '}'
 ];
 
-pub struct Line<'a> {
-    content: &'a mut String,
+pub struct Line {
+    pub content: String,
 
     pub is_history: bool,
     pub label: String,
@@ -51,8 +51,8 @@ pub struct Line<'a> {
     pub tokens: TokenVec,
 }
 
-impl<'a> Line<'a> {
-    pub fn new(content: &'a mut String, line_count: usize) -> Self {
+impl Line {
+    pub fn new(line_count: usize) -> Self {
         let label_str = line_count.to_string();
         let label_fmted_width = label_str.len() + 1; // `1` is space width
         let label_fmted = if unsafe { ENV_OPTION.support_ansi } {
@@ -62,7 +62,7 @@ impl<'a> Line<'a> {
         };
 
         Line {
-            content,
+            content: String::new(),
 
             is_history: false,
             label_width: label_fmted_width,
@@ -73,7 +73,7 @@ impl<'a> Line<'a> {
 
     fn refresh(&mut self) {
         // token vector refresh
-        self.tokens = tokenize(self.content);
+        self.tokens = tokenize(&self.content);
     }
     pub fn is_allowed_char(ch: char) -> bool {
         // characters in the char_map
@@ -146,7 +146,7 @@ impl<'a> Line<'a> {
     pub fn reset_with(&mut self, mut new_content: String) {
         new_content.pop(); // pop the '\0' of the new_content
 
-        *self.content = new_content;
+        self.content = new_content;
         self.is_history = false;
         self.refresh();
     }
