@@ -36,23 +36,28 @@ pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> Result<Value, ()> {
                 }
             }
             ASTNode::FunctionDefinition(node) => {
-                Value::create(function_definition::resolve(node.clone())?)
+                Value::create(function_definition::resolve(node)?)
             }
             ASTNode::ClassDefinition(node) => {
-                Value::create(class_definition::resolve(node.clone())?)
+                Value::create(class_definition::resolve(node)?)
             }
 
             ASTNode::SymbolLiteral(sym) => {
                 if *sym == Symbols::Not {
+                    // get last value and expected as Number | Boolean typed
                     if let Some(val) = value_stack.pop() {
-                        let Value::Number(num) = val else {
+                        if let Value::Number(num) = val {
+                            Value::Number(num.not())
+                        } else
+                        if let Value::Boolean(bool_val) = val {
+                            Value::Boolean(!bool_val)
+                        } else {
                             return Err(type_error(
                                 Some("Not operator"),
                                 vec![ValueType::Number],
                                 val.get_type(),
                             )?)
-                        };
-                        Value::Number(num.not())
+                        }
                     } else {
                         return Err(syntax_error(
                             "operating number is missing for Not operator",
@@ -73,21 +78,21 @@ pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> Result<Value, ()> {
                 }
             }
             ASTNode::ArrayLiteral(node) => {
-                let array_elements = array_literal::resolve(node.clone(), scope)?;
+                let array_elements = array_literal::resolve(node, scope)?;
                 Value::create(array_elements)
             }
             ASTNode::Instantiation(node) => {
-                Value::create(instantiation::resolve(node.clone(), scope)?)
+                Value::create(instantiation::resolve(node, scope)?)
             }
             ASTNode::Assignment(node) => {
-                assignment::resolve(node.clone(), scope)?
+                assignment::resolve(node, scope)?
             }
 
             ASTNode::Variable(_)
             | ASTNode::ObjectReading(_)
             | ASTNode::Invocation(_)
             | ASTNode::ArrayElementReading(_) => {
-                compose::resolve(current_node.clone().into(), scope)?
+                compose::resolve(current_node, scope)?
             }
 
             _ => {

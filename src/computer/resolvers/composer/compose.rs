@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::error::InternalComponent;
 use crate::public::run_time::scope::Scope;
@@ -8,18 +6,18 @@ use crate::{computer::resolvers::invocation::invocation_resolve, public::error::
 
 use super::{array_reading, object_reading};
 
-pub fn resolve(node: Rc<ASTNode>, scope: &mut Scope) -> Result<Value, ()> {
-    let result = match node.as_ref() {
+pub fn resolve(node: &ASTNode, scope: &mut Scope) -> Result<Value, ()> {
+    let result = match node {
         ASTNode::Invocation(sub_node) => invocation_resolve::resolve(sub_node.clone(), scope)?,
         ASTNode::ArrayElementReading(sub_node) => {
-            let array_clone = sub_node.array_node.clone();
-            let array_value = resolve(array_clone.into(), scope)?;
+            let sub_array_node = &sub_node.array_node;
+            let array_value = resolve(sub_array_node, scope)?;
 
             array_reading::resolve(array_value, &sub_node.index_node, scope)?
         }
         ASTNode::ObjectReading(sub_node) => {
-            let obj_clone = sub_node.obj_node.clone();
-            let obj_value = resolve(obj_clone.into(), scope)?;
+            let sub_obj_node = &sub_node.obj_node;
+            let obj_value = resolve(sub_obj_node, scope)?;
             object_reading::resolve(obj_value, &sub_node.property)?
         }
         ASTNode::Variable(sub_node) => scope.read_var(&sub_node.name)?,

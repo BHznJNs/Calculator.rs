@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use crate::public::compile_time::ast::types::InstantiationNode;
 use crate::public::error::type_error;
 use crate::public::run_time::scope::Scope;
@@ -9,7 +7,7 @@ use crate::public::value::value::{Value, ValueType};
 
 use super::array_literal;
 
-pub fn resolve(node: Rc<InstantiationNode>, scope: &mut Scope) -> Result<Object, ()> {
+pub fn resolve(node: &InstantiationNode, scope: &mut Scope) -> Result<Object, ()> {
     let target_class_value = scope.read_var(&node.class)?;
     let Value::Class(target_class) =
         target_class_value else {
@@ -20,8 +18,6 @@ pub fn resolve(node: Rc<InstantiationNode>, scope: &mut Scope) -> Result<Object,
         )?)
     };
 
-    let params_clone = node.params.clone();
-    let instantiation_params = array_literal::resolve(params_clone.into(), scope)?;
-
+    let instantiation_params = array_literal::resolve(&node.params, scope)?;
     Class::instantiate(target_class.clone(), instantiation_params)
 }
