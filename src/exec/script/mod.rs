@@ -43,6 +43,11 @@ pub fn run(path: &str, scope: &mut Scope) -> Result<(), ()> {
                     String::new()
                 };
 
+                // skip blank line
+                if script_line.len() == 0 {
+                    continue;
+                }
+
                 // multi-line symbol: `:`
                 if script_line.ends_with(":") {
                     script_line.pop();
@@ -54,7 +59,6 @@ pub fn run(path: &str, scope: &mut Scope) -> Result<(), ()> {
 
                     if cached_multiline.is_empty() {
                         // out of multi-line statement
-                        script_line.push('\0');
                         current_line = &script_line;
                     } else {
                         // the last line of multi-line statement
@@ -63,9 +67,6 @@ pub fn run(path: &str, scope: &mut Scope) -> Result<(), ()> {
                             // skip the blank line and line comment
                             continue;
                         }
-                        // add end sign to current line
-                        script_line.push('\0');
-
                         cached_multiline += &script_line;
                         current_line = &cached_multiline;
                     }

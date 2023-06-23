@@ -73,11 +73,16 @@ impl<'a> Line<'a> {
 
     fn refresh(&mut self) {
         // token vector refresh
-        self.content.push('\0');
         self.tokens = tokenize(self.content);
-        self.content.pop();
     }
     pub fn is_allowed_char(ch: char) -> bool {
+        // characters in the char_map
+        if ch == '~' {
+            // '~' is the last ascii character and
+            // '~' is not allowed.
+            return false;
+        }
+
         const OFFSET: usize = 32;
         ALLOWED_CHAR_MAP[(ch as usize) - OFFSET]
     }

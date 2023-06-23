@@ -1,16 +1,16 @@
-pub fn char_converter(ch: u8) -> Result<u8, ()> {
-    let result = match ch {
-        34 => 34,  // '\"'
-        39 => 39,  // '\''
-        92 => 92,  // '\\'
-        97 => 7,   // '\a'
-        98 => 8,   // '\b'
-        110 => 10, // '\n'
-        114 => 13, // '\r'
-        115 => 32, // '\s'
-        116 => 9,  // '\t'
-        118 => 11, // '\v'
-        _ => ch,   // for other: return itself
+pub fn char_converter(ch: char) -> Result<char, ()> {
+    let result: u8 = match ch {
+        '\"' => 34,  // '\"'
+        '\'' => 39,  // '\''
+        '\\' => 92,  // '\\'
+        'a' => 7,   // '\a'
+        'b' => 8,   // '\b'
+        'n' => 10, // '\n'
+        'r' => 13, // '\r'
+        's' => 32, // '\s'
+        't' => 9,  // '\t'
+        'v' => 11, // '\v'
+        _ => return Ok(ch),   // for other: return itself
     };
-    Ok(result)
+    Ok(result as char)
 }

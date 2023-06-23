@@ -1,0 +1,7 @@
+import Basic
+
+派 = PI
+out "派：" + string(派)
+
+测试字符串 = "测试"
+out "测试字符串：" + 测试字符串

@@ -13,7 +13,6 @@ use super::{array_literal, assignment, composer::compose, function_definition, i
 
 pub fn resolve(node: Rc<ExpressionNode>, scope: &mut Scope) -> Result<Value, ()> {
     let elements = &node.elements;
-
     if elements.len() == 0 {
         return Ok(Value::Void(VoidSign::Empty));
     }
@@ -32,14 +31,10 @@ pub fn resolve(node: Rc<ExpressionNode>, scope: &mut Scope) -> Result<Value, ()>
             }
 
             ASTNode::ImportStatement(node) => {
-                match node.type__ {
-                    ModuleType::BuildIn => {
-                        scope.import_std(&node.target)?;
-                        Value::Void(VoidSign::Empty)
-                    }
-                    ModuleType::UserDefined => {
-                        scope.import_from_path(&node.target)?
-                    }
+                if node.type__ == ModuleType::UserDefined {
+                    scope.import_from_path(&node.target)?
+                } else {
+                    unreachable!()
                 }
             }
             ASTNode::FunctionDefinition(node) => {

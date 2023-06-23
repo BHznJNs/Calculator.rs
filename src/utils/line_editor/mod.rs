@@ -27,6 +27,7 @@ use crate::{public::env::ENV_OPTION, utils::line_editor::tokenizer::Token};
 // output something into file
 // this function is used to debug.
 // fn log(content: &str) -> io::Result<()> {
+//     File::create("log.txt")?;
 //     let mut file = OpenOptions::new().write(true).open("log.txt")?;
 //     file.write(content.as_bytes())?;
 //     file.flush()?;
@@ -203,9 +204,9 @@ impl LineEditor {
 
     fn insert_edit(&mut self, ch: char, line: &mut Line) -> io::Result<()> {
         let insert_pos = self.terminal.cursor_col()? - self.prompt.len() + self.overflow_left;
-        let is_allowed_char = line.insert(insert_pos, ch);
+        let is_inserted = line.insert(insert_pos, ch);
 
-        if is_allowed_char {
+        if is_inserted {
             if line.len() - 1 >= self.visible_area_width {
                 self.overflow_left += 1;
             } else {
@@ -289,7 +290,7 @@ impl LineEditor {
             }
 
             // when displaying history content, disable editing.
-            if !line.is_history {
+            if !line.is_history {                
                 match key.code {
                     KeyCode::Left => {
                         if self.is_at.line_start {
@@ -324,7 +325,6 @@ impl LineEditor {
 
                         print_line(&mut self.terminal.stdout, "");
                         self.history.append(line_content.clone());
-                        line_content.push('\0');
                         break Signal::NewLine(line_content);
                     }
                     KeyCode::Tab => {

@@ -57,21 +57,15 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ExpressionNode, ()> {
             }
 
             Token::Keyword(Keyword::Import) => {
-                if tokens.len() == 0 {
+                let Some(next_token) = tokens.pop_front() else {
                     return Err(import_error("module name missing")?);
-                }
+                };
 
-                let next_token = tokens.pop_front().unwrap();
-
-                let import_node =
-                if let Token::Identi(module_name) = next_token {
-                    ImportNode { type__: ModuleType::BuildIn, target: module_name }
-                } else if let Token::String(module_path) = next_token {
-                    ImportNode { type__: ModuleType::UserDefined, target: module_path }
-                } else {
+                let Token::String(module_path) = next_token else {
                     return Err(import_error("invalid module name")?);
                 };
-                params.push(ASTNode::ImportStatement(import_node.into()))
+                let node = ImportNode { type__: ModuleType::UserDefined, target: module_path };
+                params.push(ASTNode::ImportStatement(node.into()))
             }
             Token::Keyword(Keyword::Function) => {
                 // function definition

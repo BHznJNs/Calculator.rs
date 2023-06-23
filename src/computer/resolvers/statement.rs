@@ -3,7 +3,7 @@ use std::rc::Rc;
 
 use crate::computer::resolvers::expression;
 use crate::public::compile_time::ast::ast_enum::ASTNode;
-use crate::public::compile_time::ast::types::StatementNode;
+use crate::public::compile_time::ast::types::{StatementNode, ModuleType};
 use crate::public::compile_time::keywords::Keyword;
 use crate::public::error::syntax_error;
 use crate::public::run_time::scope::Scope;
@@ -27,7 +27,6 @@ pub fn resolve(statement_node: Rc<StatementNode>, scope: &mut Scope) -> Result<V
             };
 
             print_line(&mut stdout(), output_value);
-            // println!("{}", output_value);
             Value::Void(VoidSign::Empty)
         }
         Keyword::For => {
@@ -99,6 +98,17 @@ pub fn resolve(statement_node: Rc<StatementNode>, scope: &mut Scope) -> Result<V
             }
 
             Value::Void(VoidSign::Empty)
+        }
+        Keyword::Import => {
+            let Some(ASTNode::ImportStatement(import_node)) = body.get(0) else {
+                unreachable!()
+            };
+            if import_node.type__ == ModuleType::BuildIn {
+                scope.import_std(&import_node.target)?;
+                Value::Void(VoidSign::Empty)
+            } else {
+                unreachable!()
+            }
         }
 
         Keyword::Continue => Value::Void(VoidSign::Continue),

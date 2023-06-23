@@ -1,9 +1,9 @@
 use crate::compiler::tokenizer::token::{Token, TokenVec};
 use crate::public::compile_time::ast::ast_enum::{ASTNode, ASTVec};
-use crate::public::compile_time::ast::types::ExpressionNode;
+use crate::public::compile_time::ast::types::{ExpressionNode, ImportNode, ModuleType};
 use crate::public::compile_time::parens::Paren;
 use crate::public::compile_time::{ast::types::StatementNode, keywords::Keyword};
-use crate::public::error::syntax_error;
+use crate::public::error::{syntax_error, import_error};
 
 use super::{expression, statement_block};
 
@@ -31,6 +31,18 @@ pub fn resolve(keyword: Keyword, tokens: &mut TokenVec) -> Result<StatementNode,
     let statement_body;
 
     match keyword {
+        Keyword::Import => {
+            let Some(next_token) = tokens.pop_front() else {
+                return Err(())
+            };
+            let Token::Identi(module_name) = next_token else {
+                return Err(import_error("invalid module name")?);
+            };
+            let node = ImportNode { type__: ModuleType::BuildIn, target: module_name };
+            statement_condition = None;
+            statement_body = vec![ASTNode::ImportStatement(node.into())];
+        }
+
         Keyword::Out => {
             let output_expression = expression::resolve(tokens)?;
             statement_condition = None;

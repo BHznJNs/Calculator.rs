@@ -30,6 +30,21 @@ pub enum Symbols {
 }
 
 impl Symbols {
+    pub fn from(ch: char) -> Self {
+        match ch {
+            '+' => Self::Plus,
+            '-' => Self::Minus,
+            '*' => Self::Multiply,
+            '/' => Self::Divide,
+            '^' => Self::Power,
+            '!' => Self::Not,
+            '<' => Self::LessThan,
+            '>' => Self::MoreThan,
+            '=' => Self::Equal,
+            _ => unreachable!()
+        }
+    }
+
     pub fn combine(&self, other: Symbols) -> Result<Symbols, ()> {
         // example:
         //    let equal_symbol = Symbols::Equal;
