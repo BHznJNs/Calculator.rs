@@ -1,6 +1,5 @@
 use std::rc::Rc;
 
-use crate::public::compile_time::keywords::Keyword;
 use crate::public::value::function::UserDefinedFnParam;
 use crate::public::value::oop::class::Property;
 
@@ -60,10 +59,27 @@ pub struct InstantiationNode {
     pub params: ArrayLiteralNode,
 }
 
+// --- --- --- ---|
+// Statement Node |
+// --- --- --- ---|
 #[derive(PartialEq, Clone)]
-pub struct StatementNode {
-    pub keyword: Keyword,
-    pub condition: Option<ExpressionNode>,
+pub enum StatementNode {
+    Output(ExpressionNode),
+    ForLoop(ForStatement),
+    Condition(IfStatement),
+    Import(ImportNode),
+
+    Continue,
+    Break(ExpressionNode),
+}
+#[derive(PartialEq, Clone)]
+pub struct ForStatement {
+    pub loop_count: ExpressionNode,
+    pub body: ASTVec,
+}
+#[derive(PartialEq, Clone)]
+pub struct IfStatement {
+    pub condition: ExpressionNode,
     pub body: ASTVec,
 }
 

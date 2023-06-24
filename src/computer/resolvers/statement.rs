@@ -1,10 +1,7 @@
-use std::borrow::Borrow;
 use std::io::stdout;
 
 use crate::computer::resolvers::expression;
-use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::compile_time::ast::types::{StatementNode, ModuleType};
-use crate::public::compile_time::keywords::Keyword;
 use crate::public::error::syntax_error;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::{Value, VoidSign};
@@ -13,25 +10,14 @@ use crate::utils::output::print_line;
 use super::sequence;
 
 pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> Result<Value, ()> {
-    let (condition, body) = (
-        statement_node.condition.clone().take(),
-        &statement_node.body,
-    );
-
-    let result = match statement_node.keyword {
-        Keyword::Out => {
-            let output_value = if let Some(ASTNode::Expression(expression_node)) = body.get(0) {
-                expression::resolve(expression_node, scope)?
-            } else {
-                Value::Void(VoidSign::Empty)
-            };
-
+    let result = match statement_node {
+        StatementNode::Output(expression_node) => {
+            let output_value = expression::resolve(expression_node, scope)?;
             print_line(&mut stdout(), output_value);
             Value::Void(VoidSign::Empty)
         }
-        Keyword::For => {
-            let loop_count_expression = condition.unwrap();
-            let loop_count_value = expression::resolve(&loop_count_expression, scope)?;
+        StatementNode::ForLoop(for_statement) => {
+            let loop_count_value = expression::resolve(&for_statement.loop_count, scope)?;
 
             let is_inf_loop;
             let loop_count;
@@ -59,7 +45,7 @@ pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> Result<Valu
 
                 // --- --- --- --- --- ---
 
-                'inner: for sequence in body {
+                'inner: for sequence in &for_statement.body {
                     let sequence_result = sequence::resolve(sequence, scope)?;
 
                     if let Value::Void(sign) = sequence_result {
@@ -77,16 +63,16 @@ pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> Result<Valu
 
             Value::Void(VoidSign::Empty)
         }
-        Keyword::If => {
-            let condition_struct = expression::resolve(condition.unwrap().borrow(), scope)?;
-            let condition_value = match condition_struct {
+        StatementNode::Condition(if_statement) => {
+            let condition_value = expression::resolve(&if_statement.condition, scope)?;
+            let condition = match condition_value {
                 Value::Boolean(val) => val,
                 Value::Number(num) => num.int_value() != 0,
                 _ => return Err(syntax_error("invalid condition for 'if' statement")?),
             };
 
-            if condition_value {
-                for sequence in body {
+            if condition {
+                for sequence in &if_statement.body {
                     let sequence_result = sequence::resolve(sequence, scope)?;
 
                     if let Value::Void(_) = sequence_result {
@@ -97,10 +83,7 @@ pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> Result<Valu
 
             Value::Void(VoidSign::Empty)
         }
-        Keyword::Import => {
-            let Some(ASTNode::ImportStatement(import_node)) = body.get(0) else {
-                unreachable!()
-            };
+        StatementNode::Import(import_node) => {
             if import_node.type__ == ModuleType::BuildIn {
                 scope.import_std(&import_node.target)?;
                 Value::Void(VoidSign::Empty)
@@ -108,17 +91,15 @@ pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> Result<Valu
                 unreachable!()
             }
         }
-
-        Keyword::Continue => Value::Void(VoidSign::Continue),
-        Keyword::Break => {
-            if let Some(ASTNode::Expression(expression_node)) = body.get(0) {
-                let expression_res = expression::resolve(expression_node, scope)?;
-                Value::Void(VoidSign::Break(expression_res.into()))
-            } else {
+        StatementNode::Continue => Value::Void(VoidSign::Continue),
+        StatementNode::Break(expression_node) => {
+            let expression_value = expression::resolve(expression_node, scope)?;
+            if expression_value == Value::Void(VoidSign::Empty)  {
                 Value::Void(VoidSign::Empty)
+            } else {
+                Value::Void(VoidSign::Break(expression_value.into()))
             }
         }
-        _ => Value::Void(VoidSign::Empty),
     };
     Ok(result)
 }

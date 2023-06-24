@@ -1,6 +1,5 @@
 use crate::compiler::tokenizer::token::{Token, TokenVec};
-use crate::public::compile_time::ast::ast_enum::{ASTNode, ASTVec};
-use crate::public::compile_time::ast::types::{ExpressionNode, ImportNode, ModuleType};
+use crate::public::compile_time::ast::types::{ExpressionNode, ImportNode, ModuleType, ForStatement, IfStatement};
 use crate::public::compile_time::parens::Paren;
 use crate::public::compile_time::{ast::types::StatementNode, keywords::Keyword};
 use crate::public::error::{syntax_error, import_error};
@@ -27,10 +26,25 @@ pub fn resolve(keyword: Keyword, tokens: &mut TokenVec) -> Result<StatementNode,
     // remove the keyword token
     tokens.pop_front();
 
-    let statement_condition;
-    let statement_body;
-
+    let result =
     match keyword {
+        Keyword::Out => {
+            let output_expression = expression::resolve(tokens)?;
+            StatementNode::Output(output_expression)
+        }
+        Keyword::For => {
+            StatementNode::ForLoop(ForStatement {
+                loop_count: statement_condition_resolve(tokens)?,
+                body: statement_block::resolve(tokens)?,
+            })
+        }
+        Keyword::If => {
+            StatementNode::Condition(IfStatement {
+                condition: statement_condition_resolve(tokens)?,
+                body: statement_block::resolve(tokens)?,
+            })
+        }
+
         Keyword::Import => {
             let Some(next_token) = tokens.pop_front() else {
                 return Err(())
@@ -39,32 +53,14 @@ pub fn resolve(keyword: Keyword, tokens: &mut TokenVec) -> Result<StatementNode,
                 return Err(import_error("invalid module name")?);
             };
             let node = ImportNode { type__: ModuleType::BuildIn, target: module_name };
-            statement_condition = None;
-            statement_body = vec![ASTNode::ImportStatement(node.into())];
-        }
-
-        Keyword::Out => {
-            let output_expression = expression::resolve(tokens)?;
-            statement_condition = None;
-            statement_body = vec![ASTNode::Expression(output_expression.into())];
-        }
-        Keyword::For => {
-            statement_condition = Some(statement_condition_resolve(tokens)?);
-            statement_body = statement_block::resolve(tokens)?;
-        }
-        Keyword::If => {
-            statement_condition = Some(statement_condition_resolve(tokens)?);
-            statement_body = statement_block::resolve(tokens)?;
+            StatementNode::Import(node)
         }
 
         Keyword::Break => {
-            let return_expression = expression::resolve(tokens)?;
-            statement_condition = None;
-            statement_body = vec![ASTNode::Expression(return_expression.into())];
+            StatementNode::Break(expression::resolve(tokens)?)
         }
         Keyword::Continue => {
-            statement_condition = None;
-            statement_body = ASTVec::new();
+            StatementNode::Continue
         } // Do nothing
         _ => {
             // example:
@@ -72,11 +68,6 @@ pub fn resolve(keyword: Keyword, tokens: &mut TokenVec) -> Result<StatementNode,
             let msg = format!("unexpected keyword '{}' at start of statement", keyword);
             return Err(syntax_error(&msg)?);
         }
-    }
-
-    Ok(StatementNode {
-        keyword,
-        condition: statement_condition,
-        body: statement_body,
-    })
+    };
+    Ok(result)
 }

@@ -1,5 +1,4 @@
 use core::fmt;
-use std::rc::Rc;
 
 use crate::public::value::{number::Number, symbols::Symbols};
 
