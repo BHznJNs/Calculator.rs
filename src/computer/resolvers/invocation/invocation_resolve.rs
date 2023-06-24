@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::borrow::Borrow;
 
 use crate::computer::resolvers::composer::compose;
 use crate::public::compile_time::ast::ast_enum::ASTNode;
@@ -29,7 +29,7 @@ fn function_invoke(
         Value::LazyExpression(le) => lazy_expression::invoke(le, scope)?,
         Value::Function(fn_enum) => match fn_enum {
             Function::BuildIn(build_in_fn) => {
-                build_in_function::invoke(build_in_fn.clone(), params, scope)?
+                build_in_function::invoke(build_in_fn.borrow(), params, scope)?
             }
             Function::UserDefined(user_defined_fn) => {
                 user_defined_function::invoke(&user_defined_fn, params, scope)?
@@ -46,7 +46,7 @@ fn function_invoke(
     Ok(invoke_result)
 }
 
-pub fn resolve(node: Rc<InvocationNode>, scope: &mut Scope) -> Result<Value, ()> {
+pub fn resolve(node: &InvocationNode, scope: &mut Scope) -> Result<Value, ()> {
     let params = &node.params;
 
     let fn_result = match &node.caller {

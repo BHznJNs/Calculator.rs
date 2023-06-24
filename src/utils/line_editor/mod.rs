@@ -7,7 +7,7 @@ mod tokenizer;
 mod candidate;
 mod history;
 
-use std::{io, ops::Range};
+use std::{io, ops::Range, mem};
 
 use crossterm::{
     event::{KeyCode, KeyModifiers},
@@ -324,8 +324,7 @@ impl LineEditor {
                         self.overflow_right = 0;
 
                         print_line(&mut self.terminal.stdout, "");
-                        let line_content = line.content;
-                        line.content = String::new();
+                        let line_content = mem::replace(&mut line.content, String::new());
 
                         self.history.append(line_content.clone());
                         break Signal::NewLine(line_content);

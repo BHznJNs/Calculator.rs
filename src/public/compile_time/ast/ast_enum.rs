@@ -21,21 +21,21 @@ pub enum ASTNode {
     StringLiteral(String),
     SymbolLiteral(Symbols),
 
-    Variable(Rc<VariableNode>),
-    Assignment(Rc<AssignmentNode>),
-    ArrayLiteral(Rc<ArrayLiteralNode>),
-    ArrayElementReading(Rc<ArrayElementReadingNode>),
-    Expression(Rc<ExpressionNode>),
-    LazyExpression(Rc<LazyExpressionNode>),
+    Variable(Box<VariableNode>),
+    Assignment(Box<AssignmentNode>),
+    ArrayLiteral(Box<ArrayLiteralNode>),
+    ArrayElementReading(Box<ArrayElementReadingNode>),
+    Expression(Box<ExpressionNode>),
+    LazyExpression(Box<LazyExpressionNode>),
 
-    Invocation(Rc<InvocationNode>),
-    Statement(Rc<StatementNode>),
+    Invocation(Box<InvocationNode>),
+    Statement(Box<StatementNode>),
 
-    ImportStatement(Rc<ImportNode>),
-    FunctionDefinition(Rc<FunctionDefinitionNode>),
-    ClassDefinition(Rc<ClassDefinitionNode>),
-    Instantiation(Rc<InstantiationNode>),
-    ObjectReading(Rc<ObjectReadingNode>),
+    ImportStatement(Box<ImportNode>),
+    FunctionDefinition(Box<FunctionDefinitionNode>),
+    ClassDefinition(Box<ClassDefinitionNode>),
+    Instantiation(Box<InstantiationNode>),
+    ObjectReading(Box<ObjectReadingNode>),
 }
 
 pub type ASTVec = Vec<ASTNode>;

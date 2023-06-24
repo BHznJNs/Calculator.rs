@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use crate::computer::resolvers::expression;
 use crate::public::compile_time::ast::types::ExpressionNode;
 use crate::public::run_time::build_in::BuildInFnIdenti;
@@ -19,7 +17,7 @@ fn call(function: &BuildInFunction, scope: &mut Scope) -> Result<Value, ()> {
 }
 
 pub fn invoke(
-    function: Rc<BuildInFunction>,
+    function: &BuildInFunction,
     params: &Vec<ExpressionNode>,
     scope: &mut Scope,
 ) -> Result<Value, ()> {

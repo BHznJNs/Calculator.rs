@@ -44,6 +44,23 @@ pub struct ObjectReadingNode {
 }
 
 #[derive(PartialEq, Clone)]
+pub struct FunctionDefinitionNode {
+    pub params: Vec<UserDefinedFnParam>,
+    pub name: Option<String>,
+    pub body: ASTVec,
+}
+#[derive(PartialEq, Clone)]
+pub struct ClassDefinitionNode {
+    pub properties: Vec<Property>,
+    pub method_nodes: Vec<Rc<FunctionDefinitionNode>>,
+}
+#[derive(PartialEq, Clone)]
+pub struct InstantiationNode {
+    pub class: String,
+    pub params: ArrayLiteralNode,
+}
+
+#[derive(PartialEq, Clone)]
 pub struct StatementNode {
     pub keyword: Keyword,
     pub condition: Option<ExpressionNode>,
@@ -59,21 +76,4 @@ pub enum ModuleType {
 pub struct ImportNode {
     pub type__: ModuleType,
     pub target: String,
-}
-
-#[derive(PartialEq, Clone)]
-pub struct FunctionDefinitionNode {
-    pub params: Vec<UserDefinedFnParam>,
-    pub name: Option<String>,
-    pub body: ASTVec,
-}
-#[derive(PartialEq, Clone)]
-pub struct ClassDefinitionNode {
-    pub properties: Vec<Property>,
-    pub method_nodes: Vec<Rc<FunctionDefinitionNode>>,
-}
-#[derive(PartialEq, Clone)]
-pub struct InstantiationNode {
-    pub class: String,
-    pub params: ArrayLiteralNode,
 }

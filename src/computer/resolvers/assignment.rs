@@ -1,5 +1,3 @@
-use std::borrow::Borrow;
-
 use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::compile_time::ast::types::AssignmentNode;
 use crate::public::error::assignment_error;
@@ -11,12 +9,12 @@ use super::expression;
 
 pub fn resolve(node: &AssignmentNode, scope: &mut Scope) -> Result<Value, ()> {
     let left_hand_node = &node.left_hand_node;
-    let right_hand_clone = node.right_hand_node.clone();
-    let right_hand_value = expression::resolve(right_hand_clone.borrow(), scope)?;
+    let right_hand_node = &node.right_hand_node;
+    let right_hand_value = expression::resolve(right_hand_node, scope)?;
 
     match left_hand_node {
         ASTNode::Variable(sub_node) => {
-            scope.assign(sub_node.name.to_owned(), right_hand_value.clone())
+            scope.assign(sub_node.name.clone(), right_hand_value.clone())
         }
 
         ASTNode::ArrayElementReading(sub_node) => {

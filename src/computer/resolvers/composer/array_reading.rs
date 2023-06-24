@@ -1,6 +1,3 @@
-use std::borrow::Borrow;
-use std::rc::Rc;
-
 use crate::public::compile_time::ast::types::ExpressionNode;
 use crate::public::error::{range_error, type_error};
 use crate::public::run_time::scope::Scope;
@@ -9,8 +6,8 @@ use crate::public::value::value::{Overload, Value, ValueType};
 
 use super::super::expression;
 
-fn index_resolve(expression_node: Rc<ExpressionNode>, scope: &mut Scope) -> Result<usize, ()> {
-    let index_value = expression::resolve(expression_node.borrow(), scope)?;
+fn index_resolve(expression_node: &ExpressionNode, scope: &mut Scope) -> Result<usize, ()> {
+    let index_value = expression::resolve(expression_node, scope)?;
     if let Value::Number(num) = index_value {
         if num < Number::Int(0) {
             return Err(range_error(
@@ -50,7 +47,7 @@ pub fn assign(
     value: Value,
     scope: &mut Scope,
 ) -> Result<(), ()> {
-    let index_value = index_resolve(index_node.clone().into(), scope)?;
+    let index_value = index_resolve(index_node, scope)?;
     if let Value::Array(arr_ref) = array_value {
         // array writing
         let mut arr = arr_ref.as_ref().borrow_mut();
@@ -85,7 +82,7 @@ pub fn resolve(
     index_node: &ExpressionNode,
     scope: &mut Scope,
 ) -> Result<Value, ()> {
-    let index_value = index_resolve(index_node.clone().into(), scope)?;
+    let index_value = index_resolve(index_node, scope)?;
 
     if let Value::Array(arr_ref) = array_value {
         let arr = arr_ref.as_ref().borrow();
