@@ -35,12 +35,8 @@ pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> Result<Value, ()> {
                     unreachable!()
                 }
             }
-            ASTNode::FunctionDefinition(node) => {
-                Value::create(function_definition::resolve(node)?)
-            }
-            ASTNode::ClassDefinition(node) => {
-                Value::create(class_definition::resolve(node)?)
-            }
+            ASTNode::FunctionDefinition(node) => Value::create(function_definition::resolve(node)?),
+            ASTNode::ClassDefinition(node) => Value::create(class_definition::resolve(node)?),
 
             ASTNode::SymbolLiteral(sym) => {
                 if *sym == Symbols::Not {
@@ -48,15 +44,14 @@ pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> Result<Value, ()> {
                     if let Some(val) = value_stack.pop() {
                         if let Value::Number(num) = val {
                             Value::Number(num.not())
-                        } else
-                        if let Value::Boolean(bool_val) = val {
+                        } else if let Value::Boolean(bool_val) = val {
                             Value::Boolean(!bool_val)
                         } else {
                             return Err(type_error(
                                 Some("Not operator"),
                                 vec![ValueType::Number],
                                 val.get_type(),
-                            )?)
+                            )?);
                         }
                     } else {
                         return Err(syntax_error(
@@ -81,19 +76,13 @@ pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> Result<Value, ()> {
                 let array_elements = array_literal::resolve(node, scope)?;
                 Value::create(array_elements)
             }
-            ASTNode::Instantiation(node) => {
-                Value::create(instantiation::resolve(node, scope)?)
-            }
-            ASTNode::Assignment(node) => {
-                assignment::resolve(node, scope)?
-            }
+            ASTNode::Instantiation(node) => Value::create(instantiation::resolve(node, scope)?),
+            ASTNode::Assignment(node) => assignment::resolve(node, scope)?,
 
             ASTNode::Variable(_)
             | ASTNode::ObjectReading(_)
             | ASTNode::Invocation(_)
-            | ASTNode::ArrayElementReading(_) => {
-                compose::resolve(current_node, scope)?
-            }
+            | ASTNode::ArrayElementReading(_) => compose::resolve(current_node, scope)?,
 
             _ => {
                 let msg = format!("unexpected AST node: '{}'", current_node);

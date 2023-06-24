@@ -20,7 +20,7 @@ impl Paren {
             ']' => Self::RightBracket,
             '{' => Self::LeftBrace,
             '}' => Self::RightBrace,
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 }

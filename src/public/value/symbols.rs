@@ -41,7 +41,7 @@ impl Symbols {
             '<' => Self::LessThan,
             '>' => Self::MoreThan,
             '=' => Self::Equal,
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 

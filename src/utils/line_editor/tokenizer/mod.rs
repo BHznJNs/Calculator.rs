@@ -1,9 +1,6 @@
 mod token;
 
-use crate::{
-    public::compile_time::keywords::Keyword,
-    utils::ascii::is_identi_ascii,
-};
+use crate::{public::compile_time::keywords::Keyword, utils::ascii::is_identi_ascii};
 
 pub use token::{TextType, Token, TokenType, TokenVec};
 
@@ -23,8 +20,7 @@ pub fn tokenize(source: &str) -> TokenVec {
     loop {
         let ch = if cached_ch != '\0' {
             cached_ch
-        } else
-        if let Some(next_ch) = chars.next() {
+        } else if let Some(next_ch) = chars.next() {
             next_ch
         } else {
             break;
@@ -95,15 +91,12 @@ pub fn tokenize(source: &str) -> TokenVec {
 
         match ch {
             // Parenthesis
-            '(' | ')'
-            | '[' | ']'
-            | '{' | '}' => {
+            '(' | ')' | '[' | ']' | '{' | '}' => {
                 last_type = TokenType::Paren;
                 tokens.push_back(Token::new(TextType::Didider, String::from(ch)));
             }
             // Computing symbols
-            '+' | '-' | '*' | '/' | '^'
-            | '!' | '<' | '>' | '=' | '.' => {
+            '+' | '-' | '*' | '/' | '^' | '!' | '<' | '>' | '=' | '.' => {
                 last_type = TokenType::Symbol;
                 tokens.push_back(Token::new(TextType::Didider, String::from(ch)));
             }
@@ -114,9 +107,7 @@ pub fn tokenize(source: &str) -> TokenVec {
                 let mut is_escape_char = false;
 
                 while let Some(ch) = chars.next() {
-                    if !is_escape_char
-                        && (ch == '\'' || ch == '\"')
-                    {
+                    if !is_escape_char && (ch == '\'' || ch == '\"') {
                         value.push(ch);
                         break;
                     }

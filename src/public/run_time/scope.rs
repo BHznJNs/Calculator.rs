@@ -5,7 +5,7 @@ use crate::exec::script;
 use crate::public::error::{import_error, reference_error, ReferenceType};
 use crate::public::std::StdModules;
 use crate::public::value::oop::module::module_create;
-use crate::public::value::value::{VoidSign, Overload};
+use crate::public::value::value::{Overload, VoidSign};
 
 use super::super::value::value::Value;
 use super::{build_in, module};

@@ -49,11 +49,11 @@ fn number_resolver(chars: &mut Chars, first_ch: char, index: &mut usize) -> (cha
         }
         cached_ch = ch;
         break;
-    };
+    }
     return (cached_ch, value);
 }
 
-fn identi_resolver(chars: &mut Chars, first_ch: char,index: &mut usize) -> (char, String) {
+fn identi_resolver(chars: &mut Chars, first_ch: char, index: &mut usize) -> (char, String) {
     let mut value = String::from(first_ch);
     let mut cached_ch = '\0';
 
@@ -87,8 +87,7 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
     loop {
         let ch = if cached_ch != '\0' {
             cached_ch
-        } else
-        if let Some(next_ch) = chars.next() {
+        } else if let Some(next_ch) = chars.next() {
             index += 1;
             next_ch
         } else {
@@ -148,12 +147,7 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
 
         match ch {
             // Parenthesis
-            '('
-            | ')'
-            | '['
-            | ']'
-            | '{'
-            | '}' => {
+            '(' | ')' | '[' | ']' | '{' | '}' => {
                 last_type = TokenType::Paren;
                 tokens.push_back(Token::Paren(Paren::from(ch)));
             }
@@ -181,12 +175,7 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
                     tokens.push_back(Token::Symbol(Symbols::Minus));
                 }
             }
-            '*'
-            | '/'
-            | '^'
-            | '!'
-            | '<'
-            | '>' => {
+            '*' | '/' | '^' | '!' | '<' | '>' => {
                 last_type = TokenType::Symbol;
                 tokens.push_back(Token::Symbol(Symbols::from(ch)));
             }

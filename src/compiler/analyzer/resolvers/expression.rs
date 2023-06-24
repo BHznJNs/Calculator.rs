@@ -2,10 +2,14 @@ use crate::compiler::analyzer::resolvers::composer::compose;
 use crate::compiler::analyzer::resolvers::{class_definition, function_definition, instantiation};
 use crate::compiler::tokenizer::token::{Token, TokenVec};
 use crate::public::compile_time::ast::ast_enum::{ASTNode, ASTVec};
-use crate::public::compile_time::ast::types::{ExpressionNode, VariableNode, ImportNode, ModuleType};
+use crate::public::compile_time::ast::types::{
+    ExpressionNode, ImportNode, ModuleType, VariableNode,
+};
 use crate::public::compile_time::keywords::Keyword;
 use crate::public::compile_time::parens::Paren;
-use crate::public::error::{assignment_error, internal_error, syntax_error, InternalComponent, import_error};
+use crate::public::error::{
+    assignment_error, import_error, internal_error, syntax_error, InternalComponent,
+};
 use crate::public::value::symbols::Symbols;
 
 use super::symbol_priority::compare;
@@ -64,7 +68,10 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ExpressionNode, ()> {
                 let Token::String(module_path) = next_token else {
                     return Err(import_error("invalid module name")?);
                 };
-                let node = ImportNode { type__: ModuleType::UserDefined, target: module_path };
+                let node = ImportNode {
+                    type__: ModuleType::UserDefined,
+                    target: module_path,
+                };
                 params.push(ASTNode::ImportStatement(node.into()))
             }
             Token::Keyword(Keyword::Function) => {

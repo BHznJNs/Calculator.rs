@@ -1,7 +1,7 @@
 use std::io::stdout;
 
 use crate::computer::resolvers::expression;
-use crate::public::compile_time::ast::types::{StatementNode, ModuleType};
+use crate::public::compile_time::ast::types::{ModuleType, StatementNode};
 use crate::public::error::syntax_error;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::{Value, VoidSign};
@@ -94,7 +94,7 @@ pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> Result<Valu
         StatementNode::Continue => Value::Void(VoidSign::Continue),
         StatementNode::Break(expression_node) => {
             let expression_value = expression::resolve(expression_node, scope)?;
-            if expression_value == Value::Void(VoidSign::Empty)  {
+            if expression_value == Value::Void(VoidSign::Empty) {
                 Value::Void(VoidSign::Empty)
             } else {
                 Value::Void(VoidSign::Break(expression_value.into()))

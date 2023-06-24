@@ -4,8 +4,8 @@ use crate::public::value::{number::Number, symbols::Symbols};
 
 use super::types::{
     ArrayElementReadingNode, ArrayLiteralNode, AssignmentNode, ClassDefinitionNode, ExpressionNode,
-    FunctionDefinitionNode, InstantiationNode, InvocationNode, LazyExpressionNode,
-    ObjectReadingNode, StatementNode, VariableNode, ImportNode,
+    FunctionDefinitionNode, ImportNode, InstantiationNode, InvocationNode, LazyExpressionNode,
+    ObjectReadingNode, StatementNode, VariableNode,
 };
 
 pub struct RootNode {

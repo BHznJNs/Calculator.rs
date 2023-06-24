@@ -6,12 +6,8 @@ use super::{expression, statement};
 
 pub fn resolve(sequence_node: &ASTNode, scope: &mut Scope) -> Result<Value, ()> {
     let result = match sequence_node {
-        ASTNode::Expression(expression_node) => {
-            expression::resolve(expression_node, scope)?
-        }
-        ASTNode::Statement(statement_node) => {
-            statement::resolve(statement_node, scope)?
-        }
+        ASTNode::Expression(expression_node) => expression::resolve(expression_node, scope)?,
+        ASTNode::Statement(statement_node) => statement::resolve(statement_node, scope)?,
         _ => Value::Void(VoidSign::Empty),
     };
 

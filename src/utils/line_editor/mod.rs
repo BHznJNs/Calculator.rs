@@ -7,7 +7,7 @@ mod tokenizer;
 mod candidate;
 mod history;
 
-use std::{io, ops::Range, mem};
+use std::{io, mem, ops::Range};
 
 use crossterm::{
     event::{KeyCode, KeyModifiers},
@@ -290,7 +290,7 @@ impl LineEditor {
             }
 
             // when displaying history content, disable editing.
-            if !line.is_history {                
+            if !line.is_history {
                 match key.code {
                     KeyCode::Left => {
                         if self.is_at.line_start {

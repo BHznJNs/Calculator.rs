@@ -10,9 +10,7 @@ use super::{array_reading, object_reading};
 
 pub fn resolve(node: &ASTNode, scope: &mut Scope) -> Result<Value, ()> {
     let result = match node {
-        ASTNode::Invocation(sub_node) => {
-            invocation_resolve::resolve(sub_node.borrow(), scope)?
-        }
+        ASTNode::Invocation(sub_node) => invocation_resolve::resolve(sub_node.borrow(), scope)?,
         ASTNode::ArrayElementReading(sub_node) => {
             let sub_array_node = &sub_node.array_node;
             let array_value = resolve(sub_array_node, scope)?;
