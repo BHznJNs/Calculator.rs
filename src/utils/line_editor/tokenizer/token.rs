@@ -6,16 +6,17 @@ use crossterm::style::{StyledContent, Stylize};
 pub enum TokenType {
     Unknown,
 
-    Number,
-    String,
-    Symbol,
-    Paren,
     Identifier,
     Keyword,
-
-    Divider,
     Annotation,
+
+    Paren,
+    Symbol,
+    Divider,
     Comment,
+
+    Number,
+    String,
 }
 
 #[derive(PartialEq, Debug, Clone, Copy)]
@@ -26,6 +27,8 @@ pub enum TextType {
     Keyword,
     Annotation,
 
+    Paren,
+    Symbol,
     Didider,
     Comment,
 
@@ -46,7 +49,7 @@ impl Token {
         Token { type__, content }
     }
     pub fn len(&self) -> usize {
-        self.content.len()
+        self.content.chars().count()
     }
 
     pub fn colored(&self, range: Range<usize>) -> StyledContent<&str> {
@@ -59,7 +62,8 @@ impl Token {
             TextType::Keyword => text.dark_cyan(),
             TextType::Annotation => text.red(),
 
-            TextType::Didider => text.white(),
+            TextType::Paren | TextType::Symbol => text.white(),
+            TextType::Didider => text.dim(),
             TextType::Comment => text.green().dim(),
 
             TextType::NumberLiteral => text.yellow(),

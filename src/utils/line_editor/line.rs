@@ -6,7 +6,7 @@ use crossterm::style::Stylize;
 use super::tokenizer::{tokenize, TokenVec};
 
 // 32 ~ 125 | ' ' ~ '}'
-const ALLOWED_CHAR_MAP: [bool; 94] = [
+const ALLOWED_CHAR_MAP: [bool; 95] = [
     true, // ' '
     true, // '!'
     true, // '"'
@@ -40,6 +40,7 @@ const ALLOWED_CHAR_MAP: [bool; 94] = [
     true, true, true, true, true, true, true, true, true, // 'z'
     true, // '{'
     false, true, // '}'
+    false,
 ];
 
 pub struct Line {
@@ -76,13 +77,6 @@ impl Line {
         self.tokens = tokenize(&self.content);
     }
     pub fn is_allowed_char(ch: char) -> bool {
-        // characters in the char_map
-        if ch == '~' {
-            // '~' is the last ascii character and
-            // '~' is not allowed.
-            return false;
-        }
-
         const OFFSET: usize = 32;
         ALLOWED_CHAR_MAP[(ch as usize) - OFFSET]
     }
@@ -107,6 +101,10 @@ impl Line {
         if paired_ch != '\0' {
             self.content.push(paired_ch);
         }
+        self.refresh();
+    }
+    pub fn push_str(&mut self, str: &str) {
+        self.content.push_str(str);
         self.refresh();
     }
     pub fn pop(&mut self) {
@@ -143,9 +141,7 @@ impl Line {
         self.refresh();
     }
     // use history content to replace self content
-    pub fn reset_with(&mut self, mut new_content: String) {
-        new_content.pop(); // pop the '\0' of the new_content
-
+    pub fn reset_with(&mut self, new_content: String) {
         self.content = new_content;
         self.is_history = false;
         self.refresh();

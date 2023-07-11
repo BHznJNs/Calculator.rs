@@ -6,6 +6,7 @@ use crate::public::error::{import_error, reference_error, ReferenceType};
 use crate::public::std::StdModules;
 use crate::public::value::oop::module::module_create;
 use crate::public::value::value::{Overload, VoidSign};
+use crate::utils::completer::Completer;
 
 use super::super::value::value::Value;
 use super::{build_in, module};
@@ -37,6 +38,7 @@ impl LocalScope {
 pub struct Scope {
     pub global: GlobalScope,
     pub local: Option<LocalScope>,
+    pub completer: Option<Completer>,
     module: HashMap<String, bool>,
     std_module_map: Rc<HashMap<&'static str, StdModules>>,
 }
@@ -52,6 +54,8 @@ impl Scope {
         Scope {
             global: GlobalScope::init(),
             local: None,
+            completer: None,
+
             module: HashMap::<String, bool>::new(),
             std_module_map: Rc::new(HashMap::from(STD_MODULE_DATA)),
         }
@@ -61,6 +65,7 @@ impl Scope {
         Scope {
             global: GlobalScope::init(),
             local: None,
+            completer: None,
             module: HashMap::<String, bool>::new(),
             std_module_map: self.std_module_map.clone(),
         }
@@ -74,7 +79,12 @@ impl Scope {
                 // usually in a function invocation.
                 local_scope.variables.insert(var_name, value)
             }
-            None => self.global.variables.insert(var_name, value),
+            None => {
+                if let Some(completer) = &mut self.completer {
+                    completer.insert(&var_name);
+                }
+                self.global.variables.insert(var_name, value)
+            }
         };
     }
     pub fn read_var(&self, var_name: &str) -> Result<Value, ()> {

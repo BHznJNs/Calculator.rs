@@ -36,15 +36,15 @@ pub fn tokenize(source: &str) -> TokenVec {
         if ch.is_ascii_digit() {
             last_type = TokenType::Number;
 
-            let mut value = String::from(ch as char);
+            let mut value = String::from(ch);
             if is_num_minus {
                 is_num_minus = false;
-                value.push('-');
+                value.insert(0, '-');
             }
 
             while let Some(ch) = chars.next() {
-                if ch.is_ascii_digit() && ch == '.' {
-                    value.push(ch as char);
+                if ch.is_ascii_digit() || ch == '.' {
+                    value.push(ch);
                 } else {
                     cached_ch = ch;
                     break;
@@ -93,12 +93,12 @@ pub fn tokenize(source: &str) -> TokenVec {
             // Parenthesis
             '(' | ')' | '[' | ']' | '{' | '}' => {
                 last_type = TokenType::Paren;
-                tokens.push_back(Token::new(TextType::Didider, String::from(ch)));
+                tokens.push_back(Token::new(TextType::Paren, String::from(ch)));
             }
             // Computing symbols
             '+' | '-' | '*' | '/' | '^' | '!' | '<' | '>' | '=' | '.' => {
                 last_type = TokenType::Symbol;
-                tokens.push_back(Token::new(TextType::Didider, String::from(ch)));
+                tokens.push_back(Token::new(TextType::Symbol, String::from(ch)));
             }
             // String literal
             '\'' | '\"' => {

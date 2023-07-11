@@ -53,11 +53,8 @@ impl History {
         }
     }
 
-    pub fn append(&mut self, mut line_content: String) {
+    pub fn append(&mut self, line_content: String) {
         self.index = 0;
-        // string end with '\0' is for tokenizer
-        line_content.push('\0');
-
         self.content_list.push(Rc::new(line_content));
     }
 }

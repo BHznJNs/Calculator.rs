@@ -16,6 +16,10 @@ impl Candidate {
         self.list = candidates;
     }
 
+    pub fn clear(&mut self) {
+        self.list.clear();
+    }
+
     pub fn current_hint<'a>(&'a self) -> Option<&'a str> {
         if !self.list.is_empty() && self.index >= 0 {
             Some(&self.list[self.index as usize])

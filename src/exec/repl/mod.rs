@@ -10,6 +10,7 @@ use crate::public::env::{Env, ENV_OPTION};
 use crate::public::error::{import_error, syntax_error};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
+use crate::utils::completer::Completer;
 use crate::utils::line_editor::{LineEditor, Signal};
 use crate::utils::output::print_line;
 
@@ -36,6 +37,8 @@ fn is_ansi_supported_setter() {
 }
 
 pub fn repl(scope: &mut Scope, calc_env: Env) -> io::Result<()> {
+    scope.completer = Some(Completer::new());
+
     // print program name and version
     println!("Calculator.rs v{}", calc_env.version);
     // set is terminal support ANSI
@@ -53,7 +56,7 @@ pub fn repl(scope: &mut Scope, calc_env: Env) -> io::Result<()> {
     loop {
         support_keyboard_enhancement::resolve()?;
 
-        let sig = rl.readline()?;
+        let sig = rl.readline(scope)?;
         let line_content = match sig {
             Signal::NewLine(line) => line,
             Signal::Interrupt => break,

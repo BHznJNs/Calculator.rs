@@ -17,7 +17,7 @@ impl Completer {
         self.root.insert(word.chars());
     }
 
-    pub fn complete(&mut self, word: &str) -> Vec<String> {
+    pub fn complete(&self, word: &str) -> Vec<String> {
         let mut result = Vec::<String>::new();
         self.root.complete(word.chars(), &mut result);
         return result;

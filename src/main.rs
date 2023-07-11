@@ -9,15 +9,13 @@ use std::{env, io};
 
 use exec::args;
 use public::env::Env;
-use public::run_time::scope::Scope;
 
 fn main() -> io::Result<()> {
-    let scope = Scope::init();
     let mut args: VecDeque<String> = env::args().collect();
 
     let self_name = args.pop_front().unwrap();
     let calc_env = Env::init(self_name);
 
-    args::entry(args, calc_env, scope)?;
+    args::entry(args, calc_env)?;
     Ok(())
 }

@@ -62,7 +62,9 @@ fn args_resolve(
     Ok(())
 }
 
-pub fn entry(mut args: VecDeque<String>, mut calc_env: Env, mut scope: Scope) -> io::Result<()> {
+pub fn entry(mut args: VecDeque<String>, mut calc_env: Env) -> io::Result<()> {
+    let mut scope = Scope::init();
+
     if args.len() == 0 {
         // if no argument, enter REPL directly.
         repl(&mut scope, calc_env)?;

@@ -20,9 +20,10 @@ pub use signal::Signal;
 use state::LineState;
 use terminal::Terminal;
 
-use crate::utils::output::print_line;
+use crate::{utils::output::print_line, public::run_time::scope::Scope};
 use crate::{public::env::ENV_OPTION, utils::line_editor::tokenizer::Token};
-// use candidate::Candidate;
+
+use candidate::Candidate;
 
 // output something into file
 // this function is used to debug.
@@ -38,8 +39,10 @@ pub struct LineEditor {
     prompt: &'static str,
     terminal: Terminal,
     history: History,
+    candidate: Candidate,
     is_at: LineState,
 
+    current_line: Line,
     line_count: usize,
     overflow_left: usize,
     overflow_right: usize,
@@ -55,8 +58,10 @@ impl LineEditor {
             prompt,
             terminal,
             history: History::new(),
+            candidate: Candidate::new(),
             is_at: LineState::new(),
 
+            current_line: Line::new(1),
             line_count: 1,
             overflow_left: 0,
             overflow_right: 0,
@@ -64,24 +69,11 @@ impl LineEditor {
         }
     }
 
-    fn back_operate(&mut self, line: &mut Line) -> io::Result<()> {
-        if self.overflow_left == 0 {
-            self.terminal.cursor.left(1)?;
-        }
-
-        if self.is_at.line_end {
-            line.pop();
-            if line.len() > self.visible_area_width {
-                self.overflow_left = line.len() - self.visible_area_width;
-            } else {
-                self.overflow_left = 0;
-            };
-        } else {
-            self.remove_edit(line)?;
-        }
-        Ok(())
+    #[inline]
+    fn display_prompt(&mut self) -> io::Result<()> {
+        print!("{}", self.prompt);
+        self.terminal.flush()
     }
-
     #[inline]
     fn move_cursor_to_prompt(&mut self) -> io::Result<()> {
         self.terminal.cursor.move_to_col(self.prompt.len())
@@ -93,27 +85,47 @@ impl LineEditor {
         Ok(())
     }
 
+    fn back_operate(&mut self) -> io::Result<()> {
+        if self.overflow_left == 0 {
+            self.terminal.cursor.left(1)?;
+        }
+
+        let line = &mut self.current_line;
+        if self.is_at.line_end {
+            line.pop();
+            if line.len() > self.visible_area_width {
+                self.overflow_left = line.len() - self.visible_area_width;
+            } else {
+                self.overflow_left = 0;
+            };
+        } else {
+            self.remove_edit()?;
+        }
+        Ok(())
+    }
+
     // recompute the states
-    fn refresh(&mut self, line: &Line) -> io::Result<()> {
+    fn refresh(&mut self) -> io::Result<()> {
         let cursor_pos = self.terminal.cursor_col()?;
         let term_width = self.terminal.width();
         let prompt_len = self.prompt.len();
+        let line_label_width = self.current_line.label_width;
 
         // refresh `self.visible_area_width`
-        self.visible_area_width = term_width - prompt_len - 2;
+        self.visible_area_width = term_width - prompt_len - line_label_width;
 
         // visible left & right end
         self.is_at.left_end = cursor_pos == prompt_len;
-        self.is_at.right_end = cursor_pos == term_width - line.label_width;
+        self.is_at.right_end = cursor_pos == term_width - self.current_line.label_width;
 
         // virtual line left & right end
         self.is_at.line_start = self.is_at.left_end && (self.overflow_left == 0);
-        self.is_at.line_end = ((cursor_pos - prompt_len) == line.len())
+        self.is_at.line_end = ((cursor_pos - prompt_len) == (self.current_line.len() - self.overflow_left))
             || (self.is_at.right_end && self.overflow_right == 0);
 
         Ok(())
     }
-    fn render(&mut self, line: &Line) -> io::Result<()> {
+    fn render(&mut self) -> io::Result<()> {
         #[inline]
         fn buffer_extend_colored(
             buffer: &mut String,
@@ -140,7 +152,8 @@ impl LineEditor {
         let mut offset = self.overflow_left;
         let mut remain_space = self.visible_area_width;
         let mut buffer = String::new();
-        for token in &line.tokens {
+        let is_history = self.current_line.is_history;
+        for token in &self.current_line.tokens {
             if remain_space == 0 {
                 break;
             }
@@ -156,33 +169,28 @@ impl LineEditor {
                     // when a token is going to be overflow left side and right side
                     if actual_print_len > remain_space {
                         // print middle part of this token
-                        buffer_extend_colored(
-                            &mut buffer,
-                            line.is_history,
-                            token,
-                            offset..offset + remain_space,
-                        );
+                        buffer_extend_colored(&mut buffer, is_history, token, offset..offset + remain_space);
                         break;
                     }
 
                     remain_space -= token.len() - offset;
-                    buffer_extend_colored(&mut buffer, line.is_history, token, offset..token.len());
+                    buffer_extend_colored(&mut buffer, is_history, token, offset..token.len());
                     offset = 0;
                 }
             } else {
                 if remain_space >= token.len() {
                     remain_space -= token.len();
-                    buffer_extend_colored(&mut buffer, line.is_history, token, 0..token.len());
+                    buffer_extend_colored(&mut buffer, is_history, token, 0..token.len());
                 } else {
-                    buffer_extend_colored(&mut buffer, line.is_history, token, 0..remain_space);
+                    buffer_extend_colored(&mut buffer, is_history, token, 0..remain_space);
                     remain_space = 0;
                 }
             }
         }
 
-        print!("{}{}", buffer, &line.label);
-        self.terminal.flush()?;
-        self.terminal.cursor.show()
+        print!("{}{}", buffer, &self.current_line.label);
+        self.terminal.cursor.show()?;
+        self.terminal.flush()
     }
 
     // --- --- --- --- --- ---
@@ -202,12 +210,12 @@ impl LineEditor {
 
     // --- --- --- --- --- ---
 
-    fn insert_edit(&mut self, ch: char, line: &mut Line) -> io::Result<()> {
+    fn insert_edit(&mut self, ch: char) -> io::Result<()> {
         let insert_pos = self.terminal.cursor_col()? - self.prompt.len() + self.overflow_left;
-        let is_inserted = line.insert(insert_pos, ch);
+        let is_inserted = self.current_line.insert(insert_pos, ch);
 
         if is_inserted {
-            if line.len() - 1 >= self.visible_area_width {
+            if self.current_line.len() - 1 >= self.visible_area_width {
                 self.overflow_left += 1;
             } else {
                 self.terminal.cursor.right(1)?;
@@ -215,7 +223,7 @@ impl LineEditor {
         }
         Ok(())
     }
-    fn remove_edit(&mut self, line: &mut Line) -> io::Result<()> {
+    fn remove_edit(&mut self) -> io::Result<()> {
         let cursor_pos = self.terminal.cursor_col()?;
         if cursor_pos == 0 {
             return Ok(());
@@ -229,18 +237,15 @@ impl LineEditor {
             self.overflow_right -= 1;
         }
 
-        line.remove(remove_pos);
+        self.current_line.remove(remove_pos);
         Ok(())
     }
 
     // --- --- --- --- --- ---
 
-    pub fn readline(&mut self) -> io::Result<Signal> {
-        print!("{}", self.prompt);
-        self.terminal.flush()?;
-
-        // let mut line_content = String::new();
-        let mut line = Line::new(self.line_count);
+    pub fn readline(&mut self, scope: &Scope) -> io::Result<Signal> {
+        self.display_prompt();
+        self.current_line = Line::new(self.line_count);
 
         let result = loop {
             let Some(key) = self.terminal.get_key() else {
@@ -254,23 +259,23 @@ impl LineEditor {
                 break Signal::Interrupt;
             }
 
-            self.refresh(&line)?;
+            self.refresh()?;
 
             // control to display history
             match key.code {
                 KeyCode::Up => {
                     if let Some(last_line) = self.history.previous() {
                         self.move_cursor_to_prompt()?;
-                        line.use_history(last_line);
+                        self.current_line.use_history(last_line);
                     }
                 }
 
                 KeyCode::Down => {
                     if let Some(next_line) = self.history.next() {
                         self.move_cursor_to_prompt()?;
-                        line.use_history(next_line);
+                        self.current_line.use_history(next_line);
                     } else {
-                        line.reset();
+                        self.current_line.reset();
                     }
                 }
 
@@ -281,7 +286,7 @@ impl LineEditor {
                             self.overflow_right = new_content.len() - self.visible_area_width;
                         }
                         self.history.reset_index();
-                        line.reset_with(new_content);
+                        self.current_line.reset_with(new_content);
                     }
                 }
 
@@ -290,7 +295,7 @@ impl LineEditor {
             }
 
             // when displaying history content, disable editing.
-            if !line.is_history {
+            if !self.current_line.is_history {
                 match key.code {
                     KeyCode::Left => {
                         if self.is_at.line_start {
@@ -324,7 +329,10 @@ impl LineEditor {
                         self.overflow_right = 0;
 
                         print_line(&mut self.terminal.stdout, "");
-                        let line_content = mem::replace(&mut line.content, String::new());
+                        let line_content = mem::replace(
+                            &mut self.current_line.content,
+                            String::new(),
+                        );
 
                         self.history.append(line_content.clone());
                         break Signal::NewLine(line_content);
@@ -337,7 +345,7 @@ impl LineEditor {
                         if self.is_at.line_start {
                             continue;
                         }
-                        self.back_operate(&mut line)?;
+                        self.back_operate()?;
                     }
 
                     KeyCode::Char(ch) => {
@@ -349,18 +357,18 @@ impl LineEditor {
 
                         let is_allowed_char = Line::is_allowed_char(ch);
                         if self.is_at.line_end && is_allowed_char {
-                            line.push(ch);
+                            self.current_line.push(ch);
 
                             if !self.is_at.right_end {
                                 self.terminal.cursor.right(1)?;
                             }
-                            if line.len() > self.visible_area_width {
-                                self.overflow_left = line.len() - self.visible_area_width;
+                            if self.current_line.len() > self.visible_area_width {
+                                self.overflow_left = self.current_line.len() - self.visible_area_width;
                             } else {
                                 self.overflow_left = 0;
                             };
                         } else {
-                            self.insert_edit(ch, &mut line)?;
+                            self.insert_edit(ch)?;
                         }
                     }
                     _ => {}
@@ -368,7 +376,7 @@ impl LineEditor {
             }
 
             self.terminal.cursor.save_pos()?;
-            self.render(&line)?;
+            self.render()?;
             self.terminal.cursor.restore_pos()?;
         };
         Ok(result)
