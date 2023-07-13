@@ -1,6 +1,6 @@
 [package]
 name = "calculator"
-version = "1.9.2"
+version = "1.9.3"
 edition = "2021"
 license = "GPL-3.0"
 repository = "https://github.com/BHznJNs/Calculator.rs"

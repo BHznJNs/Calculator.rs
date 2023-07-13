@@ -92,17 +92,11 @@ calculator.exe script
 
 ## 安装
 
-### Windows-x86_64 (已在 Windows11 上测试过)
+### Windows || GNU/Linux || MacOS (x86_64)
 
-请前往 [release 页面](https://github.com/BHznJNs/Calculator.rs/releases) 下载最新的 `.exe` 文件
+请前往 [release 页面](https://github.com/BHznJNs/Calculator.rs/releases) 下载最新的可执行文件，
 
-然后直接执行即可。
-
-### Linux-x86_64 (已在 Debian11-bullseye 上测试过)
-
-请前往 [release 页面](https://github.com/BHznJNs/Calculator.rs/releases) 下载最新的 `-x86_64-Linux` 文件
-
-然后直接执行即可。
+然后直接双击运行即可。
 
 ### 其他系统和平台架构
 

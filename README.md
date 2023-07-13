@@ -92,15 +92,9 @@ calculator.exe script
 
 ## Installation
 
-### Windows-x86_64 (tested on Windows11)
+### Windows || GNU/Linux || MacOS (x86_64)
 
-Please go to the [release page](https://github.com/BHznJNs/Calculator.rs/releases) and download the latest released `.exe` file
-
-Then just execuse it.
-
-### Linux-x86_64 (tested on Debian11-bullseye)
-
-Please go to the [release page](https://github.com/BHznJNs/Calculator.rs/releases) and download the latest released `-x86_64-Linux` file
+Please go to the [release page](https://github.com/BHznJNs/Calculator.rs/releases) and download the latest released appropriate executable file,
 
 Then just execuse it.
 
