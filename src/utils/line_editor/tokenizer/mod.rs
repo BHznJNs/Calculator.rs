@@ -52,7 +52,7 @@ pub fn tokenize(source: &str) -> TokenVec {
             }
 
             let current_token = Token::new(TextType::NumberLiteral, value);
-            tokens.push_back(current_token);
+            tokens.push(current_token);
             continue;
         }
 
@@ -71,17 +71,17 @@ pub fn tokenize(source: &str) -> TokenVec {
 
             if last_type == TokenType::Annotation {
                 // Type annotation
-                tokens.push_back(Token::new(TextType::Annotation, value));
+                tokens.push(Token::new(TextType::Annotation, value));
             } else {
                 let option_keyword = Keyword::is_keyword(&value);
                 let is_keyword = option_keyword.is_some() || value.eq("true") || value.eq("false");
 
                 if is_keyword {
                     last_type = TokenType::Keyword;
-                    tokens.push_back(Token::new(TextType::Keyword, value));
+                    tokens.push(Token::new(TextType::Keyword, value));
                 } else {
                     last_type = TokenType::Identifier;
-                    tokens.push_back(Token::new(TextType::Variable, value));
+                    tokens.push(Token::new(TextType::Variable, value));
                 }
             }
             continue;
@@ -93,12 +93,12 @@ pub fn tokenize(source: &str) -> TokenVec {
             // Parenthesis
             '(' | ')' | '[' | ']' | '{' | '}' => {
                 last_type = TokenType::Paren;
-                tokens.push_back(Token::new(TextType::Paren, String::from(ch)));
+                tokens.push(Token::new(TextType::Paren, String::from(ch)));
             }
             // Computing symbols
             '+' | '-' | '*' | '/' | '^' | '!' | '<' | '>' | '=' | '.' => {
                 last_type = TokenType::Symbol;
-                tokens.push_back(Token::new(TextType::Symbol, String::from(ch)));
+                tokens.push(Token::new(TextType::Symbol, String::from(ch)));
             }
             // String literal
             '\'' | '\"' => {
@@ -124,22 +124,22 @@ pub fn tokenize(source: &str) -> TokenVec {
 
                 last_type = TokenType::String;
                 let current_token = Token::new(TextType::StringLiteral, value);
-                tokens.push_back(current_token);
+                tokens.push(current_token);
                 continue;
             }
             // Other symbols
             '\\' | ',' | ';' => {
                 last_type = TokenType::Divider;
-                tokens.push_back(Token::new(TextType::Didider, String::from(ch)));
+                tokens.push(Token::new(TextType::Didider, String::from(ch)));
             }
 
             '$' => {
                 // type annotation
                 last_type = TokenType::Annotation;
-                tokens.push_back(Token::new(TextType::Annotation, String::from('$')))
+                tokens.push(Token::new(TextType::Annotation, String::from('$')))
             }
 
-            ' ' => tokens.push_back(Token::new(TextType::Didider, String::from(' '))),
+            ' ' => tokens.push(Token::new(TextType::Didider, String::from(' '))),
 
             // comment symbol: # (Number Sign)
             '#' => {
@@ -150,7 +150,7 @@ pub fn tokenize(source: &str) -> TokenVec {
         }
     }
     if !comment.is_empty() {
-        tokens.push_back(Token::new(TextType::Comment, comment));
+        tokens.push(Token::new(TextType::Comment, comment));
     }
     return tokens;
 }

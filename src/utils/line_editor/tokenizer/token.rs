@@ -42,7 +42,7 @@ pub struct Token {
     pub content: String,
 }
 
-pub type TokenVec = VecDeque<Token>;
+pub type TokenVec = Vec<Token>;
 
 impl Token {
     pub fn new(type__: TextType, content: String) -> Self {
