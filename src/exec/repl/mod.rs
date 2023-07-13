@@ -37,6 +37,7 @@ fn is_ansi_supported_setter() {
 }
 
 pub fn repl(scope: &mut Scope, calc_env: Env) -> io::Result<()> {
+    unsafe { ENV_OPTION.is_repl = true };
     scope.completer = Some(Completer::new());
 
     // print program name and version

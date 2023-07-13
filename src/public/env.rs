@@ -2,11 +2,13 @@ use std::collections::VecDeque;
 
 pub struct EnvOption {
     pub timer: bool,
+    pub is_repl: bool,
     pub support_ansi: bool,
 }
 
 pub static mut ENV_OPTION: EnvOption = EnvOption {
     timer: false,
+    is_repl: false,
     support_ansi: false,
 };
 

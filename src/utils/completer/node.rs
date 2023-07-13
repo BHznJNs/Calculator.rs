@@ -1,6 +1,6 @@
 use std::{collections::BTreeMap, str::Chars};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct CompleterNode {
     subnodes: BTreeMap<char, CompleterNode>,
 }

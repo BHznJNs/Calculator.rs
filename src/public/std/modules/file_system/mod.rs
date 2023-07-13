@@ -56,8 +56,8 @@ fn static_class_setter() {
     };
 
     unsafe {
-        FILE_CLASS = Some(Rc::new(Class {
-            properties: vec![
+        FILE_CLASS = Some(Rc::new(Class::new(
+            vec![
                 Property {
                     type__: ValueType::String,
                     identi: String::from("path"),
@@ -75,14 +75,12 @@ fn static_class_setter() {
                     identi: String::from("is_file"),
                 },
             ],
-            method_storage: DataStoragePattern::List,
-            method_list: Some(vec![
+            vec![
                 (String::from("read"), Function::create(read)),
                 (String::from("write"), Function::create(write)),
                 (String::from("append"), Function::create(append)),
-            ]),
-            method_map: None,
-        }))
+            ],
+        )))
     };
 }
 

@@ -10,6 +10,7 @@ use crate::public::error::{reference_error, type_error, ReferenceType};
 use crate::public::value::array::ArrayLiteral;
 use crate::public::value::function::Function;
 use crate::public::value::value::{Value, ValueType};
+use crate::utils::completer::Completer;
 use crate::utils::output::print_line;
 
 use super::object::Object;
@@ -18,11 +19,12 @@ use super::utils::getter::getter;
 
 #[derive(PartialEq)]
 pub struct Class {
-    pub properties: Vec<Property>,
+    properties: Vec<Property>,
+    pub completer: Option<Completer>,
 
-    pub method_storage: DataStoragePattern,
-    pub method_list: Option<Vec<(String, Function)>>,
-    pub method_map: Option<HashMap<String, Function>>,
+    method_storage: DataStoragePattern,
+    method_list: Option<Vec<(String, Function)>>,
+    method_map: Option<HashMap<String, Function>>,
 }
 #[derive(PartialEq, Clone)]
 pub struct Property {
@@ -32,6 +34,56 @@ pub struct Property {
 
 impl Class {
     pub const STORAGE_THRESHOLD: usize = 8;
+
+    pub fn new(properties: Vec<Property>, methods: Vec<(String, Function)>) -> Self {
+        // get properties' and methods' names into one `Vec`
+        let mut prop_name_vec = vec![];
+        for Property {identi: i, ..} in &properties {
+            prop_name_vec.push(i.clone())
+        }
+        for (k, _) in &methods {
+            prop_name_vec.push(k.clone());
+        }
+
+        // init method list / map
+        let method_storage = if methods.len() > Self::STORAGE_THRESHOLD {
+            DataStoragePattern::Map
+        } else {
+            DataStoragePattern::List
+        };
+
+        let method_list: Option<Vec<(String, Function)>>;
+        let method_map: Option<HashMap<String, Function>>;
+
+        match method_storage {
+            DataStoragePattern::List => {
+                method_list = Some(methods);
+                method_map = None;
+            }
+            DataStoragePattern::Map => {
+                let mut temp_map = HashMap::new();
+                for (k, v) in methods {
+                    temp_map.insert(k, v);
+                }
+                method_list = None;
+                method_map = Some(temp_map);
+            }
+        }
+
+        // init completer
+        let mut completer = None;
+        if unsafe { ENV_OPTION.is_repl } {
+            completer = Some(Completer::from(prop_name_vec));
+        }
+
+        return Self {
+            properties,
+            completer,
+            method_storage,
+            method_list,
+            method_map,
+        };
+    }
 
     pub fn get_method(&self, target_method: &str) -> Result<Function, ()> {
         let result_target_method = getter::<Function>(
@@ -99,7 +151,7 @@ impl Class {
         }
 
         Ok(Object {
-            prototype: Some(Value::Class(class_self.clone())),
+            prototype: Some(class_self.clone()),
             storage_pattern,
             data_list,
             data_map,

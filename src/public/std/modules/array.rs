@@ -1,11 +1,8 @@
-use std::collections::HashMap;
-
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::std::utils::get_self_prop::get_self_prop;
 use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function, Overload};
 use crate::public::value::oop::class::{Class, Property};
-use crate::public::value::oop::utils::data_storage::DataStoragePattern;
 use crate::public::value::value::{Value, ValueType, VoidSign};
 
 use super::super::utils::get_val::get_val;
@@ -56,22 +53,20 @@ pub fn module_class() -> Class {
 
     // --- --- --- --- --- ---
 
-    Class {
-        properties: vec![Property {
+    return Class::new(
+        vec![Property {
             identi: String::from("v"),
             type__: ValueType::Array,
         }],
-        method_storage: DataStoragePattern::Map,
-        method_list: None,
-        method_map: Some(HashMap::from([
+        vec![
             (String::from("push"), Function::create(push)),
             (String::from("pop"), Function::create(pop)),
             (String::from("shift"), Function::create(shift)),
             (String::from("unshift"), Function::create(unshift)),
             (String::from("insert"), Function::create(insert)),
             (String::from("remove"), Function::create(remove)),
-        ])),
-    }
+        ],
+    );
 }
 
 #[derive(PartialEq, Clone)]

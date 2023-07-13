@@ -15,7 +15,7 @@ use super::utils::getter::getter;
 
 #[derive(PartialEq, Clone)]
 pub struct Object {
-    pub prototype: Option<Value>,
+    pub prototype: Option<Rc<Class>>,
 
     pub storage_pattern: DataStoragePattern,
     pub data_list: Option<Vec<(String, Rc<RefCell<Value>>)>>,
@@ -33,7 +33,7 @@ pub fn deep_clone(obj: Rc<RefCell<Object>>) -> Value {
     }
 
     let obj_ref = &*(obj.as_ref().borrow());
-    if let Some(Value::Class(class)) = &obj_ref.prototype {
+    if let Some(proto) = &obj_ref.prototype {
         let mut instantiation_params = ArrayLiteral::new();
 
         match obj_ref.storage_pattern {
@@ -56,7 +56,7 @@ pub fn deep_clone(obj: Rc<RefCell<Object>>) -> Value {
         // the object has passed the type check,
         // thus with properties of the object,
         // the instantiation must pass the type check.
-        let res_object = Class::instantiate(class.clone(), instantiation_params).unwrap();
+        let res_object = Class::instantiate(proto.clone(), instantiation_params).unwrap();
         Value::create(res_object)
     } else {
         internal_error(
@@ -123,7 +123,7 @@ impl Object {
                 Ok(target_ref.unwrap())
             }
             Err(()) => match &self.prototype {
-                Some(Value::Class(proto)) => {
+                Some(proto) => {
                     let target_method = proto.get_method(prop_name)?;
                     Ok(Value::Function(target_method.clone()))
                 }

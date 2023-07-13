@@ -3,6 +3,7 @@ mod signal;
 mod state;
 mod terminal;
 mod tokenizer;
+mod analyzer;
 
 mod candidate;
 mod history;
@@ -24,6 +25,9 @@ use crate::{utils::output::print_line, public::run_time::scope::Scope};
 use crate::{public::env::ENV_OPTION, utils::line_editor::tokenizer::Token};
 
 use candidate::Candidate;
+
+use tokenizer::TextType;
+use analyzer::analyze;
 
 // output something into file
 // this function is used to debug.
@@ -79,6 +83,13 @@ impl LineEditor {
         self.terminal.cursor.move_to_col(self.prompt.len())
     }
     #[inline]
+    fn render_with_fixed_pos(&mut self) -> io::Result<()> {
+        self.terminal.cursor.save_pos()?;
+        self.render()?;
+        self.terminal.cursor.restore_pos()?;
+        Ok(())
+    }
+    #[inline]
     fn clear_line(&mut self) -> io::Result<()> {
         self.move_cursor_to_prompt()?;
         self.terminal.clear_after_cursor();
@@ -125,6 +136,69 @@ impl LineEditor {
 
         Ok(())
     }
+
+    // display & hide hint
+    fn display_hint(&mut self, scope: &Scope) -> io::Result<()> {
+        if let Some(hint_text) = self.candidate.next() {
+            let hint_token = Token::new(
+                TextType::Hint,
+                String::from(hint_text),
+            );
+
+            // temporarily push hint token
+            self.current_line.tokens.push(hint_token);
+
+            let hint_width = hint_text.len();
+            let content_width = self.current_line.len() + hint_width;
+
+            if content_width > self.visible_area_width {
+                let offset = content_width - self.visible_area_width;
+                let cursor_move = offset - self.overflow_left;
+
+                if cursor_move > 0 {
+                    self.terminal.cursor.left(cursor_move)?;
+                }
+                self.overflow_left = offset;
+            }
+
+            self.render_with_fixed_pos()?;
+            self.current_line.tokens.pop().unwrap();
+        } else {
+            let Ok(candidate_hints) = analyze(&self.current_line.tokens, scope) else {
+                return Ok(())
+            };
+
+            if !candidate_hints.is_empty() {
+                self.candidate.set(candidate_hints);
+                self.display_hint(scope)?;
+            } else {
+                // no hint
+                return Ok(())
+            }
+        }
+
+        Ok(())
+    }
+    fn hide_hint(&mut self) -> io::Result<()> {
+        if let Some(hint_text) = self.candidate.current_hint() {
+            let hint_width = hint_text.chars().count();
+            let overflow = self.overflow_left;
+
+            if overflow > 0 {
+                // min(self.overflow_left, hint_width)
+                let offset = if overflow > hint_width { hint_width } else { overflow };
+
+                self.overflow_left -= offset;
+                self.terminal.cursor.right(offset)?;
+            }
+            self.candidate.clear();
+            self.render_with_fixed_pos()?;
+        }
+        Ok(())
+    }
+
+    // --- --- --- --- ---
+
     fn render(&mut self) -> io::Result<()> {
         #[inline]
         fn buffer_extend_colored(
@@ -145,6 +219,8 @@ impl LineEditor {
                 *buffer += &token.content;
             }
         }
+
+        // log(&format!("overflow_left: {}, overflow_right: {}", self.overflow_left, self.overflow_right))?;
 
         self.terminal.cursor.hide()?;
         self.clear_line()?;
@@ -243,8 +319,20 @@ impl LineEditor {
 
     // --- --- --- --- --- ---
 
+    fn complete(&mut self) -> io::Result<()> {
+        let Some(hint_text) = self.candidate.current_hint() else {
+            return Ok(());
+        };
+
+        let hint_width = hint_text.chars().count();
+        self.current_line.push_str(hint_text);
+        self.candidate.clear();
+        self.terminal.cursor.right(hint_width)?;
+        self.render_with_fixed_pos()
+    }
+
     pub fn readline(&mut self, scope: &Scope) -> io::Result<Signal> {
-        self.display_prompt();
+        self.display_prompt()?;
         self.current_line = Line::new(self.line_count);
 
         let result = loop {
@@ -287,6 +375,8 @@ impl LineEditor {
                         }
                         self.history.reset_index();
                         self.current_line.reset_with(new_content);
+                        self.render_with_fixed_pos()?;
+                        continue;
                     }
                 }
 
@@ -305,13 +395,14 @@ impl LineEditor {
                         if self.is_at.left_end {
                             self.scroll_left();
                         } else {
+                            self.hide_hint()?;
                             self.terminal.cursor.left(1)?;
                             continue; // skip rerender
                         }
                     }
                     KeyCode::Right => {
                         if self.is_at.line_end {
-                            // TODO: complete
+                            self.complete()?;
                             continue;
                         }
 
@@ -338,13 +429,16 @@ impl LineEditor {
                         break Signal::NewLine(line_content);
                     }
                     KeyCode::Tab => {
-                        if self.is_at.line_end {}
-                        // continue;
+                        if self.is_at.line_end {
+                            self.display_hint(scope)?;
+                            continue;
+                        }
                     }
                     KeyCode::Backspace => {
                         if self.is_at.line_start {
                             continue;
                         }
+                        self.hide_hint()?;
                         self.back_operate()?;
                     }
 
@@ -359,6 +453,8 @@ impl LineEditor {
                         if self.is_at.line_end && is_allowed_char {
                             self.current_line.push(ch);
 
+                            self.hide_hint()?;
+                            self.refresh()?;
                             if !self.is_at.right_end {
                                 self.terminal.cursor.right(1)?;
                             }
@@ -374,10 +470,7 @@ impl LineEditor {
                     _ => {}
                 }
             }
-
-            self.terminal.cursor.save_pos()?;
-            self.render()?;
-            self.terminal.cursor.restore_pos()?;
+            self.render_with_fixed_pos()?;
         };
         Ok(result)
     }

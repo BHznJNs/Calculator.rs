@@ -2,7 +2,7 @@ mod node;
 
 use node::CompleterNode;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Completer {
     root: CompleterNode,
 }
@@ -12,6 +12,13 @@ impl Completer {
         Completer {
             root: CompleterNode::new(),
         }
+    }
+    pub fn from(contents: Vec<String>) -> Self {
+        let mut result = Self::new();
+        for word in contents {
+            result.insert(&word)
+        }
+        return result;
     }
     pub fn insert(&mut self, word: &str) {
         self.root.insert(word.chars());

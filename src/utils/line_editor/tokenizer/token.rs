@@ -1,4 +1,4 @@
-use std::{collections::VecDeque, ops::Range};
+use std::ops::Range;
 
 use crossterm::style::{StyledContent, Stylize};
 

@@ -1,4 +1,4 @@
-use std::collections::{HashMap, VecDeque};
+use std::collections::VecDeque;
 
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
@@ -8,7 +8,6 @@ use crate::public::value::function::{
     BuildInFnParam, BuildInFunction, Function, Overload as FunctionOverLoad,
 };
 use crate::public::value::oop::class::{Class, Property};
-use crate::public::value::oop::utils::data_storage::DataStoragePattern;
 use crate::public::value::value::{Overload as ValueOverload, Value, ValueType};
 
 use super::super::utils::get_val::get_val;
@@ -69,22 +68,20 @@ pub fn module_class() -> Class {
         identi: BuildInFnIdenti::String(StringFn::ENDWITH),
     };
 
-    Class {
-        properties: vec![Property {
+    return Class::new(
+        vec![Property {
             identi: String::from("v"),
             type__: ValueType::String,
         }],
-        method_storage: DataStoragePattern::Map,
-        method_list: None,
-        method_map: Some(HashMap::from([
+        vec![
             (String::from("split"), Function::create(split)),
             (String::from("replace"), Function::create(replace)),
             (String::from("repeat"), Function::create(repeat)),
             (String::from("join"), Function::create(join)),
             (String::from("start_with"), Function::create(start_with)),
             (String::from("end_with"), Function::create(end_with)),
-        ])),
-    }
+        ],
+    );
 }
 
 impl BuildInFnCall for StringFn {
@@ -109,10 +106,10 @@ impl BuildInFnCall for StringFn {
                         let first_ch = div_ref.chars().next().unwrap();
                         str_ref.split(first_ch)
                     };
-                    // convert splited to Vec<String>
-                    let mut res_vec = VecDeque::<Value>::new();
+                    // convert splited to VecDeque<String>
+                    let mut res_vec = VecDeque::new();
                     for c in res_split {
-                        let c_value = Value::create(c.to_owned());
+                        let c_value = Value::create(c.to_string());
                         res_vec.push_back(c_value);
                     }
                     Value::create(res_vec)
