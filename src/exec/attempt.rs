@@ -7,5 +7,5 @@ pub fn attempt(input: &String, scope: &mut Scope) -> Result<Value, ()> {
     let root_node = compile(input)?;
     let result = compute(root_node, scope)?;
 
-    Ok(result)
+    return Ok(result); 
 }

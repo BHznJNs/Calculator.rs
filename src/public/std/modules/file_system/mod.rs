@@ -205,6 +205,6 @@ impl BuildInFnCall for FileSysFn {
                 }
             }
         };
-        Ok(result)
+        return Ok(result);
     }
 }

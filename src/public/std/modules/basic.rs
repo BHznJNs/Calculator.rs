@@ -176,19 +176,7 @@ impl BuildInFnCall for BasicFn {
             }
             BasicFn::BOOLEAN => {
                 let input = get_val("input", scope)?;
-
-                let result_bool = match input {
-                    Value::Void(_) => false,
-                    Value::Boolean(bool_val) => bool_val,
-                    Value::Number(num) => num.int_value() != 0,
-                    Value::String(str) => !str.as_ref().borrow().is_empty(),
-                    Value::Array(arr) => !arr.as_ref().borrow().is_empty(),
-
-                    Value::Class(_)
-                    | Value::Object(_)
-                    | Value::Function(_)
-                    | Value::LazyExpression(_) => true,
-                };
+                let result_bool = input.get_bool();
                 Value::Boolean(result_bool)
             }
             BasicFn::STRING => {
@@ -260,6 +248,6 @@ impl BuildInFnCall for BasicFn {
             }
             BasicFn::EXIT => process::exit(0),
         };
-        Ok(result)
+        return Ok(result);
     }
 }

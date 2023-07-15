@@ -472,6 +472,6 @@ impl LineEditor {
             }
             self.render_with_fixed_pos()?;
         };
-        Ok(result)
+        return Ok(result); 
     }
 }

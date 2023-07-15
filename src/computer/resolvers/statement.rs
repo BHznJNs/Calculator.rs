@@ -65,13 +65,8 @@ pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> Result<Valu
         }
         StatementNode::Condition(if_statement) => {
             let condition_value = expression::resolve(&if_statement.condition, scope)?;
-            let condition = match condition_value {
-                Value::Boolean(val) => val,
-                Value::Number(num) => num.int_value() != 0,
-                _ => return Err(syntax_error("invalid condition for 'if' statement")?),
-            };
 
-            if condition {
+            if condition_value.get_bool() {
                 for sequence in &if_statement.body {
                     let sequence_result = sequence::resolve(sequence, scope)?;
 
@@ -101,5 +96,5 @@ pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> Result<Valu
             }
         }
     };
-    Ok(result)
+    return Ok(result); 
 }

@@ -28,5 +28,5 @@ pub fn resolve(node: &ASTNode, scope: &mut Scope) -> Result<Value, ()> {
             return Err(internal_error(InternalComponent::Computer, &msg)?);
         }
     };
-    Ok(result)
+    return Ok(result); 
 }

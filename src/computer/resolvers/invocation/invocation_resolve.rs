@@ -17,7 +17,7 @@ fn variable_invoke(
 ) -> Result<Value, ()> {
     let fn_value = scope.read_var(fn_name)?;
     let result = function_invoke(fn_value, params, scope)?;
-    Ok(result)
+    return Ok(result); 
 }
 
 fn function_invoke(
