@@ -7,4 +7,9 @@ pub mod env;
 pub mod error;
 pub mod value;
 
-// pub mod colored_output;
+use value::value::ValueType;
+
+pub trait Param {
+    fn type__(&self) -> ValueType;
+    fn identi(&self) -> &str;
+}

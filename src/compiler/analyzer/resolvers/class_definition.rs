@@ -38,7 +38,7 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ClassDefinitionNode, ()> {
                 };
 
                 match next_token {
-                    Token::Annotation(type__) => properties.push(Property { type__, identi }),
+                    Token::Annotation(type__) => properties.push(Property(type__, identi)),
                     Token::Symbol(Symbols::Equal) => {
                         // current as class method
                         let mut method_node = function_definition::resolve(tokens)?;

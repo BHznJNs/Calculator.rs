@@ -13,7 +13,6 @@ use crate::public::value::array::ArrayLiteral;
 use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function, Overload};
 use crate::public::value::oop::class::{Class, Property};
 use crate::public::value::oop::object::Object;
-use crate::public::value::oop::utils::data_storage::DataStoragePattern;
 use crate::public::value::value::{Overload as ValueOverload, Value, ValueType, VoidSign};
 
 use self::file_ops::file_append;
@@ -32,14 +31,15 @@ pub enum FileSysFn {
     Append,
 }
 
+static mut MODULE_CLASS: Option<Rc<Class>> = None;
 static mut FILE_CLASS: Option<Rc<Class>> = None;
 
 fn static_class_setter() {
+    // file-class methods
     let read = BuildInFunction {
         params: vec![BuildInFnParam(ValueType::Object, "self")],
         identi: BuildInFnIdenti::FileSystem(FileSysFn::Read),
     };
-
     let write = BuildInFunction {
         params: vec![
             BuildInFnParam(ValueType::Object, "self"),
@@ -55,38 +55,7 @@ fn static_class_setter() {
         identi: BuildInFnIdenti::FileSystem(FileSysFn::Append),
     };
 
-    unsafe {
-        FILE_CLASS = Some(Rc::new(Class::new(
-            vec![
-                Property {
-                    type__: ValueType::String,
-                    identi: String::from("path"),
-                },
-                Property {
-                    type__: ValueType::Boolean,
-                    identi: String::from("exist"),
-                },
-                Property {
-                    type__: ValueType::Boolean,
-                    identi: String::from("is_dir"),
-                },
-                Property {
-                    type__: ValueType::Boolean,
-                    identi: String::from("is_file"),
-                },
-            ],
-            vec![
-                (String::from("read"), Function::create(read)),
-                (String::from("write"), Function::create(write)),
-                (String::from("append"), Function::create(append)),
-            ],
-        )))
-    };
-}
-
-pub fn module_object() -> Object {
-    static_class_setter();
-
+    // fs-class methods
     let fs_method_template = BuildInFunction {
         params: vec![
             BuildInFnParam(ValueType::Object, "self"),
@@ -97,22 +66,46 @@ pub fn module_object() -> Object {
     let open = fs_method_template.clone();
     let mut create = fs_method_template.clone();
     let mut delete = fs_method_template.clone();
-
     create.identi = BuildInFnIdenti::FileSystem(FileSysFn::Create);
     delete.identi = BuildInFnIdenti::FileSystem(FileSysFn::Delete);
 
     // --- --- --- --- --- ---
 
-    Object {
-        prototype: None,
-        storage_pattern: DataStoragePattern::List,
-        data_list: Some(vec![
-            (String::from("open"), Value::create(open).into()),
-            (String::from("create"), Value::create(create).into()),
-            (String::from("delete"), Value::create(delete).into()),
-        ]),
-        data_map: None,
+    unsafe {
+        FILE_CLASS = Some(Class::new(
+            vec![
+                Property(ValueType::String, String::from("path")),
+                Property(ValueType::String, String::from("exist")),
+                Property(ValueType::Boolean, String::from("is_dir")),
+                Property(ValueType::Boolean, String::from("is_file")),
+            ],
+            vec![
+                (String::from("read"), Function::create(read)),
+                (String::from("write"), Function::create(write)),
+                (String::from("append"), Function::create(append)),
+            ],
+        ).into());
+        // --- --- --- --- --- ---
+        MODULE_CLASS = Some(Class::new(
+            vec![],
+            vec![
+                (String::from("open"), Function::create(open)),
+                (String::from("create"), Function::create(create)),
+                (String::from("delete"), Function::create(delete)),
+            ],
+        ).into());
+    };
+}
+
+pub fn module_object() -> Object {
+    if unsafe { MODULE_CLASS == None || FILE_CLASS == None } {
+        static_class_setter();
     }
+
+    return Class::instantiate(unsafe {
+            MODULE_CLASS.as_ref().unwrap().clone()
+        }, ArrayLiteral::new()
+    ).unwrap();
 }
 
 impl BuildInFnCall for FileSysFn {

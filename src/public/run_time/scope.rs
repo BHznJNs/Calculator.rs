@@ -39,7 +39,7 @@ pub struct Scope {
     pub global: GlobalScope,
     pub local: Option<LocalScope>,
     pub completer: Option<Completer>,
-    module: HashMap<String, bool>,
+    user_module_map: HashMap<String, bool>,
     std_module_map: Rc<HashMap<&'static str, StdModules>>,
 }
 const STD_MODULE_DATA: [(&'static str, StdModules); 5] = [
@@ -56,7 +56,7 @@ impl Scope {
             local: None,
             completer: None,
 
-            module: HashMap::<String, bool>::new(),
+            user_module_map: HashMap::<String, bool>::new(),
             std_module_map: Rc::new(HashMap::from(STD_MODULE_DATA)),
         }
     }
@@ -66,7 +66,7 @@ impl Scope {
             global: GlobalScope::init(),
             local: None,
             completer: None,
-            module: HashMap::<String, bool>::new(),
+            user_module_map: HashMap::<String, bool>::new(),
             std_module_map: self.std_module_map.clone(),
         }
     }
@@ -110,10 +110,7 @@ impl Scope {
             return Err(import_error(&msg)?)
         };
 
-        if let None = self.module.get(module_name) {
-            self.module.insert(module_name.to_string(), true);
-            module::std_resolve(self, target_module, module_name);
-        }
+        module::std_resolve(self, target_module, module_name);
         Ok(())
     }
     // import user defined module
@@ -121,12 +118,12 @@ impl Scope {
         let mut module_scope = self.new();
 
         // if module has not been imported
-        if self.module.get(module_path) == None {
+        if self.user_module_map.get(module_path) == None {
             // execute the module file
             script::run(module_path, &mut module_scope)?;
 
             // import modules that imported by module
-            for (module, _) in module_scope.module {
+            for (module, _) in module_scope.user_module_map {
                 if let Some(_) = self.std_module_map.get(module.as_str()) {
                     self.import_std(&module)?;
                 } else {
@@ -134,7 +131,7 @@ impl Scope {
                 }
             }
             // identify this path as imported
-            self.module.insert(String::from(module_path), true);
+            self.user_module_map.insert(String::from(module_path), true);
             let module_obj = module_create(module_scope.global);
             Ok(Value::create(module_obj))
         } else {

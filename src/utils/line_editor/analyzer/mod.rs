@@ -51,9 +51,6 @@ fn get_end_part(tokens: &TokenVec) -> Option<Vec<String>> {
     }
 }
 
-// P = cl {age $Numb, name $Str} 
-// i = new P(12, "abcd")
-
 pub fn analyze(tokens: &TokenVec, scope: &Scope) -> Result<Vec<String>, ()> {
     let Some(mut end_part) = get_end_part(tokens) else {
         return Ok(vec![])
@@ -88,9 +85,7 @@ pub fn analyze(tokens: &TokenVec, scope: &Scope) -> Result<Vec<String>, ()> {
             }
         }
 
-        let Some(target_proto) = &var_object.as_ref().borrow().prototype else {
-            return Err(());
-        };
+        let target_proto = &var_object.as_ref().borrow().prototype;
         let Some(completer) = &target_proto.completer else {
             return Err(());
         };

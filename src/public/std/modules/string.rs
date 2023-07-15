@@ -69,10 +69,7 @@ pub fn module_class() -> Class {
     };
 
     return Class::new(
-        vec![Property {
-            identi: String::from("v"),
-            type__: ValueType::String,
-        }],
+        vec![Property(ValueType::String, String::from("v"))],
         vec![
             (String::from("split"), Function::create(split)),
             (String::from("replace"), Function::create(replace)),

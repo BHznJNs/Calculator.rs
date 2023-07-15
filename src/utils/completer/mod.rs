@@ -20,6 +20,7 @@ impl Completer {
         }
         return result;
     }
+
     pub fn insert(&mut self, word: &str) {
         self.root.insert(word.chars());
     }

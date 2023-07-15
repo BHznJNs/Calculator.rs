@@ -54,10 +54,7 @@ pub fn module_class() -> Class {
     // --- --- --- --- --- ---
 
     return Class::new(
-        vec![Property {
-            identi: String::from("v"),
-            type__: ValueType::Array,
-        }],
+        vec![Property(ValueType::Array, String::from("v"))],
         vec![
             (String::from("push"), Function::create(push)),
             (String::from("pop"), Function::create(pop)),

@@ -5,6 +5,7 @@ use std::{fmt, io};
 
 use crossterm::style::Stylize;
 
+use crate::public::Param;
 use crate::public::env::ENV_OPTION;
 use crate::public::error::{reference_error, type_error, ReferenceType};
 use crate::public::value::array::ArrayLiteral;
@@ -27,9 +28,14 @@ pub struct Class {
     method_map: Option<HashMap<String, Function>>,
 }
 #[derive(PartialEq, Clone)]
-pub struct Property {
-    pub type__: ValueType,
-    pub identi: String,
+pub struct Property(pub ValueType, pub String);
+impl Param for Property {
+    fn type__(&self) -> ValueType {
+        self.0
+    }
+    fn identi(&self) -> &str {
+        &self.1
+    }
 }
 
 impl Class {
@@ -38,8 +44,8 @@ impl Class {
     pub fn new(properties: Vec<Property>, methods: Vec<(String, Function)>) -> Self {
         // get properties' and methods' names into one `Vec`
         let mut prop_name_vec = vec![];
-        for Property {identi: i, ..} in &properties {
-            prop_name_vec.push(i.clone())
+        for Property(_, identi) in &properties {
+            prop_name_vec.push(identi.clone())
         }
         for (k, _) in &methods {
             prop_name_vec.push(k.clone());
@@ -119,10 +125,10 @@ impl Class {
             let current_value = match values.pop_front() {
                 Some(val) => {
                     // check instantiation param type
-                    if !val.check_type(current_prop.type__) {
+                    if !val.check_type(current_prop.type__()) {
                         return Err(type_error(
                             Some("class instantiation"),
-                            vec![current_prop.type__],
+                            vec![current_prop.type__()],
                             val.get_type(),
                         )?);
                     }
@@ -132,7 +138,7 @@ impl Class {
                 None => break,
             };
 
-            temp_list.push((current_prop.identi.clone(), current_value));
+            temp_list.push((current_prop.identi().to_owned(), current_value));
             index += 1;
         }
 
@@ -151,7 +157,7 @@ impl Class {
         }
 
         Ok(Object {
-            prototype: Some(class_self.clone()),
+            prototype: class_self.clone(),
             storage_pattern,
             data_list,
             data_map,
@@ -169,7 +175,11 @@ impl fmt::Display for Class {
             // todo: display property indentifier and type
             print_line(
                 &mut stdout,
-                format!("  {}: {},", prop.identi, prop.type__.to_string().red(),),
+                format!(
+                    "  {}: {},",
+                    prop.identi(),
+                    prop.type__().to_string().red(),
+                ),
             );
         }
 
