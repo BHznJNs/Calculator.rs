@@ -3,4 +3,5 @@ a = 1
 a_plus = { a += 1 }
 
 # equal to: `out (a += 1)`
+# 等效于：`out (a += 1)`
 out a_plus() # 2

@@ -3,9 +3,9 @@ class = import "class.calcrs"
 
 out class.Person
 # {
-#   age,
-#   name,
-#   greet: <Class-method>,
+#   age: Number,
+#   name: String,
+#   greet: <Class-Method>,
 # }
 
 out class.inst

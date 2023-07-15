@@ -119,4 +119,4 @@ cargo build --release
 
 ## 教程
 
-请参阅此处: [语法教程](./examples/syntax/)
+请参阅此处: [教程](./tutorials)

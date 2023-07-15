@@ -1,5 +1,7 @@
 i = 0
+
 # loop 10 times
+# 循环十次
 for 10 {:
     i += 1;:
 }
@@ -7,4 +9,5 @@ for 10 {:
 out i
 
 # infinity loop
+# 无限循环
 for { out i }

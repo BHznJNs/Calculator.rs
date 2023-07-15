@@ -1,4 +1,5 @@
 # basic operators
+# 加减乘除
 out 1 + 2 # 3
 out 1 - 2 # -1
 out 1 * 2 # 2
@@ -6,12 +7,14 @@ out 1 / 2 # 0.5000000000
 out 2 ^ 2 # 4
 
 # not operator
+# 非操作符
 out !10   # 0
 out !0    # 1
 out 10!   # 0
 out  0!   # 1
 
 # comparing operator
+# 比较操作符
 out 1 > 2 # false
 out 1 < 2 # true
 out 1 >= 2 # false
@@ -20,6 +23,7 @@ out 1 == 2 # false
 out 1 != 2 # true
 
 # assignment operator
+# 赋值操作符
 out t = 10 # 10
 out t += 1 # 11
 out t -= 1 # 10
