@@ -4,6 +4,7 @@ use std::f64::consts::PI;
 
 use crate::public::std::modules::array::ArrayFn;
 use crate::public::std::modules::basic::BasicFn;
+use crate::public::std::modules::bit_ops::BitOpsFn;
 use crate::public::std::modules::file_system::FileSysFn;
 use crate::public::std::modules::math::MathFn;
 use crate::public::std::modules::string::StringFn;
@@ -20,6 +21,7 @@ pub enum BuildInFnIdenti {
     Array(ArrayFn),
     String(StringFn),
     FileSystem(FileSysFn),
+    BitOps(BitOpsFn)
 }
 
 pub fn constants() -> HashMap<String, Value> {

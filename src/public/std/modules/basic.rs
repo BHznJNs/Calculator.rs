@@ -15,6 +15,24 @@ use crate::public::value::value::{Overload, Value, ValueType, VoidSign};
 use super::super::utils::get_val::get_val;
 use super::BuildInFnCall;
 
+#[derive(PartialEq, Clone)]
+pub enum BasicFn {
+    INPUT,
+    TYPE,
+    CLONE,
+
+    INT,
+    FLOAT,
+    BOOLEAN,
+    STRING,
+
+    ARRAY,
+    ASCII,
+    LEN,
+
+    EXIT,
+}
+
 pub fn function_list() -> Vec<(String, Value)> {
     let input = BuildInFunction {
         params: vec![BuildInFnParam(ValueType::String, "prompt")],
@@ -65,7 +83,7 @@ pub fn function_list() -> Vec<(String, Value)> {
         identi: BuildInFnIdenti::Basic(BasicFn::EXIT),
     };
 
-    vec![
+    return vec![
         (String::from("input"), Value::create(input)),
         (String::from("type"), Value::create(type__)),
         (String::from("clone"), Value::create(clone)),
@@ -77,25 +95,7 @@ pub fn function_list() -> Vec<(String, Value)> {
         (String::from("ascii"), Value::create(ascii)),
         (String::from("len"), Value::create(len)),
         (String::from("exit"), Value::create(exit)),
-    ]
-}
-
-#[derive(PartialEq, Clone)]
-pub enum BasicFn {
-    INPUT,
-    TYPE,
-    CLONE,
-
-    INT,
-    FLOAT,
-    BOOLEAN,
-    STRING,
-
-    ARRAY,
-    ASCII,
-    LEN,
-
-    EXIT,
+    ];
 }
 
 impl BuildInFnCall for BasicFn {

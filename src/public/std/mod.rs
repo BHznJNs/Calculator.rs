@@ -1,8 +1,8 @@
 use crate::public::std::modules::{array, string};
 
-use self::modules::{file_system, math};
+use self::modules::{file_system, math, basic, bit_ops};
 
-use super::value::oop::{class::Class, object::Object};
+use super::value::{oop::{class::Class, object::Object}, value::Value};
 
 pub mod modules;
 
@@ -15,9 +15,18 @@ pub enum StdModules {
     Array,
     String,
     FileSystem,
+    BitOps,
 }
 
 impl StdModules {
+    pub fn get_fn_list(&self) -> Vec<(String, Value)> {
+        match self {
+            StdModules::Basic => basic::function_list(),
+            StdModules::BitOps => bit_ops::function_list(),
+            _ => unreachable!()
+        }
+    }
+
     pub fn get_obj_entry(&self) -> Object {
         match self {
             StdModules::Math => math::module_object(),

@@ -13,6 +13,7 @@ fn call(function: &BuildInFunction, scope: &mut Scope) -> Result<Value, ()> {
         BuildInFnIdenti::Array(arr_fn) => arr_fn.call(scope),
         BuildInFnIdenti::String(str_fn) => str_fn.call(scope),
         BuildInFnIdenti::FileSystem(fs_fn) => fs_fn.call(scope),
+        BuildInFnIdenti::BitOps(b_ops_fn) => b_ops_fn.call(scope),
     }
 }
 

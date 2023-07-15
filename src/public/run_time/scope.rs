@@ -42,12 +42,13 @@ pub struct Scope {
     user_module_map: HashMap<String, bool>,
     std_module_map: Rc<HashMap<&'static str, StdModules>>,
 }
-const STD_MODULE_DATA: [(&'static str, StdModules); 5] = [
+const STD_MODULE_DATA: [(&'static str, StdModules); 6] = [
     ("Basic", StdModules::Basic),
     ("Math", StdModules::Math),
     ("Array", StdModules::Array),
     ("String", StdModules::String),
     ("FS", StdModules::FileSystem),
+    ("BitOps", StdModules::BitOps),
 ];
 impl Scope {
     pub fn init() -> Scope {

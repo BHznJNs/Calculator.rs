@@ -73,12 +73,6 @@ impl Number {
     }
 }
 
-impl Default for Number {
-    fn default() -> Self {
-        return Number::Int(0);
-    }
-}
-
 impl fmt::Display for Number {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
