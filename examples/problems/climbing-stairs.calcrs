@@ -6,7 +6,7 @@ import Array
 
 cache = array(101)
 
-climb_stairs = fn (n $num) {:
+climb_stairs = fn (n $Numb) {:
     if n == 1 { brk 1 };:
     if n == 2 { brk 2 };:
     if cache[n] > 0 { brk cache[n] };:
@@ -14,7 +14,7 @@ climb_stairs = fn (n $num) {:
     result =:
         climb_stairs(n - 1) + climb_stairs(n - 2);:
     cache[n] = result;:
-    result:
+    brk result:
 }
 
 # out climb_stairs(10) # 89

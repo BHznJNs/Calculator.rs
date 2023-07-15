@@ -10,6 +10,11 @@ pub fn process(source: String) -> String {
     let mut state = State::Indent;
 
     while let Some(ch) = chars.next() {
+        if ch == '#' {
+            // avoid comments
+            break;
+        }
+
         match state {
             State::Indent => {
                 if !(ch == ' ' || ch == '\t') {
@@ -19,9 +24,6 @@ pub fn process(source: String) -> String {
                 }
             }
             State::Code => {
-                if ch == '#' {
-                    break;
-                }
                 result.push(ch)
             }
         }

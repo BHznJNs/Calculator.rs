@@ -1,4 +1,4 @@
-Node = cl {:
+self = cl {:
     data $_;:
     next $_;:
 }

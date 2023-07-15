@@ -19,4 +19,4 @@ fib = fn (i $Numb) {:
     brk fib(i - 1) + fib (i - 2):
 }
 
-out fib(35)
+out fib(30)
