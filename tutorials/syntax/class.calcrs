@@ -8,7 +8,7 @@ Person = cl {:
 
     # class method
     # 类方法
-    greet = (self $Obj) {:
+    greet = () {:
         out self.name;:
     };:
 }
