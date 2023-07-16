@@ -52,14 +52,11 @@ pub fn deep_clone(obj: Rc<RefCell<Object>>) -> Value {
         }
     }
 
-    // the object has passed the type check,
+    // the object has been passed the type check before,
     // thus with properties of the object,
     // the instantiation must pass the type check.
-    let res_object = Class::instantiate(
-        obj_ref.prototype.clone(),
-        instantiation_params
-    ).unwrap();
-    Value::create(res_object)
+    let res_object = Class::instantiate(obj_ref.prototype.clone(), instantiation_params).unwrap();
+    return Value::create(res_object);
 }
 
 pub fn display(obj: Rc<RefCell<Object>>, level: usize) {

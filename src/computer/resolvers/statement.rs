@@ -96,5 +96,5 @@ pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> Result<Valu
             }
         }
     };
-    return Ok(result); 
+    return Ok(result);
 }

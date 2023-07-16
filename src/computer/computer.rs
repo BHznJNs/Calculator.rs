@@ -27,5 +27,5 @@ pub fn compute(root_node: RootNode, scope: &mut Scope) -> Result<Value, ()> {
     let sequence_node = root_node.sub_node;
     let result = sequence::resolve(&sequence_node, scope)?;
 
-    return Ok(result); 
+    return Ok(result);
 }

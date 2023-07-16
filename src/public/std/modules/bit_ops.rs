@@ -1,7 +1,7 @@
-use crate::public::value::function::{BuildInFunction, BuildInFnParam};
-use crate::public::value::value::{Value, ValueType, Overload};
-use crate::public::run_time::{build_in::BuildInFnIdenti, scope::Scope};
 use super::super::utils::get_val::get_val;
+use crate::public::run_time::{build_in::BuildInFnIdenti, scope::Scope};
+use crate::public::value::function::{BuildInFnParam, BuildInFunction};
+use crate::public::value::value::{Overload, Value, ValueType};
 
 use super::BuildInFnCall;
 
@@ -53,16 +53,15 @@ impl BuildInFnCall for BitOpsFn {
             // AND | OR | XOR | LShift | RShift
             let num_val1 = get_val("num1", scope)?;
             let num_val2 = get_val("num2", scope)?;
-            let (compute_num1, compute_num2) =
-                (num_val1.get_i64()?, num_val2.get_i64()?);
+            let (compute_num1, compute_num2) = (num_val1.get_i64()?, num_val2.get_i64()?);
 
             let compute_res = match self {
                 BitOpsFn::AND => compute_num1 & compute_num2,
-                BitOpsFn::OR  => compute_num1 | compute_num2,
+                BitOpsFn::OR => compute_num1 | compute_num2,
                 BitOpsFn::XOR => compute_num1 ^ compute_num2,
                 BitOpsFn::LShift => compute_num1 << compute_num2,
                 BitOpsFn::RShift => compute_num1 >> compute_num2,
-                _ => unreachable!()
+                _ => unreachable!(),
             };
             Value::create(compute_res)
         } else {
@@ -71,6 +70,6 @@ impl BuildInFnCall for BitOpsFn {
             let compute_num = input.get_i64()?;
             Value::create(!compute_num)
         };
-        return Ok(result)
+        return Ok(result);
     }
 }

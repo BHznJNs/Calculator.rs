@@ -1,8 +1,11 @@
 use crate::public::std::modules::{array, string};
 
-use self::modules::{file_system, math, basic, bit_ops};
+use self::modules::{basic, bit_ops, file_system, math};
 
-use super::value::{oop::{class::Class, object::Object}, value::Value};
+use super::value::{
+    oop::{class::Class, object::Object},
+    value::Value,
+};
 
 pub mod modules;
 
@@ -23,7 +26,7 @@ impl StdModules {
         match self {
             StdModules::Basic => basic::function_list(),
             StdModules::BitOps => bit_ops::function_list(),
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 

@@ -102,29 +102,37 @@ fn static_class_setter() {
         identi: BuildInFnIdenti::Math(MathFn::MOD),
     };
 
-    unsafe { MODULE_CLASS = Some(Class::new(vec![], vec![
-        (String::from("sin"), Function::create(sin)),
-        (String::from("cos"), Function::create(cos)),
-        (String::from("tan"), Function::create(tan)),
-        (String::from("asin"), Function::create(asin)),
-        (String::from("acos"), Function::create(acos)),
-        (String::from("atan"), Function::create(atan)),
-        (String::from("sinh"), Function::create(sinh)),
-        (String::from("cosh"), Function::create(cosh)),
-        (String::from("tanh"), Function::create(tanh)),
-        (String::from("rad"), Function::create(rad)),
-        (String::from("deg"), Function::create(deg)),
-        (String::from("log10"), Function::create(log10)),
-        (String::from("log2"), Function::create(log2)),
-        (String::from("log"), Function::create(log)),
-        (String::from("ln"), Function::create(ln)),
-        (String::from("exp"), Function::create(exp)),
-        (String::from("abs"), Function::create(abs)),
-        (String::from("sqrt"), Function::create(sqrt)),
-        (String::from("floor"), Function::create(floor)),
-        (String::from("round"), Function::create(round)),
-        (String::from("mod"), Function::create(modulo)),
-    ]).into()) }
+    unsafe {
+        MODULE_CLASS = Some(
+            Class::new(
+                vec![],
+                vec![
+                    (String::from("sin"), Function::create(sin)),
+                    (String::from("cos"), Function::create(cos)),
+                    (String::from("tan"), Function::create(tan)),
+                    (String::from("asin"), Function::create(asin)),
+                    (String::from("acos"), Function::create(acos)),
+                    (String::from("atan"), Function::create(atan)),
+                    (String::from("sinh"), Function::create(sinh)),
+                    (String::from("cosh"), Function::create(cosh)),
+                    (String::from("tanh"), Function::create(tanh)),
+                    (String::from("rad"), Function::create(rad)),
+                    (String::from("deg"), Function::create(deg)),
+                    (String::from("log10"), Function::create(log10)),
+                    (String::from("log2"), Function::create(log2)),
+                    (String::from("log"), Function::create(log)),
+                    (String::from("ln"), Function::create(ln)),
+                    (String::from("exp"), Function::create(exp)),
+                    (String::from("abs"), Function::create(abs)),
+                    (String::from("sqrt"), Function::create(sqrt)),
+                    (String::from("floor"), Function::create(floor)),
+                    (String::from("round"), Function::create(round)),
+                    (String::from("mod"), Function::create(modulo)),
+                ],
+            )
+            .into(),
+        )
+    }
 }
 
 pub fn module_object() -> Object {
@@ -132,10 +140,11 @@ pub fn module_object() -> Object {
         static_class_setter();
     }
 
-    return Class::instantiate(unsafe {
-            MODULE_CLASS.as_ref().unwrap().clone()
-        }, ArrayLiteral::new()
-    ).unwrap();
+    return Class::instantiate(
+        unsafe { MODULE_CLASS.as_ref().unwrap().clone() },
+        ArrayLiteral::new(),
+    )
+    .unwrap();
 }
 
 impl BuildInFnCall for MathFn {

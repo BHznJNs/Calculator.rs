@@ -1,14 +1,14 @@
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
 
-use super::tokenizer::{TokenVec, TextType};
+use super::tokenizer::{TextType, TokenVec};
 
 fn get_end_part(tokens: &TokenVec) -> Option<Vec<String>> {
     // example:
     // input1 : ["var", "=", "obj", ".", "prop"]
     // output1: ["prop", "obj"]
     // input2:  ["var2", "=", "var1"]
-    // output2: ["var1"] 
+    // output2: ["var1"]
 
     if tokens.is_empty() {
         return None;
@@ -29,8 +29,7 @@ fn get_end_part(tokens: &TokenVec) -> Option<Vec<String>> {
         // only allow "." and identifier
         if current.type__ == TextType::Variable {
             result.push(current.content.clone());
-        } else
-        if current.type__ == TextType::Symbol && current.content.eq(".") {
+        } else if current.type__ == TextType::Symbol && current.content.eq(".") {
             // do nothing
         } else {
             break;
@@ -70,7 +69,7 @@ pub fn analyze(tokens: &TokenVec, scope: &Scope) -> Result<Vec<String>, ()> {
             if let Value::Object(obj_value) = value {
                 obj_value.clone()
             } else {
-                return Err(())
+                return Err(());
             }
         };
 

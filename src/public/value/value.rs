@@ -176,12 +176,11 @@ impl Value {
             Value::Number(num) => *num != Number::Int(0),
             Value::String(str) => str.as_ref().borrow().len() > 0,
             Value::Array(arr) => arr.as_ref().borrow().len() > 0,
-            
+
             Value::Void(_) => false,
-            Value::LazyExpression(_)
-            | Value::Function(_)
-            | Value::Class(_)
-            | Value::Object(_) => true,
+            Value::LazyExpression(_) | Value::Function(_) | Value::Class(_) | Value::Object(_) => {
+                true
+            }
         }
     }
 

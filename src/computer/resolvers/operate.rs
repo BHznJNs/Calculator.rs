@@ -47,5 +47,5 @@ pub fn operate(val1: Value, val2: Value, operator: Symbols) -> Result<Value, ()>
             "invalid computing expression because of computing token",
         )?);
     };
-    return Ok(result); 
+    return Ok(result);
 }

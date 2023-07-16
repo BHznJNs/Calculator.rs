@@ -19,12 +19,6 @@ pub fn module_create(module_scope: GlobalScope) -> Object {
             val_stack.push_back(v);
         }
     }
-    let module_class = Class::new(
-        prop_stack,
-        method_statck,
-    );
-    return Class::instantiate(
-        module_class.into(),
-        val_stack,
-    ).unwrap();
+    let module_class = Class::new(prop_stack, method_statck);
+    return Class::instantiate(module_class.into(), val_stack).unwrap();
 }

@@ -21,21 +21,24 @@ pub enum BuildInFnIdenti {
     Array(ArrayFn),
     String(StringFn),
     FileSystem(FileSysFn),
-    BitOps(BitOpsFn)
+    BitOps(BitOpsFn),
 }
 
 pub fn constants() -> HashMap<String, Value> {
     HashMap::from([
         (String::from("VOID"), Value::create(ValueType::Void as i64)),
         (
-            String::from("BOOL"),
+            String::from("BOOLEAN"),
             Value::create(ValueType::Boolean as i64),
         ),
         (
-            String::from("NUMB"),
+            String::from("NUMBER"),
             Value::create(ValueType::Number as i64),
         ),
-        (String::from("STR"), Value::create(ValueType::String as i64)),
+        (
+            String::from("STRING"),
+            Value::create(ValueType::String as i64),
+        ),
         (
             String::from("ARRAY"),
             Value::create(ValueType::Array as i64),
@@ -45,17 +48,16 @@ pub fn constants() -> HashMap<String, Value> {
             Value::create(ValueType::LazyExpression as i64),
         ),
         (
-            String::from("FUNC"),
+            String::from("FUNCION"),
             Value::create(ValueType::Function as i64),
         ),
         (
             String::from("CLASS"),
             Value::create(ValueType::Class as i64),
         ),
-        (String::from("OBJ"), Value::create(ValueType::Object as i64)),
         (
-            String::from("EPS"),
-            Value::Number(Number::Float(f64::EPSILON)),
+            String::from("OBJECT"),
+            Value::create(ValueType::Object as i64),
         ),
         (String::from("PI"), Value::Number(Number::Float(PI))),
         (String::from("E"), Value::Number(Number::Float(E))),

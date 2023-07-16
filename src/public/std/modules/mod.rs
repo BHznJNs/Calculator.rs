@@ -1,9 +1,9 @@
 pub mod array;
 pub mod basic;
+pub mod bit_ops;
 pub mod file_system;
 pub mod math;
 pub mod string;
-pub mod bit_ops;
 
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;

@@ -23,9 +23,7 @@ pub fn process(source: String) -> String {
                     continue;
                 }
             }
-            State::Code => {
-                result.push(ch)
-            }
+            State::Code => result.push(ch),
         }
     }
     return result;

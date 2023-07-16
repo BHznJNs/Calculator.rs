@@ -5,12 +5,12 @@ use std::{fmt, io};
 
 use crossterm::style::Stylize;
 
-use crate::public::Param;
 use crate::public::env::ENV_OPTION;
 use crate::public::error::{reference_error, type_error, ReferenceType};
 use crate::public::value::array::ArrayLiteral;
 use crate::public::value::function::Function;
 use crate::public::value::value::{Value, ValueType};
+use crate::public::Param;
 use crate::utils::completer::Completer;
 use crate::utils::output::print_line;
 
@@ -39,7 +39,7 @@ impl Param for Property {
 }
 
 impl Class {
-    pub const STORAGE_THRESHOLD: usize = 8;
+    const STORAGE_THRESHOLD: usize = 8;
 
     pub fn new(properties: Vec<Property>, methods: Vec<(String, Function)>) -> Self {
         // get properties' and methods' names into one `Vec`
@@ -175,11 +175,7 @@ impl fmt::Display for Class {
             // todo: display property indentifier and type
             print_line(
                 &mut stdout,
-                format!(
-                    "  {}: {},",
-                    prop.identi(),
-                    prop.type__().to_string().red(),
-                ),
+                format!("  {}: {},", prop.identi(), prop.type__().to_string().red(),),
             );
         }
 
@@ -207,6 +203,6 @@ impl fmt::Display for Class {
             }
         }
         print!("}}");
-        Ok(())
+        return Ok(());
     }
 }

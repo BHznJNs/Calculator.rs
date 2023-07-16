@@ -65,5 +65,5 @@ pub fn resolve(keyword: Keyword, tokens: &mut TokenVec) -> Result<StatementNode,
             return Err(syntax_error(&msg)?);
         }
     };
-    return Ok(result); 
+    return Ok(result);
 }

@@ -149,6 +149,6 @@ impl BuildInFnCall for ArrayFn {
                 }
             }
         };
-        return Ok(result); 
+        return Ok(result);
     }
 }

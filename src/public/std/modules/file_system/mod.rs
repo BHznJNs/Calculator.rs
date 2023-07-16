@@ -72,28 +72,34 @@ fn static_class_setter() {
     // --- --- --- --- --- ---
 
     unsafe {
-        FILE_CLASS = Some(Class::new(
-            vec![
-                Property(ValueType::String, String::from("path")),
-                Property(ValueType::String, String::from("exist")),
-                Property(ValueType::Boolean, String::from("is_dir")),
-                Property(ValueType::Boolean, String::from("is_file")),
-            ],
-            vec![
-                (String::from("read"), Function::create(read)),
-                (String::from("write"), Function::create(write)),
-                (String::from("append"), Function::create(append)),
-            ],
-        ).into());
+        FILE_CLASS = Some(
+            Class::new(
+                vec![
+                    Property(ValueType::String, String::from("path")),
+                    Property(ValueType::String, String::from("exist")),
+                    Property(ValueType::Boolean, String::from("is_dir")),
+                    Property(ValueType::Boolean, String::from("is_file")),
+                ],
+                vec![
+                    (String::from("read"), Function::create(read)),
+                    (String::from("write"), Function::create(write)),
+                    (String::from("append"), Function::create(append)),
+                ],
+            )
+            .into(),
+        );
         // --- --- --- --- --- ---
-        MODULE_CLASS = Some(Class::new(
-            vec![],
-            vec![
-                (String::from("open"), Function::create(open)),
-                (String::from("create"), Function::create(create)),
-                (String::from("delete"), Function::create(delete)),
-            ],
-        ).into());
+        MODULE_CLASS = Some(
+            Class::new(
+                vec![],
+                vec![
+                    (String::from("open"), Function::create(open)),
+                    (String::from("create"), Function::create(create)),
+                    (String::from("delete"), Function::create(delete)),
+                ],
+            )
+            .into(),
+        );
     };
 }
 
@@ -102,10 +108,11 @@ pub fn module_object() -> Object {
         static_class_setter();
     }
 
-    return Class::instantiate(unsafe {
-            MODULE_CLASS.as_ref().unwrap().clone()
-        }, ArrayLiteral::new()
-    ).unwrap();
+    return Class::instantiate(
+        unsafe { MODULE_CLASS.as_ref().unwrap().clone() },
+        ArrayLiteral::new(),
+    )
+    .unwrap();
 }
 
 impl BuildInFnCall for FileSysFn {

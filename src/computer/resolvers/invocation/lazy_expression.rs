@@ -8,5 +8,5 @@ use crate::public::value::value::Value;
 pub fn invoke(le_body: Rc<ASTNode>, scope: &mut Scope) -> Result<Value, ()> {
     // le -> lazy_expression
     let result = sequence::resolve(&le_body, scope)?;
-    return Ok(result); 
+    return Ok(result);
 }

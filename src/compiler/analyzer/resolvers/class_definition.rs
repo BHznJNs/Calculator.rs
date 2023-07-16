@@ -44,10 +44,13 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ClassDefinitionNode, ()> {
                     Token::Symbol(Symbols::Equal) => {
                         // current as class method
                         let mut method_node = function_definition::resolve(tokens)?;
-                        method_node.params.insert(0, UserDefinedFnParam {
-                            type__: ValueType::Object,
-                            identi: String::from("self"),
-                        });
+                        method_node.params.insert(
+                            0,
+                            UserDefinedFnParam {
+                                type__: ValueType::Object,
+                                identi: String::from("self"),
+                            },
+                        );
                         method_node.name = Some(identi);
                         method_nodes.push(method_node.into())
                     }

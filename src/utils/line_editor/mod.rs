@@ -1,9 +1,9 @@
+mod analyzer;
 mod line;
 mod signal;
 mod state;
 mod terminal;
 mod tokenizer;
-mod analyzer;
 
 mod candidate;
 mod history;
@@ -21,13 +21,13 @@ pub use signal::Signal;
 use state::LineState;
 use terminal::Terminal;
 
-use crate::{utils::output::print_line, public::run_time::scope::Scope};
 use crate::{public::env::ENV_OPTION, utils::line_editor::tokenizer::Token};
+use crate::{public::run_time::scope::Scope, utils::output::print_line};
 
 use candidate::Candidate;
 
-use tokenizer::TextType;
 use analyzer::analyze;
+use tokenizer::TextType;
 
 // output something into file
 // this function is used to debug.
@@ -131,7 +131,8 @@ impl LineEditor {
 
         // virtual line left & right end
         self.is_at.line_start = self.is_at.left_end && (self.overflow_left == 0);
-        self.is_at.line_end = ((cursor_pos - prompt_len) == (self.current_line.len() - self.overflow_left))
+        self.is_at.line_end = ((cursor_pos - prompt_len)
+            == (self.current_line.len() - self.overflow_left))
             || (self.is_at.right_end && self.overflow_right == 0);
 
         Ok(())
@@ -140,10 +141,7 @@ impl LineEditor {
     // display & hide hint
     fn display_hint(&mut self, scope: &Scope) -> io::Result<()> {
         if let Some(hint_text) = self.candidate.next() {
-            let hint_token = Token::new(
-                TextType::Hint,
-                String::from(hint_text),
-            );
+            let hint_token = Token::new(TextType::Hint, String::from(hint_text));
 
             // temporarily push hint token
             self.current_line.tokens.push(hint_token);
@@ -173,7 +171,7 @@ impl LineEditor {
                 self.display_hint(scope)?;
             } else {
                 // no hint
-                return Ok(())
+                return Ok(());
             }
         }
 
@@ -186,7 +184,11 @@ impl LineEditor {
 
             if overflow > 0 {
                 // min(self.overflow_left, hint_width)
-                let offset = if overflow > hint_width { hint_width } else { overflow };
+                let offset = if overflow > hint_width {
+                    hint_width
+                } else {
+                    overflow
+                };
 
                 self.overflow_left -= offset;
                 self.terminal.cursor.right(offset)?;
@@ -245,7 +247,12 @@ impl LineEditor {
                     // when a token is going to be overflow left side and right side
                     if actual_print_len > remain_space {
                         // print middle part of this token
-                        buffer_extend_colored(&mut buffer, is_history, token, offset..offset + remain_space);
+                        buffer_extend_colored(
+                            &mut buffer,
+                            is_history,
+                            token,
+                            offset..offset + remain_space,
+                        );
                         break;
                     }
 
@@ -420,10 +427,8 @@ impl LineEditor {
                         self.overflow_right = 0;
 
                         print_line(&mut self.terminal.stdout, "");
-                        let line_content = mem::replace(
-                            &mut self.current_line.content,
-                            String::new(),
-                        );
+                        let line_content =
+                            mem::replace(&mut self.current_line.content, String::new());
 
                         self.history.append(line_content.clone());
                         break Signal::NewLine(line_content);
@@ -459,7 +464,8 @@ impl LineEditor {
                                 self.terminal.cursor.right(1)?;
                             }
                             if self.current_line.len() > self.visible_area_width {
-                                self.overflow_left = self.current_line.len() - self.visible_area_width;
+                                self.overflow_left =
+                                    self.current_line.len() - self.visible_area_width;
                             } else {
                                 self.overflow_left = 0;
                             };
@@ -472,6 +478,6 @@ impl LineEditor {
             }
             self.render_with_fixed_pos()?;
         };
-        return Ok(result); 
+        return Ok(result);
     }
 }

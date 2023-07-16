@@ -11,5 +11,5 @@ pub fn resolve(sequence_node: &ASTNode, scope: &mut Scope) -> Result<Value, ()> 
         _ => Value::Void(VoidSign::Empty),
     };
 
-    return Ok(result); 
+    return Ok(result);
 }

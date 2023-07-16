@@ -134,6 +134,6 @@ impl BuildInFnCall for StringFn {
             StringFn::STARTWITH => todo!(),
             StringFn::ENDWITH => todo!(),
         };
-        return Ok(result); 
+        return Ok(result);
     }
 }

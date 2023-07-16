@@ -13,8 +13,5 @@ pub fn resolve(node: &ClassDefinitionNode) -> Result<Class, ()> {
             Function::create(function_def),
         ));
     }
-    return Ok(Class::new(
-        node.properties.clone(),
-        method_stack
-    ));
+    return Ok(Class::new(node.properties.clone(), method_stack));
 }
