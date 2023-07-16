@@ -1,4 +1,4 @@
-add1 = fn (i $Numb) {:
+add1 = fn(i $Numb) {:
     #        ^^^^   ^
     #  param-type   multi-line statements need this symbol
     #  参数类型      多行的语句需要这个符号
@@ -20,8 +20,9 @@ add1 = fn (i $Numb) {:
 
 out add1(10) # 11
 
-add1 = fn (i) {:
+add1 = fn(i) {:
     # AnyType annotation `$_` can be omitted.
+    # Any 类型的类型注解 `$_` 可以被省略。
     brk i + 1:
 }
 

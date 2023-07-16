@@ -12,7 +12,7 @@ use crate::public::value::value::ValueType;
 use super::function_definition;
 
 pub fn resolve(tokens: &mut TokenVec) -> Result<ClassDefinitionNode, ()> {
-    // no `cls` keyword
+    // no `cl` keyword
     // example:
     // { prop $_, method=(self $_){do something...} }
 

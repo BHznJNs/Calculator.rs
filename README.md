@@ -78,7 +78,7 @@ calculator.exe script
 - OOP support
 
 ```text
-> Person = cls {age $Numb, name $Str}
+> Person = cl {age $Numb, name $Str}
 = {
   name,
   age,

@@ -78,7 +78,7 @@ calculator.exe script
 - 支持面向对象编程
 
 ```text
-> Person = cls {age $Numb, name $Str}
+> Person = cl {age $Numb, name $Str}
 = {
  name,
  age,

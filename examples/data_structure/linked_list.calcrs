@@ -1,12 +1,12 @@
 # 类定义
-Node = cls {:
+Node = cl {:
     data $_;:
-    next $Obj:
+    next $Obj;:
 }
-List = cls {:
+List = cl {:
     head $Obj;:
     peak $Obj;:
-    push = fn(self $Obj, data $_) {:
+    push = fn(data) {:
         new_node = new Node[data, 0];:
         self.peak.next = new_node;:
         self.peak = new_node;:

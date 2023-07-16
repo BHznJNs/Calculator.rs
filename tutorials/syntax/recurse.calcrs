@@ -1,4 +1,4 @@
-test = fn (i $Numb) {:
+test = fn(i $Numb) {:
     if i == 5 {:
         brk i;:
     };:

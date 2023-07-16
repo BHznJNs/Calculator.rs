@@ -68,7 +68,7 @@ t = fn() {arr[index] = element}
 # class definition
 
 ```calcrs
-Person = cls {age $Numb, name $Str}
+Person = cl {age $Numb, name $Str}
 inst = new Person(10, "test")
 nested_inst = new Person(10, new Person(1, 2))
 ```
