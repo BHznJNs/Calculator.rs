@@ -3,53 +3,49 @@ use crate::public::compile_time::ast::types::FunctionDefinitionNode;
 use crate::public::compile_time::parens::Paren;
 use crate::public::error::syntax_error;
 use crate::public::value::function::UserDefinedFnParam;
+use crate::public::value::value::ValueType;
 
 use super::statement_block;
 
 // refactor: params_resolve
 fn params_resolve(tokens: &mut TokenVec) -> Result<Vec<UserDefinedFnParam>, ()> {
-    // return function Vec<Param>
     // structure:
     // identi annotation) {function body ...}
 
-    let first_index = 0;
-    let mut params = Vec::<UserDefinedFnParam>::new();
+    let mut params = vec![];
 
-    while first_index < tokens.len() {
-        let current = tokens.pop_front().unwrap();
-
-        if tokens.len() >= 3 {
-            // has more param
-            match current {
-                Token::Identi(identi) => {
-                    let next = tokens.pop_front().unwrap();
-                    if let Token::Annotation(type__) = next {
-                        // let temp = Box::leak(Box::new(identi)).as_str();
-                        // temp.
-                        params.push(UserDefinedFnParam { type__, identi })
-                    } else {
-                        return Err(syntax_error(
-                            "type annotation expected in function definition",
-                        )?);
-                    }
-                }
-                Token::Divider => continue,
-                Token::Paren(Paren::RightParen) => break,
-                _ => {
-                    let msg = format!("unexpected token {} in function param", current);
-                    return Err(syntax_error(&msg)?);
+    while let Some(current) = tokens.pop_front() {
+        match current {
+            Token::Identi(identi) => {
+                let Some(next) = tokens.pop_front() else {
+                    return Err(syntax_error(
+                        "incompleted function definition",
+                    )?);
+                };
+                if let Token::Annotation(type__) = next {
+                    params.push(UserDefinedFnParam { type__, identi })
+                } else
+                if let Token::Divider | Token::Paren(Paren::RightParen) = next {
+                    tokens.push_front(next);
+                    params.push(UserDefinedFnParam {
+                        type__: ValueType::Void,
+                        identi
+                    });
+                } else {
+                    return Err(syntax_error(
+                        "type annotation expected in function definition",
+                    )?);
                 }
             }
-        } else if tokens.len() > 0 {
-            if current == Token::Paren(Paren::RightParen) {
-                break;
+            Token::Divider => continue,
+            Token::Paren(Paren::RightParen) => break,
+            _ => {
+                let msg = format!("unexpected token {} in function param", current);
+                return Err(syntax_error(&msg)?);
             }
-        } else {
-            return Err(syntax_error("invalid function definition")?);
         }
     }
-
-    Ok(params)
+    return Ok(params);
 }
 
 pub fn resolve(tokens: &mut TokenVec) -> Result<FunctionDefinitionNode, ()> {
