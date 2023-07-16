@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 
 use crate::exec::script;
@@ -35,14 +35,8 @@ impl LocalScope {
 
 // --- --- --- --- --- ---
 
-pub struct Scope {
-    pub global: GlobalScope,
-    pub local: Option<LocalScope>,
-    pub completer: Option<Completer>,
-    user_module_map: HashMap<String, bool>,
-    std_module_map: Rc<HashMap<&'static str, StdModules>>,
-}
-const STD_MODULE_DATA: [(&'static str, StdModules); 6] = [
+const STD_MODULE_COUNT: usize = 6;
+const STD_MODULE_DATA: [(&'static str, StdModules); STD_MODULE_COUNT] = [
     ("Basic", StdModules::Basic),
     ("Math", StdModules::Math),
     ("Array", StdModules::Array),
@@ -50,6 +44,14 @@ const STD_MODULE_DATA: [(&'static str, StdModules); 6] = [
     ("FS", StdModules::FileSystem),
     ("BitOps", StdModules::BitOps),
 ];
+pub struct Scope {
+    pub global: GlobalScope,
+    pub local: Option<LocalScope>,
+    pub completer: Option<Completer>,
+    user_module_imported: HashSet<String>,
+    std_module_imported: [bool; STD_MODULE_COUNT],
+    std_module_map: Rc<HashMap<&'static str, StdModules>>,
+}
 impl Scope {
     pub fn init() -> Scope {
         Scope {
@@ -57,7 +59,8 @@ impl Scope {
             local: None,
             completer: None,
 
-            user_module_map: HashMap::<String, bool>::new(),
+            user_module_imported: HashSet::<String>::new(),
+            std_module_imported: [false; STD_MODULE_COUNT],
             std_module_map: Rc::new(HashMap::from(STD_MODULE_DATA)),
         }
     }
@@ -67,7 +70,9 @@ impl Scope {
             global: GlobalScope::init(),
             local: None,
             completer: None,
-            user_module_map: HashMap::<String, bool>::new(),
+
+            user_module_imported: HashSet::<String>::new(),
+            std_module_imported: [false; STD_MODULE_COUNT],
             std_module_map: self.std_module_map.clone(),
         }
     }
@@ -111,28 +116,34 @@ impl Scope {
             return Err(import_error(&msg)?)
         };
 
-        module::std_resolve(self, target_module, module_name);
-        Ok(())
+        if !self.std_module_imported[*target_module as usize] {
+            self.std_module_imported[*target_module as usize] = true;
+            module::std_resolve(self, target_module, module_name);
+        }
+        return Ok(());
     }
     // import user defined module
     pub fn import_from_path(&mut self, module_path: &str) -> Result<Value, ()> {
         let mut module_scope = self.new();
 
         // if module has not been imported
-        if self.user_module_map.get(module_path) == None {
+        if self.user_module_imported.get(module_path) == None {
             // execute the module file
             script::run(module_path, &mut module_scope)?;
 
             // import modules that imported by module
-            for (module, _) in module_scope.user_module_map {
-                if let Some(_) = self.std_module_map.get(module.as_str()) {
-                    self.import_std(&module)?;
-                } else {
-                    self.import_from_path(&module)?;
+            for module_name in module_scope.user_module_imported {
+                // user-defined modules
+                self.import_from_path(&module_name)?;
+            }
+            for (i, is_imported) in module_scope.std_module_imported.iter().enumerate() {
+                // std modules
+                if *is_imported {
+                    self.import_std(STD_MODULE_DATA[i].0)?;
                 }
             }
             // identify this path as imported
-            self.user_module_map.insert(String::from(module_path), true);
+            self.user_module_imported.insert(String::from(module_path));
             let module_obj = module_create(module_scope.global);
             Ok(Value::create(module_obj))
         } else {

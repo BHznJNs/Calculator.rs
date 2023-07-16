@@ -1,7 +1,5 @@
 use crate::public::std::modules::{array, string};
-
 use self::modules::{basic, bit_ops, file_system, math};
-
 use super::value::{
     oop::{class::Class, object::Object},
     value::Value,
@@ -11,7 +9,7 @@ pub mod modules;
 
 mod utils;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone, Copy)]
 pub enum StdModules {
     Basic,
     Math,

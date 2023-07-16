@@ -13,7 +13,7 @@ pub fn module_create(module_scope: GlobalScope) -> Object {
 
     for (k, v) in module_scope.variables {
         if let Value::Function(func) = v {
-            method_statck.push((k, func))
+            method_statck.push((k, func));
         } else {
             prop_stack.push(Property(v.get_type(), k));
             val_stack.push_back(v);
