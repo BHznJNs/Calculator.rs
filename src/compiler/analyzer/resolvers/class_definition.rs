@@ -4,8 +4,10 @@ use crate::compiler::tokenizer::token::{Token, TokenVec};
 use crate::public::compile_time::ast::types::{ClassDefinitionNode, FunctionDefinitionNode};
 use crate::public::compile_time::parens::Paren;
 use crate::public::error::syntax_error;
+use crate::public::value::function::UserDefinedFnParam;
 use crate::public::value::oop::class::Property;
 use crate::public::value::symbols::Symbols;
+use crate::public::value::value::ValueType;
 
 use super::function_definition;
 
@@ -42,8 +44,11 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ClassDefinitionNode, ()> {
                     Token::Symbol(Symbols::Equal) => {
                         // current as class method
                         let mut method_node = function_definition::resolve(tokens)?;
+                        method_node.params.insert(0, UserDefinedFnParam {
+                            type__: ValueType::Object,
+                            identi: String::from("self"),
+                        });
                         method_node.name = Some(identi);
-
                         method_nodes.push(method_node.into())
                     }
                     _ => {

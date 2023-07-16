@@ -82,7 +82,7 @@ impl Class {
             completer = Some(Completer::from(prop_name_vec));
         }
 
-        return Self {
+        return Class {
             properties,
             completer,
             method_storage,
