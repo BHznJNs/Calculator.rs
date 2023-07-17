@@ -10,7 +10,13 @@ fn get_end_part(tokens: &TokenVec) -> Option<Vec<String>> {
     // input2:  ["var2", "=", "var1"]
     // output2: ["var1"]
 
-    if tokens.is_empty() || tokens.last().is_some_and(|t| t.content.eq(".")) {
+    // if last token is Token with content "."
+    if let Some(token) = tokens.last() {
+        if token.content.eq(".") {
+            return None;
+        }
+    } else {
+        // tokens is empty
         return None;
     }
 
