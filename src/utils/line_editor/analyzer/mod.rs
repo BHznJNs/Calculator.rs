@@ -10,37 +10,30 @@ fn get_end_part(tokens: &TokenVec) -> Option<Vec<String>> {
     // input2:  ["var2", "=", "var1"]
     // output2: ["var1"]
 
-    if tokens.is_empty() {
+    if tokens.is_empty() || tokens.last().is_some_and(|t| t.content.eq(".")) {
         return None;
     }
 
     let mut result = vec![];
-    let mut index = tokens.len() - 1;
     let mut last_type = TextType::Comment;
 
     // traverse the inputed TokenVec reversedly
-    loop {
-        let current = &tokens[index];
-
+    for t in tokens.iter().rev() {
         // avoid repeated typed token
-        if current.type__ == last_type {
+        if t.type__ == last_type {
             break;
         }
+
         // only allow "." and identifier
-        if current.type__ == TextType::Variable {
-            result.push(current.content.clone());
-        } else if current.type__ == TextType::Symbol && current.content.eq(".") {
+        if t.type__ == TextType::Variable {
+            result.push(t.content.clone());
+        } else if t.type__ == TextType::Symbol && t.content.eq(".") {
             // do nothing
         } else {
             break;
         }
 
-        if index == 0 {
-            break;
-        }
-
-        last_type = current.type__;
-        index -= 1;
+        last_type = t.type__;
     }
 
     if result.is_empty() {
