@@ -104,7 +104,7 @@ impl Into<Rc<RefCell<Value>>> for Value {
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Value::Void(option_val) => match option_val {
+            Value::Void(void_sign) => match void_sign {
                 VoidSign::Continue => write!(f, "Void(Continue)"),
                 VoidSign::Break(val) => write!(f, "Void({})", val),
                 VoidSign::Empty => write!(f, "<Void>"),

@@ -76,8 +76,8 @@ pub fn analyze(tokens: &TokenVec, scope: &Scope) -> Result<Vec<String>, ()> {
         let mut var_object = root_object;
         while end_part.len() > 1 {
             let prop_name = end_part.pop().unwrap();
-            let sub_val = var_object.as_ref().borrow().get(&prop_name)?;
-            if let Value::Object(sub_obj) = sub_val {
+            let sub_value = var_object.as_ref().borrow().get(&prop_name)?;
+            if let Value::Object(sub_obj) = sub_value {
                 var_object = sub_obj
             } else {
                 return Err(());

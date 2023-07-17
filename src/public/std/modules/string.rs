@@ -56,14 +56,14 @@ pub fn module_class() -> Class {
     let start_with = BuildInFunction {
         params: vec![
             BuildInFnParam(ValueType::Object, "self"),
-            BuildInFnParam(ValueType::String, "str"),
+            BuildInFnParam(ValueType::String, "pat"),
         ],
         identi: BuildInFnIdenti::String(StringFn::STARTWITH),
     };
     let end_with = BuildInFunction {
         params: vec![
             BuildInFnParam(ValueType::Object, "self"),
-            BuildInFnParam(ValueType::String, "str"),
+            BuildInFnParam(ValueType::String, "pat"),
         ],
         identi: BuildInFnIdenti::String(StringFn::ENDWITH),
     };
@@ -131,8 +131,20 @@ impl BuildInFnCall for StringFn {
             }
             StringFn::REPEAT => todo!(),
             StringFn::JOIN => todo!(),
-            StringFn::STARTWITH => todo!(),
-            StringFn::ENDWITH => todo!(),
+            StringFn::STARTWITH | StringFn::ENDWITH => {
+                let pat_value = get_val("pat", scope)?;
+                let Value::String(pat) = pat_value else {
+                    unreachable!()
+                };
+                let pat_ref = pat.borrow();
+                let result =
+                match self {
+                    StringFn::STARTWITH => str_ref.borrow().starts_with(&*pat_ref),
+                    StringFn::ENDWITH => str_ref.borrow().ends_with(&*pat_ref),
+                    _ => unreachable!()
+                };
+                Value::create(result)
+            }
         };
         return Ok(result);
     }
