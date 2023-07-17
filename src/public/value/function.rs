@@ -109,17 +109,13 @@ impl fmt::Display for Function {
     }
 }
 
-pub trait Overload<T> {
-    fn create(value: T) -> Self;
-}
-
-impl Overload<UserDefinedFunction> for Function {
-    fn create(value: UserDefinedFunction) -> Self {
+impl From<UserDefinedFunction> for Function {
+    fn from(value: UserDefinedFunction) -> Self {
         Function::UserDefined(Rc::new(value))
     }
 }
-impl Overload<BuildInFunction> for Function {
-    fn create(value: BuildInFunction) -> Self {
+impl From<BuildInFunction> for Function {
+    fn from(value: BuildInFunction) -> Self {
         Function::BuildIn(Rc::new(value))
     }
 }

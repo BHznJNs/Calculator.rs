@@ -1,5 +1,5 @@
 use crate::public::compile_time::ast::types::ClassDefinitionNode;
-use crate::public::value::function::{Function, Overload};
+use crate::public::value::function::Function;
 use crate::public::value::oop::class::Class;
 
 use super::function_definition;
@@ -10,7 +10,7 @@ pub fn resolve(node: &ClassDefinitionNode) -> Result<Class, ()> {
         let function_def = function_definition::resolve(function_node)?;
         method_stack.push((
             function_node.name.clone().unwrap(),
-            Function::create(function_def),
+            Function::from(function_def),
         ));
     }
     return Ok(Class::new(node.properties.clone(), method_stack));

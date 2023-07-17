@@ -10,7 +10,7 @@ use crate::public::std::modules::file_system::file_ops::{file_read, file_write};
 use crate::public::std::utils::get_self_prop::get_self_prop;
 use crate::public::std::utils::get_val::get_val;
 use crate::public::value::array::ArrayLiteral;
-use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function, Overload};
+use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function};
 use crate::public::value::oop::class::{Class, Property};
 use crate::public::value::oop::object::Object;
 use crate::public::value::value::{Overload as ValueOverload, Value, ValueType, VoidSign};
@@ -81,9 +81,9 @@ fn static_class_setter() {
                     Property(ValueType::Boolean, String::from("is_file")),
                 ],
                 vec![
-                    (String::from("read"), Function::create(read)),
-                    (String::from("write"), Function::create(write)),
-                    (String::from("append"), Function::create(append)),
+                    (String::from("read"), Function::from(read)),
+                    (String::from("write"), Function::from(write)),
+                    (String::from("append"), Function::from(append)),
                 ],
             )
             .into(),
@@ -93,9 +93,9 @@ fn static_class_setter() {
             Class::new(
                 vec![],
                 vec![
-                    (String::from("open"), Function::create(open)),
-                    (String::from("create"), Function::create(create)),
-                    (String::from("delete"), Function::create(delete)),
+                    (String::from("open"), Function::from(open)),
+                    (String::from("create"), Function::from(create)),
+                    (String::from("delete"), Function::from(delete)),
                 ],
             )
             .into(),

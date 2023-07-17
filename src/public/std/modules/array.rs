@@ -2,7 +2,7 @@ use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::std::utils::get_self_prop::get_self_prop;
 use crate::public::value::array::Array;
-use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function, Overload as FunctionOverload};
+use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function};
 use crate::public::value::oop::class::{Class, Property};
 use crate::public::value::value::{Value, ValueType, VoidSign, Overload as ValueOverload};
 
@@ -74,13 +74,13 @@ pub fn module_class() -> Class {
     return Class::new(
         vec![Property(ValueType::Array, String::from("v"))],
         vec![
-            (String::from("push"), Function::create(push)),
-            (String::from("pop"), Function::create(pop)),
-            (String::from("shift"), Function::create(shift)),
-            (String::from("unshift"), Function::create(unshift)),
-            (String::from("insert"), Function::create(insert)),
-            (String::from("remove"), Function::create(remove)),
-            (String::from("join"), Function::create(join)),
+            (String::from("push"), Function::from(push)),
+            (String::from("pop"), Function::from(pop)),
+            (String::from("shift"), Function::from(shift)),
+            (String::from("unshift"), Function::from(unshift)),
+            (String::from("insert"), Function::from(insert)),
+            (String::from("remove"), Function::from(remove)),
+            (String::from("join"), Function::from(join)),
         ],
     );
 }

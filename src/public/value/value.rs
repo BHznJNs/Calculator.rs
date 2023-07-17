@@ -10,7 +10,7 @@ use crate::public::error::{internal_error, InternalComponent};
 use super::super::compile_time::ast::ast_enum::ASTNode;
 use super::array::{ArrayLiteral, Array};
 use super::function::{
-    BuildInFunction, Function, Overload as FunctionOverload, UserDefinedFunction,
+    BuildInFunction, Function, UserDefinedFunction,
 };
 use super::number::Number;
 use super::oop::class::Class;
@@ -315,12 +315,12 @@ impl Overload<ASTNode> for Value {
 
 impl Overload<UserDefinedFunction> for Value {
     fn create(value: UserDefinedFunction) -> Self {
-        Value::Function(Function::create(value))
+        Value::Function(Function::from(value))
     }
 }
 impl Overload<BuildInFunction> for Value {
     fn create(value: BuildInFunction) -> Self {
-        Value::Function(Function::create(value))
+        Value::Function(Function::from(value))
     }
 }
 impl Overload<Class> for Value {

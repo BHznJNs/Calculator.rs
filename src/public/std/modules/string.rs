@@ -4,7 +4,7 @@ use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::std::utils::get_self_prop::get_self_prop;
 use crate::public::value::function::{
-    BuildInFnParam, BuildInFunction, Function, Overload as FunctionOverLoad,
+    BuildInFnParam, BuildInFunction, Function,
 };
 use crate::public::value::oop::class::{Class, Property};
 use crate::public::value::value::{Overload as ValueOverload, Value, ValueType};
@@ -62,11 +62,11 @@ pub fn module_class() -> Class {
     return Class::new(
         vec![Property(ValueType::String, String::from("v"))],
         vec![
-            (String::from("split"), Function::create(split)),
-            (String::from("replace"), Function::create(replace)),
-            (String::from("repeat"), Function::create(repeat)),
-            (String::from("start_with"), Function::create(start_with)),
-            (String::from("end_with"), Function::create(end_with)),
+            (String::from("split"), Function::from(split)),
+            (String::from("replace"), Function::from(replace)),
+            (String::from("repeat"), Function::from(repeat)),
+            (String::from("start_with"), Function::from(start_with)),
+            (String::from("end_with"), Function::from(end_with)),
         ],
     );
 }

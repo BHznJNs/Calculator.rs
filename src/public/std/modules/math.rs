@@ -3,7 +3,7 @@ use std::rc::Rc;
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::array::ArrayLiteral;
-use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function, Overload};
+use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function};
 use crate::public::value::number::Number;
 use crate::public::value::oop::class::Class;
 use crate::public::value::oop::object::Object;
@@ -107,27 +107,27 @@ fn static_class_setter() {
             Class::new(
                 vec![],
                 vec![
-                    (String::from("sin"), Function::create(sin)),
-                    (String::from("cos"), Function::create(cos)),
-                    (String::from("tan"), Function::create(tan)),
-                    (String::from("asin"), Function::create(asin)),
-                    (String::from("acos"), Function::create(acos)),
-                    (String::from("atan"), Function::create(atan)),
-                    (String::from("sinh"), Function::create(sinh)),
-                    (String::from("cosh"), Function::create(cosh)),
-                    (String::from("tanh"), Function::create(tanh)),
-                    (String::from("rad"), Function::create(rad)),
-                    (String::from("deg"), Function::create(deg)),
-                    (String::from("log10"), Function::create(log10)),
-                    (String::from("log2"), Function::create(log2)),
-                    (String::from("log"), Function::create(log)),
-                    (String::from("ln"), Function::create(ln)),
-                    (String::from("exp"), Function::create(exp)),
-                    (String::from("abs"), Function::create(abs)),
-                    (String::from("sqrt"), Function::create(sqrt)),
-                    (String::from("floor"), Function::create(floor)),
-                    (String::from("round"), Function::create(round)),
-                    (String::from("mod"), Function::create(modulo)),
+                    (String::from("sin"), Function::from(sin)),
+                    (String::from("cos"), Function::from(cos)),
+                    (String::from("tan"), Function::from(tan)),
+                    (String::from("asin"), Function::from(asin)),
+                    (String::from("acos"), Function::from(acos)),
+                    (String::from("atan"), Function::from(atan)),
+                    (String::from("sinh"), Function::from(sinh)),
+                    (String::from("cosh"), Function::from(cosh)),
+                    (String::from("tanh"), Function::from(tanh)),
+                    (String::from("rad"), Function::from(rad)),
+                    (String::from("deg"), Function::from(deg)),
+                    (String::from("log10"), Function::from(log10)),
+                    (String::from("log2"), Function::from(log2)),
+                    (String::from("log"), Function::from(log)),
+                    (String::from("ln"), Function::from(ln)),
+                    (String::from("exp"), Function::from(exp)),
+                    (String::from("abs"), Function::from(abs)),
+                    (String::from("sqrt"), Function::from(sqrt)),
+                    (String::from("floor"), Function::from(floor)),
+                    (String::from("round"), Function::from(round)),
+                    (String::from("mod"), Function::from(modulo)),
                 ],
             )
             .into(),
