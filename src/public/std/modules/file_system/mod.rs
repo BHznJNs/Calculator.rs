@@ -76,7 +76,7 @@ fn static_class_setter() {
             Class::new(
                 vec![
                     Property(ValueType::String, String::from("path")),
-                    Property(ValueType::String, String::from("exist")),
+                    Property(ValueType::Boolean, String::from("exist")),
                     Property(ValueType::Boolean, String::from("is_dir")),
                     Property(ValueType::Boolean, String::from("is_file")),
                 ],
@@ -118,66 +118,52 @@ pub fn module_object() -> Object {
 impl BuildInFnCall for FileSysFn {
     fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
         let result = match self {
-            FileSysFn::Open => {
+            FileSysFn::Open | FileSysFn::Create | FileSysFn::Delete => {
                 let path_value = get_val("path", scope)?;
-                let Value::String(str) = path_value.clone() else {
-                    unreachable!()
-                };
+                let temp = path_value.clone();
+                let temp = temp.get_str()?;
+                let path_str = temp.as_str();
 
-                let str_ref = str.borrow();
-                let str_slice = str_ref.as_str();
-
-                let path = Path::new(str_slice);
-                let path_exist = path.exists();
-                let path_is_dir = path.is_dir();
-                let path_is_file = path.is_file();
-
-                let file_obj = unsafe {
-                    Class::instantiate(
-                        FILE_CLASS.as_ref().unwrap().clone(),
-                        ArrayLiteral::from([
-                            path_value,
-                            Value::Boolean(path_exist),
-                            Value::Boolean(path_is_dir),
-                            Value::Boolean(path_is_file),
-                        ]),
-                    )?
-                };
-
-                Value::create(file_obj)
-            }
-            FileSysFn::Create => {
-                let path_value = get_val("path", scope)?;
-                let Value::String(str) = path_value.clone() else {
-                    unreachable!()
-                };
-
-                let path_ref = str.borrow();
-                let path_str = path_ref.as_str();
-                if path_str.ends_with('/') || path_str.ends_with('\\') {
-                    dir_create(path_str)?;
-                } else {
-                    file_create(path_str)?;
+                match self {
+                    FileSysFn::Open => {
+                        let path = Path::new(path_str);
+                        let path_exist = path.exists();
+                        let path_is_dir = path.is_dir();
+                        let path_is_file = path.is_file();
+        
+                        let file_obj = unsafe {
+                            Class::instantiate(
+                                FILE_CLASS.as_ref().unwrap().clone(),
+                                ArrayLiteral::from([
+                                    path_value,
+                                    Value::Boolean(path_exist),
+                                    Value::Boolean(path_is_dir),
+                                    Value::Boolean(path_is_file),
+                                ]),
+                            )?
+                        };
+        
+                        Value::create(file_obj)
+                    }
+                    FileSysFn::Create => {
+                        if path_str.ends_with('/') || path_str.ends_with('\\') {
+                            dir_create(path_str)?;
+                        } else {
+                            file_create(path_str)?;
+                        }
+                        Value::Void(VoidSign::Empty)
+                    }
+                    FileSysFn::Delete => {
+                        let path = Path::new(path_str);
+                        if path.is_dir() {
+                            dir_delete(path_str)?;
+                        } else {
+                            file_delete(path_str)?;
+                        }
+                        Value::Void(VoidSign::Empty)
+                    }
+                    _ => unreachable!()
                 }
-
-                FileSysFn::Open.call(scope)?
-            }
-            FileSysFn::Delete => {
-                let path_value = get_val("path", scope)?;
-                let Value::String(str) = path_value.clone() else {
-                    unreachable!()
-                };
-
-                let path_ref = str.borrow();
-                let path_str = path_ref.as_str();
-                let path = Path::new(path_str);
-                if path.is_dir() {
-                    dir_delete(path_str)?;
-                } else {
-                    file_delete(path_str)?;
-                }
-
-                Value::Void(VoidSign::Empty)
             }
             _ => {
                 // the code following is used as the method of class `File`.
@@ -189,12 +175,8 @@ impl BuildInFnCall for FileSysFn {
                 let is_file = get_self_prop(&self_value, "is_file")?;
                 let file_info = (exist, is_dir, is_file);
 
-                // these 5 lines is to get the `&str` typed path data.
-                let Value::String(path_str) = self_path else {
-                    unreachable!()
-                };
-                let path_str_temp = path_str.borrow();
-                let file_path = path_str_temp.as_str();
+                let temp = self_path.get_str()?;
+                let file_path = temp.as_str();
 
                 match self {
                     FileSysFn::Read => file_read(file_path, file_info)?,

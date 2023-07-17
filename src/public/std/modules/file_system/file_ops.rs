@@ -53,13 +53,9 @@ pub fn file_write(
     content_value: Value,
     file_info: (Value, Value, Value),
 ) -> Result<(), ()> {
-    let Value::String(content_ref) = content_value else {
-        unreachable!()
-    };
-    let content_str_temp = content_ref.borrow();
-    let content = content_str_temp.as_str();
-
+    let content_str = content_value.get_str()?;
     let (exist, _, is_file) = file_info;
+
     if exist == TRUE_VALUE && is_file == TRUE_VALUE {
         let mut file = OpenOptions::new()
             .write(true)
@@ -71,7 +67,7 @@ pub fn file_write(
         file.set_len(0).unwrap();
         file.flush().unwrap();
 
-        match file.write_all(content.as_bytes()) {
+        match file.write_all(content_str.as_bytes()) {
             Ok(_) => Ok(()),
             Err(_) => {
                 let msg = format!("file '{}' is not writable", file_path);

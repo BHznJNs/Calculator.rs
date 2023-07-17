@@ -1,18 +1,18 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
-use std::{fmt, io};
+use std::fmt;
 
 use crossterm::style::Stylize;
 
 use crate::public::env::ENV_OPTION;
 use crate::public::error::{reference_error, type_error, ReferenceType};
 use crate::public::value::array::ArrayLiteral;
+use crate::public::value::display_indent;
 use crate::public::value::function::Function;
 use crate::public::value::value::{Value, ValueType};
 use crate::public::Param;
 use crate::utils::completer::Completer;
-use crate::utils::output::print_line;
 
 use super::object::Object;
 use super::utils::data_storage::DataStoragePattern;
@@ -40,6 +40,7 @@ impl Param for Property {
 
 impl Class {
     const STORAGE_THRESHOLD: usize = 8;
+    const METHOD_DISP_STR: &'static str = "<Class-Method>";
 
     pub fn new(properties: Vec<Property>, methods: Vec<(String, Function)>) -> Self {
         // get properties' and methods' names into one `Vec`
@@ -156,53 +157,50 @@ impl Class {
             }
         }
 
-        Ok(Object {
+        return Ok(Object {
             prototype: class_self.clone(),
             storage_pattern,
             data_list,
             data_map,
-        })
+        });
     }
-}
 
-const CLASS_METHOD_DISP_STR: &'static str = "<Class-Method>";
-impl fmt::Display for Class {
-    fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut stdout = io::stdout();
-
-        print_line(&mut stdout, '{');
-        for prop in &self.properties {
-            // todo: display property indentifier and type
-            print_line(
-                &mut stdout,
-                format!("  {}: {},", prop.identi(), prop.type__().to_string().red(),),
-            );
-        }
-
+    pub fn display_methods(f: &mut fmt::Formatter<'_>, cls: &Class, level: usize) -> fmt::Result {
         let class_method_disp = if unsafe { ENV_OPTION.support_ansi } {
-            CLASS_METHOD_DISP_STR.cyan().to_string()
+            Class::METHOD_DISP_STR.cyan().to_string()
         } else {
-            String::from(CLASS_METHOD_DISP_STR)
+            String::from(Class::METHOD_DISP_STR)
         };
-        match self.method_storage {
+
+        match cls.method_storage {
             DataStoragePattern::List => {
-                let list = self.method_list.as_ref().unwrap();
+                let list = cls.method_list.as_ref().unwrap();
                 for method in list {
-                    print_line(
-                        &mut stdout,
-                        format!("  {}: {},", method.0, class_method_disp),
-                    );
+                    write!(f, "{}{}: {}\r\n", display_indent(level), method.0, class_method_disp)?;
                 }
             }
             DataStoragePattern::Map => {
-                let map = self.method_map.as_ref().unwrap();
+                let map = cls.method_map.as_ref().unwrap();
 
                 for (key, _) in map {
-                    print_line(&mut stdout, format!("  {}: {},", key, class_method_disp));
+                    write!(f, "{}{}: {}\r\n", display_indent(level), key, class_method_disp)?;
                 }
             }
         }
-        print!("}}");
         return Ok(());
+    }
+}
+
+
+impl fmt::Display for Class {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{{\r\n")?;
+        // display class properties
+        for prop in &self.properties {
+            write!(f, "{}{}: {}\r\n", display_indent(1), prop.identi(), prop.type__().to_string().red())?;
+        }
+
+        Class::display_methods(f, self, 1)?;
+        write!(f, "}}")
     }
 }

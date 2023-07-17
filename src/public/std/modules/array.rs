@@ -1,14 +1,24 @@
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::std::utils::get_self_prop::get_self_prop;
-use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function, Overload};
+use crate::public::value::array::Array;
+use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function, Overload as FunctionOverload};
 use crate::public::value::oop::class::{Class, Property};
-use crate::public::value::value::{Value, ValueType, VoidSign};
+use crate::public::value::value::{Value, ValueType, VoidSign, Overload as ValueOverload};
 
 use super::super::utils::get_val::get_val;
 use super::BuildInFnCall;
 
-// static SELF_STR: &str= "self";
+#[derive(PartialEq, Clone)]
+pub enum ArrayFn {
+    PUSH,
+    POP,
+    SHIFT,
+    UNSHIFT,
+    INSERT,
+    REMOVE,
+    JOIN,
+}
 
 pub fn module_class() -> Class {
     let push = BuildInFunction {
@@ -24,11 +34,11 @@ pub fn module_class() -> Class {
         identi: BuildInFnIdenti::Array(ArrayFn::POP),
     };
 
-    let shift: BuildInFunction = BuildInFunction {
+    let shift = BuildInFunction {
         params: vec![BuildInFnParam(ValueType::Object, "self")],
         identi: BuildInFnIdenti::Array(ArrayFn::SHIFT),
     };
-    let unshift: BuildInFunction = BuildInFunction {
+    let unshift = BuildInFunction {
         params: vec![
             BuildInFnParam(ValueType::Object, "self"),
             BuildInFnParam(ValueType::Void, "element"),
@@ -43,13 +53,21 @@ pub fn module_class() -> Class {
         ],
         identi: BuildInFnIdenti::Array(ArrayFn::INSERT),
     };
-    let remove: BuildInFunction = BuildInFunction {
+    let remove = BuildInFunction {
         params: vec![
             BuildInFnParam(ValueType::Object, "self"),
             BuildInFnParam(ValueType::Number, "index"),
         ],
         identi: BuildInFnIdenti::Array(ArrayFn::REMOVE),
     };
+    let join = BuildInFunction {
+        params: vec![
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::String, "divider"),
+        ],
+        identi: BuildInFnIdenti::Array(ArrayFn::JOIN),
+    };
+
 
     // --- --- --- --- --- ---
 
@@ -62,64 +80,45 @@ pub fn module_class() -> Class {
             (String::from("unshift"), Function::create(unshift)),
             (String::from("insert"), Function::create(insert)),
             (String::from("remove"), Function::create(remove)),
+            (String::from("join"), Function::create(join)),
         ],
     );
-}
-
-#[derive(PartialEq, Clone)]
-pub enum ArrayFn {
-    PUSH,
-    POP,
-    SHIFT,
-    UNSHIFT,
-    INSERT,
-    REMOVE,
 }
 
 impl BuildInFnCall for ArrayFn {
     fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
         let self_value = get_val("self", scope)?;
         let arr_value = get_self_prop(&self_value, "v")?;
+        let Value::Array(arr) = arr_value else {
+            unreachable!()
+        };
+        let mut arr_ref = arr.borrow_mut();
 
         let result = match self {
             ArrayFn::PUSH => {
                 let element_value = get_val("element", scope)?;
-
-                if let Value::Array(arr) = arr_value {
-                    let mut arr_ref = arr.borrow_mut();
-                    arr_ref.push_back(element_value.clone());
-                }
+                arr_ref.push_back(element_value.clone());
                 element_value
             }
             ArrayFn::POP => {
-                if let Value::Array(arr) = arr_value {
-                    let mut arr_ref = arr.borrow_mut();
+                let poped_el = arr_ref.pop_back();
+                if let Some(val) = poped_el {
                     // return poped value
-                    let poped_el = arr_ref.pop_back();
-                    if let Some(val) = poped_el {
-                        return Ok(val);
-                    }
+                    return Ok(val);
                 }
                 Value::Void(VoidSign::Empty)
             }
             ArrayFn::SHIFT => {
-                if let Value::Array(arr) = arr_value {
-                    let mut arr_ref = arr.borrow_mut();
+                let shifted = arr_ref.pop_front();
+                if let Some(val) = shifted {
                     // return shifted value
-                    let shifted = arr_ref.pop_front();
-                    if let Some(val) = shifted {
-                        return Ok(val);
-                    }
+                    return Ok(val);
                 }
                 Value::Void(VoidSign::Empty)
             }
             ArrayFn::UNSHIFT => {
                 let element_value = get_val("element", scope)?;
-
-                if let Value::Array(arr) = arr_value {
-                    let mut arr_ref = arr.borrow_mut();
-                    arr_ref.push_front(element_value.clone());
-                }
+                arr_ref.push_front(element_value.clone());
                 element_value
             }
             ArrayFn::INSERT => {
@@ -127,26 +126,24 @@ impl BuildInFnCall for ArrayFn {
                 let element_value = get_val("element", scope)?;
 
                 let index = index_value.get_i64()? as usize;
-                if let Value::Array(arr) = arr_value {
-                    let mut arr_ref = arr.borrow_mut();
-                    arr_ref.insert(index, element_value.clone());
-                }
+                arr_ref.insert(index, element_value.clone());
                 element_value
             }
             ArrayFn::REMOVE => {
                 let index_value = get_val("index", scope)?;
 
                 let index = index_value.get_i64()? as usize;
-                let mut removed_element: Option<Value> = None;
-
-                if let Value::Array(arr) = arr_value {
-                    let mut arr_ref = arr.borrow_mut();
-                    removed_element = arr_ref.remove(index);
-                }
+                let removed_element = arr_ref.remove(index);
                 match removed_element {
                     Some(val) => val,
                     None => Value::Void(VoidSign::Empty),
                 }
+            }
+            ArrayFn::JOIN => {
+                let divider_value = get_val("divider", scope)?;
+                let divider_ref = divider_value.get_str()?;
+                let result_str = Array::join(&*arr_ref, &*divider_ref);
+                Value::create(result_str)
             }
         };
         return Ok(result);

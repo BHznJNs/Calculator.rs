@@ -1,4 +1,4 @@
-use std::cell::RefCell;
+use std::cell::{RefCell, RefMut};
 use std::fmt;
 use std::rc::Rc;
 
@@ -8,13 +8,13 @@ use crate::public::env::ENV_OPTION;
 use crate::public::error::{internal_error, InternalComponent};
 
 use super::super::compile_time::ast::ast_enum::ASTNode;
-use super::array::{self, ArrayLiteral};
+use super::array::{ArrayLiteral, Array};
 use super::function::{
     BuildInFunction, Function, Overload as FunctionOverload, UserDefinedFunction,
 };
 use super::number::Number;
 use super::oop::class::Class;
-use super::oop::object::{self, Object};
+use super::oop::object::Object;
 
 #[derive(PartialEq, Clone, Copy)]
 pub enum ValueType {
@@ -78,7 +78,7 @@ pub enum VoidSign {
 }
 #[derive(PartialEq, Clone)]
 pub enum Value {
-    // Value::Void(None)
+    // Value::Void(..)
     // is used when comment line
     // or blank line or
     // or return state for statement.
@@ -93,51 +93,6 @@ pub enum Value {
     Function(Function),
     Class(Rc<Class>),
     Object(Rc<RefCell<Object>>),
-}
-
-impl Into<Rc<RefCell<Value>>> for Value {
-    fn into(self) -> Rc<RefCell<Value>> {
-        Rc::new(RefCell::new(self))
-    }
-}
-
-impl fmt::Display for Value {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Value::Void(void_sign) => match void_sign {
-                VoidSign::Continue => write!(f, "Void(Continue)"),
-                VoidSign::Break(val) => write!(f, "Void({})", val),
-                VoidSign::Empty => write!(f, "<Void>"),
-            },
-
-            Value::String(str) => write!(f, "{}", str.as_ref().borrow()),
-            Value::Array(arr) => Ok(array::display(arr.clone(), 1)),
-            Value::Class(cls) => write!(f, "{}", cls),
-            Value::Object(obj) => Ok(object::display(obj.clone(), 1)),
-
-            _ => {
-                if unsafe { ENV_OPTION.support_ansi } {
-                    match self {
-                        Value::Boolean(bool_val) => {
-                            write!(f, "{}", bool_val.to_string().dark_yellow())
-                        }
-                        Value::Number(num) => write!(f, "{}", num.to_string().yellow()),
-                        Value::LazyExpression(_) => write!(f, "{}", "<Lazy-Expression>".cyan()),
-                        Value::Function(func) => write!(f, "{}", format!("{}", func).cyan()),
-                        _ => unreachable!(),
-                    }
-                } else {
-                    match self {
-                        Value::Boolean(bool_val) => write!(f, "{}", bool_val),
-                        Value::Number(num) => write!(f, "{}", num),
-                        Value::LazyExpression(_) => write!(f, "{}", "<Lazy-Expression>"),
-                        Value::Function(func) => write!(f, "{}", func),
-                        _ => unreachable!(),
-                    }
-                }
-            }
-        }
-    }
 }
 
 impl Value {
@@ -158,7 +113,7 @@ impl Value {
                 "invalid `Value::get_i64` invocation"
             )?)
         };
-        Ok(num.int_value())
+        return Ok(num.int_value());
     }
     pub fn get_f64(&self) -> Result<f64, ()> {
         // expected Number typed value to call this method
@@ -168,7 +123,7 @@ impl Value {
                 "invalid `Value::get_f64` invocation"
             )?)
         };
-        Ok(num.float_value())
+        return Ok(num.float_value());
     }
     pub fn get_bool(&self) -> bool {
         match self {
@@ -181,6 +136,33 @@ impl Value {
             Value::LazyExpression(_) | Value::Function(_) | Value::Class(_) | Value::Object(_) => {
                 true
             }
+        }
+    }
+    pub fn get_str(&self) -> Result<RefMut<String>, ()> {
+        let Value::String(str) = self else {
+            return Err(internal_error(
+                InternalComponent::InternalFn,
+                "invalid `Value::get_str` invocation"
+            )?)
+        };
+        let temp = str.borrow_mut();
+        return Ok(temp);
+    }
+
+    // since the `to_string` method returns the string to display,
+    // it needs an extra method to get raw_string(string without ANSI code).
+    pub fn to_raw_string(&self) -> String {
+        match self {
+            Value::Void(_) => self.to_string(),
+            Value::Boolean(bool_val) => bool_val.to_string(),
+            Value::Number(num) => num.to_string(),
+            Value::String(str) => str.borrow().clone(),
+            Value::Function(func) => func.to_string(),
+            Value::Array(arr) => Array::join(&arr.borrow(), ", "),
+
+            Value::LazyExpression(_) => String::from("<Lazy-Expression>"),
+            Value::Class(_) => String::from("<Class>"),
+            Value::Object(_) => String::from("<Object>"),
         }
     }
 
@@ -208,9 +190,9 @@ impl Value {
             // for `Array` and `Object` the two complex type,
             // recursive clone is needed.
             Value::Array(arr) =>
-                array::deep_clone(arr.clone()),
+                Array::deep_clone(arr.clone()),
             Value::Object(obj) =>
-                object::deep_clone(obj.clone()),
+                Object::deep_clone(obj.clone()),
 
             Value::LazyExpression(l_expr) => {
                 let cloned_l_expr = l_expr.as_ref().clone();
@@ -247,6 +229,51 @@ impl Value {
         }
 
         return self.get_type() == target_type;
+    }
+}
+
+impl Into<Rc<RefCell<Value>>> for Value {
+    fn into(self) -> Rc<RefCell<Value>> {
+        Rc::new(RefCell::new(self))
+    }
+}
+
+impl fmt::Display for Value {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Value::Void(void_sign) => match void_sign {
+                VoidSign::Continue => write!(f, "Void(Continue)"),
+                VoidSign::Break(val) => write!(f, "Void({})", val),
+                VoidSign::Empty => write!(f, "<Void>"),
+            },
+
+            Value::String(str) => write!(f, "{}", str.as_ref().borrow()),
+            Value::Array(arr) => Array::display(f, arr, 1),
+            Value::Class(cls) => write!(f, "{}", cls),
+            Value::Object(obj) => Object::display(f, obj, 1),
+
+            _ => {
+                if unsafe { ENV_OPTION.support_ansi } {
+                    match self {
+                        Value::Boolean(bool_val) => {
+                            write!(f, "{}", bool_val.to_string().dark_yellow())
+                        }
+                        Value::Number(num) => write!(f, "{}", num.to_string().yellow()),
+                        Value::LazyExpression(_) => write!(f, "{}", "<Lazy-Expression>".cyan()),
+                        Value::Function(func) => write!(f, "{}", func.to_string().cyan()),
+                        _ => unreachable!(),
+                    }
+                } else {
+                    match self {
+                        Value::Boolean(bool_val) => write!(f, "{}", bool_val),
+                        Value::Number(num) => write!(f, "{}", num),
+                        Value::LazyExpression(_) => write!(f, "{}", "<Lazy-Expression>"),
+                        Value::Function(func) => write!(f, "{}", func),
+                        _ => unreachable!(),
+                    }
+                }
+            }
+        }
     }
 }
 

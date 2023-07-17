@@ -63,7 +63,7 @@ pub fn function_list() -> Vec<(String, Value)> {
         identi: BuildInFnIdenti::Basic(BasicFn::BOOLEAN),
     };
     let string = BuildInFunction {
-        params: vec![BuildInFnParam(ValueType::Number, "input")],
+        params: vec![BuildInFnParam(ValueType::Void, "input")],
         identi: BuildInFnIdenti::Basic(BasicFn::STRING),
     };
     let array = BuildInFunction {
@@ -102,12 +102,12 @@ impl BuildInFnCall for BasicFn {
     fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
         let result = match self {
             BasicFn::INPUT => {
-                let prompt = get_val("prompt", scope)?;
+                let prompt_value = get_val("prompt", scope)?;
                 // show prompt
-                if let Value::String(str) = prompt {
-                    print!("{}", str.as_ref().borrow());
-                    io::stdout().flush().unwrap();
-                }
+                let prompt_ref = prompt_value.get_str()?;
+                print!("{}", prompt_ref);
+                io::stdout().flush().unwrap();
+
                 // get input
                 let mut input = String::new();
                 disable_raw_mode().unwrap();
@@ -181,55 +181,29 @@ impl BuildInFnCall for BasicFn {
             }
             BasicFn::STRING => {
                 let input = get_val("input", scope)?;
-
-                match input {
-                    Value::String(_) => input.deep_clone(),
-                    Value::Number(num) => Value::create(num.to_string()),
-
-                    Value::Boolean(bool_val) => Value::create(format!("{}", bool_val)),
-                    _ => {
-                        return Err(type_error(
-                            Some("Build-in function 'string'"),
-                            vec![ValueType::Boolean, ValueType::Number, ValueType::String],
-                            input.get_type(),
-                        )?)
-                    }
-                }
+                Value::create(input.to_raw_string())
             }
             BasicFn::ARRAY => {
                 let input = get_val("input", scope)?;
 
-                if let Value::Number(num) = input {
-                    let size = num.int_value() as usize;
-                    let arr_literal: ArrayLiteral = vec![Value::create(0); size].into();
-                    Value::create(arr_literal)
-                } else {
-                    return Err(type_error(
-                        Some("Build-in function 'string'"),
-                        vec![ValueType::Number],
-                        input.get_type(),
-                    )?);
-                }
+                let Value::Number(num) = input else {
+                    unreachable!()
+                };
+                let size = num.int_value() as usize;
+                let arr_literal: ArrayLiteral = vec![Value::create(0); size].into();
+                Value::create(arr_literal)
             }
             BasicFn::ASCII => {
-                let input = get_val("input", scope)?;
+                let input_value = get_val("input", scope)?;
+                let input_ref = input_value.get_str()?;
+                let Some(first_char) = input_ref.chars().next() else {
+                    return Ok(Value::create(0));
+                };
 
-                if let Value::String(str) = input {
-                    let temp = str.as_ref().borrow();
-                    let option_first_char = temp.chars().next();
-                    if let Some(char) = option_first_char {
-                        if char.is_ascii() {
-                            Value::create(char as i64)
-                        } else {
-                            println!("Invalid ASCII character");
-                            return Err(());
-                        }
-                    } else {
-                        println!("Invalid params to convert.");
-                        return Err(());
-                    }
+                if first_char.is_ascii() {
+                    Value::create(first_char as i64)
                 } else {
-                    println!("Invalid param type: expected String.");
+                    println!("Invalid ASCII character");
                     return Err(());
                 }
             }

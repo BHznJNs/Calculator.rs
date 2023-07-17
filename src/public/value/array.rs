@@ -1,52 +1,72 @@
-use std::{cell::RefCell, collections::VecDeque, io, rc::Rc};
+use std::{cell::RefCell, collections::VecDeque, rc::Rc, fmt};
 
-use crate::{public::value::oop::object, utils::output::print_line};
-
+use crossterm::style::Stylize;
+use crate::public::value::{oop::object::Object, display_indent};
 use super::value::{Overload, Value};
 
 pub type ArrayLiteral = VecDeque<Value>;
 
-// recursively clone array elements
-pub fn deep_clone(arr: Rc<RefCell<ArrayLiteral>>) -> Value {
-    let mut new_array = ArrayLiteral::new();
+pub struct Array;
 
-    for i in &*(arr.as_ref().borrow()) {
-        let element = if let Value::Array(arr) = i {
-            deep_clone(arr.clone())
-        } else {
-            i.deep_clone()
-        };
-        new_array.push_back(element);
-    }
-    return Value::create(new_array);
-}
+impl Array {
+    // recursively clone array elements
+    pub fn deep_clone(arr: Rc<RefCell<ArrayLiteral>>) -> Value {
+        let mut new_array = ArrayLiteral::new();
 
-pub fn display(arr: Rc<RefCell<ArrayLiteral>>, level: usize) {
-    const LINE_COUNT: i8 = 5;
-    let mut index = 0;
-    let mut stdout = io::stdout();
-
-    print!("[");
-    let iterator = &*(arr.as_ref().borrow());
-    for element in iterator {
-        // print indent
-        if index % LINE_COUNT == 0 {
-            print_line(&mut stdout, "");
-            print!("{}", "  ".repeat(level));
+        for i in &*(arr.as_ref().borrow()) {
+            let element = if let Value::Array(arr) = i {
+                Array::deep_clone(arr.clone())
+            } else {
+                i.deep_clone()
+            };
+            new_array.push_back(element);
         }
-
-        // print elements
-        match element {
-            Value::String(_) => print!("{}", element.str_format()),
-            Value::Array(arr) => display(arr.clone(), level + 1),
-            Value::Object(obj) => object::display(obj.clone(), level + 1),
-            _ => print!("{}", element),
-        }
-
-        print!(", ");
-        index += 1;
+        return Value::create(new_array);
     }
 
-    print_line(&mut stdout, "");
-    print!("{}]", "  ".repeat(level - 1))
+    pub fn join(arr: &ArrayLiteral, div: &str) -> String {
+        if arr.is_empty() {
+            return String::new();
+        }
+    
+        let mut arr_iter = arr.iter();
+        let mut result_str = arr_iter
+            .next()
+            .unwrap()
+            .to_raw_string();
+
+        for v in arr_iter {
+            result_str += div;
+            result_str += &v.to_raw_string();
+        }
+        return result_str;
+    }
+
+    pub fn display(f: &mut fmt::Formatter<'_>, arr: &Rc<RefCell<ArrayLiteral>>, level: usize) -> fmt::Result {
+        const LINE_COUNT: i8 = 5;
+        let mut index = 0;
+
+        write!(f, "[")?;
+        let iterator = &*(arr.as_ref().borrow());
+        for element in iterator {
+            // print indent
+            if index % LINE_COUNT == 0 {
+                write!(f, "\r\n")?;
+                write!(f, "{}", "  ".repeat(level))?;
+            }
+
+            // print elements
+            match element {
+                Value::String(_) => write!(f, "{}", element.str_format())?,
+                Value::Array(arr) => Array::display(f, arr, level + 1)?,
+                Value::Object(obj) => Object::display(f, obj, level + 1)?,
+                _ => write!(f, "{}", element)?,
+            }
+            write!(f, "{}", ", ".dim())?;
+            index += 1;
+        }
+
+        write!(f, "\r\n")?;
+        write!(f, "{}]", display_indent(level - 1))
+    }
 }
