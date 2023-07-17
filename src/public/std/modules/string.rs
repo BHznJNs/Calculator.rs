@@ -7,7 +7,7 @@ use crate::public::value::function::{
     BuildInFnParam, BuildInFunction, Function,
 };
 use crate::public::value::oop::class::{Class, Property};
-use crate::public::value::value::{Overload as ValueOverload, Value, ValueType};
+use crate::public::value::value::{Value, ValueType};
 
 use super::super::utils::get_val::get_val;
 use super::BuildInFnCall;
@@ -92,10 +92,10 @@ impl BuildInFnCall for StringFn {
                 // convert splited to VecDeque<String>
                 let mut res_vec = VecDeque::new();
                 for c in res_split {
-                    let c_value = Value::create(c.to_string());
+                    let c_value = Value::from(c.to_string());
                     res_vec.push_back(c_value);
                 }
-                Value::create(res_vec)
+                Value::from(res_vec)
             }
 
             StringFn::REPLACE => {
@@ -103,13 +103,13 @@ impl BuildInFnCall for StringFn {
                 let to_value = get_val("to", scope)?;
                 let (from_ref, to_ref) = (from_value.get_str()?, to_value.get_str()?);
                 let replaced_str = str_ref.replace(&*from_ref, &to_ref);
-                Value::create(replaced_str)
+                Value::from(replaced_str)
             }
             StringFn::REPEAT => {
                 let num_value = get_val("num", scope)?;
                 let repeat_count = num_value.get_i64()?;
                 let repeated_str = str_ref.repeat(repeat_count as usize);
-                Value::create(repeated_str)
+                Value::from(repeated_str)
             }
 
             StringFn::STARTWITH | StringFn::ENDWITH => {
@@ -121,7 +121,7 @@ impl BuildInFnCall for StringFn {
                     StringFn::ENDWITH => str_ref.ends_with(&*pat_ref),
                     _ => unreachable!()
                 };
-                Value::create(result)
+                Value::from(result)
             }
         };
         return Ok(result);

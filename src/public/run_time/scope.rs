@@ -5,7 +5,7 @@ use crate::exec::script;
 use crate::public::error::{import_error, reference_error, ReferenceType};
 use crate::public::std::StdModules;
 use crate::public::value::oop::module::module_create;
-use crate::public::value::value::{Overload, VoidSign};
+use crate::public::value::value::VoidSign;
 use crate::utils::completer::Completer;
 
 use super::super::value::value::Value;
@@ -145,7 +145,7 @@ impl Scope {
             // identify this path as imported
             self.user_module_imported.insert(String::from(module_path));
             let module_obj = module_create(module_scope.global);
-            Ok(Value::create(module_obj))
+            Ok(Value::from(module_obj))
         } else {
             Ok(Value::Void(VoidSign::Empty))
         }

@@ -6,7 +6,6 @@ use std::rc::Rc;
 use crate::public::error::{reference_error, ReferenceType};
 use crate::public::value::array::{Array, ArrayLiteral};
 use crate::public::value::oop::class::Class;
-use crate::public::value::value::Overload;
 
 use super::super::value::Value;
 use super::super::display_indent;
@@ -135,6 +134,6 @@ impl Object {
         // thus with properties of the object,
         // the instantiation must pass the type check.
         let res_object = Class::instantiate(obj_ref.prototype.clone(), instantiation_params).unwrap();
-        return Value::create(res_object);
+        return Value::from(res_object);
     }
 }

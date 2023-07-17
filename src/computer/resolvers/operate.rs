@@ -1,6 +1,6 @@
 use crate::public::error::{internal_error, syntax_error, InternalComponent};
 use crate::public::value::symbols::Symbols;
-use crate::public::value::value::{Overload, Value};
+use crate::public::value::value::Value;
 
 pub fn operate(val1: Value, val2: Value, operator: Symbols) -> Result<Value, ()> {
     let result = if let (Value::Number(num1_ref), Value::Number(num2_ref)) = (&val1, &val2) {
@@ -31,7 +31,7 @@ pub fn operate(val1: Value, val2: Value, operator: Symbols) -> Result<Value, ()>
             Symbols::Plus => {
                 let mut cloned = str1.clone();
                 cloned.push_str(&str2);
-                Value::create(cloned)
+                Value::from(cloned)
             }
             Symbols::CompareEqual => Value::Boolean(str1.eq(&*str2)),
             _ => return Err(syntax_error("invalid string operating")?),

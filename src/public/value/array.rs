@@ -2,7 +2,7 @@ use std::{cell::RefCell, collections::VecDeque, rc::Rc, fmt};
 
 use crossterm::style::Stylize;
 use crate::public::value::{oop::object::Object, display_indent};
-use super::value::{Overload, Value};
+use super::value::Value;
 
 pub type ArrayLiteral = VecDeque<Value>;
 
@@ -21,7 +21,7 @@ impl Array {
             };
             new_array.push_back(element);
         }
-        return Value::create(new_array);
+        return Value::from(new_array);
     }
 
     pub fn join(arr: &ArrayLiteral, div: &str) -> String {

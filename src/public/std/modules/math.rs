@@ -7,7 +7,7 @@ use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function};
 use crate::public::value::number::Number;
 use crate::public::value::oop::class::Class;
 use crate::public::value::oop::object::Object;
-use crate::public::value::value::{Overload as ValueOverload, Value, ValueType};
+use crate::public::value::value::{Value, ValueType};
 
 use super::super::utils::get_val::get_val;
 use super::BuildInFnCall;
@@ -205,6 +205,6 @@ impl BuildInFnCall for MathFn {
                 }
             }
         };
-        Ok(Value::create(result))
+        Ok(Value::from(result))
     }
 }

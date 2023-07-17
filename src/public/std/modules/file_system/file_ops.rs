@@ -7,7 +7,7 @@ use crate::public::{
     error::{internal_error, InternalComponent},
     value::{
         array::ArrayLiteral,
-        value::{Overload, Value},
+        value::Value,
     },
 };
 
@@ -24,7 +24,7 @@ pub fn file_read(file_path: &str, file_info: (Value, Value, Value)) -> Result<Va
                 let msg = format!("file '{}' read error", file_path);
                 return Err(internal_error(InternalComponent::Std, &msg)?);
             }
-            return Ok(Value::create(buffer));
+            return Ok(Value::from(buffer));
         }
         if is_dir == TRUE_VALUE {
             let mut dir_content = ArrayLiteral::new();
@@ -37,9 +37,9 @@ pub fn file_read(file_path: &str, file_info: (Value, Value, Value)) -> Result<Va
 
             for entry in sub_paths.unwrap() {
                 let path = entry.unwrap().path();
-                dir_content.push_back(Value::create(path.display().to_string()))
+                dir_content.push_back(Value::from(path.display().to_string()))
             }
-            return Ok(Value::create(dir_content));
+            return Ok(Value::from(dir_content));
         }
         unreachable!()
     } else {

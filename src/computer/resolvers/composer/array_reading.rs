@@ -2,7 +2,7 @@ use crate::public::compile_time::ast::types::ExpressionNode;
 use crate::public::error::{range_error, type_error};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::number::Number;
-use crate::public::value::value::{Overload, Value, ValueType};
+use crate::public::value::value::{Value, ValueType};
 
 use super::super::expression;
 
@@ -94,7 +94,7 @@ pub fn resolve(
         // check if out of range
         check_outof_range(index_value, str.len())?;
         let slice = &str[index_value..index_value + 1];
-        Ok(Value::create(slice.to_string()))
+        Ok(Value::from(slice.to_string()))
     } else {
         Err(type_error(
             Some("indexing"),

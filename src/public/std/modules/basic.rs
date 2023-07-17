@@ -10,7 +10,7 @@ use crate::public::std::utils::str_to_num::str_to_num;
 use crate::public::value::array::ArrayLiteral;
 use crate::public::value::function::{BuildInFnParam, BuildInFunction};
 use crate::public::value::number::Number;
-use crate::public::value::value::{Overload, Value, ValueType, VoidSign};
+use crate::public::value::value::{Value, ValueType, VoidSign};
 
 use super::super::utils::get_val::get_val;
 use super::BuildInFnCall;
@@ -84,17 +84,17 @@ pub fn function_list() -> Vec<(String, Value)> {
     };
 
     return vec![
-        (String::from("input"), Value::create(input)),
-        (String::from("type"), Value::create(type__)),
-        (String::from("clone"), Value::create(clone)),
-        (String::from("int"), Value::create(int)),
-        (String::from("float"), Value::create(float)),
-        (String::from("bool"), Value::create(boolean)),
-        (String::from("string"), Value::create(string)),
-        (String::from("array"), Value::create(array)),
-        (String::from("ascii"), Value::create(ascii)),
-        (String::from("len"), Value::create(len)),
-        (String::from("exit"), Value::create(exit)),
+        (String::from("input"), Value::from(input)),
+        (String::from("type"), Value::from(type__)),
+        (String::from("clone"), Value::from(clone)),
+        (String::from("int"), Value::from(int)),
+        (String::from("float"), Value::from(float)),
+        (String::from("bool"), Value::from(boolean)),
+        (String::from("string"), Value::from(string)),
+        (String::from("array"), Value::from(array)),
+        (String::from("ascii"), Value::from(ascii)),
+        (String::from("len"), Value::from(len)),
+        (String::from("exit"), Value::from(exit)),
     ];
 }
 
@@ -122,12 +122,12 @@ impl BuildInFnCall for BasicFn {
                     }
                 }
 
-                Value::create(input)
+                Value::from(input)
             }
             BasicFn::TYPE => {
                 let input = get_val("input", scope)?;
                 let type_value = input.get_type() as i64;
-                Value::create(type_value)
+                Value::from(type_value)
             }
             BasicFn::CLONE => {
                 let input = get_val("input", scope)?;
@@ -142,9 +142,9 @@ impl BuildInFnCall for BasicFn {
                     Value::String(str) => {
                         let refer = str.as_ref().borrow();
                         let i = str_to_num::<i64>(refer)?;
-                        Value::create(i)
+                        Value::from(i)
                     }
-                    Value::Boolean(bool_val) => Value::create(bool_val as i64),
+                    Value::Boolean(bool_val) => Value::from(bool_val as i64),
                     _ => {
                         return Err(type_error(
                             Some("Build-in function 'int'"),
@@ -162,9 +162,9 @@ impl BuildInFnCall for BasicFn {
                     Value::String(str) => {
                         let refer = str.as_ref().borrow();
                         let f = str_to_num::<f64>(refer)?;
-                        Value::create(f)
+                        Value::from(f)
                     }
-                    Value::Boolean(bool_val) => Value::create(bool_val as i64 as f64),
+                    Value::Boolean(bool_val) => Value::from(bool_val as i64 as f64),
                     _ => {
                         return Err(type_error(
                             Some("Build-in function 'float'"),
@@ -181,7 +181,7 @@ impl BuildInFnCall for BasicFn {
             }
             BasicFn::STRING => {
                 let input = get_val("input", scope)?;
-                Value::create(input.to_raw_string())
+                Value::from(input.to_raw_string())
             }
             BasicFn::ARRAY => {
                 let input = get_val("input", scope)?;
@@ -190,18 +190,18 @@ impl BuildInFnCall for BasicFn {
                     unreachable!()
                 };
                 let size = num.int_value() as usize;
-                let arr_literal: ArrayLiteral = vec![Value::create(0); size].into();
-                Value::create(arr_literal)
+                let arr_literal: ArrayLiteral = vec![Value::from(0); size].into();
+                Value::from(arr_literal)
             }
             BasicFn::ASCII => {
                 let input_value = get_val("input", scope)?;
                 let input_ref = input_value.get_str()?;
                 let Some(first_char) = input_ref.chars().next() else {
-                    return Ok(Value::create(0));
+                    return Ok(Value::from(0));
                 };
 
                 if first_char.is_ascii() {
-                    Value::create(first_char as i64)
+                    Value::from(first_char as i64)
                 } else {
                     println!("Invalid ASCII character");
                     return Err(());

@@ -13,7 +13,7 @@ use crate::public::value::array::ArrayLiteral;
 use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function};
 use crate::public::value::oop::class::{Class, Property};
 use crate::public::value::oop::object::Object;
-use crate::public::value::value::{Overload as ValueOverload, Value, ValueType, VoidSign};
+use crate::public::value::value::{Value, ValueType, VoidSign};
 
 use self::file_ops::file_append;
 use self::fs_ops::{dir_create, dir_delete, file_create, file_delete};
@@ -143,7 +143,7 @@ impl BuildInFnCall for FileSysFn {
                             )?
                         };
         
-                        Value::create(file_obj)
+                        Value::from(file_obj)
                     }
                     FileSysFn::Create => {
                         if path_str.ends_with('/') || path_str.ends_with('\\') {

@@ -1,5 +1,5 @@
 use crate::public::std::StdModules;
-use crate::public::value::value::{Overload, Value};
+use crate::public::value::value::Value;
 
 use super::scope::Scope;
 
@@ -18,12 +18,12 @@ pub fn std_resolve(scope: &mut Scope, target_module: &StdModules, module_name: &
 
         StdModules::FileSystem | StdModules::Math => {
             let module_obj = target_module.get_obj_entry();
-            scope.assign(String::from(module_name), Value::create(module_obj));
+            scope.assign(String::from(module_name), Value::from(module_obj));
         }
 
         StdModules::String | StdModules::Array => {
             let module_cls = target_module.get_cls_entry();
-            scope.assign(String::from(module_name), Value::create(module_cls));
+            scope.assign(String::from(module_name), Value::from(module_cls));
         }
     }
 }

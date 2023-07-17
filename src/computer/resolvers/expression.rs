@@ -3,7 +3,7 @@ use crate::public::compile_time::ast::types::{ExpressionNode, ModuleType};
 use crate::public::error::{internal_error, syntax_error, type_error, InternalComponent};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::symbols::Symbols;
-use crate::public::value::value::{Overload, Value, ValueType, VoidSign};
+use crate::public::value::value::{Value, ValueType, VoidSign};
 
 use super::class_definition;
 use super::operate::operate;
@@ -22,7 +22,7 @@ pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> Result<Value, ()> {
             ASTNode::Expression(node) => resolve(node, scope)?,
 
             ASTNode::NumberLiteral(num) => Value::Number(num.clone()),
-            ASTNode::StringLiteral(str) => Value::create(str.clone()),
+            ASTNode::StringLiteral(str) => Value::from(str.clone()),
 
             ASTNode::LazyExpression(node) => {
                 Value::LazyExpression(node.sub_sequence.clone().into())
@@ -35,8 +35,8 @@ pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> Result<Value, ()> {
                     unreachable!()
                 }
             }
-            ASTNode::FunctionDefinition(node) => Value::create(function_definition::resolve(node)?),
-            ASTNode::ClassDefinition(node) => Value::create(class_definition::resolve(node)?),
+            ASTNode::FunctionDefinition(node) => Value::from(function_definition::resolve(node)?),
+            ASTNode::ClassDefinition(node) => Value::from(class_definition::resolve(node)?),
 
             ASTNode::SymbolLiteral(sym) => {
                 if *sym == Symbols::Not {
@@ -72,11 +72,8 @@ pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> Result<Value, ()> {
                     operate(num1, num2, current_symbol)?
                 }
             }
-            ASTNode::ArrayLiteral(node) => {
-                let array_elements = array_literal::resolve(node, scope)?;
-                Value::create(array_elements)
-            }
-            ASTNode::Instantiation(node) => Value::create(instantiation::resolve(node, scope)?),
+            ASTNode::ArrayLiteral(node) => Value::from(array_literal::resolve(node, scope)?),
+            ASTNode::Instantiation(node) => Value::from(instantiation::resolve(node, scope)?),
             ASTNode::Assignment(node) => assignment::resolve(node, scope)?,
 
             ASTNode::Variable(_)

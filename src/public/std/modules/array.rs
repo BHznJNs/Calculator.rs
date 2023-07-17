@@ -4,7 +4,7 @@ use crate::public::std::utils::get_self_prop::get_self_prop;
 use crate::public::value::array::Array;
 use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function};
 use crate::public::value::oop::class::{Class, Property};
-use crate::public::value::value::{Value, ValueType, VoidSign, Overload as ValueOverload};
+use crate::public::value::value::{Value, ValueType, VoidSign};
 
 use super::super::utils::get_val::get_val;
 use super::BuildInFnCall;
@@ -143,7 +143,7 @@ impl BuildInFnCall for ArrayFn {
                 let divider_value = get_val("divider", scope)?;
                 let divider_ref = divider_value.get_str()?;
                 let result_str = Array::join(&*arr_ref, &*divider_ref);
-                Value::create(result_str)
+                Value::from(result_str)
             }
         };
         return Ok(result);

@@ -1,7 +1,7 @@
 use super::super::utils::get_val::get_val;
 use crate::public::run_time::{build_in::BuildInFnIdenti, scope::Scope};
 use crate::public::value::function::{BuildInFnParam, BuildInFunction};
-use crate::public::value::value::{Overload, Value, ValueType};
+use crate::public::value::value::{Value, ValueType};
 
 use super::BuildInFnCall;
 
@@ -38,12 +38,12 @@ pub fn function_list() -> Vec<(String, Value)> {
     };
 
     return vec![
-        (String::from("AND"), Value::create(and)),
-        (String::from("OR"), Value::create(or)),
-        (String::from("XOR"), Value::create(xor)),
-        (String::from("LShift"), Value::create(l_shift)),
-        (String::from("RShift"), Value::create(r_shift)),
-        (String::from("NOT"), Value::create(not)),
+        (String::from("AND"), Value::from(and)),
+        (String::from("OR"), Value::from(or)),
+        (String::from("XOR"), Value::from(xor)),
+        (String::from("LShift"), Value::from(l_shift)),
+        (String::from("RShift"), Value::from(r_shift)),
+        (String::from("NOT"), Value::from(not)),
     ];
 }
 
@@ -63,12 +63,12 @@ impl BuildInFnCall for BitOpsFn {
                 BitOpsFn::RShift => compute_num1 >> compute_num2,
                 _ => unreachable!(),
             };
-            Value::create(compute_res)
+            Value::from(compute_res)
         } else {
             // NOT
             let input = get_val("input", scope)?;
             let compute_num = input.get_i64()?;
-            Value::create(!compute_num)
+            Value::from(!compute_num)
         };
         return Ok(result);
     }

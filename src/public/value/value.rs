@@ -184,7 +184,7 @@ impl Value {
 
             Value::String(str) => {
                 let cloned_str = str.as_ref().borrow().clone();
-                Value::create(cloned_str)
+                Value::from(cloned_str)
             },
 
             // for `Array` and `Object` the two complex type,
@@ -196,10 +196,10 @@ impl Value {
 
             Value::LazyExpression(l_expr) => {
                 let cloned_l_expr = l_expr.as_ref().clone();
-                Value::create(cloned_l_expr)
+                Value::from(cloned_l_expr)
             },
 
-            // variable type can not be `void`,
+            // user-defined common variable can not be `void` typed,
             // so that it need not to implement
             // `deep_clone`.
             Value::Void(_) => unreachable!(),
@@ -277,59 +277,54 @@ impl fmt::Display for Value {
     }
 }
 
-// Overload functions
-pub trait Overload<T> {
-    fn create(value: T) -> Self;
-}
-
-impl Overload<bool> for Value {
-    fn create(value: bool) -> Self {
+impl From<bool> for Value {
+    fn from(value: bool) -> Self {
         Value::Boolean(value)
     }
 }
-impl Overload<i64> for Value {
-    fn create(value: i64) -> Self {
+impl From<i64> for Value {
+    fn from(value: i64) -> Self {
         Value::Number(Number::Int(value))
     }
 }
-impl Overload<f64> for Value {
-    fn create(value: f64) -> Self {
+impl From<f64> for Value {
+    fn from(value: f64) -> Self {
         Value::Number(Number::Float(value))
     }
 }
-impl Overload<String> for Value {
-    fn create(value: String) -> Self {
+impl From<String> for Value {
+    fn from(value: String) -> Self {
         Value::String(Rc::new(RefCell::new(value)))
     }
 }
-impl Overload<ArrayLiteral> for Value {
-    fn create(value: ArrayLiteral) -> Self {
+impl From<ArrayLiteral> for Value {
+    fn from(value: ArrayLiteral) -> Self {
         Value::Array(Rc::new(RefCell::new(value)))
     }
 }
-impl Overload<ASTNode> for Value {
-    fn create(value: ASTNode) -> Self {
+impl From<ASTNode> for Value {
+    fn from(value: ASTNode) -> Self {
         Value::LazyExpression(Rc::new(value))
     }
 }
 
-impl Overload<UserDefinedFunction> for Value {
-    fn create(value: UserDefinedFunction) -> Self {
+impl From<UserDefinedFunction> for Value {
+    fn from(value: UserDefinedFunction) -> Self {
         Value::Function(Function::from(value))
     }
 }
-impl Overload<BuildInFunction> for Value {
-    fn create(value: BuildInFunction) -> Self {
+impl From<BuildInFunction> for Value {
+    fn from(value: BuildInFunction) -> Self {
         Value::Function(Function::from(value))
     }
 }
-impl Overload<Class> for Value {
-    fn create(value: Class) -> Self {
+impl From<Class> for Value {
+    fn from(value: Class) -> Self {
         Value::Class(Rc::new(value))
     }
 }
-impl Overload<Object> for Value {
-    fn create(value: Object) -> Self {
+impl From<Object> for Value {
+    fn from(value: Object) -> Self {
         Value::Object(Rc::new(RefCell::new(value)))
     }
 }

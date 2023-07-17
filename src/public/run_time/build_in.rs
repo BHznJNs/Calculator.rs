@@ -9,10 +9,7 @@ use crate::public::std::modules::file_system::FileSysFn;
 use crate::public::std::modules::math::MathFn;
 use crate::public::std::modules::string::StringFn;
 
-use crate::public::value::number::Number;
-use crate::public::value::value::Overload;
-use crate::public::value::value::Value;
-use crate::public::value::value::ValueType;
+use crate::public::value::value::{Value, ValueType};
 
 #[derive(PartialEq, Clone)]
 pub enum BuildInFnIdenti {
@@ -26,41 +23,35 @@ pub enum BuildInFnIdenti {
 
 pub fn constants() -> HashMap<String, Value> {
     HashMap::from([
-        (String::from("VOID"), Value::create(ValueType::Void as i64)),
+        (String::from("VOID"), Value::from(ValueType::Void as i64)),
         (
             String::from("BOOLEAN"),
-            Value::create(ValueType::Boolean as i64),
+            Value::from(ValueType::Boolean as i64),
         ),
         (
             String::from("NUMBER"),
-            Value::create(ValueType::Number as i64),
+            Value::from(ValueType::Number as i64),
         ),
         (
             String::from("STRING"),
-            Value::create(ValueType::String as i64),
+            Value::from(ValueType::String as i64),
         ),
-        (
-            String::from("ARRAY"),
-            Value::create(ValueType::Array as i64),
-        ),
+        (String::from("ARRAY"), Value::from(ValueType::Array as i64)),
         (
             String::from("LAZYEXPR"),
-            Value::create(ValueType::LazyExpression as i64),
+            Value::from(ValueType::LazyExpression as i64),
         ),
         (
             String::from("FUNCION"),
-            Value::create(ValueType::Function as i64),
+            Value::from(ValueType::Function as i64),
         ),
-        (
-            String::from("CLASS"),
-            Value::create(ValueType::Class as i64),
-        ),
+        (String::from("CLASS"), Value::from(ValueType::Class as i64)),
         (
             String::from("OBJECT"),
-            Value::create(ValueType::Object as i64),
+            Value::from(ValueType::Object as i64),
         ),
-        (String::from("PI"), Value::Number(Number::Float(PI))),
-        (String::from("E"), Value::Number(Number::Float(E))),
+        (String::from("PI"), Value::from(PI)),
+        (String::from("E"), Value::from(E)),
         (String::from("true"), Value::Boolean(true)),
         (String::from("false"), Value::Boolean(false)),
     ])
