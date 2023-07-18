@@ -36,8 +36,8 @@ impl Array {
             .to_raw_string();
 
         for v in arr_iter {
-            result_str += div;
-            result_str += &v.to_raw_string();
+            result_str.extend(div.chars());
+            result_str.extend(v.to_raw_string().chars());
         }
         return result_str;
     }

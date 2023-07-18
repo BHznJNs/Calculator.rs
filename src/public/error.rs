@@ -20,7 +20,7 @@ pub fn type_error(param: Option<&str>, expected: Vec<ValueType>, found: ValueTyp
         let mut res_string = String::new();
         loop {
             let current = type_vec.remove(0);
-            res_string += &format!("{}", current);
+            res_string.extend(format!("{}", current).chars());
 
             if type_vec.len() != 0 {
                 res_string.push('/');

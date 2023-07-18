@@ -227,7 +227,6 @@ impl Value {
             // `void` type can be any type
             return true;
         }
-
         return self.get_type() == target_type;
     }
 }
