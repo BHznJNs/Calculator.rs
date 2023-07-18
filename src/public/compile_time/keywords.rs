@@ -52,14 +52,23 @@ impl fmt::Display for Keyword {
     }
 }
 
-pub const KEYWORD_PAIRS: [(&'static str, Keyword); 9] = [
+pub const KEYWORD_PAIRS: [(&'static str, Keyword); 18] = [
     ("out", Keyword::Out),
+    ("输出", Keyword::Out),
     ("for", Keyword::For),
+    ("循环", Keyword::For),
     ("if", Keyword::If),
+    ("若", Keyword::If),
     ("ctn", Keyword::Continue),
+    ("跳过", Keyword::Continue),
     ("brk", Keyword::Break),
+    ("中断", Keyword::Break),
     ("import", Keyword::Import),
+    ("导入", Keyword::Import),
     ("fn", Keyword::Function),
+    ("函数", Keyword::Function),
     ("cl", Keyword::Class),
+    ("类", Keyword::Class),
     ("new", Keyword::New),
+    ("实例", Keyword::New),
 ];

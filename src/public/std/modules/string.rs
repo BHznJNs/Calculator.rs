@@ -60,13 +60,19 @@ pub fn module_class() -> Class {
     };
 
     return Class::new(
-        vec![Property(ValueType::String, String::from("v"))],
+        vec![Property(ValueType::String, String::from("_"))],
         vec![
-            (String::from("split"), Function::from(split)),
-            (String::from("replace"), Function::from(replace)),
-            (String::from("repeat"), Function::from(repeat)),
-            (String::from("start_with"), Function::from(start_with)),
-            (String::from("end_with"), Function::from(end_with)),
+            (String::from("split"), Function::from(split.clone())),
+            (String::from("replace"), Function::from(replace.clone())),
+            (String::from("repeat"), Function::from(repeat.clone())),
+            (String::from("start_with"), Function::from(start_with.clone())),
+            (String::from("end_with"), Function::from(end_with.clone())),
+
+            (String::from("分割"), Function::from(split)),
+            (String::from("替换"), Function::from(replace)),
+            (String::from("重复"), Function::from(repeat)),
+            (String::from("以为始"), Function::from(start_with)),
+            (String::from("以为终"), Function::from(end_with)),
         ],
     );
 }

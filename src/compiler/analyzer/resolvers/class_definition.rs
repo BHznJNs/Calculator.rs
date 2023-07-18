@@ -48,7 +48,7 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ClassDefinitionNode, ()> {
                             0,
                             UserDefinedFnParam {
                                 type__: ValueType::Object,
-                                identi: String::from("self"),
+                                identi: String::from("自身"),
                             },
                         );
                         method_node.name = Some(identi);

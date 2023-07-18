@@ -74,13 +74,21 @@ pub fn module_class() -> Class {
     return Class::new(
         vec![Property(ValueType::Array, String::from("v"))],
         vec![
-            (String::from("push"), Function::from(push)),
-            (String::from("pop"), Function::from(pop)),
-            (String::from("shift"), Function::from(shift)),
-            (String::from("unshift"), Function::from(unshift)),
-            (String::from("insert"), Function::from(insert)),
-            (String::from("remove"), Function::from(remove)),
-            (String::from("join"), Function::from(join)),
+            (String::from("push"), Function::from(push.clone())),
+            (String::from("pop"), Function::from(pop.clone())),
+            (String::from("shift"), Function::from(shift.clone())),
+            (String::from("unshift"), Function::from(unshift.clone())),
+            (String::from("insert"), Function::from(insert.clone())),
+            (String::from("remove"), Function::from(remove.clone())),
+            (String::from("join"), Function::from(join.clone())),
+
+            (String::from("尾插"), Function::from(push)),
+            (String::from("尾出"), Function::from(pop)),
+            (String::from("头出"), Function::from(shift)),
+            (String::from("头插"), Function::from(unshift)),
+            (String::from("插入"), Function::from(insert)),
+            (String::from("移除"), Function::from(remove)),
+            (String::from("组合"), Function::from(join)),
         ],
     );
 }

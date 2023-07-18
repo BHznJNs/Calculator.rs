@@ -81,9 +81,13 @@ fn static_class_setter() {
                     Property(ValueType::Boolean, String::from("is_file")),
                 ],
                 vec![
-                    (String::from("read"), Function::from(read)),
-                    (String::from("write"), Function::from(write)),
-                    (String::from("append"), Function::from(append)),
+                    (String::from("read"), Function::from(read.clone())),
+                    (String::from("write"), Function::from(write.clone())),
+                    (String::from("append"), Function::from(append.clone())),
+
+                    (String::from("读取"), Function::from(read)),
+                    (String::from("写入"), Function::from(write)),
+                    (String::from("追加"), Function::from(append)),
                 ],
             )
             .into(),
@@ -93,9 +97,13 @@ fn static_class_setter() {
             Class::new(
                 vec![],
                 vec![
-                    (String::from("open"), Function::from(open)),
-                    (String::from("create"), Function::from(create)),
-                    (String::from("delete"), Function::from(delete)),
+                    (String::from("open"), Function::from(open.clone())),
+                    (String::from("create"), Function::from(create.clone())),
+                    (String::from("delete"), Function::from(delete.clone())),
+
+                    (String::from("开启"), Function::from(open)),
+                    (String::from("创建"), Function::from(create)),
+                    (String::from("删除"), Function::from(delete)),
                 ],
             )
             .into(),

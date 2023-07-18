@@ -1,28 +1,24 @@
 # Calculator.rs
 
-English | [简体中文](./README_CN.md)
+这是一个用 Rust 编写的简单命令行计算器程序。
 
-An simple command-line calculator program writen with Rust.
+## 特性
 
-## Features
-
-- Variable support
+- 支持变量
 
 ```text
-> a = 1
-= 1
-> a
-= 1
+甲 = 1
+输出 甲 # 1
 ```
 
-- Math functions support
+- 支持数学函数
 
 ```text
 > Math.sin(1) 
 = 0.84147098
 ```
 
-- Lazy-Expression support
+- 支持惰性表达式
 
 ```text
 > a = 10
@@ -39,29 +35,29 @@ An simple command-line calculator program writen with Rust.
 = 31
 ```
 
-- Comment support
+- 支持注释
 
 ```text
 > 1 + 1 # plus
 = 2
 ```
 
-- Array support
+- 支持数组
 
 ```text
 > arr = [1, 2, 3] 
 = [
-  1, 2, 3,
+ 1, 2, 3,
 ]
 > push(arr, 4) 
 > arr
 = [
-  1, 2, 3, 4,
+ 1, 2, 3, 4,
 ]
 >
 ```
 
-- Function defining support
+- 支持函数定义
 
 ```text
 > plus1 = fn(i $Numb) {i + 1} 
@@ -69,54 +65,54 @@ An simple command-line calculator program writen with Rust.
 = 2
 ```
 
-- Script execute support
+- 支持脚本执行
 
 ```text
 calculator.exe script
 ```
 
-- OOP support
+- 支持面向对象编程
 
 ```text
 > Person = cl {age $Numb, name $Str}
 = {
-  name,
-  age,
+ name,
+ age,
 }
 > inst = new Person(10, "test") 
 = {
-  age: 10
-  name: test
+ age: 10
+ name: test
 }
 ```
 
-## Installation
+## 安装
 
 ### Windows || GNU/Linux || MacOS (x86_64)
 
-Please go to the [release page](https://github.com/BHznJNs/Calculator.rs/releases) and download the latest released appropriate executable file,
+请前往 [release 页面](https://github.com/BHznJNs/Calculator.rs/releases) 下载最新的可执行文件，
 
-Then just execuse it.
+然后直接双击运行即可。
 
-### Other OS && Platform
+### 其他系统和平台架构
 
-You need to install the Rust (version >= 1.60).
+您需要安装 Rust (版本 >= 1.60)。
 
-Clone this repository
+克隆此仓库:
 
-```sh
+```bash
 git clone https://github.com/BHznJNs/Calculator.rs
 cd Calculator.rs
 ```
 
-Then, use Cargo to compile
+然后，使用 Cargo 进行编译:
 
-```sh
+```bash
 cargo build --release
 ```
 
-The release executable file will be at: `Calculator.rs/target/release`
+发布的可执行文件将位于: `Calculator.rs/target/release`
 
-## Tutorial
+## 教程
 
-See here: [Tutorials](./tutorials)
+请参阅此处: [教程](./tutorials)

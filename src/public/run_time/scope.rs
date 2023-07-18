@@ -36,13 +36,19 @@ impl LocalScope {
 // --- --- --- --- --- ---
 
 const STD_MODULE_COUNT: usize = 6;
-const STD_MODULE_DATA: [(&'static str, StdModules); STD_MODULE_COUNT] = [
+const STD_MODULE_DATA: [(&'static str, StdModules); STD_MODULE_COUNT * 2] = [
     ("Basic", StdModules::Basic),
     ("Math", StdModules::Math),
     ("Array", StdModules::Array),
     ("String", StdModules::String),
     ("FS", StdModules::FileSystem),
     ("BitOps", StdModules::BitOps),
+    ("基础", StdModules::Basic),
+    ("数学", StdModules::Math),
+    ("数组类", StdModules::Array),
+    ("字符串类", StdModules::String),
+    ("文件系统", StdModules::FileSystem),
+    ("位运算", StdModules::BitOps),
 ];
 pub struct Scope {
     pub global: GlobalScope,

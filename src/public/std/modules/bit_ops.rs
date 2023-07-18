@@ -38,12 +38,19 @@ pub fn function_list() -> Vec<(String, Value)> {
     };
 
     return vec![
-        (String::from("AND"), Value::from(and)),
-        (String::from("OR"), Value::from(or)),
-        (String::from("XOR"), Value::from(xor)),
-        (String::from("LShift"), Value::from(l_shift)),
-        (String::from("RShift"), Value::from(r_shift)),
-        (String::from("NOT"), Value::from(not)),
+        (String::from("AND"), Value::from(and.clone())),
+        (String::from("OR"), Value::from(or.clone())),
+        (String::from("XOR"), Value::from(xor.clone())),
+        (String::from("LShift"), Value::from(l_shift.clone())),
+        (String::from("RShift"), Value::from(r_shift.clone())),
+        (String::from("NOT"), Value::from(not.clone())),
+
+        (String::from("与"), Value::from(and)),
+        (String::from("或"), Value::from(or)),
+        (String::from("异或"), Value::from(xor)),
+        (String::from("左移"), Value::from(l_shift)),
+        (String::from("右移"), Value::from(r_shift)),
+        (String::from("非"), Value::from(not)),
     ];
 }
 

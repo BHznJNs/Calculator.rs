@@ -17,7 +17,7 @@ pub fn env_resolve(calc_env: Env, scope: &mut Scope) {
         run(&script_path, scope);
         let elapsed_time = now.elapsed();
         let elapsed_second = elapsed_time.as_secs_f64();
-        println!("Executed in: {}s.", elapsed_second);
+        println!("在 {}s 内执行完成。", elapsed_second);
     } else {
         run(&script_path, scope);
     }
@@ -54,7 +54,7 @@ pub fn run(path: &str, scope: &mut Scope) {
         }
 
         match brace_count {
-            x if x == 0 => {
+            x if x <= 0 => {
                 let line_to_exec = if cached_multiline.is_empty() {
                     &current_line
                 } else {
@@ -66,14 +66,13 @@ pub fn run(path: &str, scope: &mut Scope) {
                 cached_multiline.clear();
 
                 if line_result.is_err() {
-                    println!("Error occured at line {}.", line_count);
+                    println!("错误发生在第 {} 行。", line_count);
                     // print error code
-                    println!("Code: `{}`.", current_line);
+                    println!("错误代码：“{}”。", current_line);
                     break;
                 }
             }
             x if x > 0 => cached_multiline.extend(current_line.chars()),
-            x if x < 0 => brace_count = 0,
             _ => unreachable!()
         }
     }

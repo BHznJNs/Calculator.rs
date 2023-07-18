@@ -84,17 +84,29 @@ pub fn function_list() -> Vec<(String, Value)> {
     };
 
     return vec![
-        (String::from("input"), Value::from(input)),
-        (String::from("type"), Value::from(type__)),
-        (String::from("clone"), Value::from(clone)),
-        (String::from("int"), Value::from(int)),
-        (String::from("float"), Value::from(float)),
-        (String::from("bool"), Value::from(boolean)),
-        (String::from("string"), Value::from(string)),
-        (String::from("array"), Value::from(array)),
-        (String::from("ascii"), Value::from(ascii)),
-        (String::from("len"), Value::from(len)),
-        (String::from("exit"), Value::from(exit)),
+        (String::from("input"), Value::from(input.clone())),
+        (String::from("type"), Value::from(type__.clone())),
+        (String::from("clone"), Value::from(clone.clone())),
+        (String::from("int"), Value::from(int.clone())),
+        (String::from("float"), Value::from(float.clone())),
+        (String::from("bool"), Value::from(boolean.clone())),
+        (String::from("string"), Value::from(string.clone())),
+        (String::from("array"), Value::from(array.clone())),
+        (String::from("ascii"), Value::from(ascii.clone())),
+        (String::from("len"), Value::from(len.clone())),
+        (String::from("exit"), Value::from(exit.clone())),
+
+        (String::from("输入"), Value::from(input)),
+        (String::from("类型"), Value::from(type__)),
+        (String::from("复杂"), Value::from(clone)),
+        (String::from("整形"), Value::from(int)),
+        (String::from("浮点形"), Value::from(float)),
+        (String::from("布尔值"), Value::from(boolean)),
+        (String::from("字符串"), Value::from(string)),
+        (String::from("数组"), Value::from(array)),
+        (String::from("ASCII"), Value::from(ascii)),
+        (String::from("长度"), Value::from(len)),
+        (String::from("退出"), Value::from(exit)),
     ];
 }
 

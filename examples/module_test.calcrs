@@ -1,7 +1,0 @@
-node = import "test_modules/node.calcrs"
-
-node_cl  = node.self
-node_inst = new node_cl(1, 0)
-
-out "node instance:"
-out node_inst

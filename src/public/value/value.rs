@@ -31,7 +31,7 @@ pub enum ValueType {
     Object,
 }
 
-pub const VALUE_TYPE_PAIRS: [(&'static str, ValueType); 8] = [
+pub const VALUE_TYPE_PAIRS: [(&'static str, ValueType); 15] = [
     ("_", ValueType::Void),
     ("Bool", ValueType::Boolean),
     ("Numb", ValueType::Number),
@@ -40,6 +40,14 @@ pub const VALUE_TYPE_PAIRS: [(&'static str, ValueType); 8] = [
     ("LazyExpr", ValueType::LazyExpression),
     ("Func", ValueType::Function),
     ("Obj", ValueType::Object),
+
+    ("布尔", ValueType::Boolean),
+    ("数字", ValueType::Number),
+    ("字符串", ValueType::String),
+    ("数组", ValueType::Array),
+    ("懒表达式", ValueType::LazyExpression),
+    ("函数", ValueType::Function),
+    ("对象", ValueType::Object),
 ];
 
 impl ValueType {
@@ -56,15 +64,15 @@ impl ValueType {
 impl fmt::Display for ValueType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ValueType::Void => write!(f, "Void"),
-            ValueType::Boolean => write!(f, "Boolean"),
-            ValueType::Number => write!(f, "Number"),
-            ValueType::String => write!(f, "String"),
-            ValueType::Array => write!(f, "Array"),
-            ValueType::LazyExpression => write!(f, "LazyExpression"),
-            ValueType::Function => write!(f, "Function"),
-            ValueType::Class => write!(f, "Class"),
-            ValueType::Object => write!(f, "Object"),
+            ValueType::Void => write!(f, "任意类型"),
+            ValueType::Boolean => write!(f, "布尔值"),
+            ValueType::Number => write!(f, "数字"),
+            ValueType::String => write!(f, "字符串"),
+            ValueType::Array => write!(f, "数组"),
+            ValueType::LazyExpression => write!(f, "懒表达式"),
+            ValueType::Function => write!(f, "函数"),
+            ValueType::Class => write!(f, "类"),
+            ValueType::Object => write!(f, "对象"),
         }
     }
 }
@@ -160,9 +168,9 @@ impl Value {
             Value::Function(func) => func.to_string(),
             Value::Array(arr) => Array::join(&arr.borrow(), ", "),
 
-            Value::LazyExpression(_) => String::from("<Lazy-Expression>"),
-            Value::Class(_) => String::from("<Class>"),
-            Value::Object(_) => String::from("<Object>"),
+            Value::LazyExpression(_) => String::from("【懒表达式】"),
+            Value::Class(_) => String::from("【类】"),
+            Value::Object(_) => String::from("【对象】"),
         }
     }
 
@@ -258,7 +266,7 @@ impl fmt::Display for Value {
                             write!(f, "{}", bool_val.to_string().dark_yellow())
                         }
                         Value::Number(num) => write!(f, "{}", num.to_string().yellow()),
-                        Value::LazyExpression(_) => write!(f, "{}", "<Lazy-Expression>".cyan()),
+                        Value::LazyExpression(_) => write!(f, "{}", "【懒表达式】".cyan()),
                         Value::Function(func) => write!(f, "{}", func.to_string().cyan()),
                         _ => unreachable!(),
                     }
@@ -266,7 +274,7 @@ impl fmt::Display for Value {
                     match self {
                         Value::Boolean(bool_val) => write!(f, "{}", bool_val),
                         Value::Number(num) => write!(f, "{}", num),
-                        Value::LazyExpression(_) => write!(f, "{}", "<Lazy-Expression>"),
+                        Value::LazyExpression(_) => write!(f, "{}", "【懒表达式】"),
                         Value::Function(func) => write!(f, "{}", func),
                         _ => unreachable!(),
                     }

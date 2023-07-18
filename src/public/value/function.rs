@@ -103,8 +103,8 @@ impl Function {
 impl fmt::Display for Function {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Function::BuildIn(_) => write!(f, "<Build-in-Function>"),
-            Function::UserDefined(_) => write!(f, "<User-Defined-Function>"),
+            Function::BuildIn(_) => write!(f, "【内置函数】"),
+            Function::UserDefined(_) => write!(f, "【自定义函数】"),
         }
     }
 }
