@@ -1,16 +1,16 @@
 # 类定义
-Node = cl {:
-    data $_;:
-    next $Obj;:
+Node = cl {
+    data $_;
+    next $Obj;
 }
-List = cl {:
-    head $Obj;:
-    peak $Obj;:
-    push = fn(data) {:
-        new_node = new Node[data, 0];:
-        self.peak.next = new_node;:
-        self.peak = new_node;:
-    };:
+List = cl {
+    head $Obj;
+    peak $Obj;
+    push = fn(data) {
+        new_node = new Node[data, 0];
+        self.peak.next = new_node;
+        self.peak = new_node;
+    }
 }
 
 # 实例化

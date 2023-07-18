@@ -1,22 +1,22 @@
 # fibonacci | 斐波那契
 
 # 循环
-fib = fn(i $Numb) {:
-    a = 0;:
-    b = 1;:
-    for i {:
-        c = a + b;:
-        a = b;:
-        b = c;:
-    };:
-    brk c:
+fib = fn(i $Numb) {
+    a = 0;
+    b = 1;
+    for i {
+        c = a + b;
+        a = b;
+        b = c;
+    }
+    brk c
 }
 
 # 递归
-fib = fn(i $Numb) {:
-    if i == 0 {brk 0};:
-    if i == 1 {brk 1};:
-    brk fib(i - 1) + fib (i - 2):
+fib = fn(i $Numb) {
+    if i == 0 {brk 0};
+    if i == 1 {brk 1};
+    brk fib(i - 1) + fib(i - 2)
 }
 
 out fib(30)

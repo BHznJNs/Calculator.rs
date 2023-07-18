@@ -1,9 +1,10 @@
-test = fn(i $Numb) {:
-    if i == 5 {:
-        brk i;:
-    };:
-    out i;:
-    test(i + 1);:
+test = fn(i $Numb) {
+    if i == 5 {
+        brk i;
+    }
+
+    out i;
+    test(i + 1);
 }
 
 test(0)

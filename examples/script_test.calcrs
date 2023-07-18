@@ -1,7 +1,21 @@
-node = import "test_modules/node.calcrs"
+add1 = fn(i) {
+    test_fn = fn(j) {
+        brk j
+    }
 
-node_cl  = node.self
-node_inst = new node_cl(1, 0)
+    j = 1;   # temp variable
+    brk i + j
+}
+out add1(1)
 
-out "node instance:"
-out node_inst
+
+Person = cl {
+    age $Numb;  # age of person
+    name $Str;  # name of person
+    method=() {
+        out self.name
+    }
+}
+
+i = new Person(1, "Test")
+out i

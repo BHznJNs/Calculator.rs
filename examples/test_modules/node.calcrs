@@ -1,4 +1,4 @@
-self = cl {:
-    data $_;:
-    next $_;:
+self = cl {
+    data $_;
+    next $_;
 }
