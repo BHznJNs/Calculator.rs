@@ -4,12 +4,10 @@ enum State {
 }
 
 pub fn process(source: String) -> String {
-    let mut chars = source.chars();
     let mut result = String::new();
-
     let mut state = State::Indent;
 
-    while let Some(ch) = chars.next() {
+    for ch in source.chars() {
         if ch == '#' {
             // avoid comments
             break;
@@ -26,5 +24,19 @@ pub fn process(source: String) -> String {
             State::Code => result.push(ch),
         }
     }
+
+    // remove the WhiteSpaces and Tabs at the peak of result
+    let mut white_space_count = 0;
+    for ch in result.chars().rev() {
+        if ch == ' ' || ch == '\t' {
+            white_space_count += 1;
+        } else {
+            break;
+        }
+    }
+    for _ in 0..white_space_count {
+        result.pop();
+    }
+
     return result;
 }

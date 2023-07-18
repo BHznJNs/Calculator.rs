@@ -14,80 +14,67 @@ pub fn env_resolve(calc_env: Env, scope: &mut Scope) {
     if unsafe { ENV_OPTION.timer } {
         let now = Instant::now();
 
-        if let Ok(_) = run(&script_path, scope) {
-            let elapsed_time = now.elapsed();
-            let elapsed_second = elapsed_time.as_secs_f64();
-            println!("Executed in: {}s.", elapsed_second);
-        }
+        run(&script_path, scope);
+        let elapsed_time = now.elapsed();
+        let elapsed_second = elapsed_time.as_secs_f64();
+        println!("Executed in: {}s.", elapsed_second);
     } else {
-        let _ = run(&script_path, scope);
+        run(&script_path, scope);
     }
 }
 
-pub fn run(path: &str, scope: &mut Scope) -> Result<(), ()> {
+pub fn run(path: &str, scope: &mut Scope) {
     let Ok(mut script_lines) = readlines::resolve(path) else {
         println!("Invalid script file.");
-        return Err(())
+        return;
     };
 
     let mut cached_multiline = String::new();
     let mut line_count = 0;
-    loop {
-        match script_lines.next() {
-            Some(item) => {
-                line_count += 1;
+    let mut brace_count = 0;
 
-                let mut script_line = if let Ok(line) = item {
-                    pre_processer::process(line)
+    while let Some(Ok(current_line)) = script_lines.next() {
+        let mut current_line= pre_processer::process(current_line);
+        line_count += 1;
+
+        // skip blank line
+        if current_line.is_empty() {
+            continue;
+        }
+
+        if current_line.ends_with('{') {
+            brace_count += 1;
+        }
+        if current_line.ends_with('}') {
+            brace_count -= 1;
+            if brace_count > 0 {
+                // nested function or class
+                current_line.push(';');
+            }
+        }
+
+        match brace_count {
+            x if x == 0 => {
+                let line_to_exec = if cached_multiline.is_empty() {
+                    &current_line
                 } else {
-                    String::new()
+                    cached_multiline.extend(current_line.chars());
+                    &cached_multiline
                 };
+                // execuse the line
+                let line_result = attempt(line_to_exec, scope);
+                cached_multiline.clear();
 
-                // skip blank line
-                if script_line.len() == 0 {
-                    continue;
-                }
-
-                // multi-line symbol: `:`
-                if script_line.ends_with(":") {
-                    script_line.pop();
-                    cached_multiline += &script_line;
-                } else {
-                    // out of multi-line statement
-                    // or last line of multi-line statement
-                    let current_line: &String;
-
-                    if cached_multiline.is_empty() {
-                        // out of multi-line statement
-                        current_line = &script_line;
-                    } else {
-                        // the last line of multi-line statement
-                        // or the blank line || line comment
-                        if script_line.len() == 0 {
-                            // skip the blank line and line comment
-                            continue;
-                        }
-                        cached_multiline += &script_line;
-                        current_line = &cached_multiline;
-                    }
-
-                    // execuse the line
-                    let line_result = attempt(current_line, scope);
-
-                    if line_result.is_err() {
-                        println!("Error occured at line {}.", line_count);
-                        // print error code
-                        println!("Code: `{}`.", current_line);
-                        break Err(());
-                    }
-
-                    if !cached_multiline.is_empty() {
-                        cached_multiline.clear();
-                    }
+                if line_result.is_err() {
+                    println!("Error occured at line {}.", line_count);
+                    // print error code
+                    println!("Code: `{}`.", current_line);
+                    break;
                 }
             }
-            // if is the last line
-            None => break Ok(()),
+            x if x > 0 => cached_multiline.extend(current_line.chars()),
+            x if x < 0 => brace_count = 0,
+            _ => unreachable!()
         }
     }
 }
