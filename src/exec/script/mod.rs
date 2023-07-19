@@ -54,7 +54,7 @@ pub fn run(path: &str, scope: &mut Scope) {
         }
 
         match brace_count {
-            x if x == 0 => {
+            x if x <= 0 => {
                 let line_to_exec = if cached_multiline.is_empty() {
                     &current_line
                 } else {
@@ -73,7 +73,6 @@ pub fn run(path: &str, scope: &mut Scope) {
                 }
             }
             x if x > 0 => cached_multiline.extend(current_line.chars()),
-            x if x < 0 => brace_count = 0,
             _ => unreachable!()
         }
     }
