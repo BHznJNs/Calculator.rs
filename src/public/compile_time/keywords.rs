@@ -15,6 +15,7 @@ pub enum Keyword {
     Function,
     Class,
     New,
+    Global,
 }
 
 impl Keyword {
@@ -36,6 +37,19 @@ impl Keyword {
     }
 }
 
+pub const KEYWORD_PAIRS: [(&'static str, Keyword); 10] = [
+    ("out", Keyword::Out),
+    ("for", Keyword::For),
+    ("if", Keyword::If),
+    ("ctn", Keyword::Continue),
+    ("brk", Keyword::Break),
+    ("import", Keyword::Import),
+    ("fn", Keyword::Function),
+    ("cl", Keyword::Class),
+    ("new", Keyword::New),
+    ("glo", Keyword::Global),
+];
+
 impl fmt::Display for Keyword {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -48,18 +62,7 @@ impl fmt::Display for Keyword {
             Keyword::Function => write!(f, "function"),
             Keyword::Class => write!(f, "class"),
             Keyword::New => write!(f, "new"),
+            Keyword::Global => write!(f, "global"),
         }
     }
 }
-
-pub const KEYWORD_PAIRS: [(&'static str, Keyword); 9] = [
-    ("out", Keyword::Out),
-    ("for", Keyword::For),
-    ("if", Keyword::If),
-    ("ctn", Keyword::Continue),
-    ("brk", Keyword::Break),
-    ("import", Keyword::Import),
-    ("fn", Keyword::Function),
-    ("cl", Keyword::Class),
-    ("new", Keyword::New),
-];

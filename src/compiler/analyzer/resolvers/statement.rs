@@ -1,4 +1,5 @@
 use crate::compiler::tokenizer::token::{Token, TokenVec};
+use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::compile_time::ast::types::{
     ExpressionNode, ForStatement, IfStatement, ImportNode, ModuleType,
 };
@@ -54,6 +55,16 @@ pub fn resolve(keyword: Keyword, tokens: &mut TokenVec) -> Result<StatementNode,
                 target: module_name,
             };
             StatementNode::Import(node)
+        }
+
+        Keyword::Global => {
+            let mut sub_expression = expression::resolve(tokens)?;
+            let first_node = sub_expression.elements.remove(0);
+            if let ASTNode::Assignment(sub_node) = first_node {
+                StatementNode::GlobalAssignment(*sub_node)
+            } else {
+                return Err(syntax_error("assignment expression is expected following the keyword `glo`")?);
+            }
         }
 
         Keyword::Break => StatementNode::Break(expression::resolve(tokens)?),

@@ -68,6 +68,7 @@ pub enum StatementNode {
     ForLoop(ForStatement),
     Condition(IfStatement),
     Import(ImportNode),
+    GlobalAssignment(AssignmentNode),
 
     Continue,
     Break(ExpressionNode),

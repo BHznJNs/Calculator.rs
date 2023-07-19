@@ -1,7 +1,7 @@
 use std::io::stdout;
 
-use crate::computer::resolvers::expression;
-use crate::public::compile_time::ast::types::{ModuleType, StatementNode};
+use crate::computer::resolvers::{expression, assignment};
+use crate::public::compile_time::ast::types::StatementNode;
 use crate::public::error::syntax_error;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::{Value, VoidSign};
@@ -79,13 +79,14 @@ pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> Result<Valu
             Value::Void(VoidSign::Empty)
         }
         StatementNode::Import(import_node) => {
-            if import_node.type__ == ModuleType::BuildIn {
-                scope.import_std(&import_node.target)?;
-                Value::Void(VoidSign::Empty)
-            } else {
-                unreachable!()
-            }
+            // import_node.type__ must be `ModuleType::BuildIn`
+            scope.import_std(&import_node.target)?;
+            Value::Void(VoidSign::Empty)
         }
+        StatementNode::GlobalAssignment(assignment_node) => {
+            assignment::resolve(assignment_node, scope, true)?
+        }
+
         StatementNode::Continue => Value::Void(VoidSign::Continue),
         StatementNode::Break(expression_node) => {
             let expression_value = expression::resolve(expression_node, scope)?;

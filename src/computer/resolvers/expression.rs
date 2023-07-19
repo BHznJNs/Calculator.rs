@@ -74,7 +74,7 @@ pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> Result<Value, ()> {
             }
             ASTNode::ArrayLiteral(node) => Value::from(array_literal::resolve(node, scope)?),
             ASTNode::Instantiation(node) => Value::from(instantiation::resolve(node, scope)?),
-            ASTNode::Assignment(node) => assignment::resolve(node, scope)?,
+            ASTNode::Assignment(node) => assignment::resolve(node, scope, false)?,
 
             ASTNode::Variable(_)
             | ASTNode::ObjectReading(_)

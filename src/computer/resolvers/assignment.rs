@@ -7,14 +7,24 @@ use crate::public::value::value::Value;
 use super::composer::{array_reading, compose, object_reading};
 use super::expression;
 
-pub fn resolve(node: &AssignmentNode, scope: &mut Scope) -> Result<Value, ()> {
+pub fn resolve(node: &AssignmentNode, scope: &mut Scope, is_global: bool) -> Result<Value, ()> {
     let left_hand_node = &node.left_hand_node;
     let right_hand_node = &node.right_hand_node;
     let right_hand_value = expression::resolve(right_hand_node, scope)?;
 
     match left_hand_node {
         ASTNode::Variable(sub_node) => {
-            scope.assign(sub_node.name.clone(), right_hand_value.clone())
+            if is_global {
+                scope.global.variables.insert(
+                    sub_node.name.clone(),
+                    right_hand_value.clone(),
+                );
+            } else {
+                scope.assign(
+                    sub_node.name.clone(),
+                    right_hand_value.clone(),
+                );
+            }
         }
 
         ASTNode::ArrayElementReading(sub_node) => {
@@ -35,5 +45,5 @@ pub fn resolve(node: &AssignmentNode, scope: &mut Scope) -> Result<Value, ()> {
         _ => return Err(assignment_error("invalid left-hand value")?),
     }
 
-    Ok(right_hand_value)
+    return Ok(right_hand_value);
 }
