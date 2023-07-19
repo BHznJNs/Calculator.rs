@@ -162,7 +162,13 @@ impl Value {
     pub fn to_raw_string(&self) -> String {
         match self {
             Value::Void(_) => self.to_string(),
-            Value::Boolean(bool_val) => bool_val.to_string(),
+            Value::Boolean(bool_val) => {
+                if *bool_val {
+                    String::from("真")
+                } else {
+                    String::from("假")
+                }
+            },
             Value::Number(num) => num.to_string(),
             Value::String(str) => str.borrow().clone(),
             Value::Function(func) => func.to_string(),
@@ -263,7 +269,11 @@ impl fmt::Display for Value {
                 if unsafe { ENV_OPTION.support_ansi } {
                     match self {
                         Value::Boolean(bool_val) => {
-                            write!(f, "{}", bool_val.to_string().dark_yellow())
+                            if *bool_val {
+                                write!(f, "真")
+                            } else {
+                                write!(f, "假")
+                            }
                         }
                         Value::Number(num) => write!(f, "{}", num.to_string().yellow()),
                         Value::LazyExpression(_) => write!(f, "{}", "【懒表达式】".cyan()),
@@ -272,7 +282,13 @@ impl fmt::Display for Value {
                     }
                 } else {
                     match self {
-                        Value::Boolean(bool_val) => write!(f, "{}", bool_val),
+                        Value::Boolean(bool_val) => {
+                            if *bool_val {
+                                write!(f, "真")
+                            } else {
+                                write!(f, "假")
+                            }
+                        },
                         Value::Number(num) => write!(f, "{}", num),
                         Value::LazyExpression(_) => write!(f, "{}", "【懒表达式】"),
                         Value::Function(func) => write!(f, "{}", func),
