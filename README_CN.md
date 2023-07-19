@@ -49,16 +49,21 @@
 - 支持数组
 
 ```text
-> arr = [1, 2, 3] 
-= [
- 1, 2, 3,
-]
-> push(arr, 4) 
+> arr = new Array([1, 2, 3])
+= {
+  v: [
+    1, 2, 3, 
+  ]
+  ...
+}
+> arr.push(4)
 > arr
-= [
- 1, 2, 3, 4,
-]
->
+= {
+  v: [
+    1, 2, 3, 4,
+  ]
+  ...
+}
 ```
 
 - 支持函数定义
@@ -80,13 +85,13 @@ calculator.exe script
 ```text
 > Person = cl {age $Numb, name $Str}
 = {
- name,
- age,
+  age: Number
+  name: String
 }
 > inst = new Person(10, "test") 
 = {
- age: 10
- name: test
+  age: 10
+  name: "test"
 }
 ```
 
