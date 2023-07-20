@@ -15,6 +15,15 @@ An simple command-line calculator program writen with Rust.
 = 1
 ```
 
+- Fraction support
+
+```text
+> f1 = fraction(1, 2)
+= (1 / 2)
+> f1 + 1
+= (3 / 2)
+```
+
 - Math functions support
 
 ```text
