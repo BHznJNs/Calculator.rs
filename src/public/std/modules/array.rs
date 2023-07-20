@@ -68,7 +68,6 @@ pub fn module_class() -> Class {
         identi: BuildInFnIdenti::Array(ArrayFn::JOIN),
     };
 
-
     // --- --- --- --- --- ---
 
     return Class::new(

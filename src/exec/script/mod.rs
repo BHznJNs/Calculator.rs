@@ -34,7 +34,7 @@ pub fn run(path: &str, scope: &mut Scope) {
     let mut brace_count = 0;
 
     while let Some(Ok(current_line)) = script_lines.next() {
-        let mut current_line= pre_processer::process(current_line);
+        let mut current_line = pre_processer::process(current_line);
         line_count += 1;
 
         // skip blank line
@@ -73,7 +73,7 @@ pub fn run(path: &str, scope: &mut Scope) {
                 }
             }
             x if x > 0 => cached_multiline.extend(current_line.chars()),
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 }

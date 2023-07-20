@@ -1,8 +1,8 @@
-use std::{cell::RefCell, collections::VecDeque, rc::Rc, fmt};
+use std::{cell::RefCell, collections::VecDeque, fmt, rc::Rc};
 
-use crossterm::style::Stylize;
-use crate::public::value::{oop::object::Object, display_indent};
 use super::value::Value;
+use crate::public::value::{display_indent, oop::object::Object};
+use crossterm::style::Stylize;
 
 pub type ArrayLiteral = VecDeque<Value>;
 
@@ -28,12 +28,9 @@ impl Array {
         if arr.is_empty() {
             return String::new();
         }
-    
+
         let mut arr_iter = arr.iter();
-        let mut result_str = arr_iter
-            .next()
-            .unwrap()
-            .to_raw_string();
+        let mut result_str = arr_iter.next().unwrap().to_raw_string();
 
         for v in arr_iter {
             result_str.extend(div.chars());
@@ -42,7 +39,11 @@ impl Array {
         return result_str;
     }
 
-    pub fn display(f: &mut fmt::Formatter<'_>, arr: &Rc<RefCell<ArrayLiteral>>, level: usize) -> fmt::Result {
+    pub fn display(
+        f: &mut fmt::Formatter<'_>,
+        arr: &Rc<RefCell<ArrayLiteral>>,
+        level: usize,
+    ) -> fmt::Result {
         const LINE_COUNT: i8 = 5;
         let mut index = 0;
 

@@ -15,15 +15,12 @@ pub fn resolve(node: &AssignmentNode, scope: &mut Scope, is_global: bool) -> Res
     match left_hand_node {
         ASTNode::Variable(sub_node) => {
             if is_global {
-                scope.global.variables.insert(
-                    sub_node.name.clone(),
-                    right_hand_value.clone(),
-                );
+                scope
+                    .global
+                    .variables
+                    .insert(sub_node.name.clone(), right_hand_value.clone());
             } else {
-                scope.assign(
-                    sub_node.name.clone(),
-                    right_hand_value.clone(),
-                );
+                scope.assign(sub_node.name.clone(), right_hand_value.clone());
             }
         }
 

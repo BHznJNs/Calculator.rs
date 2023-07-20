@@ -63,7 +63,9 @@ pub fn resolve(keyword: Keyword, tokens: &mut TokenVec) -> Result<StatementNode,
             if let ASTNode::Assignment(sub_node) = first_node {
                 StatementNode::GlobalAssignment(*sub_node)
             } else {
-                return Err(syntax_error("assignment expression is expected following the keyword `glo`")?);
+                return Err(syntax_error(
+                    "assignment expression is expected following the keyword `glo`",
+                )?);
             }
         }
 

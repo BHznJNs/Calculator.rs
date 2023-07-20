@@ -1,6 +1,6 @@
 use std::io::stdout;
 
-use crate::computer::resolvers::{expression, assignment};
+use crate::computer::resolvers::{assignment, expression};
 use crate::public::compile_time::ast::types::StatementNode;
 use crate::public::error::syntax_error;
 use crate::public::run_time::scope::Scope;

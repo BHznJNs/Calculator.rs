@@ -130,7 +130,7 @@ impl BuildInFnCall for FileSysFn {
                         let path_exist = path.exists();
                         let path_is_dir = path.is_dir();
                         let path_is_file = path.is_file();
-        
+
                         let file_obj = unsafe {
                             Class::instantiate(
                                 FILE_CLASS.as_ref().unwrap().clone(),
@@ -142,7 +142,7 @@ impl BuildInFnCall for FileSysFn {
                                 ]),
                             )?
                         };
-        
+
                         Value::from(file_obj)
                     }
                     FileSysFn::Create => {
@@ -162,7 +162,7 @@ impl BuildInFnCall for FileSysFn {
                         }
                         Value::Void(VoidSign::Empty)
                     }
-                    _ => unreachable!()
+                    _ => unreachable!(),
                 }
             }
             _ => {

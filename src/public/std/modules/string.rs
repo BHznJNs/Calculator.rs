@@ -3,9 +3,7 @@ use std::collections::VecDeque;
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::std::utils::get_self_prop::get_self_prop;
-use crate::public::value::function::{
-    BuildInFnParam, BuildInFunction, Function,
-};
+use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function};
 use crate::public::value::oop::class::{Class, Property};
 use crate::public::value::value::{Value, ValueType};
 
@@ -115,11 +113,10 @@ impl BuildInFnCall for StringFn {
             StringFn::STARTWITH | StringFn::ENDWITH => {
                 let pat_value = get_val("pat", scope)?;
                 let pat_ref = pat_value.get_str()?;
-                let result =
-                match self {
+                let result = match self {
                     StringFn::STARTWITH => str_ref.starts_with(&*pat_ref),
                     StringFn::ENDWITH => str_ref.ends_with(&*pat_ref),
-                    _ => unreachable!()
+                    _ => unreachable!(),
                 };
                 Value::from(result)
             }

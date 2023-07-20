@@ -15,6 +15,5 @@ pub fn resolve(headfiles: VecDeque<String>, scope: &mut Scope) {
         headfile_scope.global.variables = build_in::constants();
         // insert variables into global scope
         scope.global.variables.extend(headfile_vars);
-
     }
 }

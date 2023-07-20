@@ -1,7 +1,7 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::rc::Rc;
 use std::fmt;
+use std::rc::Rc;
 
 use crossterm::style::Stylize;
 
@@ -176,14 +176,26 @@ impl Class {
             DataStoragePattern::List => {
                 let list = cls.method_list.as_ref().unwrap();
                 for method in list {
-                    write!(f, "{}{}: {}\r\n", display_indent(level), method.0, class_method_disp)?;
+                    write!(
+                        f,
+                        "{}{}: {}\r\n",
+                        display_indent(level),
+                        method.0,
+                        class_method_disp
+                    )?;
                 }
             }
             DataStoragePattern::Map => {
                 let map = cls.method_map.as_ref().unwrap();
 
                 for (key, _) in map {
-                    write!(f, "{}{}: {}\r\n", display_indent(level), key, class_method_disp)?;
+                    write!(
+                        f,
+                        "{}{}: {}\r\n",
+                        display_indent(level),
+                        key,
+                        class_method_disp
+                    )?;
                 }
             }
         }
@@ -191,13 +203,18 @@ impl Class {
     }
 }
 
-
 impl fmt::Display for Class {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{{\r\n")?;
         // display class properties
         for prop in &self.properties {
-            write!(f, "{}{}: {}\r\n", display_indent(1), prop.identi(), prop.type__().to_string().red())?;
+            write!(
+                f,
+                "{}{}: {}\r\n",
+                display_indent(1),
+                prop.identi(),
+                prop.type__().to_string().red()
+            )?;
         }
 
         Class::display_methods(f, self, 1)?;

@@ -8,10 +8,8 @@ use crate::public::env::ENV_OPTION;
 use crate::public::error::{internal_error, InternalComponent};
 
 use super::super::compile_time::ast::ast_enum::ASTNode;
-use super::array::{ArrayLiteral, Array};
-use super::function::{
-    BuildInFunction, Function, UserDefinedFunction,
-};
+use super::array::{Array, ArrayLiteral};
+use super::function::{BuildInFunction, Function, UserDefinedFunction};
 use super::number::Number;
 use super::oop::class::Class;
 use super::oop::object::Object;

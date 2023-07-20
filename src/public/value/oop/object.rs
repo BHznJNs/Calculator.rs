@@ -7,8 +7,8 @@ use crate::public::error::{reference_error, ReferenceType};
 use crate::public::value::array::{Array, ArrayLiteral};
 use crate::public::value::oop::class::Class;
 
-use super::super::value::Value;
 use super::super::display_indent;
+use super::super::value::Value;
 use super::utils::data_storage::DataStoragePattern;
 use super::utils::getter::getter;
 
@@ -59,10 +59,19 @@ impl Object {
         }
     }
 
-    pub fn display(f: &mut fmt::Formatter<'_>, obj: &Rc<RefCell<Object>>, level: usize) -> fmt::Result {
-        fn display_item(f: &mut fmt::Formatter<'_>, key: &str, value: &Rc<RefCell<Value>>, level: usize) -> fmt::Result {
+    pub fn display(
+        f: &mut fmt::Formatter<'_>,
+        obj: &Rc<RefCell<Object>>,
+        level: usize,
+    ) -> fmt::Result {
+        fn display_item(
+            f: &mut fmt::Formatter<'_>,
+            key: &str,
+            value: &Rc<RefCell<Value>>,
+            level: usize,
+        ) -> fmt::Result {
             let value_ref = value.as_ref().borrow();
-    
+
             // print indent and key
             write!(f, "{}{}: ", display_indent(level), key)?;
 
@@ -73,13 +82,13 @@ impl Object {
                 Value::Object(obj) => Object::display(f, obj, level + 1)?,
                 _ => write!(f, "{}", value_ref)?,
             }
-    
+
             // next line
             write!(f, "\r\n")
         }
-    
+
         let obj_ref = obj.as_ref().borrow();
-    
+
         write!(f, "{{\r\n")?;
         match obj_ref.storage_pattern {
             DataStoragePattern::List => {
@@ -90,7 +99,7 @@ impl Object {
             }
             DataStoragePattern::Map => {
                 let map = obj_ref.data_map.as_ref().unwrap();
-    
+
                 for (k, v) in map {
                     display_item(f, k, v, level)?;
                 }
@@ -109,10 +118,10 @@ impl Object {
                 param_vec.push_back(v_ref.deep_clone());
             }
         }
-    
+
         let obj_ref = &*(obj.as_ref().borrow());
         let mut instantiation_params = ArrayLiteral::new();
-    
+
         match obj_ref.storage_pattern {
             DataStoragePattern::List => {
                 if let Some(list) = &obj_ref.data_list {
@@ -129,11 +138,12 @@ impl Object {
                 }
             }
         }
-    
+
         // the object has been passed the type check before,
         // thus with properties of the object,
         // the instantiation must pass the type check.
-        let res_object = Class::instantiate(obj_ref.prototype.clone(), instantiation_params).unwrap();
+        let res_object =
+            Class::instantiate(obj_ref.prototype.clone(), instantiation_params).unwrap();
         return Value::from(res_object);
     }
 }

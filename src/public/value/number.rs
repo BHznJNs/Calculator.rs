@@ -29,28 +29,28 @@ impl Number {
                 Number::Float(num2) => Number::Float((num1 as f64).powf(num2)),
                 Number::Fraction(_, _) => Number::Float((num1 as f64).powf(target.float_value())),
                 _ => Number::NotANumber,
-            }
+            },
             Number::Float(num1) => match target {
                 Number::Int(num2) => Number::Float(num1.powi(num2 as i32)),
                 Number::Float(num2) => Number::Float(num1.powf(num2)),
                 Number::Fraction(_, _) => Number::Float(num1.powf(target.float_value())),
                 _ => Number::NotANumber,
-            }
+            },
             Number::Fraction(upper, lower) => match target {
                 Number::Int(num2) => {
                     let upper_powed = upper.pow(num2 as u32);
                     let lower_powed = lower.pow(num2 as u32);
-                    Number::Fraction(upper_powed, lower_powed)
-                        .reduce()
-                        .unwrap()
+                    Number::Fraction(upper_powed, lower_powed).reduce().unwrap()
                 }
                 Number::Float(num2) => {
                     let f_value = self.float_value();
                     Number::Float(f_value.powf(num2))
                 }
-                Number::Fraction(_, _) => Number::Float(self.float_value().powf(target.float_value())),
-                _ => Number::NotANumber
-            }
+                Number::Fraction(_, _) => {
+                    Number::Float(self.float_value().powf(target.float_value()))
+                }
+                _ => Number::NotANumber,
+            },
             Number::NotANumber => Number::NotANumber,
         }
     }
@@ -60,7 +60,11 @@ impl Number {
             Number::Int(i) => Number::Int(!(*i > 0) as i64),
             Number::Float(f) => Number::Int(!(*f > 0.0) as i64),
             Number::Fraction(upper, _) => {
-                if *upper == 0 { Number::Int(1) } else { Number::Int(0) }
+                if *upper == 0 {
+                    Number::Int(1)
+                } else {
+                    Number::Int(0)
+                }
             }
             Number::NotANumber => Number::Int(1),
         }
@@ -86,7 +90,11 @@ impl Number {
             Number::Int(i) => i,
             Number::Float(f) => f as i64,
             Number::Fraction(upper, lower) => {
-                if lower > upper { 0 } else { upper / lower }
+                if lower > upper {
+                    0
+                } else {
+                    upper / lower
+                }
             }
             Number::NotANumber => 0,
         }
@@ -129,7 +137,7 @@ impl Number {
         // avoid negative number
         let larger = cmp::max(n1, n2).abs();
         let smaller = cmp::min(n1, n2).abs();
-    
+
         if smaller == 0 {
             return larger;
         }
@@ -181,17 +189,15 @@ impl Add for Number {
         match self {
             Number::Int(num1) => match other {
                 Number::Int(num2) => Number::Int(num1 + num2),
-                Number::Fraction(upper, lower) =>
-                    Number::Fraction(upper + num1 * lower, lower)
-                        .reduce()
-                        .unwrap(),
+                Number::Fraction(upper, lower) => Number::Fraction(upper + num1 * lower, lower)
+                    .reduce()
+                    .unwrap(),
                 _ => unreachable!(),
             },
             Number::Fraction(upper, lower) => match other {
-                Number::Int(num2) =>
-                    Number::Fraction(upper + num2 * lower, lower)
-                        .reduce()
-                        .unwrap(),
+                Number::Int(num2) => Number::Fraction(upper + num2 * lower, lower)
+                    .reduce()
+                    .unwrap(),
                 Number::Fraction(other_upper, other_lower) => {
                     let lower_lcm = Number::lcm(lower, other_lower);
                     let self_factor = lower_lcm / lower;
@@ -200,7 +206,7 @@ impl Add for Number {
                     Number::Fraction(res_upper, lower_lcm).reduce().unwrap()
                 }
                 _ => unreachable!(),
-            }
+            },
             _ => unreachable!(),
         }
     }
@@ -223,17 +229,15 @@ impl Sub for Number {
         match self {
             Number::Int(num1) => match other {
                 Number::Int(num2) => Number::Int(num1 - num2),
-                Number::Fraction(upper, lower) =>
-                    Number::Fraction(num1 * lower - upper, lower)
-                        .reduce()
-                        .unwrap(),
+                Number::Fraction(upper, lower) => Number::Fraction(num1 * lower - upper, lower)
+                    .reduce()
+                    .unwrap(),
                 _ => unreachable!(),
             },
             Number::Fraction(upper, lower) => match other {
-                Number::Int(num2) =>
-                    Number::Fraction(upper - num2 * lower, lower)
-                        .reduce()
-                        .unwrap(),
+                Number::Int(num2) => Number::Fraction(upper - num2 * lower, lower)
+                    .reduce()
+                    .unwrap(),
                 Number::Fraction(other_upper, other_lower) => {
                     let lower_lcm = Number::lcm(lower, other_lower);
                     let self_factor = lower_lcm / lower;
@@ -242,7 +246,7 @@ impl Sub for Number {
                     Number::Fraction(res_upper, lower_lcm).reduce().unwrap()
                 }
                 _ => unreachable!(),
-            }
+            },
             _ => unreachable!(),
         }
     }
@@ -265,9 +269,9 @@ impl Mul for Number {
         match self {
             Number::Int(num1) => match other {
                 Number::Int(num2) => Number::Int(num1 * num2),
-                Number::Fraction(upper, lower) => Number::Fraction(num1 * upper, lower)
-                    .reduce()
-                    .unwrap(),
+                Number::Fraction(upper, lower) => {
+                    Number::Fraction(num1 * upper, lower).reduce().unwrap()
+                }
                 _ => unreachable!(),
             },
             Number::Fraction(upper, lower) => match other {
@@ -275,12 +279,10 @@ impl Mul for Number {
                 Number::Fraction(other_upper, other_lower) => {
                     let muled_upper = upper * other_upper;
                     let muled_lower = lower * other_lower;
-                    Number::Fraction(muled_upper, muled_lower)
-                        .reduce()
-                        .unwrap()
+                    Number::Fraction(muled_upper, muled_lower).reduce().unwrap()
                 }
                 _ => unreachable!(),
-            }
+            },
             _ => unreachable!(),
         }
     }
@@ -303,9 +305,9 @@ impl Div for Number {
                 print_line__("The dividend should not to be ZERO!");
                 match f1 {
                     x if x == 0.0 => return Number::Float(0.0),
-                    x if x >  0.0 => return Number::Float(INFINITY),
-                    x if x <  0.0 => return Number::Float(-INFINITY),
-                    _ => unreachable!()
+                    x if x > 0.0 => return Number::Float(INFINITY),
+                    x if x < 0.0 => return Number::Float(-INFINITY),
+                    _ => unreachable!(),
                 }
             }
             return Number::Float(f1 / f2);
@@ -314,22 +316,19 @@ impl Div for Number {
         match self {
             Number::Int(num1) => match other {
                 Number::Int(num2) => Number::Int(num1 / num2),
-                Number::Fraction(upper, lower) =>
-                    Number::Fraction(num1 * lower, upper)
-                        .reduce()
-                        .unwrap(),
+                Number::Fraction(upper, lower) => {
+                    Number::Fraction(num1 * lower, upper).reduce().unwrap()
+                }
                 _ => unreachable!(),
             },
             Number::Fraction(upper, lower) => match other {
-                Number::Int(num2) =>
-                    Number::Fraction(upper, lower * num2)
-                        .reduce()
-                        .unwrap(),
-                Number::Fraction(other_upper, other_lower) =>
+                Number::Int(num2) => Number::Fraction(upper, lower * num2).reduce().unwrap(),
+                Number::Fraction(other_upper, other_lower) => {
                     Number::Fraction(upper * other_lower, lower * other_upper)
                         .reduce()
-                        .unwrap(),
-                _ => unreachable!()
+                        .unwrap()
+                }
+                _ => unreachable!(),
             },
             _ => unreachable!(),
         }
@@ -358,7 +357,9 @@ impl PartialEq for Number {
             },
             Number::Fraction(_, _) => match other {
                 Number::Int(num2) => self.int_value() == *num2,
-                Number::Fraction(_, _) => Number::float_cmp(self.float_value(), other.float_value()),
+                Number::Fraction(_, _) => {
+                    Number::float_cmp(self.float_value(), other.float_value())
+                }
                 _ => unreachable!(),
             },
             _ => unreachable!(),
