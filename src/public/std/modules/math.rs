@@ -1,6 +1,5 @@
 use std::rc::Rc;
 
-use crate::public::error::{internal_error, InternalComponent};
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::array::ArrayLiteral;
@@ -36,7 +35,6 @@ pub enum MathFn {
     FLOOR,
     ROUND,
     MOD,
-    Fraction,
 }
 
 static mut MODULE_CLASS: Option<Rc<Class>> = None;
@@ -103,14 +101,6 @@ fn static_class_setter() {
         ],
         identi: BuildInFnIdenti::Math(MathFn::MOD),
     };
-    let fraction = BuildInFunction {
-        params: vec![
-            BuildInFnParam(ValueType::Object, "self"),
-            BuildInFnParam(ValueType::Number, "upper"),
-            BuildInFnParam(ValueType::Number, "lower"),
-        ],
-        identi: BuildInFnIdenti::Math(MathFn::Fraction),
-    };
 
     unsafe {
         MODULE_CLASS = Some(
@@ -138,7 +128,6 @@ fn static_class_setter() {
                     (String::from("floor"), Function::from(floor)),
                     (String::from("round"), Function::from(round)),
                     (String::from("mod"), Function::from(modulo)),
-                    (String::from("fraction"), Function::from(fraction)),
                 ],
             )
             .into(),
@@ -186,19 +175,6 @@ impl BuildInFnCall for MathFn {
                     let f1 = number1.float_value();
                     let f2 = number2.float_value();
                     f1 % f2
-                }
-            }
-            MathFn::Fraction => {
-                let upper_value = get_val("upper", scope)?;
-                let lower_value = get_val("lower", scope)?;
-
-                if let (Value::Number(Number::Int(upper)), Value::Number(Number::Int(lower))) = (upper_value, lower_value) {
-                    return Ok(Value::Number(Number::Fraction(upper, lower)));
-                } else {
-                    return Err(internal_error(
-                        InternalComponent::Std,
-                        "two Int typed value is expected"
-                    )?)
                 }
             }
             _ => {
