@@ -184,11 +184,7 @@ impl LineEditor {
 
             if overflow > 0 {
                 // min(self.overflow_left, hint_width)
-                let offset = if overflow > hint_width {
-                    hint_width
-                } else {
-                    overflow
-                };
+                let offset = std::cmp::min(overflow, hint_width);
 
                 self.overflow_left -= offset;
                 self.terminal.cursor.right(offset)?;
