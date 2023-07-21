@@ -1,3 +1,5 @@
+![Calculator.rs Logo](./logo.svg)
+
 # Calculator.rs
 
 [English](./README.md) | 简体中文
