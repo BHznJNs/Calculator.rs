@@ -1,5 +1,7 @@
 use std::collections::VecDeque;
 
+use crate::exec::args::commands;
+
 pub struct EnvOption {
     pub timer: bool,
     pub is_repl: bool,
@@ -35,5 +37,15 @@ impl Env {
 
     pub fn version_output(&self) {
         println!("Calculator.rs version {}", self.version);
+    }
+
+    pub fn help_output(&self) {
+        println!("Usage: calculator [SCRIPT_PATH] [OPTIONS]\n");
+
+        println!("Options:");
+        for i in 0..commands::COMMAND_COUNT {
+            println!("{}, {}", commands::COMMANDS[i][0], commands::COMMANDS[i][1]);
+            println!("  {}", commands::COMMAND_DESCRIPTIONS[i]);
+        }
     }
 }

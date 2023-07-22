@@ -1,6 +1,6 @@
 use crate::public::{
     error::{internal_error, InternalComponent},
-    value::{oop::object::Object, value::Value},
+    value::value::Value,
 };
 
 pub fn get_self_prop(self_value: &Value, prop_name: &str) -> Result<Value, ()> {
@@ -12,5 +12,5 @@ pub fn get_self_prop(self_value: &Value, prop_name: &str) -> Result<Value, ()> {
     };
 
     let obj_ref = obj.as_ref().borrow();
-    Object::get(&obj_ref, &prop_name)
+    return obj_ref.get(prop_name);
 }

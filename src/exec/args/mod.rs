@@ -1,5 +1,4 @@
 pub mod commands;
-mod help_msg;
 
 use std::{collections::VecDeque, io, process};
 
@@ -35,7 +34,7 @@ fn args_resolve(
             match command {
                 CommandArg::Timer => unsafe { ENV_OPTION.timer = true },
                 CommandArg::Help => {
-                    help_msg::output();
+                    calc_env.help_output();
                     process::exit(0);
                 }
                 CommandArg::Version => {
@@ -59,7 +58,7 @@ fn args_resolve(
         Mode::REPL => repl(&mut scope, calc_env)?,
         Mode::Script => script::env_resolve(calc_env, &mut scope),
     }
-    Ok(())
+    return Ok(());
 }
 
 pub fn entry(mut args: VecDeque<String>, mut calc_env: Env) -> io::Result<()> {
@@ -82,5 +81,5 @@ pub fn entry(mut args: VecDeque<String>, mut calc_env: Env) -> io::Result<()> {
         Mode::Script
     };
 
-    args_resolve(mode, args, calc_env, scope)
+    return args_resolve(mode, args, calc_env, scope);
 }
