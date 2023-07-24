@@ -1,5 +1,3 @@
-use std::cell::RefCell;
-use std::collections::HashMap;
 use std::fmt;
 use std::rc::Rc;
 
@@ -10,22 +8,19 @@ use crate::public::error::{reference_error, type_error, ReferenceType};
 use crate::public::value::array::ArrayLiteral;
 use crate::public::value::display_indent;
 use crate::public::value::function::Function;
-use crate::public::value::value::{Value, ValueType};
+use crate::public::value::value::{ValueType, Value};
 use crate::public::Param;
 use crate::utils::completer::Completer;
 
 use super::object::Object;
-use super::utils::data_storage::DataStoragePattern;
-use super::utils::getter::getter;
+use super::data_storage::{DataStoragePattern, ComposeStorage, self};
 
 #[derive(PartialEq)]
 pub struct Class {
     properties: Vec<Property>,
-    pub completer: Option<Completer>,
+    method_storage: ComposeStorage<Function>,
 
-    method_storage: DataStoragePattern,
-    method_list: Option<Vec<(String, Function)>>,
-    method_map: Option<HashMap<String, Function>>,
+    pub completer: Option<Completer>,
 }
 #[derive(PartialEq, Clone)]
 pub struct Property(pub ValueType, pub String);
@@ -39,7 +34,6 @@ impl Param for Property {
 }
 
 impl Class {
-    const STORAGE_THRESHOLD: usize = 8;
     const METHOD_DISP_STR: &'static str = "<Class-Method>";
 
     pub fn new(properties: Vec<Property>, methods: Vec<(String, Function)>) -> Self {
@@ -52,30 +46,8 @@ impl Class {
             prop_name_vec.push(k.clone());
         }
 
-        // init method list / map
-        let method_storage = if methods.len() > Self::STORAGE_THRESHOLD {
-            DataStoragePattern::Map
-        } else {
-            DataStoragePattern::List
-        };
-
-        let method_list: Option<Vec<(String, Function)>>;
-        let method_map: Option<HashMap<String, Function>>;
-
-        match method_storage {
-            DataStoragePattern::List => {
-                method_list = Some(methods);
-                method_map = None;
-            }
-            DataStoragePattern::Map => {
-                let mut temp_map = HashMap::new();
-                for (k, v) in methods {
-                    temp_map.insert(k, v);
-                }
-                method_list = None;
-                method_map = Some(temp_map);
-            }
-        }
+        // init method storage
+        let method_storage = ComposeStorage::new(methods);
 
         // init completer
         let mut completer = None;
@@ -85,41 +57,24 @@ impl Class {
 
         return Class {
             properties,
-            completer,
             method_storage,
-            method_list,
-            method_map,
+            completer,
         };
     }
 
-    pub fn get_method(&self, target_method: &str) -> Result<Function, ()> {
-        let result_target_method = getter::<Function>(
-            self.method_storage,
-            target_method,
-            &self.method_list,
-            &self.method_map,
-        );
-
-        match result_target_method {
-            Ok(target_method) => Ok(target_method),
-            Err(()) => Err(reference_error(ReferenceType::Property, target_method)?),
+    pub fn get_method(&self, method_name: &str) -> Result<Function, ()> {
+        let result_method = self.method_storage.getter(method_name);
+        match result_method {
+            Ok(func) => Ok(func),
+            Err(_) => Err(reference_error(ReferenceType::Property, method_name)?),
         }
     }
 
     pub fn instantiate(class_self: Rc<Class>, mut values: ArrayLiteral) -> Result<Object, ()> {
-        let param_count = values.len();
-        let storage_pattern = if param_count > Class::STORAGE_THRESHOLD {
-            DataStoragePattern::Map
-        } else {
-            DataStoragePattern::List
-        };
-
-        let data_list: Option<Vec<(String, Rc<RefCell<Value>>)>>;
-        let data_map: Option<HashMap<String, Rc<RefCell<Value>>>>;
         let properties = &class_self.properties;
-
-        let mut temp_list = Vec::<(String, Rc<RefCell<Value>>)>::new();
+        let mut temp_list = data_storage::ListStorage::<Value>::new();
         let mut index = 0;
+
         while index < class_self.properties.len() {
             let current_prop = &properties[index];
 
@@ -133,8 +88,7 @@ impl Class {
                             val.get_type(),
                         )?);
                     }
-
-                    Rc::new(RefCell::new(val))
+                    val.into()
                 }
                 None => break,
             };
@@ -143,25 +97,9 @@ impl Class {
             index += 1;
         }
 
-        match storage_pattern {
-            DataStoragePattern::List => {
-                data_list = Some(temp_list);
-                data_map = None;
-            }
-            DataStoragePattern::Map => {
-                let mut temp_map = HashMap::<String, Rc<RefCell<Value>>>::new();
-                temp_map.extend(temp_list);
-
-                data_list = None;
-                data_map = Some(temp_map);
-            }
-        }
-
         return Ok(Object {
             prototype: class_self.clone(),
-            storage_pattern,
-            data_list,
-            data_map,
+            storage: ComposeStorage::new(temp_list),
         });
     }
 
@@ -172,9 +110,11 @@ impl Class {
             String::from(Class::METHOD_DISP_STR)
         };
 
-        match cls.method_storage {
+        let ComposeStorage {storage_pattern, data_list, data_map} = &cls.method_storage;
+
+        match storage_pattern {
             DataStoragePattern::List => {
-                let list = cls.method_list.as_ref().unwrap();
+                let list = data_list.as_ref().unwrap();
                 for method in list {
                     write!(
                         f,
@@ -186,7 +126,7 @@ impl Class {
                 }
             }
             DataStoragePattern::Map => {
-                let map = cls.method_map.as_ref().unwrap();
+                let map = data_map.as_ref().unwrap();
 
                 for (key, _) in map {
                     write!(

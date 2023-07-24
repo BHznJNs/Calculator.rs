@@ -7,7 +7,7 @@ pub fn assign(obj_value: Value, property: &String, value: Value) -> Result<(), (
         return Err(())
     };
 
-    let obj = obj_ref.as_ref().borrow();
+    let mut obj = obj_ref.as_ref().borrow_mut();
     obj.set(property, value)?;
     Ok(())
 }

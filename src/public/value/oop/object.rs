@@ -1,5 +1,4 @@
 use std::cell::RefCell;
-use std::collections::HashMap;
 use std::fmt;
 use std::rc::Rc;
 
@@ -9,29 +8,19 @@ use crate::public::value::oop::class::Class;
 
 use super::super::display_indent;
 use super::super::value::Value;
-use super::utils::data_storage::DataStoragePattern;
-use super::utils::getter::getter;
+use super::data_storage::{DataStoragePattern, ComposeStorage};
 
 #[derive(PartialEq, Clone)]
 pub struct Object {
     pub prototype: Rc<Class>,
-
-    pub storage_pattern: DataStoragePattern,
-    pub data_list: Option<Vec<(String, Rc<RefCell<Value>>)>>,
-    pub data_map: Option<HashMap<String, Rc<RefCell<Value>>>>,
+    pub(super) storage: ComposeStorage<Value>,
 }
 
 impl Object {
     pub fn get(&self, prop_name: &str) -> Result<Value, ()> {
-        let target_value_result = getter::<Rc<RefCell<Value>>>(
-            self.storage_pattern,
-            prop_name,
-            &self.data_list,
-            &self.data_map,
-        );
+        let target_value_result = self.storage.getter(prop_name);
         match target_value_result {
-            Ok(target_rc) => {
-                let target_ref = target_rc.as_ref().borrow();
+            Ok(target_ref) => {
                 Ok(target_ref.unwrap())
             }
             Err(_) => {
@@ -41,21 +30,11 @@ impl Object {
         }
     }
 
-    pub fn set(&self, prop_name: &String, value: Value) -> Result<(), ()> {
-        let result_target_rc = getter::<Rc<RefCell<Value>>>(
-            self.storage_pattern,
-            prop_name,
-            &self.data_list,
-            &self.data_map,
-        );
-
-        match result_target_rc {
-            Ok(target_rc) => {
-                let mut target_ref = target_rc.as_ref().borrow_mut();
-                *target_ref = value;
-                Ok(())
-            }
-            Err(()) => Err(reference_error(ReferenceType::Property, prop_name)?),
+    pub fn set(&mut self, prop_name: &str, value: Value) -> Result<(), ()> {
+        let result = self.storage.setter(prop_name, value);
+        match result {
+            Ok(_) => Ok(()),
+            Err(_) => Err(reference_error(ReferenceType::Property, prop_name)?)
         }
     }
 
@@ -67,20 +46,18 @@ impl Object {
         fn display_item(
             f: &mut fmt::Formatter<'_>,
             key: &str,
-            value: &Rc<RefCell<Value>>,
+            value: &Value,
             level: usize,
         ) -> fmt::Result {
-            let value_ref = value.as_ref().borrow();
-
             // print indent and key
             write!(f, "{}{}: ", display_indent(level), key)?;
 
             // print value
-            match &*value_ref {
-                Value::String(_) => write!(f, "{}", value_ref.str_format())?,
-                Value::Array(arr) => Array::display(f, arr, level + 1)?,
-                Value::Object(obj) => Object::display(f, obj, level + 1)?,
-                _ => write!(f, "{}", value_ref)?,
+            match value {
+                Value::String(_) => write!(f, "{}", value.str_format())?,
+                Value::Array(arr) => Array::display(f, &arr, level + 1)?,
+                Value::Object(obj) => Object::display(f, &obj, level + 1)?,
+                _ => write!(f, "{}", value)?,
             }
 
             // next line
@@ -88,17 +65,18 @@ impl Object {
         }
 
         let obj_ref = obj.as_ref().borrow();
+        let ComposeStorage {storage_pattern, data_list, data_map} = &obj_ref.storage;
 
         write!(f, "{{\r\n")?;
-        match obj_ref.storage_pattern {
+        match storage_pattern {
             DataStoragePattern::List => {
-                let list = obj_ref.data_list.as_ref().unwrap();
+                let list = data_list.as_ref().unwrap();
                 for (k, v) in list {
                     display_item(f, k, v, level)?;
                 }
             }
             DataStoragePattern::Map => {
-                let map = obj_ref.data_map.as_ref().unwrap();
+                let map = data_map.as_ref().unwrap();
 
                 for (k, v) in map {
                     display_item(f, k, v, level)?;
@@ -110,31 +88,29 @@ impl Object {
     }
 
     pub fn deep_clone(obj: Rc<RefCell<Object>>) -> Value {
-        fn prop_value_resolve(v: &Rc<RefCell<Value>>, param_vec: &mut ArrayLiteral) {
-            let v_ref = v.as_ref().borrow();
-            if let Value::Object(sub_obj) = v_ref.unwrap() {
+        fn prop_value_resolve(v: &Value, param_vec: &mut ArrayLiteral) {
+            if let Value::Object(sub_obj) = v.unwrap() {
                 param_vec.push_back(Object::deep_clone(sub_obj));
             } else {
-                param_vec.push_back(v_ref.deep_clone());
+                param_vec.push_back(v.deep_clone());
             }
         }
 
         let obj_ref = &*(obj.as_ref().borrow());
+        let ComposeStorage {storage_pattern, data_list, data_map} = &obj_ref.storage;
         let mut instantiation_params = ArrayLiteral::new();
 
-        match obj_ref.storage_pattern {
+        match storage_pattern {
             DataStoragePattern::List => {
-                if let Some(list) = &obj_ref.data_list {
-                    for (_, v) in list {
-                        prop_value_resolve(v, &mut instantiation_params);
-                    }
+                let list = data_list.as_ref().unwrap();
+                for (_, v) in list {
+                    prop_value_resolve(v, &mut instantiation_params);
                 }
             }
             DataStoragePattern::Map => {
-                if let Some(map) = &obj_ref.data_map {
-                    for (_, v) in map {
-                        prop_value_resolve(v, &mut instantiation_params);
-                    }
+                let map = data_map.as_ref().unwrap();
+                for (_, v) in map {
+                    prop_value_resolve(v, &mut instantiation_params);
                 }
             }
         }
