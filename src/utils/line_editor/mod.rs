@@ -291,14 +291,12 @@ impl LineEditor {
 
     fn insert_edit(&mut self, ch: char) -> io::Result<()> {
         let insert_pos = self.terminal.cursor_col()? - self.prompt.len() + self.overflow_left;
-        let is_inserted = self.current_line.insert(insert_pos, ch);
+        self.current_line.insert(insert_pos, ch);
 
-        if is_inserted {
-            if self.current_line.len() - 1 >= self.visible_area_width {
-                self.overflow_left += 1;
-            } else {
-                self.terminal.cursor.right(1)?;
-            }
+        if self.current_line.len() - 1 >= self.visible_area_width {
+            self.overflow_left += 1;
+        } else {
+            self.terminal.cursor.right(1)?;
         }
         Ok(())
     }
@@ -450,8 +448,7 @@ impl LineEditor {
                             break Signal::NonASCII;
                         }
 
-                        let is_allowed_char = Line::is_allowed_char(ch);
-                        if self.is_at.line_end && is_allowed_char {
+                        if self.is_at.line_end {
                             self.current_line.push(ch);
 
                             self.hide_hint()?;

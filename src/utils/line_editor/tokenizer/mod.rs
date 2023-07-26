@@ -146,7 +146,11 @@ pub fn tokenize(source: &str) -> TokenVec {
                 last_type = TokenType::Comment;
                 comment.push('#');
             }
-            _ => {}
+            _ => {
+                // is not allowed character
+                last_type = TokenType::Unknown;
+                tokens.push(Token::new(TextType::Unknown, String::from(ch)));
+            }
         }
     }
     if !comment.is_empty() {

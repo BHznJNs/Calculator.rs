@@ -21,7 +21,7 @@ pub enum TokenType {
 
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum TextType {
-    Hint,
+    Unknown,
 
     Variable,
     Keyword,
@@ -34,6 +34,8 @@ pub enum TextType {
 
     NumberLiteral,
     StringLiteral,
+
+    Hint,
 }
 
 #[derive(PartialEq, Debug)]
@@ -56,7 +58,7 @@ impl Token {
         let text = &self.content[range];
 
         match self.type__ {
-            TextType::Hint => text.dim(),
+            TextType::Unknown => text.white().on_dark_red(),
 
             TextType::Variable => text.underlined(),
             TextType::Keyword => text.dark_cyan(),
@@ -68,6 +70,8 @@ impl Token {
 
             TextType::NumberLiteral => text.yellow(),
             TextType::StringLiteral => text.dark_yellow(),
+
+            TextType::Hint => text.dim(),
         }
     }
 }

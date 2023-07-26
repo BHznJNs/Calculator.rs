@@ -5,44 +5,6 @@ use crossterm::style::Stylize;
 
 use super::tokenizer::{tokenize, TokenVec};
 
-// 32 ~ 125 | ' ' ~ '}'
-const ALLOWED_CHAR_MAP: [bool; 95] = [
-    true, // ' '
-    true, // '!'
-    true, // '"'
-    true, // '#'
-    true, // '$'
-    false, false, true, // '\''
-    true, // '('
-    true, // ')'
-    true, // '*'
-    true, // '+'
-    true, // ','
-    true, // '-'
-    true, // '.'
-    true, // '/'
-    true, // '0'
-    true, true, true, true, true, true, true, true, true, // '9'
-    true, true, // ';'
-    true, // '<'
-    true, // '='
-    true, // '>'
-    false, false, true, // 'A'
-    true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-    true, true, true, true, true, true, true, true, true, // 'Z'
-    true, // '['
-    true, // '\'
-    true, // ']'
-    true, // '^'
-    true, // '_'
-    false, true, // 'a'
-    true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-    true, true, true, true, true, true, true, true, true, // 'z'
-    true, // '{'
-    false, true, // '}'
-    false,
-];
-
 pub struct Line {
     pub content: String,
 
@@ -75,10 +37,6 @@ impl Line {
     fn refresh(&mut self) {
         // token vector refresh
         self.tokens = tokenize(&self.content);
-    }
-    pub fn is_allowed_char(ch: char) -> bool {
-        const OFFSET: usize = 32;
-        ALLOWED_CHAR_MAP[(ch as usize) - OFFSET]
     }
 
     // push / pop
@@ -113,14 +71,9 @@ impl Line {
     }
 
     // insert / remove
-    pub fn insert(&mut self, index: usize, ch: char) -> bool {
-        if Self::is_allowed_char(ch) {
-            self.content.insert(index, ch);
-            self.refresh();
-            true
-        } else {
-            false
-        }
+    pub fn insert(&mut self, index: usize, ch: char) {
+        self.content.insert(index, ch);
+        self.refresh();
     }
     pub fn remove(&mut self, index: usize) {
         self.content.remove(index);
