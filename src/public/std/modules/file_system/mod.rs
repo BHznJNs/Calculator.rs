@@ -31,7 +31,6 @@ pub enum FileSysFn {
     Append,
 }
 
-static mut MODULE_CLASS: Option<Rc<Class>> = None;
 static mut FILE_CLASS: Option<Rc<Class>> = None;
 
 fn static_class_setter() {
@@ -54,23 +53,7 @@ fn static_class_setter() {
         ],
         identi: BuildInFnIdenti::FileSystem(FileSysFn::Append),
     };
-
-    // fs-class methods
-    let fs_method_template = BuildInFunction {
-        params: vec![
-            BuildInFnParam(ValueType::Object, "self"),
-            BuildInFnParam(ValueType::String, "path"),
-        ],
-        identi: BuildInFnIdenti::FileSystem(FileSysFn::Open),
-    };
-    let open = fs_method_template.clone();
-    let mut create = fs_method_template.clone();
-    let mut delete = fs_method_template.clone();
-    create.identi = BuildInFnIdenti::FileSystem(FileSysFn::Create);
-    delete.identi = BuildInFnIdenti::FileSystem(FileSysFn::Delete);
-
     // --- --- --- --- --- ---
-
     unsafe {
         FILE_CLASS = Some(
             Class::new(
@@ -88,31 +71,34 @@ fn static_class_setter() {
             )
             .into(),
         );
-        // --- --- --- --- --- ---
-        MODULE_CLASS = Some(
-            Class::new(
-                vec![],
-                vec![
-                    (String::from("open"), Function::from(open)),
-                    (String::from("create"), Function::from(create)),
-                    (String::from("delete"), Function::from(delete)),
-                ],
-            )
-            .into(),
-        );
     };
 }
 
 pub fn module_object() -> Object {
-    if unsafe { MODULE_CLASS == None || FILE_CLASS == None } {
+    if unsafe { FILE_CLASS == None } {
         static_class_setter();
     }
 
-    return Class::instantiate(
-        unsafe { MODULE_CLASS.as_ref().unwrap().clone() },
-        ArrayLiteral::new(),
-    )
-    .unwrap();
+    // fs-class methods
+    let fs_method_template = BuildInFunction {
+        params: vec![
+            BuildInFnParam(ValueType::Object, "self"),
+            BuildInFnParam(ValueType::String, "path"),
+        ],
+        identi: BuildInFnIdenti::FileSystem(FileSysFn::Open),
+    };
+    let open = fs_method_template.clone();
+    let mut create = fs_method_template.clone();
+    let mut delete = fs_method_template.clone();
+    create.identi = BuildInFnIdenti::FileSystem(FileSysFn::Create);
+    delete.identi = BuildInFnIdenti::FileSystem(FileSysFn::Delete);
+
+    let module_obj_props = vec![
+        (String::from("open"), Value::from(open)),
+        (String::from("create"), Value::from(create)),
+        (String::from("delete"), Value::from(delete)),
+    ];
+    return Object::new(module_obj_props, None);
 }
 
 impl BuildInFnCall for FileSysFn {

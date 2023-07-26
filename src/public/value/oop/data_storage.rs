@@ -57,7 +57,7 @@ impl<Item: Clone> ComposeStorage<Item> {
         match self.storage_pattern {
             DataStoragePattern::List => {
                 let data_list = self.data_list.as_ref().unwrap();
-    
+
                 for data_tuple in data_list {
                     if target_prop.eq(&data_tuple.0) {
                         let target_value = &data_tuple.1;

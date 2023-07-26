@@ -19,7 +19,7 @@ impl CompleterNode {
                 subnode.insert(word);
             }
             None => {
-                self.subnodes.insert(0 as char, Self::new());
+                self.subnodes.insert('\0', Self::new());
             }
         }
     }

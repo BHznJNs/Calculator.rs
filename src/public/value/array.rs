@@ -1,7 +1,7 @@
 use std::{cell::RefCell, collections::VecDeque, fmt, rc::Rc};
 
 use super::value::Value;
-use crate::public::value::{display_indent, oop::object::Object};
+use crate::public::value::{display_indent, oop::object};
 use crossterm::style::Stylize;
 
 pub type ArrayLiteral = VecDeque<Value>;
@@ -60,7 +60,7 @@ impl Array {
             match element {
                 Value::String(_) => write!(f, "{}", element.str_format())?,
                 Value::Array(arr) => Array::display(f, arr, level + 1)?,
-                Value::Object(obj) => Object::display(f, obj, level + 1)?,
+                Value::Object(obj) => object::display(f, obj, level + 1)?,
                 _ => write!(f, "{}", element)?,
             }
             write!(f, "{}", ", ".dim())?;

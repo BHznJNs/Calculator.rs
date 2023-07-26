@@ -1,11 +1,7 @@
-use std::rc::Rc;
-
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
-use crate::public::value::array::ArrayLiteral;
-use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function};
+use crate::public::value::function::{BuildInFnParam, BuildInFunction};
 use crate::public::value::number::Number;
-use crate::public::value::oop::class::Class;
 use crate::public::value::oop::object::Object;
 use crate::public::value::value::{Value, ValueType};
 
@@ -37,9 +33,7 @@ pub enum MathFn {
     MOD,
 }
 
-static mut MODULE_CLASS: Option<Rc<Class>> = None;
-
-fn static_class_setter() {
+pub fn module_object() -> Object {
     let sin = BuildInFunction {
         params: vec![
             BuildInFnParam(ValueType::Object, "self"),
@@ -102,49 +96,30 @@ fn static_class_setter() {
         identi: BuildInFnIdenti::Math(MathFn::MOD),
     };
 
-    unsafe {
-        MODULE_CLASS = Some(
-            Class::new(
-                vec![],
-                vec![
-                    (String::from("sin"), Function::from(sin)),
-                    (String::from("cos"), Function::from(cos)),
-                    (String::from("tan"), Function::from(tan)),
-                    (String::from("asin"), Function::from(asin)),
-                    (String::from("acos"), Function::from(acos)),
-                    (String::from("atan"), Function::from(atan)),
-                    (String::from("sinh"), Function::from(sinh)),
-                    (String::from("cosh"), Function::from(cosh)),
-                    (String::from("tanh"), Function::from(tanh)),
-                    (String::from("rad"), Function::from(rad)),
-                    (String::from("deg"), Function::from(deg)),
-                    (String::from("log10"), Function::from(log10)),
-                    (String::from("log2"), Function::from(log2)),
-                    (String::from("log"), Function::from(log)),
-                    (String::from("ln"), Function::from(ln)),
-                    (String::from("exp"), Function::from(exp)),
-                    (String::from("abs"), Function::from(abs)),
-                    (String::from("sqrt"), Function::from(sqrt)),
-                    (String::from("floor"), Function::from(floor)),
-                    (String::from("round"), Function::from(round)),
-                    (String::from("mod"), Function::from(modulo)),
-                ],
-            )
-            .into(),
-        )
-    }
-}
-
-pub fn module_object() -> Object {
-    if unsafe { MODULE_CLASS == None } {
-        static_class_setter();
-    }
-
-    return Class::instantiate(
-        unsafe { MODULE_CLASS.as_ref().unwrap().clone() },
-        ArrayLiteral::new(),
-    )
-    .unwrap();
+    let module_obj_props = vec![
+        (String::from("sin"), Value::from(sin)),
+        (String::from("cos"), Value::from(cos)),
+        (String::from("tan"), Value::from(tan)),
+        (String::from("asin"), Value::from(asin)),
+        (String::from("acos"), Value::from(acos)),
+        (String::from("atan"), Value::from(atan)),
+        (String::from("sinh"), Value::from(sinh)),
+        (String::from("cosh"), Value::from(cosh)),
+        (String::from("tanh"), Value::from(tanh)),
+        (String::from("rad"), Value::from(rad)),
+        (String::from("deg"), Value::from(deg)),
+        (String::from("log10"), Value::from(log10)),
+        (String::from("log2"), Value::from(log2)),
+        (String::from("log"), Value::from(log)),
+        (String::from("ln"), Value::from(ln)),
+        (String::from("exp"), Value::from(exp)),
+        (String::from("abs"), Value::from(abs)),
+        (String::from("sqrt"), Value::from(sqrt)),
+        (String::from("floor"), Value::from(floor)),
+        (String::from("round"), Value::from(round)),
+        (String::from("mod"), Value::from(modulo)),
+    ];
+    return Object::new(module_obj_props, None);
 }
 
 impl BuildInFnCall for MathFn {

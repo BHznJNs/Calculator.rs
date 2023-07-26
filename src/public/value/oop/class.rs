@@ -20,7 +20,7 @@ pub struct Class {
     properties: Vec<Property>,
     method_storage: ComposeStorage<Function>,
 
-    pub completer: Option<Completer>,
+    pub completer: Option<Rc<Completer>>,
 }
 #[derive(PartialEq, Clone)]
 pub struct Property(pub ValueType, pub String);
@@ -52,7 +52,10 @@ impl Class {
         // init completer
         let mut completer = None;
         if unsafe { ENV_OPTION.is_repl } {
-            completer = Some(Completer::from(prop_name_vec));
+            completer = Some(
+                Completer::from(prop_name_vec)
+                .into()
+            );
         }
 
         return Class {
@@ -97,10 +100,7 @@ impl Class {
             index += 1;
         }
 
-        return Ok(Object {
-            prototype: class_self.clone(),
-            storage: ComposeStorage::new(temp_list),
-        });
+        return Ok(Object::new(temp_list, Some(class_self)));
     }
 
     pub fn display_methods(f: &mut fmt::Formatter<'_>, cls: &Class, level: usize) -> fmt::Result {

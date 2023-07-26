@@ -1,4 +1,5 @@
 use std::borrow::Borrow;
+use std::cell::RefCell;
 use std::fmt;
 use std::rc::Rc;
 
@@ -52,8 +53,8 @@ pub struct UserDefinedFunction {
 
 #[derive(PartialEq, Clone)]
 pub enum Function {
-    BuildIn(Rc<BuildInFunction>),
-    UserDefined(Rc<UserDefinedFunction>),
+    BuildIn(Rc<RefCell<BuildInFunction>>),
+    UserDefined(Rc<RefCell<UserDefinedFunction>>),
 }
 
 impl Function {
@@ -111,11 +112,11 @@ impl fmt::Display for Function {
 
 impl From<UserDefinedFunction> for Function {
     fn from(value: UserDefinedFunction) -> Self {
-        Function::UserDefined(Rc::new(value))
+        Function::UserDefined(Rc::new(RefCell::new(value)))
     }
 }
 impl From<BuildInFunction> for Function {
     fn from(value: BuildInFunction) -> Self {
-        Function::BuildIn(Rc::new(value))
+        Function::BuildIn(Rc::new(RefCell::new(value)))
     }
 }

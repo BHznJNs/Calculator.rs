@@ -19,5 +19,5 @@ pub fn resolve(node: &InstantiationNode, scope: &mut Scope) -> Result<Object, ()
     };
 
     let instantiation_params = array_literal::resolve(&node.params, scope)?;
-    Class::instantiate(target_class.clone(), instantiation_params)
+    return Class::instantiate(target_class.clone(), instantiation_params);
 }

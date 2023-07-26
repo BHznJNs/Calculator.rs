@@ -12,7 +12,7 @@ use super::array::{Array, ArrayLiteral};
 use super::function::{BuildInFunction, Function, UserDefinedFunction};
 use super::number::Number;
 use super::oop::class::Class;
-use super::oop::object::Object;
+use super::oop::object::{Object, self};
 
 #[derive(PartialEq, Clone, Copy)]
 pub enum ValueType {
@@ -190,7 +190,7 @@ impl Value {
             Value::Array(arr) =>
                 Array::deep_clone(arr.clone()),
             Value::Object(obj) =>
-                Object::deep_clone(obj.clone()),
+                object::deep_clone(obj.clone()),
 
             Value::LazyExpression(l_expr) => {
                 let cloned_l_expr = l_expr.as_ref().clone();
@@ -247,7 +247,7 @@ impl fmt::Display for Value {
             Value::String(str) => write!(f, "{}", str.as_ref().borrow()),
             Value::Array(arr) => Array::display(f, arr, 1),
             Value::Class(cls) => write!(f, "{}", cls),
-            Value::Object(obj) => Object::display(f, obj, 1),
+            Value::Object(obj) => object::display(f, obj, 1),
 
             _ => {
                 if unsafe { ENV_OPTION.support_ansi } {

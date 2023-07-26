@@ -1,5 +1,3 @@
-use std::borrow::Borrow;
-
 use crate::computer::resolvers::composer::compose;
 use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::compile_time::ast::types::{ExpressionNode, InvocationNode};
@@ -29,12 +27,12 @@ fn function_invoke(
         Value::LazyExpression(le) => lazy_expression::invoke(le, scope)?,
         Value::Function(fn_enum) => match fn_enum {
             Function::BuildIn(build_in_fn) => {
-                build_in_function::invoke(build_in_fn.borrow(), params, scope)?
+                build_in_function::invoke(&build_in_fn.as_ref().borrow(), params, scope)?
             }
             Function::UserDefined(user_defined_fn) => {
-                user_defined_function::invoke(&user_defined_fn, params, scope)?
+                user_defined_function::invoke(&user_defined_fn.as_ref().borrow(), params, scope)?
             }
-        },
+        }
         _ => {
             return Err(type_error(
                 None,

@@ -9,7 +9,8 @@ use crate::public::value::value::VoidSign;
 use crate::utils::completer::Completer;
 
 use super::super::value::value::Value;
-use super::{build_in, module};
+use super::super::std::modules;
+use super::build_in;
 
 pub struct GlobalScope {
     pub variables: HashMap<String, Value>,
@@ -118,7 +119,7 @@ impl Scope {
 
         if !self.std_module_imported[*target_module as usize] {
             self.std_module_imported[*target_module as usize] = true;
-            module::std_resolve(self, target_module, module_name);
+            modules::import_resolver(self, target_module, module_name);
         }
         return Ok(());
     }

@@ -83,8 +83,8 @@ pub fn analyze(tokens: &TokenVec, scope: &Scope) -> Result<Vec<String>, ()> {
             }
         }
 
-        let target_proto = &var_object.as_ref().borrow().prototype;
-        let Some(completer) = &target_proto.completer else {
+        let completer = var_object.as_ref().borrow().get_completer();
+        let Some(completer) = completer else {
             return Err(());
         };
         let candidates = completer.complete(&end_part[0]);
