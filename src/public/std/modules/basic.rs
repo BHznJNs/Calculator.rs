@@ -205,7 +205,7 @@ impl BuildInFnCall for BasicFn {
                             Value::Number(Number::Int(refer.len() as i64))
                         } else if let Value::String(str) = input {
                             let refer = str.borrow();
-                            Value::Number(Number::Int(refer.len() as i64))
+                            Value::Number(Number::Int(refer.chars().count() as i64))
                         } else {
                             return Err(type_error(
                                 Some("Build-in function `len`"),
