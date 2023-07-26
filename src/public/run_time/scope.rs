@@ -8,8 +8,8 @@ use crate::public::value::oop::module::module_create;
 use crate::public::value::value::VoidSign;
 use crate::utils::completer::Completer;
 
-use super::super::value::value::Value;
 use super::super::std::modules;
+use super::super::value::value::Value;
 use super::build_in;
 
 pub struct GlobalScope {

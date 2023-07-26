@@ -17,10 +17,13 @@ pub fn module_create(module_scope: GlobalScope) -> Object {
             if let Function::UserDefined(func) = &func {
                 // automatically add `module` param
                 let mut func_ref = func.borrow_mut();
-                func_ref.params.insert(0, UserDefinedFnParam {
-                    type__: ValueType::Object,
-                    identi: String::from("module"),
-                })
+                func_ref.params.insert(
+                    0,
+                    UserDefinedFnParam {
+                        type__: ValueType::Object,
+                        identi: String::from("module"),
+                    },
+                )
             }
             method_statck.push((k, func));
         } else {

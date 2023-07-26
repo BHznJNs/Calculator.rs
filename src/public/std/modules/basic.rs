@@ -10,7 +10,7 @@ use crate::public::std::utils::str_to_num::str_to_num;
 use crate::public::value::array::ArrayLiteral;
 use crate::public::value::function::{BuildInFnParam, BuildInFunction};
 use crate::public::value::number::Number;
-use crate::public::value::value::{Value, ValueType, VoidSign};
+use crate::public::value::value::{Value, ValueType};
 
 use super::super::utils::get_val::get_val;
 use super::BuildInFnCall;
@@ -153,7 +153,7 @@ impl BuildInFnCall for BasicFn {
                         Value::Boolean(bool_val) => Value::from(bool_val as i64),
                         _ => {
                             return Err(type_error(
-                                Some("Build-in function 'int'"),
+                                Some("Build-in function `int`"),
                                 vec![ValueType::Boolean, ValueType::Number, ValueType::String],
                                 input.get_type(),
                             )?)
@@ -169,7 +169,7 @@ impl BuildInFnCall for BasicFn {
                         Value::Boolean(bool_val) => Value::from(bool_val as i64 as f64),
                         _ => {
                             return Err(type_error(
-                                Some("Build-in function 'float'"),
+                                Some("Build-in function `float`"),
                                 vec![ValueType::Boolean, ValueType::Number, ValueType::String],
                                 input.get_type(),
                             )?)
@@ -207,7 +207,11 @@ impl BuildInFnCall for BasicFn {
                             let refer = str.borrow();
                             Value::Number(Number::Int(refer.len() as i64))
                         } else {
-                            Value::Void(VoidSign::Empty)
+                            return Err(type_error(
+                                Some("Build-in function `len`"),
+                                vec![ValueType::Array, ValueType::String],
+                                input.get_type(),
+                            )?);
                         }
                     }
                     _ => unreachable!(),

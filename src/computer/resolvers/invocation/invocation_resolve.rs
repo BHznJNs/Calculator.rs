@@ -32,7 +32,7 @@ fn function_invoke(
             Function::UserDefined(user_defined_fn) => {
                 user_defined_function::invoke(&user_defined_fn.as_ref().borrow(), params, scope)?
             }
-        }
+        },
         _ => {
             return Err(type_error(
                 None,

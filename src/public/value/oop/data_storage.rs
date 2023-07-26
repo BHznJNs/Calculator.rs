@@ -68,7 +68,7 @@ impl<Item: Clone> ComposeStorage<Item> {
             }
             DataStoragePattern::Map => {
                 let data_map = self.data_map.as_ref().unwrap();
-    
+
                 match data_map.get(target_prop) {
                     Some(target_value) => Ok(target_value.clone()),
                     None => Err(()),
@@ -96,7 +96,7 @@ impl<Item: Clone> ComposeStorage<Item> {
                     Some(target_value) => {
                         *target_value = value;
                         Ok(())
-                    },
+                    }
                     None => Err(()),
                 }
             }

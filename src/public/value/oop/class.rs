@@ -8,12 +8,12 @@ use crate::public::error::{reference_error, type_error, ReferenceType};
 use crate::public::value::array::ArrayLiteral;
 use crate::public::value::display_indent;
 use crate::public::value::function::Function;
-use crate::public::value::value::{ValueType, Value};
+use crate::public::value::value::{Value, ValueType};
 use crate::public::Param;
 use crate::utils::completer::Completer;
 
+use super::data_storage::{self, ComposeStorage, DataStoragePattern};
 use super::object::Object;
-use super::data_storage::{DataStoragePattern, ComposeStorage, self};
 
 #[derive(PartialEq)]
 pub struct Class {
@@ -109,7 +109,11 @@ impl Class {
             String::from(Class::METHOD_DISP_STR)
         };
 
-        let ComposeStorage {storage_pattern, data_list, data_map} = &cls.method_storage;
+        let ComposeStorage {
+            storage_pattern,
+            data_list,
+            data_map,
+        } = &cls.method_storage;
 
         match storage_pattern {
             DataStoragePattern::List => {

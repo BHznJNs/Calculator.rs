@@ -61,13 +61,14 @@ array(10)
 # ]
 
 # Def: ascii(str $Str)
-# Returns the ASCII code of the first character of `str`.
+# Returns the ASCII code of the first character of `str`,
+# will throw an error when inputed Non-ASCII character.
 ascii("a") # 97
 ascii("$10") # 36
 
 # Def: len(value $_)
 # Receives Array typed and String typed value and return its length,
-# will throw an error when inputed Non-ASCII character.
+# will throw type_error when the other typed value is received.
 len("abc") # 3
 len([1, 2, 3]) # 3
 

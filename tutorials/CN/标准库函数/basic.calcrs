@@ -68,7 +68,8 @@ ascii("a") # 97
 ascii("$10") # 36
 
 # Def: len(value $_)
-# 接收 Array | String 类型的值并返回其大小。
+# 接收 Array | String 类型的值并返回其大小，
+# 当接收到其它类型的值时则抛出类型错误。
 len("abc") # 3
 len([1, 2, 3]) # 3
 

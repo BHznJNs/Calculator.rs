@@ -12,7 +12,7 @@ use super::array::{Array, ArrayLiteral};
 use super::function::{BuildInFunction, Function, UserDefinedFunction};
 use super::number::Number;
 use super::oop::class::Class;
-use super::oop::object::{Object, self};
+use super::oop::object::{self, Object};
 
 #[derive(PartialEq, Clone, Copy)]
 pub enum ValueType {
@@ -47,7 +47,7 @@ impl ValueType {
                 return Some(type__);
             }
         }
-        None
+        return None;
     }
 }
 

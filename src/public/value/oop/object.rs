@@ -3,7 +3,7 @@ use std::fmt;
 use std::rc::Rc;
 
 use crate::public::env::ENV_OPTION;
-use crate::public::error::{reference_error, ReferenceType, assignment_error};
+use crate::public::error::{assignment_error, reference_error, ReferenceType};
 use crate::public::value::array::Array;
 use crate::public::value::oop::class::Class;
 use crate::public::value::value::VoidSign;
@@ -11,7 +11,7 @@ use crate::utils::completer::Completer;
 
 use super::super::display_indent;
 use super::super::value::Value;
-use super::data_storage::{DataStoragePattern, ComposeStorage, ListStorage};
+use super::data_storage::{ComposeStorage, DataStoragePattern, ListStorage};
 
 #[derive(PartialEq, Clone)]
 pub enum Object {
@@ -46,9 +46,7 @@ impl Object {
                     }
                 };
                 let storage = ComposeStorage::new(params);
-                Object::BuildIn(BuildInObject {
-                    completer, storage,
-                })
+                Object::BuildIn(BuildInObject { completer, storage })
             }
         }
     }
@@ -82,9 +80,7 @@ impl Object {
         let target_value_result = store.getter(prop_name);
 
         match target_value_result {
-            Ok(target_ref) => {
-                Ok(target_ref.unwrap())
-            }
+            Ok(target_ref) => Ok(target_ref.unwrap()),
             Err(_) => {
                 if let Some(prototype) = self.get_proto() {
                     let target_method = prototype.get_method(prop_name)?;
@@ -100,7 +96,9 @@ impl Object {
             Object::BuildIn(obj) => {
                 let target_value = obj.storage.getter(prop_name);
                 if let Ok(Value::Function(_)) = target_value {
-                    return Err(assignment_error("invalid assignment to module object method")?)
+                    return Err(assignment_error(
+                        "invalid assignment to module object method",
+                    )?);
                 }
                 &mut obj.storage
             }
@@ -110,7 +108,7 @@ impl Object {
         let result = store.setter(prop_name, value);
         match result {
             Ok(_) => Ok(()),
-            Err(_) => Err(reference_error(ReferenceType::Property, prop_name)?)
+            Err(_) => Err(reference_error(ReferenceType::Property, prop_name)?),
         }
     }
 }
@@ -127,11 +125,7 @@ pub struct BuildInObject {
     pub(self) storage: ComposeStorage<Value>,
 }
 
-pub fn display(
-    f: &mut fmt::Formatter<'_>,
-    obj: &Rc<RefCell<Object>>,
-    level: usize,
-) -> fmt::Result {
+pub fn display(f: &mut fmt::Formatter<'_>, obj: &Rc<RefCell<Object>>, level: usize) -> fmt::Result {
     fn display_item(
         f: &mut fmt::Formatter<'_>,
         key: &str,
@@ -155,7 +149,11 @@ pub fn display(
 
     let obj_ref = obj.as_ref().borrow();
     let store = obj_ref.get_store();
-    let ComposeStorage {storage_pattern, data_list, data_map} = store;
+    let ComposeStorage {
+        storage_pattern,
+        data_list,
+        data_map,
+    } = store;
 
     write!(f, "{{\r\n")?;
     match storage_pattern {
@@ -190,7 +188,11 @@ pub fn deep_clone(obj: Rc<RefCell<Object>>) -> Value {
 
     let obj_ref = &*(obj.as_ref().borrow());
     let store = obj_ref.get_store();
-    let ComposeStorage {storage_pattern, data_list, data_map} = store;
+    let ComposeStorage {
+        storage_pattern,
+        data_list,
+        data_map,
+    } = store;
     let mut instantiation_params = Vec::<(String, Value)>::new();
 
     match storage_pattern {
@@ -215,7 +217,9 @@ pub fn deep_clone(obj: Rc<RefCell<Object>>) -> Value {
     // the instantiation must pass the type check.
     let res_obj = match obj_ref {
         Object::BuildIn(_) => Object::new(instantiation_params, None),
-        Object::UserDefined(_) => Object::new(instantiation_params, Some(obj_ref.get_proto().unwrap()))
+        Object::UserDefined(_) => {
+            Object::new(instantiation_params, Some(obj_ref.get_proto().unwrap()))
+        }
     };
     return Value::from(res_obj);
 }
