@@ -1,0 +1,13 @@
+i = 0
+
+# loop 10 times
+for 10 {
+    i += 1;
+}
+
+out i
+
+# infinity loop
+for {
+    out i
+}

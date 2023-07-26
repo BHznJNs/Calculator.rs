@@ -1,0 +1,30 @@
+# 内置模块导入
+import Basic
+import Math
+
+# 用户模块导入
+mod = import "./module.calcrs"
+# 'User module'
+
+# 模块内变量使用
+out mod.var
+# 1
+
+# 模块内函数使用
+out mod.func
+# <User-Defined-Function>
+
+# 模块内类的使用
+class = mod.class
+out class
+# {
+#   t: Void
+# }
+
+out mod.func(1)
+# 2
+
+out (new class(1))
+# {
+#   t: 1
+# }

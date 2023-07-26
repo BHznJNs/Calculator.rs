@@ -1,0 +1,11 @@
+out "User module"
+
+var = 1
+
+func = fn(i) {
+    brk i + 1
+}
+
+class = cl {
+    t $_
+}

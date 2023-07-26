@@ -1,0 +1,16 @@
+# class definition
+Person = cl {
+    # class properties
+    age $Numb;
+    name $Str;
+
+    # class method
+    greet = () {
+        out self.name;
+    }
+}
+
+# class instantiation
+inst = new Person(10, "test")
+
+inst.greet() # 'test'

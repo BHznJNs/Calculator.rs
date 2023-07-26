@@ -1,0 +1,76 @@
+import Basic
+
+# Def: input(prompt $Str)
+# Read a String value from standard input with `prompt`.
+input("Please input something: ")
+
+# Def: type(value $_)
+# Get the type of a variable.
+#
+# Note:
+# `NUMBER` here is a build-in type code constant.
+# Other type codes:
+# - STRING
+# - BOOLEAN
+# - ARRAY
+# - LAZYEXPR
+# - FUNCION
+# - CLASS
+# - OBJECT
+type(1) == NUMBER # true
+
+# Def: clone(value $_)
+# Returns a deep clone of a value.
+arr1 = [1, 2, 3]
+arr2 = clone(arr1) # [1, 2, 3]
+
+# Def: int(value ${ Numb | Bool | Str })
+# Convert Number | Boolean | String typed value to int typed value,
+# will throw type_error when received other typed value or invalid string.
+int(1.1) # 1
+
+# Def: float(value ${ Numb | Bool | Str })
+# Convert Number | Boolean | String typed value to float typed value,
+# will throw type_error when received other typed value or invalid string.
+float("1.1") # 1.1
+
+# Def: fraction(upper $Numb, lower $Numb)
+# Receive two int typed Number value as dividend and divisor, returns (upper / lower).
+fraction(1, 2) # (1 / 2)
+
+# Def: bool(value $_)
+# Convert value to Boolean type, will return true when received
+# Lazy-Expression typed, Function typed, Class typed or Object typed value.
+bool(10) # true
+bool(0) # false
+bool("") # false
+bool([1, 2, 3]) # true
+
+# Def: str(value $_)
+# Convert value to String type.
+string(10) # "10"
+string(true) # "true"
+string(arr2) # "1, 2, 3"
+
+# Def: array(size $Numb)
+# Returns an array with `size`.
+array(10)
+# [
+#   0, 0, 0, 0, 0,
+#   0, 0, 0, 0, 0,
+# ]
+
+# Def: ascii(str $Str)
+# Returns the ASCII code of the first character of `str`.
+ascii("a") # 97
+ascii("$10") # 36
+
+# Def: len(value $_)
+# Receives Array typed and String typed value and return its length,
+# will throw an error when inputed Non-ASCII character.
+len("abc") # 3
+len([1, 2, 3]) # 3
+
+# Def: exit()
+# Directly terminate the current running script or REPL.
+exit()

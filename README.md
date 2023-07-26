@@ -135,4 +135,4 @@ The release executable file will be at: `Calculator.rs/target/release`
 
 ## Tutorial
 
-See here: [Tutorials](./tutorials)
+See here: [Tutorials](./tutorials/EN)

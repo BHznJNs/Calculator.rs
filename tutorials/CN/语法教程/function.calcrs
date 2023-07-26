@@ -1,9 +1,8 @@
 add1 = fn(i $Numb) {
     #        ^^^^
     #  param-type
-    #  参数类型
 
-    # param-type list | 参数类型列表 :
+    # 参数类型列表 :
     # AnyType         -> $_       
     # Boolean         -> $Bool
     # Number          -> $Numb
@@ -13,7 +12,6 @@ add1 = fn(i $Numb) {
     # Function        -> $Func
     # Object          -> $Obj
 
-    # use `brk` to return value from function.
     # 使用 `brk` 关键字从函数中返回值。
     brk i + 1
 }
@@ -21,7 +19,6 @@ add1 = fn(i $Numb) {
 out add1(10) # 11
 
 add1 = fn(i) {
-    # AnyType annotation `$_` can be omitted.
     # Any 类型的类型注解 `$_` 可以被省略。
     brk i + 1
 }

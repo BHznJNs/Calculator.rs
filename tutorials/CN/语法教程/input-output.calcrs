@@ -1,5 +1,6 @@
 import Basic
 
+# 使用 `out` 关键字输出变量和值
 out "test content"
 # 'test content'
 
@@ -11,5 +12,6 @@ out [1, 2, 3]
 #   1, 2, 3,
 # ]
 
+# `input` 内置函数的使用参见：标准库函数/basic.calcrs
 out input("Please input something here: ") # test content
 # 'test content'

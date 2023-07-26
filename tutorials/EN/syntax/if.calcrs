@@ -6,7 +6,6 @@ if a == 1 {
 # 'a is equal to 1'
 
 # equal to: if bool(a) { ... }
-# 等效于：if bool(a) { ... }
 if a {
     out "a is truth value"
 }

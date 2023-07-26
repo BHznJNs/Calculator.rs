@@ -1,0 +1,15 @@
+# 变量赋值
+a = 1
+
+# 变量赋值会返回与右值相同的值
+out b = 1 # 1
+
+# 所以，你可以在同一个表达式中给两个变量赋值。
+c = d = 1
+out c # 1
+out d # 1
+
+# 非法的左值
+10 = 20
+# AssignmentError: invalid left-hand value.
+# Error occured at line 13

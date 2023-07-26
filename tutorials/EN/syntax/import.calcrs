@@ -1,0 +1,30 @@
+# Build-in module import
+import Basic
+import Math
+
+# User module import
+mod = import "./module.calcrs"
+# 'User module'
+
+# variable in module
+out mod.var
+# 1
+
+# function in module
+out mod.func
+# <User-Defined-Function>
+
+# class in module
+class = mod.class
+out class
+# {
+#   t: Void
+# }
+
+out mod.func(1)
+# 2
+
+out (new class(1))
+# {
+#   t: 1
+# }

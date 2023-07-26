@@ -1,5 +1,5 @@
 import Math
 
-sin = Math.sin
-cos = Math.cos
-tan = Math.tan
+sin = fn(i) {brk Math.sin(i)}
+cos = fn(i) {brk Math.cos(i)}
+tan = fn(i) {brk Math.tan(i)}
