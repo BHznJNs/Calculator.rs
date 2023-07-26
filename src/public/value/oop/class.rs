@@ -40,23 +40,22 @@ impl Class {
         // get properties' and methods' names into one `Vec`
         let mut prop_name_vec = vec![];
         for Property(_, identi) in &properties {
-            prop_name_vec.push(identi.clone())
+            prop_name_vec.push(identi.as_str())
         }
         for (k, _) in &methods {
-            prop_name_vec.push(k.clone());
+            prop_name_vec.push(k.as_str());
         }
-
-        // init method storage
-        let method_storage = ComposeStorage::new(methods);
 
         // init completer
         let mut completer = None;
         if unsafe { ENV_OPTION.is_repl } {
-            completer = Some(
-                Completer::from(prop_name_vec)
-                .into()
-            );
+            let mut temp = Completer::new();
+            temp.extend(prop_name_vec);
+            completer = Some(temp.into())
         }
+
+        // init method storage
+        let method_storage = ComposeStorage::new(methods);
 
         return Class {
             properties,

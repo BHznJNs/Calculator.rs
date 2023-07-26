@@ -13,13 +13,6 @@ impl Completer {
             root: CompleterNode::new(),
         }
     }
-    pub fn from(contents: Vec<String>) -> Self {
-        let mut result = Self::new();
-        for word in contents {
-            result.insert(&word)
-        }
-        return result;
-    }
 
     pub fn insert(&mut self, word: &str) {
         self.root.insert(word.chars());
@@ -29,5 +22,13 @@ impl Completer {
         let mut result = Vec::<String>::new();
         self.root.complete(word.chars(), &mut result);
         return result;
+    }
+}
+
+impl<'a> Extend<&'a str> for Completer {
+    fn extend<T: IntoIterator<Item = &'a str>>(&mut self, iter: T) {
+        for item in iter {
+            self.insert(&item);
+        }
     }
 }

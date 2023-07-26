@@ -11,9 +11,9 @@ pub enum Paren {
     RightBrace,
 }
 
-impl Paren {
-    pub fn from(ch: char) -> Self {
-        match ch {
+impl From<char> for Paren {
+    fn from(value: char) -> Self {
+        match value {
             '(' => Self::LeftParen,
             ')' => Self::RightParen,
             '[' => Self::LeftBracket,

@@ -35,10 +35,12 @@ impl Object {
                 let completer = {
                     if unsafe { ENV_OPTION.is_repl } {
                         let mut words = vec![];
+                        let mut temp = Completer::new();
                         for (k, _) in &params {
-                            words.push(k.clone())
+                            words.push(k.as_str())
                         }
-                        Some(Completer::from(words).into())
+                        temp.extend(words);
+                        Some(temp.into())
                     } else {
                         None
                     }
