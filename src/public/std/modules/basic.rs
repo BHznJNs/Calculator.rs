@@ -1,19 +1,25 @@
+use std::cell::RefCell;
 use std::io::{self, Write};
 use std::process;
+use std::rc::Rc;
 
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 
 use crate::public::error::{internal_error, type_error, InternalComponent};
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
+use crate::public::std::utils::get_self_prop::get_self_prop;
 use crate::public::std::utils::str_to_num::str_to_num;
+use crate::public::value::GetAddr;
 use crate::public::value::array::ArrayLiteral;
 use crate::public::value::function::{BuildInFnParam, BuildInFunction};
 use crate::public::value::number::Number;
 use crate::public::value::value::{Value, ValueType};
 
 use super::super::utils::get_val::get_val;
-use super::{BuildInFnCall, FunctionModule};
+use super::array::ArrayModule;
+use super::string::StringModule;
+use super::{BuildInFnCall, FunctionModule, ClassModule};
 
 #[derive(PartialEq, Clone)]
 pub enum BasicModule {
@@ -202,20 +208,45 @@ impl BuildInFnCall for BasicModule {
                         }
                     }
                     Self::LEN => {
-                        match input {
-                            Value::Array(arr) => {
-                                let refer = arr.borrow();
-                                let length = refer.len() as i64;
-                                return Ok(Value::Number(Number::Int(length)))
+                        #[inline]
+                        fn array_length(arr: &Rc<RefCell<ArrayLiteral>>) -> Value {
+                            let refer = arr.borrow();
+                            let length = refer.len() as i64;
+                            return Value::from(length);
+                        }
+                        #[inline]
+                        fn string_length(str: &Rc<RefCell<String>>) -> Value {
+                            let refer = str.borrow();
+                            let length = refer.chars().count() as i64;
+                            return Value::from(length);
+                        }
+                        match &input {
+                            Value::Array(arr) =>
+                                return Ok(array_length(arr)),
+                            Value::String(str) => 
+                                return Ok(string_length(str)),
+                            Value::Object(obj) => {
+                                if let Some(proto) = obj.borrow().get_proto() {
+                                    let string_cls = StringModule::module_class();
+                                    let array_cls = ArrayModule::module_class();
+                                    let proto_addr = proto.get_addr();
+
+                                    if proto_addr == array_cls.get_addr() {
+                                        let arr_val = get_self_prop(&input, "v")?;
+                                        let Value::Array(arr_ref) = arr_val else {
+                                            unreachable!()
+                                        };
+                                        return Ok(array_length(&arr_ref));
+                                    }
+                                    if proto_addr == string_cls.get_addr() {
+                                        let str_val = get_self_prop(&input, "v")?;
+                                        let Value::String(str_ref) = str_val else {
+                                            unreachable!()
+                                        };
+                                        return Ok(string_length(&str_ref));
+                                    }
+                                }
                             }
-                            Value::String(str) => {
-                                let refer = str.borrow();
-                                let length = refer.chars().count() as i64;
-                                return Ok(Value::Number(Number::Int(length)))
-                            }
-                            // Value::Object(obj) => {
-                            //     todo!()
-                            // }
                             _ => {}
                         };
                         return Err(type_error(

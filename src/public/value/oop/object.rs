@@ -58,7 +58,7 @@ impl Object {
             Object::UserDefined(obj) => &obj.storage,
         }
     }
-    fn get_proto(&self) -> Option<Prototype> {
+    pub fn get_proto(&self) -> Option<Prototype> {
         match self {
             Object::BuildIn(_) => None,
             Object::UserDefined(obj) => Some(obj.prototype.clone()),

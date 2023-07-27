@@ -24,12 +24,12 @@ type(1) == NUMBER # true
 arr1 = [1, 2, 3]
 arr2 = clone(arr)
 
-# Def: int(value ${ Numb | Bool | Str })
+# Def: int(value $_)
 # 将 Number | Boolean | String 类型的值转换为整型数值,
 # 当收到其它类型的值或者不合法的字符串时会抛出类型错误。
 int(1.1) # 1
 
-# Def: float(value ${ Numb | Bool | Str })
+# Def: float(value $_)
 # 将 Number | Boolean | String 类型的值转换为浮点型数值,
 # 当收到其它类型的值或者不合法的字符串时会抛出类型错误。
 float("1.1") # 1.1
@@ -68,7 +68,7 @@ ascii("a") # 97
 ascii("$10") # 36
 
 # Def: len(value $_)
-# 接收 Array | String 类型的值并返回其大小，
+# 接收 原始数组 | 数组对象 | 原始字符串 | 字符串对象 类型的值并返回其大小，
 # 当接收到其它类型的值时则抛出类型错误。
 len("abc") # 3
 len([1, 2, 3]) # 3

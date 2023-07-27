@@ -24,12 +24,12 @@ type(1) == NUMBER # true
 arr1 = [1, 2, 3]
 arr2 = clone(arr1) # [1, 2, 3]
 
-# Def: int(value ${ Numb | Bool | Str })
+# Def: int(value $_)
 # Convert Number | Boolean | String typed value to int typed value,
 # will throw type_error when received other typed value or invalid string.
 int(1.1) # 1
 
-# Def: float(value ${ Numb | Bool | Str })
+# Def: float(value $_)
 # Convert Number | Boolean | String typed value to float typed value,
 # will throw type_error when received other typed value or invalid string.
 float("1.1") # 1.1
@@ -67,7 +67,7 @@ ascii("a") # 97
 ascii("$10") # 36
 
 # Def: len(value $_)
-# Receives Array typed and String typed value and return its length,
+# Receives Raw-Array | Array-Object | Raw-String | String-Object value and return its length,
 # will throw type_error when the other typed value is received.
 len("abc") # 3
 len([1, 2, 3]) # 3
