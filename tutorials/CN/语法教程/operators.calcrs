@@ -19,6 +19,11 @@ out 1 <= 2 # true
 out 1 == 2 # false
 out 1 != 2 # true
 
+# 与操作符
+out true & false # false
+# 或操作符
+out true | false # true
+
 # 赋值操作符
 out t = 10 # 10
 out t += 1 # 11

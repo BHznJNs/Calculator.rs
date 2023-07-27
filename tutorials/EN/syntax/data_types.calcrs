@@ -1,0 +1,37 @@
+import String
+import Array
+
+# Number type
+number_int_var = 1 # int number
+number_float_var = 1.2 # float number
+
+# Boolean type
+bool_true_var = true
+bool_false_var = false
+
+# Raw-String type
+raw_str_var = "abcd"
+# String-Object type
+str_obj_var = new String("abcd")
+
+# Raw-Array type
+raw_arr_var = [1, 2, 3]
+# Array-Object type
+arr_obj_var = new Array([1, 2, 3])
+
+# Lazy-Expression type
+lazy_expr_var = { 1 + number_int_var }
+# Lazy-Expression invocation
+lazy_expr_var() # 2
+
+# Function type
+# Detailed information about function see also: ./function.calcrs
+func_var = fn(i) {brk i + 1}
+
+# Class type
+# Detailed information about class see also: ./class.calcrs
+class_var = cl {prop $_}
+
+# Object type
+object_var = new class_var(1)
+

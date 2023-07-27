@@ -1,6 +1,7 @@
 # Syntax
 
 - [变量](./variable.calcrs)
+- [数据类型](./data_types.calcrs)
 - [操作符](./operators.calcrs)
 - [输入输出](./input-output.calcrs)
 - [条件判断](./if.calcrs)

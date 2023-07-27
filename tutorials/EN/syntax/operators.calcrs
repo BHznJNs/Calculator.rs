@@ -19,6 +19,11 @@ out 1 <= 2 # true
 out 1 == 2 # false
 out 1 != 2 # true
 
+# And operator
+out true & false # false
+# Or operator
+out true | false # true
+
 # assignment operator
 out t = 10 # 10
 out t += 1 # 11

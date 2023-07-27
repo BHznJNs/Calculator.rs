@@ -1,6 +1,7 @@
 # Syntax
 
 - [Variable](./variable.calcrs)
+- [Data Types](./data_types.calcrs)
 - [Operator](./operators.calcrs)
 - [Input-Output](./input-output.calcrs)
 - [IF-Condition](./if.calcrs)

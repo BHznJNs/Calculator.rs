@@ -1,0 +1,37 @@
+import String
+import Array
+
+# 数字类型
+number_int_var = 1 # 整型数字
+number_float_var = 1.2 # 浮点型数字
+
+# 布尔类型
+bool_true_var = true
+bool_false_var = false
+
+# 原始字符串类型
+raw_str_var = "abcd"
+# 字符串对象类型
+str_obj_var = new String("abcd")
+
+# 原始数组类型
+raw_arr_var = [1, 2, 3]
+# 数组对象类型
+arr_obj_var = new Array([1, 2, 3])
+
+# 惰性求值表达式类型
+lazy_expr_var = { 1 + number_int_var }
+# 惰性求值表达式调用
+lazy_expr_var() # 2
+
+# 函数类型
+# 关于函数的详细信息参见函数小节
+func_var = fn(i) {brk i + 1}
+
+# 类 类型
+# 关于类的详细信息参见 类 小节
+class_var = cl {prop $_}
+
+# 对象类型
+object_var = new class_var(1)
+
