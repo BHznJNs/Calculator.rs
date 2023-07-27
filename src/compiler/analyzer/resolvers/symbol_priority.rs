@@ -3,19 +3,21 @@ use crate::public::{
     error::{internal_error, InternalComponent},
 };
 
-const PRIORITY: [i8; 12] = [
-    1, // Symbols::Plus
-    1, // Symbols::Minus
-    2, // Symbols::Multiply
-    2, // Symbols::Divide
-    3, // Symbols::Power
+const PRIORITY: [i8; 14] = [
+    2, // Symbols::Plus
+    2, // Symbols::Minus
+    3, // Symbols::Multiply
+    3, // Symbols::Divide
+    4, // Symbols::Power
     5, // Symbols::Not
-    0, // Symbols::LessThan
-    0, // Symbols::MoreThan
-    0, // Symbols::LessThanEqual
-    0, // Symbols::MoreThanEqual
-    0, // Symbols::CompareEqual
-    0, // Symbols::NotEqual
+    1, // Symbols::LessThan
+    1, // Symbols::MoreThan
+    1, // Symbols::LessThanEqual
+    1, // Symbols::MoreThanEqual
+    1, // Symbols::CompareEqual
+    1, // Symbols::NotEqual
+    0, // Symbols::AndSign
+    0, // Symbols::OrSign
 ];
 
 fn get_priority(symbol_node: &ASTNode) -> Result<i8, ()> {

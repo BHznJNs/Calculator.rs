@@ -11,3 +11,8 @@ pub mod oop;
 fn display_indent(level: usize) -> String {
     "  ".repeat(level)
 }
+
+pub type Addr = usize;
+pub trait GetAddr {
+    fn get_addr(&self) -> Addr;
+}

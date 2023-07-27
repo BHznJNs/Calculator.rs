@@ -8,6 +8,7 @@ use crate::public::env::ENV_OPTION;
 use crate::public::error::{internal_error, InternalComponent};
 
 use super::super::compile_time::ast::ast_enum::ASTNode;
+use super::GetAddr;
 use super::array::{Array, ArrayLiteral};
 use super::function::{BuildInFunction, Function, UserDefinedFunction};
 use super::number::Number;
@@ -74,7 +75,7 @@ pub enum VoidSign {
     Break(Rc<Value>),
     Empty,
 }
-#[derive(PartialEq, Clone)]
+#[derive(Clone)]
 pub enum Value {
     // Value::Void(..)
     // is used when comment line
@@ -229,12 +230,6 @@ impl Value {
     }
 }
 
-impl Into<Rc<RefCell<Value>>> for Value {
-    fn into(self) -> Rc<RefCell<Value>> {
-        Rc::new(RefCell::new(self))
-    }
-}
-
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -271,6 +266,48 @@ impl fmt::Display for Value {
                 }
             }
         }
+    }
+}
+
+impl GetAddr for Value {
+    fn get_addr(&self) -> super::Addr {
+        match self {
+            Value::Array(arr) => arr.as_ptr() as super::Addr,
+            Value::LazyExpression(lexpr) => (lexpr.as_ref() as *const ASTNode) as usize,
+            Value::Function(func) => func.get_addr(),
+            Value::Class(cls) => cls.get_addr(),
+            Value::Object(obj) => obj.borrow().get_addr(),
+            _ => unreachable!()
+        }
+    }
+}
+
+impl PartialEq for Value {
+    fn eq(&self, other: &Self) -> bool {
+        if self.get_type() != other.get_type() {
+            return false;
+        }
+
+        match (self, other) {
+            (Value::Void(sub1), Value::Void(sub2)) => sub1 == sub2,
+            (Value::Boolean(bool_val1), Value::Boolean(bool_val2)) => *bool_val1 == *bool_val2,
+            (Value::Number(num1), Value::Number(num2)) => *num1 == *num2,
+            (Value::String(str_ref1), Value::String(str_ref2)) => {
+                let str1 = str_ref1.borrow();
+                let temp = str_ref2.borrow();
+                let str2 = temp.as_str();
+                str1.eq(str2)
+            },
+            (Value::LazyExpression(_), Value::LazyExpression(_))
+            | (Value::Array(_), Value::Array(_))
+            | (Value::Function(_), Value::Function(_))
+            | (Value::Class(_), Value::Class(_))
+            | (Value::Object(_), Value::Object(_)) => self.get_addr() == other.get_addr(),
+            _ => unreachable!()
+        }
+    }
+    fn ne(&self, other: &Self) -> bool {
+        !self.eq(other)
     }
 }
 

@@ -19,6 +19,9 @@ pub enum Symbols {
     CompareEqual,
     NotEqual,
 
+    AndSign,
+    OrSign,
+
     Equal,
     PlusEqual,
     MinusEqual,
@@ -103,6 +106,8 @@ impl From<char> for Symbols {
             '/' => Self::Divide,
             '^' => Self::Power,
             '!' => Self::Not,
+            '&' => Self::AndSign,
+            '|' => Self::OrSign,
             '<' => Self::LessThan,
             '>' => Self::MoreThan,
             '=' => Self::Equal,
@@ -121,6 +126,9 @@ impl fmt::Display for Symbols {
             Symbols::Power => write!(f, "Power"),
 
             Symbols::Not => write!(f, "Not"),
+            Symbols::AndSign => write!(f, "And"),
+            Symbols::OrSign => write!(f, "Or"),
+
             Symbols::LessThan => write!(f, "LessThan"),
             Symbols::MoreThan => write!(f, "MoreThan"),
             Symbols::Equal => write!(f, "Equal"),

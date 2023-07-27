@@ -10,6 +10,7 @@ use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::{LocalScope, Scope};
 use crate::public::Param;
 
+use super::GetAddr;
 use super::value::{Value, ValueType};
 
 #[derive(PartialEq, Clone)]
@@ -106,6 +107,14 @@ impl fmt::Display for Function {
         match self {
             Function::BuildIn(_) => write!(f, "<Build-in-Function>"),
             Function::UserDefined(_) => write!(f, "<User-Defined-Function>"),
+        }
+    }
+}
+impl GetAddr for Function {
+    fn get_addr(&self) -> super::Addr {
+        match self {
+            Function::BuildIn(func) => func.as_ptr() as super::Addr,
+            Function::UserDefined(func) => func.as_ptr() as super::Addr,
         }
     }
 }

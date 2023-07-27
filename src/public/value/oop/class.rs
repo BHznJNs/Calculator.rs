@@ -6,7 +6,7 @@ use crossterm::style::Stylize;
 use crate::public::env::ENV_OPTION;
 use crate::public::error::{reference_error, type_error, ReferenceType};
 use crate::public::value::array::ArrayLiteral;
-use crate::public::value::display_indent;
+use crate::public::value::{display_indent, GetAddr, self};
 use crate::public::value::function::Function;
 use crate::public::value::value::{Value, ValueType};
 use crate::public::Param;
@@ -162,5 +162,12 @@ impl fmt::Display for Class {
 
         Class::display_methods(f, self, 1)?;
         write!(f, "}}")
+    }
+}
+
+impl GetAddr for Class {
+    fn get_addr(&self) -> value::Addr {
+        let ptr = self as *const Class;
+        return ptr as value::Addr;
     }
 }

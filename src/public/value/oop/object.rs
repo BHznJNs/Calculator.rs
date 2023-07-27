@@ -4,6 +4,7 @@ use std::rc::Rc;
 
 use crate::public::env::ENV_OPTION;
 use crate::public::error::{assignment_error, reference_error, ReferenceType};
+use crate::public::value::{GetAddr, self};
 use crate::public::value::array::Array;
 use crate::public::value::oop::class::Class;
 use crate::public::value::value::VoidSign;
@@ -110,6 +111,13 @@ impl Object {
             Ok(_) => Ok(()),
             Err(_) => Err(reference_error(ReferenceType::Property, prop_name)?),
         }
+    }
+}
+
+impl GetAddr for Object {
+    fn get_addr(&self) -> value::Addr {
+        let ptr = self as *const Object;
+        return ptr as value::Addr;
     }
 }
 
