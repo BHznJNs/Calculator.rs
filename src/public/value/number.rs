@@ -128,10 +128,10 @@ impl Number {
         lower /= gcd_val;
         return Ok(Number::Fraction(upper, lower));
     }
-
+    // greatest common divisor
     fn gcd(n1: i64, n2: i64) -> i64 {
         if n1 == n2 {
-            return 1;
+            return n1;
         }
 
         // avoid negative number
@@ -144,6 +144,7 @@ impl Number {
 
         return Number::gcd(smaller, larger % smaller);
     }
+    // least common multiple
     fn lcm(n1: i64, n2: i64) -> i64 {
         return (n1 * n2) / Number::gcd(n1, n2);
     }
