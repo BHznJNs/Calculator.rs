@@ -5,7 +5,7 @@ pub struct Candidate {
 
 impl Candidate {
     pub fn new() -> Self {
-        Candidate {
+        Self {
             list: vec![],
             index: 0,
         }

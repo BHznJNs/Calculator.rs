@@ -9,7 +9,7 @@ pub struct Completer {
 
 impl Completer {
     pub fn new() -> Self {
-        Completer {
+        Self {
             root: CompleterNode::new(),
         }
     }

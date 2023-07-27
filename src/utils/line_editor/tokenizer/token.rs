@@ -48,7 +48,7 @@ pub type TokenVec = Vec<Token>;
 
 impl Token {
     pub fn new(type__: TextType, content: String) -> Self {
-        Token { type__, content }
+        Self { type__, content }
     }
     pub fn len(&self) -> usize {
         self.content.chars().count()

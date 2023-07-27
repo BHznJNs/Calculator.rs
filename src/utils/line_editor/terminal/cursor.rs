@@ -8,7 +8,7 @@ pub struct Cursor {
 
 impl Cursor {
     pub fn new() -> Self {
-        Cursor {
+        Self {
             stdout: io::stdout(),
         }
     }

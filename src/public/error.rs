@@ -8,7 +8,6 @@ use crate::utils::output::print_line__;
 use super::value::value::ValueType;
 
 type ErrorResult = Result<(), ()>;
-
 fn error_name_output(name: &str) -> StyledContent<&str> {
     name.white().on_red().bold()
 }

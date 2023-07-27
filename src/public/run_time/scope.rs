@@ -16,8 +16,8 @@ pub struct GlobalScope {
     pub variables: HashMap<String, Value>,
 }
 impl GlobalScope {
-    pub fn init() -> GlobalScope {
-        GlobalScope {
+    pub fn init() -> Self {
+        Self {
             variables: build_in::constants(),
         }
     }
@@ -27,8 +27,8 @@ pub struct LocalScope {
     pub variables: HashMap<String, Value>,
 }
 impl LocalScope {
-    pub fn init() -> LocalScope {
-        LocalScope {
+    pub fn init() -> Self {
+        Self {
             variables: HashMap::<String, Value>::new(),
         }
     }
@@ -54,8 +54,8 @@ pub struct Scope {
     std_module_map: Rc<HashMap<&'static str, StdModules>>,
 }
 impl Scope {
-    pub fn init() -> Scope {
-        Scope {
+    pub fn init() -> Self {
+        Self {
             global: GlobalScope::init(),
             local: None,
             completer: None,
@@ -66,8 +66,8 @@ impl Scope {
         }
     }
     // inherit self to create new scope
-    pub fn new(&self) -> Scope {
-        Scope {
+    pub fn new(&self) -> Self {
+        Self {
             global: GlobalScope::init(),
             local: None,
             completer: None,

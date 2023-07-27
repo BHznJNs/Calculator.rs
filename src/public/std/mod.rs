@@ -1,15 +1,8 @@
 use std::rc::Rc;
 
 use self::modules::{
-    basic::BasicModule,
-    bit_ops::BitOpsModule,
-    file_system::FileSysModule,
-    math::MathModule,
-    array::ArrayModule,
-    string::StringModule,
-    FunctionModule,
-    ObjectModule,
-    ClassModule,
+    array::ArrayModule, basic::BasicModule, bit_ops::BitOpsModule, file_system::FileSysModule,
+    math::MathModule, string::StringModule, ClassModule, FunctionModule, ObjectModule,
 };
 use super::value::{
     oop::{class::Class, object::Object},

@@ -25,8 +25,8 @@ pub struct Env {
 }
 
 impl Env {
-    pub fn init(self_name: String) -> Env {
-        Env {
+    pub fn init(self_name: String) -> Self {
+        Self {
             self_name,
             version: env!("CARGO_PKG_VERSION"),
 

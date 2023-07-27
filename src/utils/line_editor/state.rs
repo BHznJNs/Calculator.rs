@@ -7,7 +7,7 @@ pub struct LineState {
 
 impl LineState {
     pub fn new() -> Self {
-        LineState {
+        Self {
             left_end: true,
             right_end: false,
             line_start: true,

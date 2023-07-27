@@ -16,95 +16,95 @@ pub enum Number {
 }
 
 impl Number {
-    pub fn pow(self, target: Number) -> Number {
+    pub fn pow(self, target: Self) -> Self {
         match self {
-            Number::Int(num1) => match target {
-                Number::Int(num2) => {
+            Self::Int(num1) => match target {
+                Self::Int(num2) => {
                     if num2 >= 0 {
-                        Number::Int(num1.pow(num2 as u32))
+                        Self::Int(num1.pow(num2 as u32))
                     } else {
-                        Number::Float((num1 as f64).powi(num2 as i32))
+                        Self::Float((num1 as f64).powi(num2 as i32))
                     }
                 }
-                Number::Float(num2) => Number::Float((num1 as f64).powf(num2)),
-                Number::Fraction(_, _) => Number::Float((num1 as f64).powf(target.float_value())),
-                _ => Number::NotANumber,
+                Self::Float(num2) => Self::Float((num1 as f64).powf(num2)),
+                Self::Fraction(_, _) => Self::Float((num1 as f64).powf(target.float_value())),
+                _ => Self::NotANumber,
             },
-            Number::Float(num1) => match target {
-                Number::Int(num2) => Number::Float(num1.powi(num2 as i32)),
-                Number::Float(num2) => Number::Float(num1.powf(num2)),
-                Number::Fraction(_, _) => Number::Float(num1.powf(target.float_value())),
-                _ => Number::NotANumber,
+            Self::Float(num1) => match target {
+                Self::Int(num2) => Self::Float(num1.powi(num2 as i32)),
+                Self::Float(num2) => Self::Float(num1.powf(num2)),
+                Self::Fraction(_, _) => Self::Float(num1.powf(target.float_value())),
+                _ => Self::NotANumber,
             },
-            Number::Fraction(upper, lower) => match target {
-                Number::Int(num2) => {
+            Self::Fraction(upper, lower) => match target {
+                Self::Int(num2) => {
                     let upper_powed = upper.pow(num2 as u32);
                     let lower_powed = lower.pow(num2 as u32);
-                    Number::Fraction(upper_powed, lower_powed).reduce().unwrap()
+                    Self::Fraction(upper_powed, lower_powed).reduce().unwrap()
                 }
-                Number::Float(num2) => {
+                Self::Float(num2) => {
                     let f_value = self.float_value();
-                    Number::Float(f_value.powf(num2))
+                    Self::Float(f_value.powf(num2))
                 }
-                Number::Fraction(_, _) => {
-                    Number::Float(self.float_value().powf(target.float_value()))
+                Self::Fraction(_, _) => {
+                    Self::Float(self.float_value().powf(target.float_value()))
                 }
-                _ => Number::NotANumber,
+                _ => Self::NotANumber,
             },
-            Number::NotANumber => Number::NotANumber,
+            Self::NotANumber => Self::NotANumber,
         }
     }
 
-    pub fn not(&self) -> Number {
+    pub fn not(&self) -> Self {
         match self {
-            Number::Int(i) => Number::Int(!(*i > 0) as i64),
-            Number::Float(f) => Number::Int(!(*f > 0.0) as i64),
-            Number::Fraction(upper, _) => {
+            Self::Int(i) => Self::Int(!(*i > 0) as i64),
+            Self::Float(f) => Self::Int(!(*f > 0.0) as i64),
+            Self::Fraction(upper, _) => {
                 if *upper == 0 {
-                    Number::Int(1)
+                    Self::Int(1)
                 } else {
-                    Number::Int(0)
+                    Self::Int(0)
                 }
             }
-            Number::NotANumber => Number::Int(1),
+            Self::NotANumber => Self::Int(1),
         }
     }
 
-    pub fn int(&self) -> Number {
+    pub fn int(&self) -> Self {
         match self {
-            Number::Float(f) => Number::Int(*f as i64),
-            Number::Fraction(_, _) => Number::Int(self.int_value()),
+            Self::Float(f) => Self::Int(*f as i64),
+            Self::Fraction(_, _) => Self::Int(self.int_value()),
             _ => self.clone(),
         }
     }
-    pub fn float(&self) -> Number {
+    pub fn float(&self) -> Self {
         match self {
-            Number::Int(i) => Number::Float(*i as f64),
-            Number::Fraction(_, _) => Number::Float(self.float_value()),
+            Self::Int(i) => Self::Float(*i as f64),
+            Self::Fraction(_, _) => Self::Float(self.float_value()),
             _ => self.clone(),
         }
     }
 
     pub fn int_value(self) -> i64 {
         match self {
-            Number::Int(i) => i,
-            Number::Float(f) => f as i64,
-            Number::Fraction(upper, lower) => {
+            Self::Int(i) => i,
+            Self::Float(f) => f as i64,
+            Self::Fraction(upper, lower) => {
                 if lower > upper {
                     0
                 } else {
                     upper / lower
                 }
             }
-            Number::NotANumber => 0,
+            Self::NotANumber => 0,
         }
     }
     pub fn float_value(self) -> f64 {
         match self {
-            Number::Int(i) => i as f64,
-            Number::Float(f) => f,
-            Number::Fraction(upper, lower) => (upper as f64) / (lower as f64),
-            Number::NotANumber => 0_f64,
+            Self::Int(i) => i as f64,
+            Self::Float(f) => f,
+            Self::Fraction(upper, lower) => (upper as f64) / (lower as f64),
+            Self::NotANumber => 0_f64,
         }
     }
 
@@ -117,16 +117,16 @@ impl Number {
 
     fn reduce(&self) -> Result<Self, ()> {
         // this method is specially for Number::Fraction
-        let Number::Fraction(mut upper, mut lower) = self else {
+        let Self::Fraction(mut upper, mut lower) = self else {
             return Err(internal_error(
                 InternalComponent::InternalFn,
                 "invalid `Number::reduce` invocation"
             )?);
         };
-        let gcd_val = Number::gcd(upper, lower);
+        let gcd_val = Self::gcd(upper, lower);
         upper /= gcd_val;
         lower /= gcd_val;
-        return Ok(Number::Fraction(upper, lower));
+        return Ok(Self::Fraction(upper, lower));
     }
     // greatest common divisor
     fn gcd(n1: i64, n2: i64) -> i64 {
@@ -142,21 +142,21 @@ impl Number {
             return larger;
         }
 
-        return Number::gcd(smaller, larger % smaller);
+        return Self::gcd(smaller, larger % smaller);
     }
     // least common multiple
     fn lcm(n1: i64, n2: i64) -> i64 {
-        return (n1 * n2) / Number::gcd(n1, n2);
+        return (n1 * n2) / Self::gcd(n1, n2);
     }
 }
 
 impl fmt::Display for Number {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Number::NotANumber => write!(f, "Not a Number"),
+            Self::NotANumber => write!(f, "Not a Number"),
 
-            Number::Int(num) => write!(f, "{}", num),
-            Number::Float(num) => {
+            Self::Int(num) => write!(f, "{}", num),
+            Self::Float(num) => {
                 // optimize float number output
                 // example:
                 // 1.0000000000 -> 1
@@ -166,7 +166,7 @@ impl fmt::Display for Number {
                     write!(f, "{:.10}", num)
                 }
             }
-            Number::Fraction(upper, lower) => {
+            Self::Fraction(upper, lower) => {
                 write!(f, "({} / {})", upper, lower)
             }
         }
@@ -175,36 +175,36 @@ impl fmt::Display for Number {
 
 // override operating symbols
 impl Add for Number {
-    type Output = Number;
-    fn add(self, other: Number) -> Number {
-        if self == Number::NotANumber || other == Number::NotANumber {
-            return Number::NotANumber;
+    type Output = Self;
+    fn add(self, other: Self) -> Self {
+        if self == Self::NotANumber || other == Self::NotANumber {
+            return Self::NotANumber;
         }
 
-        if let (Number::Float(_), _) | (_, Number::Float(_)) = (self, other) {
+        if let (Self::Float(_), _) | (_, Self::Float(_)) = (self, other) {
             let f1 = self.float_value();
             let f2 = other.float_value();
-            return Number::Float(f1 + f2);
+            return Self::Float(f1 + f2);
         }
 
         match self {
-            Number::Int(num1) => match other {
-                Number::Int(num2) => Number::Int(num1 + num2),
-                Number::Fraction(upper, lower) => Number::Fraction(upper + num1 * lower, lower)
+            Self::Int(num1) => match other {
+                Self::Int(num2) => Self::Int(num1 + num2),
+                Self::Fraction(upper, lower) => Self::Fraction(upper + num1 * lower, lower)
                     .reduce()
                     .unwrap(),
                 _ => unreachable!(),
             },
-            Number::Fraction(upper, lower) => match other {
-                Number::Int(num2) => Number::Fraction(upper + num2 * lower, lower)
+            Self::Fraction(upper, lower) => match other {
+                Self::Int(num2) => Self::Fraction(upper + num2 * lower, lower)
                     .reduce()
                     .unwrap(),
-                Number::Fraction(other_upper, other_lower) => {
-                    let lower_lcm = Number::lcm(lower, other_lower);
+                Self::Fraction(other_upper, other_lower) => {
+                    let lower_lcm = Self::lcm(lower, other_lower);
                     let self_factor = lower_lcm / lower;
                     let other_factor = lower_lcm / other_lower;
                     let res_upper = upper * self_factor + other_upper * other_factor;
-                    Number::Fraction(res_upper, lower_lcm).reduce().unwrap()
+                    Self::Fraction(res_upper, lower_lcm).reduce().unwrap()
                 }
                 _ => unreachable!(),
             },
@@ -214,37 +214,37 @@ impl Add for Number {
 }
 
 impl Sub for Number {
-    type Output = Number;
-    fn sub(self, other: Number) -> Number {
-        if self == Number::NotANumber || other == Number::NotANumber {
-            return Number::NotANumber;
+    type Output = Self;
+    fn sub(self, other: Self) -> Self {
+        if self == Self::NotANumber || other == Self::NotANumber {
+            return Self::NotANumber;
         }
 
-        if let (Number::Float(_), _) | (_, Number::Float(_)) = (self, other) {
+        if let (Self::Float(_), _) | (_, Self::Float(_)) = (self, other) {
             // convert num1 and num2 to float type
             let f1 = self.float_value();
             let f2 = other.float_value();
-            return Number::Float(f1 - f2);
+            return Self::Float(f1 - f2);
         }
 
         match self {
-            Number::Int(num1) => match other {
-                Number::Int(num2) => Number::Int(num1 - num2),
-                Number::Fraction(upper, lower) => Number::Fraction(num1 * lower - upper, lower)
+            Self::Int(num1) => match other {
+                Self::Int(num2) => Self::Int(num1 - num2),
+                Self::Fraction(upper, lower) => Self::Fraction(num1 * lower - upper, lower)
                     .reduce()
                     .unwrap(),
                 _ => unreachable!(),
             },
-            Number::Fraction(upper, lower) => match other {
-                Number::Int(num2) => Number::Fraction(upper - num2 * lower, lower)
+            Self::Fraction(upper, lower) => match other {
+                Self::Int(num2) => Self::Fraction(upper - num2 * lower, lower)
                     .reduce()
                     .unwrap(),
-                Number::Fraction(other_upper, other_lower) => {
-                    let lower_lcm = Number::lcm(lower, other_lower);
+                Self::Fraction(other_upper, other_lower) => {
+                    let lower_lcm = Self::lcm(lower, other_lower);
                     let self_factor = lower_lcm / lower;
                     let other_factor = lower_lcm / other_lower;
                     let res_upper = upper * self_factor - other_upper * other_factor;
-                    Number::Fraction(res_upper, lower_lcm).reduce().unwrap()
+                    Self::Fraction(res_upper, lower_lcm).reduce().unwrap()
                 }
                 _ => unreachable!(),
             },
@@ -254,33 +254,33 @@ impl Sub for Number {
 }
 
 impl Mul for Number {
-    type Output = Number;
-    fn mul(self, other: Number) -> Number {
-        if self == Number::NotANumber || other == Number::NotANumber {
-            return Number::NotANumber;
+    type Output = Self;
+    fn mul(self, other: Self) -> Self {
+        if self == Self::NotANumber || other == Self::NotANumber {
+            return Self::NotANumber;
         }
 
-        if let (Number::Float(_), _) | (_, Number::Float(_)) = (self, other) {
+        if let (Self::Float(_), _) | (_, Self::Float(_)) = (self, other) {
             // convert num1 and num2 to float type
             let f1 = self.float_value();
             let f2 = other.float_value();
-            return Number::Float(f1 * f2);
+            return Self::Float(f1 * f2);
         }
 
         match self {
-            Number::Int(num1) => match other {
-                Number::Int(num2) => Number::Int(num1 * num2),
-                Number::Fraction(upper, lower) => {
-                    Number::Fraction(num1 * upper, lower).reduce().unwrap()
+            Self::Int(num1) => match other {
+                Self::Int(num2) => Self::Int(num1 * num2),
+                Self::Fraction(upper, lower) => {
+                    Self::Fraction(num1 * upper, lower).reduce().unwrap()
                 }
                 _ => unreachable!(),
             },
-            Number::Fraction(upper, lower) => match other {
-                Number::Int(num2) => Number::Fraction(upper * num2, lower).reduce().unwrap(),
-                Number::Fraction(other_upper, other_lower) => {
+            Self::Fraction(upper, lower) => match other {
+                Self::Int(num2) => Self::Fraction(upper * num2, lower).reduce().unwrap(),
+                Self::Fraction(other_upper, other_lower) => {
                     let muled_upper = upper * other_upper;
                     let muled_lower = lower * other_lower;
-                    Number::Fraction(muled_upper, muled_lower).reduce().unwrap()
+                    Self::Fraction(muled_upper, muled_lower).reduce().unwrap()
                 }
                 _ => unreachable!(),
             },
@@ -290,14 +290,14 @@ impl Mul for Number {
 }
 
 impl Div for Number {
-    type Output = Number;
-    fn div(self, other: Number) -> Number {
-        if self == Number::NotANumber || other == Number::NotANumber {
-            return Number::NotANumber;
+    type Output = Self;
+    fn div(self, other: Self) -> Self {
+        if self == Self::NotANumber || other == Self::NotANumber {
+            return Self::NotANumber;
         }
 
         // when either `self` or `other` is float
-        if let (Number::Float(_), _) | (_, Number::Float(_)) = (self, other) {
+        if let (Self::Float(_), _) | (_, Self::Float(_)) = (self, other) {
             // convert num1 and num2 to float type
             let f1 = self.float_value();
             let f2 = other.float_value();
@@ -305,27 +305,27 @@ impl Div for Number {
             if f2 == 0.0 {
                 print_line__("The dividend should not to be ZERO!");
                 match f1 {
-                    x if x == 0.0 => return Number::Float(0.0),
-                    x if x > 0.0 => return Number::Float(INFINITY),
-                    x if x < 0.0 => return Number::Float(-INFINITY),
+                    x if x == 0.0 => return Self::Float(0.0),
+                    x if x > 0.0 => return Self::Float(INFINITY),
+                    x if x < 0.0 => return Self::Float(-INFINITY),
                     _ => unreachable!(),
                 }
             }
-            return Number::Float(f1 / f2);
+            return Self::Float(f1 / f2);
         }
 
         match self {
-            Number::Int(num1) => match other {
-                Number::Int(num2) => Number::Int(num1 / num2),
-                Number::Fraction(upper, lower) => {
-                    Number::Fraction(num1 * lower, upper).reduce().unwrap()
+            Self::Int(num1) => match other {
+                Self::Int(num2) => Self::Int(num1 / num2),
+                Self::Fraction(upper, lower) => {
+                    Self::Fraction(num1 * lower, upper).reduce().unwrap()
                 }
                 _ => unreachable!(),
             },
-            Number::Fraction(upper, lower) => match other {
-                Number::Int(num2) => Number::Fraction(upper, lower * num2).reduce().unwrap(),
-                Number::Fraction(other_upper, other_lower) => {
-                    Number::Fraction(upper * other_lower, lower * other_upper)
+            Self::Fraction(upper, lower) => match other {
+                Self::Int(num2) => Self::Fraction(upper, lower * num2).reduce().unwrap(),
+                Self::Fraction(other_upper, other_lower) => {
+                    Self::Fraction(upper * other_lower, lower * other_upper)
                         .reduce()
                         .unwrap()
                 }
@@ -340,26 +340,26 @@ impl Div for Number {
 
 impl PartialEq for Number {
     fn eq(&self, other: &Self) -> bool {
-        if let (Number::NotANumber, _) | (_, Number::NotANumber) = (self, other) {
+        if let (Self::NotANumber, _) | (_, Self::NotANumber) = (self, other) {
             return false;
         }
 
-        if let (Number::Float(_), _) | (_, Number::Float(_)) = (self, other) {
+        if let (Self::Float(_), _) | (_, Self::Float(_)) = (self, other) {
             let f1 = self.float_value();
             let f2 = other.float_value();
-            return Number::float_cmp(f1, f2);
+            return Self::float_cmp(f1, f2);
         }
 
         match self {
-            Number::Int(num1) => match other {
-                Number::Int(num2) => *num1 == *num2,
-                Number::Fraction(_, _) => *num1 as f64 == other.float_value(),
+            Self::Int(num1) => match other {
+                Self::Int(num2) => *num1 == *num2,
+                Self::Fraction(_, _) => *num1 as f64 == other.float_value(),
                 _ => unreachable!(),
             },
-            Number::Fraction(_, _) => match other {
-                Number::Int(num2) => self.int_value() == *num2,
-                Number::Fraction(_, _) => {
-                    Number::float_cmp(self.float_value(), other.float_value())
+            Self::Fraction(_, _) => match other {
+                Self::Int(num2) => self.int_value() == *num2,
+                Self::Fraction(_, _) => {
+                    Self::float_cmp(self.float_value(), other.float_value())
                 }
                 _ => unreachable!(),
             },

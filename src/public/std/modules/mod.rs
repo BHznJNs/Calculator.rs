@@ -43,14 +43,14 @@ pub trait BuildInFnCall {
     fn call(&self, scope: &mut Scope) -> Result<Value, ()>;
 }
 
-pub trait FunctionModule {
+pub trait FunctionModule: BuildInFnCall {
     fn function_list() -> Vec<(String, Value)>;
 }
 
-pub trait ClassModule {
+pub trait ClassModule: BuildInFnCall {
     fn __static_class_init();
     fn module_class() -> Rc<Class>;
 }
-pub trait ObjectModule {
+pub trait ObjectModule: BuildInFnCall {
     fn module_object() -> Object;
 }

@@ -3,8 +3,7 @@ use crate::public::value::symbols::Symbols;
 use crate::public::value::value::Value;
 
 pub fn operate(val1: Value, val2: Value, operator: Symbols) -> Result<Value, ()> {
-    let result =
-    match (&val1, &val2, operator) {
+    let result = match (&val1, &val2, operator) {
         (Value::Number(num1_ref), Value::Number(num2_ref), _) => {
             // number computing and comparing
             let num1 = *num1_ref;
@@ -39,16 +38,16 @@ pub fn operate(val1: Value, val2: Value, operator: Symbols) -> Result<Value, ()>
         }
         (_, _, Symbols::NotEqual | Symbols::CompareEqual | Symbols::AndSign | Symbols::OrSign) =>
         // all typed value comparing
-        match operator {
-            Symbols::NotEqual => Value::Boolean(val1 != val2),
-            Symbols::CompareEqual => Value::Boolean(val1 == val2),
-            Symbols::AndSign => Value::Boolean(val1.get_bool() && val2.get_bool()),
-            Symbols::OrSign => Value::Boolean(val1.get_bool() || val2.get_bool()),
-            _ => unreachable!()
-        },
-        _ => return Err(syntax_error(
-            "invalid computing expression",
-        )?)
+        {
+            match operator {
+                Symbols::NotEqual => Value::Boolean(val1 != val2),
+                Symbols::CompareEqual => Value::Boolean(val1 == val2),
+                Symbols::AndSign => Value::Boolean(val1.get_bool() && val2.get_bool()),
+                Symbols::OrSign => Value::Boolean(val1.get_bool() || val2.get_bool()),
+                _ => unreachable!(),
+            }
+        }
+        _ => return Err(syntax_error("invalid computing expression")?),
     };
     return Ok(result);
 }

@@ -8,12 +8,12 @@ use crate::public::env::ENV_OPTION;
 use crate::public::error::{internal_error, InternalComponent};
 
 use super::super::compile_time::ast::ast_enum::ASTNode;
-use super::GetAddr;
 use super::array::{Array, ArrayLiteral};
 use super::function::{BuildInFunction, Function, UserDefinedFunction};
 use super::number::Number;
 use super::oop::class::Class;
 use super::oop::object::{self, Object};
+use super::GetAddr;
 
 #[derive(PartialEq, Clone, Copy)]
 pub enum ValueType {
@@ -106,7 +106,7 @@ impl Value {
 
     pub fn get_i64(&self) -> Result<i64, ()> {
         // expected Number typed value to call this method
-        let Value::Number(num) = self else {
+        let Self::Number(num) = self else {
             return Err(internal_error(
                 InternalComponent::InternalFn,
                 "invalid `Value::get_i64` invocation"
@@ -116,7 +116,7 @@ impl Value {
     }
     pub fn get_f64(&self) -> Result<f64, ()> {
         // expected Number typed value to call this method
-        let Value::Number(num) = self else {
+        let Self::Number(num) = self else {
             return Err(internal_error(
                 InternalComponent::InternalFn,
                 "invalid `Value::get_f64` invocation"
@@ -126,19 +126,17 @@ impl Value {
     }
     pub fn get_bool(&self) -> bool {
         match self {
-            Value::Boolean(bool_val) => *bool_val,
-            Value::Number(num) => *num != Number::Int(0),
-            Value::String(str) => str.as_ref().borrow().len() > 0,
-            Value::Array(arr) => arr.as_ref().borrow().len() > 0,
+            Self::Boolean(bool_val) => *bool_val,
+            Self::Number(num) => *num != Number::Int(0),
+            Self::String(str) => str.as_ref().borrow().len() > 0,
+            Self::Array(arr) => arr.as_ref().borrow().len() > 0,
 
-            Value::Void(_) => false,
-            Value::LazyExpression(_) | Value::Function(_) | Value::Class(_) | Value::Object(_) => {
-                true
-            }
+            Self::Void(_) => false,
+            Self::LazyExpression(_) | Self::Function(_) | Self::Class(_) | Self::Object(_) => true,
         }
     }
     pub fn get_str(&self) -> Result<RefMut<String>, ()> {
-        let Value::String(str) = self else {
+        let Self::String(str) = self else {
             return Err(internal_error(
                 InternalComponent::InternalFn,
                 "invalid `Value::get_str` invocation"
@@ -152,73 +150,73 @@ impl Value {
     // it needs an extra method to get raw_string(string without ANSI code).
     pub fn to_raw_string(&self) -> String {
         match self {
-            Value::Void(_) => self.to_string(),
-            Value::Boolean(bool_val) => bool_val.to_string(),
-            Value::Number(num) => num.to_string(),
-            Value::String(str) => str.borrow().clone(),
-            Value::Function(func) => func.to_string(),
-            Value::Array(arr) => Array::join(&arr.borrow(), ", "),
+            Self::Void(_) => self.to_string(),
+            Self::Boolean(bool_val) => bool_val.to_string(),
+            Self::Number(num) => num.to_string(),
+            Self::String(str) => str.borrow().clone(),
+            Self::Function(func) => func.to_string(),
+            Self::Array(arr) => Array::join(&arr.borrow(), ", "),
 
-            Value::LazyExpression(_) => String::from("<Lazy-Expression>"),
-            Value::Class(_) => String::from("<Class>"),
-            Value::Object(_) => String::from("<Object>"),
+            Self::LazyExpression(_) => String::from("<Lazy-Expression>"),
+            Self::Class(_) => String::from("<Class>"),
+            Self::Object(_) => String::from("<Object>"),
         }
     }
 
-    pub fn unwrap(&self) -> Value {
+    pub fn unwrap(&self) -> Self {
         // Rc<Value> -> Value
         // Ref<Value> -> Value
         self.clone()
     }
-    pub fn deep_clone(&self) -> Value {
+    pub fn deep_clone(&self) -> Self {
         let result = match self {
             // Boolean and Number is primitive type,
             // can be directly cloned.
-            Value::Boolean(_)
-            | Value::Number(_)
+            Self::Boolean(_)
+            | Self::Number(_)
             // Function and Class can not be modified,
             // can just clone their Rc.
-            | Value::Function(_)
-            | Value::Class(_) => self.clone(),
+            | Self::Function(_)
+            | Self::Class(_) => self.clone(),
 
-            Value::String(str) => {
+            Self::String(str) => {
                 let cloned_str = str.as_ref().borrow().clone();
-                Value::from(cloned_str)
+                Self::from(cloned_str)
             },
 
             // for `Array` and `Object` the two complex type,
             // recursive clone is needed.
-            Value::Array(arr) =>
+            Self::Array(arr) =>
                 Array::deep_clone(arr.clone()),
-            Value::Object(obj) =>
+            Self::Object(obj) =>
                 object::deep_clone(obj.clone()),
 
-            Value::LazyExpression(l_expr) => {
+            Self::LazyExpression(l_expr) => {
                 let cloned_l_expr = l_expr.as_ref().clone();
-                Value::from(cloned_l_expr)
+                Self::from(cloned_l_expr)
             },
 
             // user-defined common variable can not be `void` typed,
             // so that it need not to implement
             // `deep_clone`.
-            Value::Void(_) => unreachable!(),
+            Self::Void(_) => unreachable!(),
         };
         return result;
     }
 
     pub fn get_type(&self) -> ValueType {
         match self {
-            Value::Void(_) => ValueType::Void,
+            Self::Void(_) => ValueType::Void,
 
-            Value::Boolean(_) => ValueType::Boolean,
-            Value::Number(_) => ValueType::Number,
-            Value::String(_) => ValueType::String,
-            Value::Array(_) => ValueType::Array,
-            Value::LazyExpression(_) => ValueType::LazyExpression,
+            Self::Boolean(_) => ValueType::Boolean,
+            Self::Number(_) => ValueType::Number,
+            Self::String(_) => ValueType::String,
+            Self::Array(_) => ValueType::Array,
+            Self::LazyExpression(_) => ValueType::LazyExpression,
 
-            Value::Function(_) => ValueType::Function,
-            Value::Class(_) => ValueType::Class,
-            Value::Object(_) => ValueType::Object,
+            Self::Function(_) => ValueType::Function,
+            Self::Class(_) => ValueType::Class,
+            Self::Object(_) => ValueType::Object,
         }
     }
     pub fn check_type(&self, target_type: ValueType) -> bool {
@@ -233,34 +231,34 @@ impl Value {
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Value::Void(void_sign) => match void_sign {
+            Self::Void(void_sign) => match void_sign {
                 VoidSign::Continue => write!(f, "Void(Continue)"),
                 VoidSign::Break(val) => write!(f, "Void({})", val),
                 VoidSign::Empty => write!(f, "<Void>"),
             },
 
-            Value::String(str) => write!(f, "{}", str.as_ref().borrow()),
-            Value::Array(arr) => Array::display(f, arr, 1),
-            Value::Class(cls) => write!(f, "{}", cls),
-            Value::Object(obj) => object::display(f, obj, 1),
+            Self::String(str) => write!(f, "{}", str.as_ref().borrow()),
+            Self::Array(arr) => Array::display(f, arr, 1),
+            Self::Class(cls) => write!(f, "{}", cls),
+            Self::Object(obj) => object::display(f, obj, 1),
 
             _ => {
                 if unsafe { ENV_OPTION.support_ansi } {
                     match self {
-                        Value::Boolean(bool_val) => {
+                        Self::Boolean(bool_val) => {
                             write!(f, "{}", bool_val.to_string().dark_yellow())
                         }
-                        Value::Number(num) => write!(f, "{}", num.to_string().yellow()),
-                        Value::LazyExpression(_) => write!(f, "{}", "<Lazy-Expression>".cyan()),
-                        Value::Function(func) => write!(f, "{}", func.to_string().cyan()),
+                        Self::Number(num) => write!(f, "{}", num.to_string().yellow()),
+                        Self::LazyExpression(_) => write!(f, "{}", "<Lazy-Expression>".cyan()),
+                        Self::Function(func) => write!(f, "{}", func.to_string().cyan()),
                         _ => unreachable!(),
                     }
                 } else {
                     match self {
-                        Value::Boolean(bool_val) => write!(f, "{}", bool_val),
-                        Value::Number(num) => write!(f, "{}", num),
-                        Value::LazyExpression(_) => write!(f, "{}", "<Lazy-Expression>"),
-                        Value::Function(func) => write!(f, "{}", func),
+                        Self::Boolean(bool_val) => write!(f, "{}", bool_val),
+                        Self::Number(num) => write!(f, "{}", num),
+                        Self::LazyExpression(_) => write!(f, "{}", "<Lazy-Expression>"),
+                        Self::Function(func) => write!(f, "{}", func),
                         _ => unreachable!(),
                     }
                 }
@@ -272,12 +270,12 @@ impl fmt::Display for Value {
 impl GetAddr for Value {
     fn get_addr(&self) -> super::Addr {
         match self {
-            Value::Array(arr) => arr.as_ptr() as super::Addr,
-            Value::LazyExpression(lexpr) => (lexpr.as_ref() as *const ASTNode) as usize,
-            Value::Function(func) => func.get_addr(),
-            Value::Class(cls) => cls.get_addr(),
-            Value::Object(obj) => obj.borrow().get_addr(),
-            _ => unreachable!()
+            Self::Array(arr) => arr.as_ptr() as super::Addr,
+            Self::LazyExpression(lexpr) => (lexpr.as_ref() as *const ASTNode) as usize,
+            Self::Function(func) => func.get_addr(),
+            Self::Class(cls) => cls.get_addr(),
+            Self::Object(obj) => obj.borrow().get_addr(),
+            _ => unreachable!(),
         }
     }
 }
@@ -289,21 +287,21 @@ impl PartialEq for Value {
         }
 
         match (self, other) {
-            (Value::Void(sub1), Value::Void(sub2)) => sub1 == sub2,
-            (Value::Boolean(bool_val1), Value::Boolean(bool_val2)) => *bool_val1 == *bool_val2,
-            (Value::Number(num1), Value::Number(num2)) => *num1 == *num2,
-            (Value::String(str_ref1), Value::String(str_ref2)) => {
+            (Self::Void(sub1), Self::Void(sub2)) => sub1 == sub2,
+            (Self::Boolean(bool_val1), Self::Boolean(bool_val2)) => *bool_val1 == *bool_val2,
+            (Self::Number(num1), Self::Number(num2)) => *num1 == *num2,
+            (Self::String(str_ref1), Self::String(str_ref2)) => {
                 let str1 = str_ref1.borrow();
                 let temp = str_ref2.borrow();
                 let str2 = temp.as_str();
                 str1.eq(str2)
-            },
-            (Value::LazyExpression(_), Value::LazyExpression(_))
-            | (Value::Array(_), Value::Array(_))
-            | (Value::Function(_), Value::Function(_))
-            | (Value::Class(_), Value::Class(_))
-            | (Value::Object(_), Value::Object(_)) => self.get_addr() == other.get_addr(),
-            _ => unreachable!()
+            }
+            (Self::LazyExpression(_), Self::LazyExpression(_))
+            | (Self::Array(_), Self::Array(_))
+            | (Self::Function(_), Self::Function(_))
+            | (Self::Class(_), Self::Class(_))
+            | (Self::Object(_), Self::Object(_)) => self.get_addr() == other.get_addr(),
+            _ => unreachable!(),
         }
     }
     fn ne(&self, other: &Self) -> bool {
@@ -313,52 +311,52 @@ impl PartialEq for Value {
 
 impl From<bool> for Value {
     fn from(value: bool) -> Self {
-        Value::Boolean(value)
+        Self::Boolean(value)
     }
 }
 impl From<i64> for Value {
     fn from(value: i64) -> Self {
-        Value::Number(Number::Int(value))
+        Self::Number(Number::Int(value))
     }
 }
 impl From<f64> for Value {
     fn from(value: f64) -> Self {
-        Value::Number(Number::Float(value))
+        Self::Number(Number::Float(value))
     }
 }
 impl From<String> for Value {
     fn from(value: String) -> Self {
-        Value::String(Rc::new(RefCell::new(value)))
+        Self::String(Rc::new(RefCell::new(value)))
     }
 }
 impl From<ArrayLiteral> for Value {
     fn from(value: ArrayLiteral) -> Self {
-        Value::Array(Rc::new(RefCell::new(value)))
+        Self::Array(Rc::new(RefCell::new(value)))
     }
 }
 impl From<ASTNode> for Value {
     fn from(value: ASTNode) -> Self {
-        Value::LazyExpression(Rc::new(value))
+        Self::LazyExpression(Rc::new(value))
     }
 }
 
 impl From<UserDefinedFunction> for Value {
     fn from(value: UserDefinedFunction) -> Self {
-        Value::Function(Function::from(value))
+        Self::Function(Function::from(value))
     }
 }
 impl From<BuildInFunction> for Value {
     fn from(value: BuildInFunction) -> Self {
-        Value::Function(Function::from(value))
+        Self::Function(Function::from(value))
     }
 }
 impl From<Class> for Value {
     fn from(value: Class) -> Self {
-        Value::Class(Rc::new(value))
+        Self::Class(Rc::new(value))
     }
 }
 impl From<Object> for Value {
     fn from(value: Object) -> Self {
-        Value::Object(Rc::new(RefCell::new(value)))
+        Self::Object(Rc::new(RefCell::new(value)))
     }
 }

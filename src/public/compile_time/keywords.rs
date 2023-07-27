@@ -19,9 +19,9 @@ pub enum Keyword {
 }
 
 impl Keyword {
-    pub fn is_keyword(word: &str) -> Option<Keyword> {
+    pub fn is_keyword(word: &str) -> Option<Self> {
         // check is keyword
-        let keyword: Keyword;
+        let keyword: Self;
 
         let mut index = 0;
         while index < KEYWORD_PAIRS.len() {

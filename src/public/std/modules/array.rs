@@ -74,27 +74,30 @@ impl ClassModule for ArrayModule {
 
         // --- --- --- --- --- ---
 
-        unsafe { MODULE_CLASS = Some(Class::new(
-            vec![Property(ValueType::Array, String::from("v"))],
-            vec![
-                (String::from("push"), Function::from(push)),
-                (String::from("pop"), Function::from(pop)),
-                (String::from("shift"), Function::from(shift)),
-                (String::from("unshift"), Function::from(unshift)),
-                (String::from("insert"), Function::from(insert)),
-                (String::from("remove"), Function::from(remove)),
-                (String::from("join"), Function::from(join)),
-            ],
-        ).into()) }
+        unsafe {
+            MODULE_CLASS = Some(
+                Class::new(
+                    vec![Property(ValueType::Array, String::from("v"))],
+                    vec![
+                        (String::from("push"), Function::from(push)),
+                        (String::from("pop"), Function::from(pop)),
+                        (String::from("shift"), Function::from(shift)),
+                        (String::from("unshift"), Function::from(unshift)),
+                        (String::from("insert"), Function::from(insert)),
+                        (String::from("remove"), Function::from(remove)),
+                        (String::from("join"), Function::from(join)),
+                    ],
+                )
+                .into(),
+            )
+        }
     }
-    
+
     fn module_class() -> Rc<Class> {
         if unsafe { MODULE_CLASS.is_none() } {
             Self::__static_class_init();
         }
-        let class = unsafe {
-            MODULE_CLASS.as_ref().unwrap().clone()
-        };
+        let class = unsafe { MODULE_CLASS.as_ref().unwrap().clone() };
         return class;
     }
 }

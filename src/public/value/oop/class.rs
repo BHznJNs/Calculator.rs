@@ -6,9 +6,9 @@ use crossterm::style::Stylize;
 use crate::public::env::ENV_OPTION;
 use crate::public::error::{reference_error, type_error, ReferenceType};
 use crate::public::value::array::ArrayLiteral;
-use crate::public::value::{display_indent, GetAddr, self};
 use crate::public::value::function::Function;
 use crate::public::value::value::{Value, ValueType};
+use crate::public::value::{self, display_indent, GetAddr};
 use crate::public::Param;
 use crate::utils::completer::Completer;
 
@@ -57,7 +57,7 @@ impl Class {
         // init method storage
         let method_storage = ComposeStorage::new(methods);
 
-        return Class {
+        return Self {
             properties,
             method_storage,
             completer,
@@ -160,14 +160,14 @@ impl fmt::Display for Class {
             )?;
         }
 
-        Class::display_methods(f, self, 1)?;
+        Self::display_methods(f, self, 1)?;
         write!(f, "}}")
     }
 }
 
 impl GetAddr for Class {
     fn get_addr(&self) -> value::Addr {
-        let ptr = self as *const Class;
+        let ptr = self as *const Self;
         return ptr as value::Addr;
     }
 }

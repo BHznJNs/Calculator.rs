@@ -4,10 +4,10 @@ use std::rc::Rc;
 
 use crate::public::env::ENV_OPTION;
 use crate::public::error::{assignment_error, reference_error, ReferenceType};
-use crate::public::value::{GetAddr, self};
 use crate::public::value::array::Array;
 use crate::public::value::oop::class::Class;
 use crate::public::value::value::VoidSign;
+use crate::public::value::{self, GetAddr};
 use crate::utils::completer::Completer;
 
 use super::super::display_indent;
@@ -27,7 +27,7 @@ impl Object {
         match prototype {
             Some(proto) => {
                 let store = ComposeStorage::new(params);
-                Object::UserDefined(UserDefinedObject {
+                Self::UserDefined(UserDefinedObject {
                     prototype: proto,
                     storage: store,
                 })
@@ -47,27 +47,27 @@ impl Object {
                     }
                 };
                 let storage = ComposeStorage::new(params);
-                Object::BuildIn(BuildInObject { completer, storage })
+                Self::BuildIn(BuildInObject { completer, storage })
             }
         }
     }
 
     fn get_store<'obj>(&'obj self) -> &'obj ComposeStorage<Value> {
         match self {
-            Object::BuildIn(obj) => &obj.storage,
-            Object::UserDefined(obj) => &obj.storage,
+            Self::BuildIn(obj) => &obj.storage,
+            Self::UserDefined(obj) => &obj.storage,
         }
     }
     pub fn get_proto(&self) -> Option<Prototype> {
         match self {
-            Object::BuildIn(_) => None,
-            Object::UserDefined(obj) => Some(obj.prototype.clone()),
+            Self::BuildIn(_) => None,
+            Self::UserDefined(obj) => Some(obj.prototype.clone()),
         }
     }
     pub fn get_completer(&self) -> Option<Rc<Completer>> {
         match self {
-            Object::BuildIn(obj) => obj.completer.clone(),
-            Object::UserDefined(_) => {
+            Self::BuildIn(obj) => obj.completer.clone(),
+            Self::UserDefined(_) => {
                 let Some(proto) = self.get_proto() else {
                     return None;
                 };
@@ -94,7 +94,7 @@ impl Object {
     }
     pub fn set(&mut self, prop_name: &str, value: Value) -> Result<(), ()> {
         let store = match self {
-            Object::BuildIn(obj) => {
+            Self::BuildIn(obj) => {
                 let target_value = obj.storage.getter(prop_name);
                 if let Ok(Value::Function(_)) = target_value {
                     return Err(assignment_error(
@@ -103,7 +103,7 @@ impl Object {
                 }
                 &mut obj.storage
             }
-            Object::UserDefined(obj) => &mut obj.storage,
+            Self::UserDefined(obj) => &mut obj.storage,
         };
 
         let result = store.setter(prop_name, value);
@@ -116,7 +116,7 @@ impl Object {
 
 impl GetAddr for Object {
     fn get_addr(&self) -> value::Addr {
-        let ptr = self as *const Object;
+        let ptr = self as *const Self;
         return ptr as value::Addr;
     }
 }

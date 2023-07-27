@@ -7,7 +7,7 @@ pub struct History {
 
 impl History {
     pub fn new() -> Self {
-        History {
+        Self {
             index: 0,
             content_list: vec![],
         }

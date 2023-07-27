@@ -10,8 +10,8 @@ use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::{LocalScope, Scope};
 use crate::public::Param;
 
-use super::GetAddr;
 use super::value::{Value, ValueType};
+use super::GetAddr;
 
 #[derive(PartialEq, Clone)]
 pub struct BuildInFnParam(pub ValueType, pub &'static str);
@@ -105,27 +105,27 @@ impl Function {
 impl fmt::Display for Function {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Function::BuildIn(_) => write!(f, "<Build-in-Function>"),
-            Function::UserDefined(_) => write!(f, "<User-Defined-Function>"),
+            Self::BuildIn(_) => write!(f, "<Build-in-Function>"),
+            Self::UserDefined(_) => write!(f, "<User-Defined-Function>"),
         }
     }
 }
 impl GetAddr for Function {
     fn get_addr(&self) -> super::Addr {
         match self {
-            Function::BuildIn(func) => func.as_ptr() as super::Addr,
-            Function::UserDefined(func) => func.as_ptr() as super::Addr,
+            Self::BuildIn(func) => func.as_ptr() as super::Addr,
+            Self::UserDefined(func) => func.as_ptr() as super::Addr,
         }
     }
 }
 
 impl From<UserDefinedFunction> for Function {
     fn from(value: UserDefinedFunction) -> Self {
-        Function::UserDefined(Rc::new(RefCell::new(value)))
+        Self::UserDefined(Rc::new(RefCell::new(value)))
     }
 }
 impl From<BuildInFunction> for Function {
     fn from(value: BuildInFunction) -> Self {
-        Function::BuildIn(Rc::new(RefCell::new(value)))
+        Self::BuildIn(Rc::new(RefCell::new(value)))
     }
 }

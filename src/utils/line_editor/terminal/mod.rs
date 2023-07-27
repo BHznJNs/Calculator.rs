@@ -17,8 +17,8 @@ pub struct Terminal {
 const BACKSPACE: &'static str = "\x1B[K";
 
 impl Terminal {
-    pub fn new() -> Terminal {
-        Terminal {
+    pub fn new() -> Self {
+        Self {
             stdout: io::stdout(),
             cursor: Cursor::new(),
         }

@@ -24,7 +24,7 @@ impl Line {
             format!(" {}", label_str)
         };
 
-        Line {
+        Self {
             content: String::new(),
 
             is_history: false,

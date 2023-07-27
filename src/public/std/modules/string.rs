@@ -61,25 +61,26 @@ impl ClassModule for StringModule {
         };
 
         unsafe {
-            MODULE_CLASS = Some(Class::new(
-                vec![Property(ValueType::String, String::from("v"))],
-                vec![
-                    (String::from("split"), Function::from(split)),
-                    (String::from("replace"), Function::from(replace)),
-                    (String::from("repeat"), Function::from(repeat)),
-                    (String::from("start_with"), Function::from(start_with)),
-                    (String::from("end_with"), Function::from(end_with)),
-                ],
-            ).into())
+            MODULE_CLASS = Some(
+                Class::new(
+                    vec![Property(ValueType::String, String::from("v"))],
+                    vec![
+                        (String::from("split"), Function::from(split)),
+                        (String::from("replace"), Function::from(replace)),
+                        (String::from("repeat"), Function::from(repeat)),
+                        (String::from("start_with"), Function::from(start_with)),
+                        (String::from("end_with"), Function::from(end_with)),
+                    ],
+                )
+                .into(),
+            )
         }
     }
     fn module_class() -> Rc<Class> {
         if unsafe { MODULE_CLASS.is_none() } {
             Self::__static_class_init();
         }
-        let class = unsafe {
-            MODULE_CLASS.as_ref().unwrap().clone()
-        };
+        let class = unsafe { MODULE_CLASS.as_ref().unwrap().clone() };
         return class;
     }
 }

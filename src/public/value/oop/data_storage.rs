@@ -46,7 +46,7 @@ impl<Item: Clone> ComposeStorage<Item> {
                 data_map = Some(temp_map);
             }
         }
-        return ComposeStorage {
+        return Self {
             storage_pattern,
             data_list,
             data_map,

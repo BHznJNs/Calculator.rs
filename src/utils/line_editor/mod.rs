@@ -58,7 +58,7 @@ impl LineEditor {
         let terminal = Terminal::new();
         let term_width = terminal.width();
 
-        LineEditor {
+        Self {
             prompt,
             terminal,
             history: History::new(),

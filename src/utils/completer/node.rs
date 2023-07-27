@@ -7,7 +7,7 @@ pub struct CompleterNode {
 
 impl CompleterNode {
     pub fn new() -> Self {
-        CompleterNode {
+        Self {
             subnodes: BTreeMap::<char, CompleterNode>::new(),
         }
     }

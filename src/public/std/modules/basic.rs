@@ -10,16 +10,16 @@ use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::std::utils::get_self_prop::get_self_prop;
 use crate::public::std::utils::str_to_num::str_to_num;
-use crate::public::value::GetAddr;
 use crate::public::value::array::ArrayLiteral;
 use crate::public::value::function::{BuildInFnParam, BuildInFunction};
 use crate::public::value::number::Number;
 use crate::public::value::value::{Value, ValueType};
+use crate::public::value::GetAddr;
 
 use super::super::utils::get_val::get_val;
 use super::array::ArrayModule;
 use super::string::StringModule;
-use super::{BuildInFnCall, FunctionModule, ClassModule};
+use super::{BuildInFnCall, ClassModule, FunctionModule};
 
 #[derive(PartialEq, Clone)]
 pub enum BasicModule {
@@ -221,10 +221,8 @@ impl BuildInFnCall for BasicModule {
                             return Value::from(length);
                         }
                         match &input {
-                            Value::Array(arr) =>
-                                return Ok(array_length(arr)),
-                            Value::String(str) => 
-                                return Ok(string_length(str)),
+                            Value::Array(arr) => return Ok(array_length(arr)),
+                            Value::String(str) => return Ok(string_length(str)),
                             Value::Object(obj) => {
                                 if let Some(proto) = obj.borrow().get_proto() {
                                     let string_cls = StringModule::module_class();
@@ -253,7 +251,7 @@ impl BuildInFnCall for BasicModule {
                             Some("Build-in function `len`"),
                             vec![ValueType::Array, ValueType::String],
                             input.get_type(),
-                        )?)
+                        )?);
                     }
                     _ => unreachable!(),
                 }
