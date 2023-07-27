@@ -5,7 +5,11 @@ pub mod file_system;
 pub mod math;
 pub mod string;
 
+use std::rc::Rc;
+
 use crate::public::run_time::scope::Scope;
+use crate::public::value::oop::class::Class;
+use crate::public::value::oop::object::Object;
 use crate::public::value::value::Value;
 
 use super::StdModules;
@@ -30,11 +34,23 @@ pub fn import_resolver(scope: &mut Scope, target_module: &StdModules, module_nam
 
         StdModules::String | StdModules::Array => {
             let module_cls = target_module.get_cls_entry();
-            scope.assign(String::from(module_name), Value::from(module_cls));
+            scope.assign(String::from(module_name), Value::Class(module_cls));
         }
     }
 }
 
 pub trait BuildInFnCall {
     fn call(&self, scope: &mut Scope) -> Result<Value, ()>;
+}
+
+pub trait FunctionModule {
+    fn function_list() -> Vec<(String, Value)>;
+}
+
+pub trait ClassModule {
+    fn __static_class_init();
+    fn module_class() -> Rc<Class>;
+}
+pub trait ObjectModule {
+    fn module_object() -> Object;
 }

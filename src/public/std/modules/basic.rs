@@ -13,10 +13,10 @@ use crate::public::value::number::Number;
 use crate::public::value::value::{Value, ValueType};
 
 use super::super::utils::get_val::get_val;
-use super::BuildInFnCall;
+use super::{BuildInFnCall, FunctionModule};
 
 #[derive(PartialEq, Clone)]
-pub enum BasicFn {
+pub enum BasicModule {
     INPUT,
     TYPE,
     CLONE,
@@ -34,69 +34,71 @@ pub enum BasicFn {
     EXIT,
 }
 
-pub fn function_list() -> Vec<(String, Value)> {
-    let input = BuildInFunction {
-        params: vec![BuildInFnParam(ValueType::String, "prompt")],
-        identi: BuildInFnIdenti::Basic(BasicFn::INPUT),
-    };
-    let exit = BuildInFunction {
-        params: vec![],
-        identi: BuildInFnIdenti::Basic(BasicFn::EXIT),
-    };
-    let array = BuildInFunction {
-        params: vec![BuildInFnParam(ValueType::Number, "input")],
-        identi: BuildInFnIdenti::Basic(BasicFn::ARRAY),
-    };
-    let fraction = BuildInFunction {
-        params: vec![
-            BuildInFnParam(ValueType::Number, "upper"),
-            BuildInFnParam(ValueType::Number, "lower"),
-        ],
-        identi: BuildInFnIdenti::Basic(BasicFn::FRACTION),
-    };
+impl FunctionModule for BasicModule {
+    fn function_list() -> Vec<(String, Value)> {
+        let input = BuildInFunction {
+            params: vec![BuildInFnParam(ValueType::String, "prompt")],
+            identi: BuildInFnIdenti::Basic(Self::INPUT),
+        };
+        let exit = BuildInFunction {
+            params: vec![],
+            identi: BuildInFnIdenti::Basic(Self::EXIT),
+        };
+        let array = BuildInFunction {
+            params: vec![BuildInFnParam(ValueType::Number, "input")],
+            identi: BuildInFnIdenti::Basic(Self::ARRAY),
+        };
+        let fraction = BuildInFunction {
+            params: vec![
+                BuildInFnParam(ValueType::Number, "upper"),
+                BuildInFnParam(ValueType::Number, "lower"),
+            ],
+            identi: BuildInFnIdenti::Basic(Self::FRACTION),
+        };
 
-    // --- --- --- --- --- ---
+        // --- --- --- --- --- ---
 
-    let function_template = BuildInFunction {
-        params: vec![BuildInFnParam(ValueType::Void, "input")],
-        identi: BuildInFnIdenti::Basic(BasicFn::TYPE),
-    };
-    let type__ = function_template.clone();
-    let mut clone = function_template.clone();
-    let mut int = function_template.clone();
-    let mut float = function_template.clone();
-    let mut boolean = function_template.clone();
-    let mut string = function_template.clone();
-    let mut ascii = function_template.clone();
-    let mut len = function_template.clone();
-    clone.identi = BuildInFnIdenti::Basic(BasicFn::CLONE);
-    int.identi = BuildInFnIdenti::Basic(BasicFn::INT);
-    float.identi = BuildInFnIdenti::Basic(BasicFn::FLOAT);
-    boolean.identi = BuildInFnIdenti::Basic(BasicFn::BOOLEAN);
-    string.identi = BuildInFnIdenti::Basic(BasicFn::STRING);
-    ascii.identi = BuildInFnIdenti::Basic(BasicFn::ASCII);
-    len.identi = BuildInFnIdenti::Basic(BasicFn::LEN);
+        let function_template = BuildInFunction {
+            params: vec![BuildInFnParam(ValueType::Void, "input")],
+            identi: BuildInFnIdenti::Basic(Self::TYPE),
+        };
+        let type__ = function_template.clone();
+        let mut clone = function_template.clone();
+        let mut int = function_template.clone();
+        let mut float = function_template.clone();
+        let mut boolean = function_template.clone();
+        let mut string = function_template.clone();
+        let mut ascii = function_template.clone();
+        let mut len = function_template.clone();
+        clone.identi = BuildInFnIdenti::Basic(Self::CLONE);
+        int.identi = BuildInFnIdenti::Basic(Self::INT);
+        float.identi = BuildInFnIdenti::Basic(Self::FLOAT);
+        boolean.identi = BuildInFnIdenti::Basic(Self::BOOLEAN);
+        string.identi = BuildInFnIdenti::Basic(Self::STRING);
+        ascii.identi = BuildInFnIdenti::Basic(Self::ASCII);
+        len.identi = BuildInFnIdenti::Basic(Self::LEN);
 
-    return vec![
-        (String::from("input"), Value::from(input)),
-        (String::from("type"), Value::from(type__)),
-        (String::from("clone"), Value::from(clone)),
-        (String::from("int"), Value::from(int)),
-        (String::from("float"), Value::from(float)),
-        (String::from("fraction"), Value::from(fraction)),
-        (String::from("bool"), Value::from(boolean)),
-        (String::from("string"), Value::from(string)),
-        (String::from("array"), Value::from(array)),
-        (String::from("ascii"), Value::from(ascii)),
-        (String::from("len"), Value::from(len)),
-        (String::from("exit"), Value::from(exit)),
-    ];
+        return vec![
+            (String::from("input"), Value::from(input)),
+            (String::from("type"), Value::from(type__)),
+            (String::from("clone"), Value::from(clone)),
+            (String::from("int"), Value::from(int)),
+            (String::from("float"), Value::from(float)),
+            (String::from("fraction"), Value::from(fraction)),
+            (String::from("bool"), Value::from(boolean)),
+            (String::from("string"), Value::from(string)),
+            (String::from("array"), Value::from(array)),
+            (String::from("ascii"), Value::from(ascii)),
+            (String::from("len"), Value::from(len)),
+            (String::from("exit"), Value::from(exit)),
+        ];
+    }
 }
 
-impl BuildInFnCall for BasicFn {
+impl BuildInFnCall for BasicModule {
     fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
         let result = match self {
-            BasicFn::INPUT => {
+            Self::INPUT => {
                 let prompt_value = get_val("prompt", scope)?;
                 // show prompt
                 let prompt_ref = prompt_value.get_str()?;
@@ -119,7 +121,7 @@ impl BuildInFnCall for BasicFn {
 
                 Value::from(input)
             }
-            BasicFn::FRACTION => {
+            Self::FRACTION => {
                 let upper_value = get_val("upper", scope)?;
                 let lower_value = get_val("lower", scope)?;
 
@@ -134,16 +136,16 @@ impl BuildInFnCall for BasicFn {
                     )?);
                 }
             }
-            BasicFn::EXIT => process::exit(0),
+            Self::EXIT => process::exit(0),
 
             _ => {
                 let input = get_val("input", scope)?;
 
                 match self {
-                    BasicFn::TYPE => Value::from(input.get_type() as i64),
-                    BasicFn::CLONE => input.deep_clone(),
+                    Self::TYPE => Value::from(input.get_type() as i64),
+                    Self::CLONE => input.deep_clone(),
 
-                    BasicFn::INT => match input {
+                    Self::INT => match input {
                         Value::Number(num) => Value::Number(num.int()),
                         Value::String(str) => {
                             let refer = str.as_ref().borrow();
@@ -159,7 +161,7 @@ impl BuildInFnCall for BasicFn {
                             )?)
                         }
                     },
-                    BasicFn::FLOAT => match input {
+                    Self::FLOAT => match input {
                         Value::Number(num) => Value::Number(num.float()),
                         Value::String(str) => {
                             let refer = str.as_ref().borrow();
@@ -176,9 +178,9 @@ impl BuildInFnCall for BasicFn {
                         }
                     },
 
-                    BasicFn::BOOLEAN => Value::Boolean(input.get_bool()),
-                    BasicFn::STRING => Value::from(input.to_raw_string()),
-                    BasicFn::ARRAY => {
+                    Self::BOOLEAN => Value::Boolean(input.get_bool()),
+                    Self::STRING => Value::from(input.to_raw_string()),
+                    Self::ARRAY => {
                         let Value::Number(num) = input else {
                             unreachable!()
                         };
@@ -186,7 +188,7 @@ impl BuildInFnCall for BasicFn {
                         let arr_literal: ArrayLiteral = vec![Value::from(0); size].into();
                         Value::from(arr_literal)
                     }
-                    BasicFn::ASCII => {
+                    Self::ASCII => {
                         let input_ref = input.get_str()?;
                         let Some(first_char) = input_ref.chars().next() else {
                             return Ok(Value::from(0));
@@ -199,20 +201,28 @@ impl BuildInFnCall for BasicFn {
                             return Err(());
                         }
                     }
-                    BasicFn::LEN => {
-                        if let Value::Array(arr) = input {
-                            let refer = arr.borrow();
-                            Value::Number(Number::Int(refer.len() as i64))
-                        } else if let Value::String(str) = input {
-                            let refer = str.borrow();
-                            Value::Number(Number::Int(refer.chars().count() as i64))
-                        } else {
-                            return Err(type_error(
-                                Some("Build-in function `len`"),
-                                vec![ValueType::Array, ValueType::String],
-                                input.get_type(),
-                            )?);
-                        }
+                    Self::LEN => {
+                        match input {
+                            Value::Array(arr) => {
+                                let refer = arr.borrow();
+                                let length = refer.len() as i64;
+                                return Ok(Value::Number(Number::Int(length)))
+                            }
+                            Value::String(str) => {
+                                let refer = str.borrow();
+                                let length = refer.chars().count() as i64;
+                                return Ok(Value::Number(Number::Int(length)))
+                            }
+                            // Value::Object(obj) => {
+                            //     todo!()
+                            // }
+                            _ => {}
+                        };
+                        return Err(type_error(
+                            Some("Build-in function `len`"),
+                            vec![ValueType::Array, ValueType::String],
+                            input.get_type(),
+                        )?)
                     }
                     _ => unreachable!(),
                 }

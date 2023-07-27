@@ -1,9 +1,20 @@
-use self::modules::{basic, bit_ops, file_system, math};
+use std::rc::Rc;
+
+use self::modules::{
+    basic::BasicModule,
+    bit_ops::BitOpsModule,
+    file_system::FileSysModule,
+    math::MathModule,
+    array::ArrayModule,
+    string::StringModule,
+    FunctionModule,
+    ObjectModule,
+    ClassModule,
+};
 use super::value::{
     oop::{class::Class, object::Object},
     value::Value,
 };
-use crate::public::std::modules::{array, string};
 
 pub mod modules;
 
@@ -22,24 +33,24 @@ pub enum StdModules {
 impl StdModules {
     pub fn get_fn_list(&self) -> Vec<(String, Value)> {
         match self {
-            StdModules::Basic => basic::function_list(),
-            StdModules::BitOps => bit_ops::function_list(),
+            StdModules::Basic => BasicModule::function_list(),
+            StdModules::BitOps => BitOpsModule::function_list(),
             _ => unreachable!(),
         }
     }
 
     pub fn get_obj_entry(&self) -> Object {
         match self {
-            StdModules::Math => math::module_object(),
-            StdModules::FileSystem => file_system::module_object(),
+            StdModules::Math => MathModule::module_object(),
+            StdModules::FileSystem => FileSysModule::module_object(),
             _ => unreachable!(),
         }
     }
 
-    pub fn get_cls_entry(&self) -> Class {
+    pub fn get_cls_entry(&self) -> Rc<Class> {
         match self {
-            StdModules::Array => array::module_class(),
-            StdModules::String => string::module_class(),
+            StdModules::Array => ArrayModule::module_class(),
+            StdModules::String => StringModule::module_class(),
             _ => unreachable!(),
         }
     }

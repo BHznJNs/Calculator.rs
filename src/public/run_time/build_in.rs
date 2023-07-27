@@ -2,23 +2,23 @@ use std::collections::HashMap;
 use std::f64::consts::E;
 use std::f64::consts::PI;
 
-use crate::public::std::modules::array::ArrayFn;
-use crate::public::std::modules::basic::BasicFn;
-use crate::public::std::modules::bit_ops::BitOpsFn;
-use crate::public::std::modules::file_system::FileSysFn;
-use crate::public::std::modules::math::MathFn;
-use crate::public::std::modules::string::StringFn;
+use crate::public::std::modules::array::ArrayModule;
+use crate::public::std::modules::basic::BasicModule;
+use crate::public::std::modules::bit_ops::BitOpsModule;
+use crate::public::std::modules::file_system::FileSysModule;
+use crate::public::std::modules::math::MathModule;
+use crate::public::std::modules::string::StringModule;
 
 use crate::public::value::value::{Value, ValueType};
 
 #[derive(PartialEq, Clone)]
 pub enum BuildInFnIdenti {
-    Basic(BasicFn),
-    Math(MathFn),
-    Array(ArrayFn),
-    String(StringFn),
-    FileSystem(FileSysFn),
-    BitOps(BitOpsFn),
+    Basic(BasicModule),
+    Math(MathModule),
+    Array(ArrayModule),
+    String(StringModule),
+    FileSystem(FileSysModule),
+    BitOps(BitOpsModule),
 }
 
 pub fn constants() -> HashMap<String, Value> {

@@ -18,10 +18,10 @@ use crate::public::value::value::{Value, ValueType, VoidSign};
 use self::file_ops::file_append;
 use self::fs_ops::{dir_create, dir_delete, file_create, file_delete};
 
-use super::BuildInFnCall;
+use super::{BuildInFnCall, ObjectModule};
 
 #[derive(PartialEq, Clone)]
-pub enum FileSysFn {
+pub enum FileSysModule {
     Open,
     Create,
     Delete,
@@ -37,21 +37,21 @@ fn static_class_setter() {
     // file-class methods
     let read = BuildInFunction {
         params: vec![BuildInFnParam(ValueType::Object, "self")],
-        identi: BuildInFnIdenti::FileSystem(FileSysFn::Read),
+        identi: BuildInFnIdenti::FileSystem(FileSysModule::Read),
     };
     let write = BuildInFunction {
         params: vec![
             BuildInFnParam(ValueType::Object, "self"),
             BuildInFnParam(ValueType::String, "content"),
         ],
-        identi: BuildInFnIdenti::FileSystem(FileSysFn::Write),
+        identi: BuildInFnIdenti::FileSystem(FileSysModule::Write),
     };
     let append = BuildInFunction {
         params: vec![
             BuildInFnParam(ValueType::Object, "self"),
             BuildInFnParam(ValueType::String, "content"),
         ],
-        identi: BuildInFnIdenti::FileSystem(FileSysFn::Append),
+        identi: BuildInFnIdenti::FileSystem(FileSysModule::Append),
     };
     // --- --- --- --- --- ---
     unsafe {
@@ -74,44 +74,46 @@ fn static_class_setter() {
     };
 }
 
-pub fn module_object() -> Object {
-    if unsafe { FILE_CLASS == None } {
-        static_class_setter();
+impl ObjectModule for FileSysModule {
+    fn module_object() -> Object {
+        if unsafe { FILE_CLASS == None } {
+            static_class_setter();
+        }
+
+        // fs-class methods
+        let fs_method_template = BuildInFunction {
+            params: vec![
+                BuildInFnParam(ValueType::Object, "self"),
+                BuildInFnParam(ValueType::String, "path"),
+            ],
+            identi: BuildInFnIdenti::FileSystem(Self::Open),
+        };
+        let open = fs_method_template.clone();
+        let mut create = fs_method_template.clone();
+        let mut delete = fs_method_template.clone();
+        create.identi = BuildInFnIdenti::FileSystem(Self::Create);
+        delete.identi = BuildInFnIdenti::FileSystem(Self::Delete);
+
+        let module_obj_props = vec![
+            (String::from("open"), Value::from(open)),
+            (String::from("create"), Value::from(create)),
+            (String::from("delete"), Value::from(delete)),
+        ];
+        return Object::new(module_obj_props, None);
     }
-
-    // fs-class methods
-    let fs_method_template = BuildInFunction {
-        params: vec![
-            BuildInFnParam(ValueType::Object, "self"),
-            BuildInFnParam(ValueType::String, "path"),
-        ],
-        identi: BuildInFnIdenti::FileSystem(FileSysFn::Open),
-    };
-    let open = fs_method_template.clone();
-    let mut create = fs_method_template.clone();
-    let mut delete = fs_method_template.clone();
-    create.identi = BuildInFnIdenti::FileSystem(FileSysFn::Create);
-    delete.identi = BuildInFnIdenti::FileSystem(FileSysFn::Delete);
-
-    let module_obj_props = vec![
-        (String::from("open"), Value::from(open)),
-        (String::from("create"), Value::from(create)),
-        (String::from("delete"), Value::from(delete)),
-    ];
-    return Object::new(module_obj_props, None);
 }
 
-impl BuildInFnCall for FileSysFn {
+impl BuildInFnCall for FileSysModule {
     fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
         let result = match self {
-            FileSysFn::Open | FileSysFn::Create | FileSysFn::Delete => {
+            Self::Open | Self::Create | Self::Delete => {
                 let path_value = get_val("path", scope)?;
                 let temp = path_value.clone();
                 let temp = temp.get_str()?;
                 let path_str = temp.as_str();
 
                 match self {
-                    FileSysFn::Open => {
+                    Self::Open => {
                         let path = Path::new(path_str);
                         let path_exist = path.exists();
                         let path_is_dir = path.is_dir();
@@ -131,7 +133,7 @@ impl BuildInFnCall for FileSysFn {
 
                         Value::from(file_obj)
                     }
-                    FileSysFn::Create => {
+                    Self::Create => {
                         if path_str.ends_with('/') || path_str.ends_with('\\') {
                             dir_create(path_str)?;
                         } else {
@@ -139,7 +141,7 @@ impl BuildInFnCall for FileSysFn {
                         }
                         Value::Void(VoidSign::Empty)
                     }
-                    FileSysFn::Delete => {
+                    Self::Delete => {
                         let path = Path::new(path_str);
                         if path.is_dir() {
                             dir_delete(path_str)?;
@@ -165,13 +167,13 @@ impl BuildInFnCall for FileSysFn {
                 let file_path = temp.as_str();
 
                 match self {
-                    FileSysFn::Read => file_read(file_path, file_info)?,
-                    FileSysFn::Write => {
+                    Self::Read => file_read(file_path, file_info)?,
+                    Self::Write => {
                         let content_value = get_val("content", scope)?;
                         file_write(file_path, content_value, file_info)?;
                         Value::Void(VoidSign::Empty)
                     }
-                    FileSysFn::Append => {
+                    Self::Append => {
                         let content_value = get_val("content", scope)?;
                         file_append(file_path, content_value, file_info)?;
                         Value::Void(VoidSign::Empty)

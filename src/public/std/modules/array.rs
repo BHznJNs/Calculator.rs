@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::std::utils::get_self_prop::get_self_prop;
@@ -7,10 +9,10 @@ use crate::public::value::oop::class::{Class, Property};
 use crate::public::value::value::{Value, ValueType, VoidSign};
 
 use super::super::utils::get_val::get_val;
-use super::BuildInFnCall;
+use super::{BuildInFnCall, ClassModule};
 
 #[derive(PartialEq, Clone)]
-pub enum ArrayFn {
+pub enum ArrayModule {
     PUSH,
     POP,
     SHIFT,
@@ -20,71 +22,84 @@ pub enum ArrayFn {
     JOIN,
 }
 
-pub fn module_class() -> Class {
-    let push = BuildInFunction {
-        params: vec![
-            BuildInFnParam(ValueType::Object, "self"),
-            BuildInFnParam(ValueType::Void, "element"),
-        ],
-        identi: BuildInFnIdenti::Array(ArrayFn::PUSH),
-    };
+static mut MODULE_CLASS: Option<Rc<Class>> = None;
+impl ClassModule for ArrayModule {
+    fn __static_class_init() {
+        let push = BuildInFunction {
+            params: vec![
+                BuildInFnParam(ValueType::Object, "self"),
+                BuildInFnParam(ValueType::Void, "element"),
+            ],
+            identi: BuildInFnIdenti::Array(Self::PUSH),
+        };
 
-    let pop = BuildInFunction {
-        params: vec![BuildInFnParam(ValueType::Object, "self")],
-        identi: BuildInFnIdenti::Array(ArrayFn::POP),
-    };
+        let pop = BuildInFunction {
+            params: vec![BuildInFnParam(ValueType::Object, "self")],
+            identi: BuildInFnIdenti::Array(Self::POP),
+        };
 
-    let shift = BuildInFunction {
-        params: vec![BuildInFnParam(ValueType::Object, "self")],
-        identi: BuildInFnIdenti::Array(ArrayFn::SHIFT),
-    };
-    let unshift = BuildInFunction {
-        params: vec![
-            BuildInFnParam(ValueType::Object, "self"),
-            BuildInFnParam(ValueType::Void, "element"),
-        ],
-        identi: BuildInFnIdenti::Array(ArrayFn::UNSHIFT),
-    };
-    let insert = BuildInFunction {
-        params: vec![
-            BuildInFnParam(ValueType::Object, "self"),
-            BuildInFnParam(ValueType::Number, "index"),
-            BuildInFnParam(ValueType::Void, "element"),
-        ],
-        identi: BuildInFnIdenti::Array(ArrayFn::INSERT),
-    };
-    let remove = BuildInFunction {
-        params: vec![
-            BuildInFnParam(ValueType::Object, "self"),
-            BuildInFnParam(ValueType::Number, "index"),
-        ],
-        identi: BuildInFnIdenti::Array(ArrayFn::REMOVE),
-    };
-    let join = BuildInFunction {
-        params: vec![
-            BuildInFnParam(ValueType::Object, "self"),
-            BuildInFnParam(ValueType::String, "divider"),
-        ],
-        identi: BuildInFnIdenti::Array(ArrayFn::JOIN),
-    };
+        let shift = BuildInFunction {
+            params: vec![BuildInFnParam(ValueType::Object, "self")],
+            identi: BuildInFnIdenti::Array(Self::SHIFT),
+        };
+        let unshift = BuildInFunction {
+            params: vec![
+                BuildInFnParam(ValueType::Object, "self"),
+                BuildInFnParam(ValueType::Void, "element"),
+            ],
+            identi: BuildInFnIdenti::Array(Self::UNSHIFT),
+        };
+        let insert = BuildInFunction {
+            params: vec![
+                BuildInFnParam(ValueType::Object, "self"),
+                BuildInFnParam(ValueType::Number, "index"),
+                BuildInFnParam(ValueType::Void, "element"),
+            ],
+            identi: BuildInFnIdenti::Array(Self::INSERT),
+        };
+        let remove = BuildInFunction {
+            params: vec![
+                BuildInFnParam(ValueType::Object, "self"),
+                BuildInFnParam(ValueType::Number, "index"),
+            ],
+            identi: BuildInFnIdenti::Array(Self::REMOVE),
+        };
+        let join = BuildInFunction {
+            params: vec![
+                BuildInFnParam(ValueType::Object, "self"),
+                BuildInFnParam(ValueType::String, "divider"),
+            ],
+            identi: BuildInFnIdenti::Array(Self::JOIN),
+        };
 
-    // --- --- --- --- --- ---
+        // --- --- --- --- --- ---
 
-    return Class::new(
-        vec![Property(ValueType::Array, String::from("v"))],
-        vec![
-            (String::from("push"), Function::from(push)),
-            (String::from("pop"), Function::from(pop)),
-            (String::from("shift"), Function::from(shift)),
-            (String::from("unshift"), Function::from(unshift)),
-            (String::from("insert"), Function::from(insert)),
-            (String::from("remove"), Function::from(remove)),
-            (String::from("join"), Function::from(join)),
-        ],
-    );
+        unsafe { MODULE_CLASS = Some(Class::new(
+            vec![Property(ValueType::Array, String::from("v"))],
+            vec![
+                (String::from("push"), Function::from(push)),
+                (String::from("pop"), Function::from(pop)),
+                (String::from("shift"), Function::from(shift)),
+                (String::from("unshift"), Function::from(unshift)),
+                (String::from("insert"), Function::from(insert)),
+                (String::from("remove"), Function::from(remove)),
+                (String::from("join"), Function::from(join)),
+            ],
+        ).into()) }
+    }
+    
+    fn module_class() -> Rc<Class> {
+        if unsafe { MODULE_CLASS.is_none() } {
+            Self::__static_class_init();
+        }
+        let class = unsafe {
+            MODULE_CLASS.as_ref().unwrap().clone()
+        };
+        return class;
+    }
 }
 
-impl BuildInFnCall for ArrayFn {
+impl BuildInFnCall for ArrayModule {
     fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
         let self_value = get_val("self", scope)?;
         let arr_value = get_self_prop(&self_value, "v")?;
@@ -94,12 +109,12 @@ impl BuildInFnCall for ArrayFn {
         let mut arr_ref = arr.borrow_mut();
 
         let result = match self {
-            ArrayFn::PUSH => {
+            Self::PUSH => {
                 let element_value = get_val("element", scope)?;
                 arr_ref.push_back(element_value.clone());
                 element_value
             }
-            ArrayFn::POP => {
+            Self::POP => {
                 let poped_el = arr_ref.pop_back();
                 if let Some(val) = poped_el {
                     // return poped value
@@ -107,7 +122,7 @@ impl BuildInFnCall for ArrayFn {
                 }
                 Value::Void(VoidSign::Empty)
             }
-            ArrayFn::SHIFT => {
+            Self::SHIFT => {
                 let shifted = arr_ref.pop_front();
                 if let Some(val) = shifted {
                     // return shifted value
@@ -115,12 +130,12 @@ impl BuildInFnCall for ArrayFn {
                 }
                 Value::Void(VoidSign::Empty)
             }
-            ArrayFn::UNSHIFT => {
+            Self::UNSHIFT => {
                 let element_value = get_val("element", scope)?;
                 arr_ref.push_front(element_value.clone());
                 element_value
             }
-            ArrayFn::INSERT => {
+            Self::INSERT => {
                 let index_value = get_val("index", scope)?;
                 let element_value = get_val("element", scope)?;
 
@@ -128,7 +143,7 @@ impl BuildInFnCall for ArrayFn {
                 arr_ref.insert(index, element_value.clone());
                 element_value
             }
-            ArrayFn::REMOVE => {
+            Self::REMOVE => {
                 let index_value = get_val("index", scope)?;
 
                 let index = index_value.get_i64()? as usize;
@@ -138,7 +153,7 @@ impl BuildInFnCall for ArrayFn {
                     None => Value::Void(VoidSign::Empty),
                 }
             }
-            ArrayFn::JOIN => {
+            Self::JOIN => {
                 let divider_value = get_val("divider", scope)?;
                 let divider_ref = divider_value.get_str()?;
                 let result_str = Array::join(&*arr_ref, &*divider_ref);
