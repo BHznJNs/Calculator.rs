@@ -4,3 +4,13 @@ a_plus = { a += 1 }
 
 # 等效于：`out (a += 1)`
 out a_plus() # 2
+
+# 你可以在计算中直接使用惰性求值表达式。
+# 示例：
+lazy_expr1 = { 1 + 1 }
+lazy_expr2 = lazy_expr1 + 1
+lazy_expr2() # 3
+
+lazy_expr3 = { 2 + 2 }
+lazy_expr2 += lazy_expr3
+lazy_expr2() # 7

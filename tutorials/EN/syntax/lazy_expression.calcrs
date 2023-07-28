@@ -4,3 +4,13 @@ a_plus = { a += 1 }
 
 # equal to: `out (a += 1)`
 out a_plus() # 2
+
+# You can use Lazy-Expression in computing directly.
+# Examples:
+lazy_expr1 = { 1 + 1 }
+lazy_expr2 = lazy_expr1 + 1
+lazy_expr2() # 3
+
+lazy_expr3 = { 2 + 2 }
+lazy_expr2 += lazy_expr3
+lazy_expr2() # 7
