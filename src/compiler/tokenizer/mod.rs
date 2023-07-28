@@ -4,6 +4,7 @@ pub mod token;
 use std::str::Chars;
 
 use crate::compiler::tokenizer::char_converter::char_converter;
+use crate::public::compile_time::dividers::Divider;
 use crate::public::compile_time::keywords::Keyword;
 use crate::public::compile_time::parens::Paren;
 use crate::public::error::{assignment_error, syntax_error};
@@ -234,9 +235,9 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
             }
 
             // Other symbols
-            ',' | ';' => {
+            ',' | ';' | ':' => {
                 last_type = TokenType::Symbol;
-                tokens.push_back(Token::Divider);
+                tokens.push_back(Token::Divider(Divider::from(ch)));
             }
             '$' => {
                 // type annotation

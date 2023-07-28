@@ -2,6 +2,7 @@ use std::rc::Rc;
 
 use crate::compiler::tokenizer::token::{Token, TokenVec};
 use crate::public::compile_time::ast::types::{ClassDefinitionNode, FunctionDefinitionNode};
+use crate::public::compile_time::dividers::Divider;
 use crate::public::compile_time::parens::Paren;
 use crate::public::error::syntax_error;
 use crate::public::value::function::UserDefinedFnParam;
@@ -55,16 +56,16 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ClassDefinitionNode, ()> {
                         method_nodes.push(method_node.into())
                     }
                     _ => {
-                        let msg = format!("unexpected token {} in class body.", next_token);
+                        let msg = format!("unexpected token {} in class body", next_token);
                         return Err(syntax_error(&msg)?);
                     }
                 }
-            } else if current == Token::Divider {
+            } else if current == Token::Divider(Divider::Semicolon) {
                 continue;
             } else if current == Token::Paren(Paren::RightBrace) {
                 break;
             } else {
-                let msg = format!("unexpected token {} in class body.", current);
+                let msg = format!("unexpected token {} in class body", current);
                 return Err(syntax_error(&msg)?);
             }
         }

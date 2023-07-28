@@ -1,6 +1,7 @@
 use crate::compiler::analyzer::resolvers::sequence;
 use crate::compiler::tokenizer::token::{Token, TokenVec};
 use crate::public::compile_time::ast::ast_enum::ASTVec;
+use crate::public::compile_time::dividers::Divider;
 use crate::public::compile_time::parens::Paren;
 
 pub fn resolve(tokens: &mut TokenVec) -> Result<ASTVec, ()> {
@@ -25,7 +26,7 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ASTVec, ()> {
     while first_index < tokens.len() {
         let current = tokens.pop_front().unwrap();
 
-        let is_divider = current == Token::Divider;
+        let is_divider = current == Token::Divider(Divider::Semicolon);
         let is_left_paren = current == Token::Paren(Paren::LeftBrace)
             || current == Token::Paren(Paren::LeftParen)
             || current == Token::Paren(Paren::LeftBracket);

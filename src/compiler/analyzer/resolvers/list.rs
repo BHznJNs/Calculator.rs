@@ -1,6 +1,7 @@
 use crate::compiler::analyzer::resolvers::expression;
 use crate::compiler::tokenizer::token::{Token, TokenVec};
 use crate::public::compile_time::ast::types::ExpressionNode;
+use crate::public::compile_time::dividers::Divider;
 use crate::public::compile_time::parens::Paren;
 use crate::public::error::syntax_error;
 
@@ -41,7 +42,7 @@ pub fn resolve(tokens: &mut TokenVec, identi_paren: Paren) -> Result<Vec<Express
 
         let current = tokens.pop_front().unwrap();
 
-        let is_divider = current == Token::Divider;
+        let is_divider = current == Token::Divider(Divider::Comma);
         let is_identi_paren = current == Token::Paren(identi_paren);
         let is_left_paren = current == Token::Paren(Paren::LeftBrace)
             || current == Token::Paren(Paren::LeftParen)
