@@ -2,14 +2,13 @@ use std::fmt;
 
 use crate::public::error::{internal_error, InternalComponent};
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Clone, Copy, Debug)]
 pub enum Symbols {
-    // math symbols
-    Plus, // low  priority
+    Plus,
     Minus,
     Multiply,
     Divide,
-    Power, // high priority
+    Power,
 
     Not,
     LessThan,

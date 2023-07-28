@@ -13,8 +13,9 @@ use super::function::{BuildInFunction, Function, UserDefinedFunction};
 use super::number::Number;
 use super::oop::class::Class;
 use super::oop::object::{self, Object};
-use super::GetAddr;
+use super::{GetAddr, into_rc_refcell};
 
+#[cfg_attr(debug_assertions, derive(Debug))]
 #[derive(PartialEq, Clone, Copy)]
 pub enum ValueType {
     Void, // all value type
@@ -87,7 +88,7 @@ pub enum Value {
     Number(Number),
     String(Rc<RefCell<String>>),
     Array(Rc<RefCell<RawArray>>),
-    LazyExpression(Rc<ASTNode>),
+    LazyExpression(Rc<RefCell<ASTNode>>),
 
     Function(Function),
     Class(Rc<Class>),
@@ -192,7 +193,7 @@ impl Value {
                 object::deep_clone(obj.clone()),
 
             Self::LazyExpression(l_expr) => {
-                let cloned_l_expr = l_expr.as_ref().clone();
+                let cloned_l_expr = l_expr.as_ref().borrow().clone();
                 Self::from(cloned_l_expr)
             },
 
@@ -271,7 +272,7 @@ impl GetAddr for Value {
     fn get_addr(&self) -> super::Addr {
         match self {
             Self::Array(arr) => arr.as_ptr() as super::Addr,
-            Self::LazyExpression(lexpr) => (lexpr.as_ref() as *const ASTNode) as usize,
+            Self::LazyExpression(lexpr) => (&*lexpr.borrow() as *const ASTNode) as usize,
             Self::Function(func) => func.get_addr(),
             Self::Class(cls) => cls.get_addr(),
             Self::Object(obj) => obj.borrow().get_addr(),
@@ -326,17 +327,17 @@ impl From<f64> for Value {
 }
 impl From<String> for Value {
     fn from(value: String) -> Self {
-        Self::String(Rc::new(RefCell::new(value)))
+        Self::String(into_rc_refcell(value))
     }
 }
 impl From<ArrayLiteral> for Value {
     fn from(value: ArrayLiteral) -> Self {
-        Self::Array(Rc::new(RefCell::new(RawArray::new(value))))
+        Self::Array(into_rc_refcell(RawArray::new(value)))
     }
 }
 impl From<ASTNode> for Value {
     fn from(value: ASTNode) -> Self {
-        Self::LazyExpression(Rc::new(value))
+        Self::LazyExpression(into_rc_refcell(value))
     }
 }
 
@@ -357,6 +358,6 @@ impl From<Class> for Value {
 }
 impl From<Object> for Value {
     fn from(value: Object) -> Self {
-        Self::Object(Rc::new(RefCell::new(value)))
+        Self::Object(into_rc_refcell(value))
     }
 }

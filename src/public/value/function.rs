@@ -11,7 +11,7 @@ use crate::public::run_time::scope::{LocalScope, Scope};
 use crate::public::Param;
 
 use super::value::{Value, ValueType};
-use super::GetAddr;
+use super::{GetAddr, into_rc_refcell};
 
 #[derive(PartialEq, Clone)]
 pub struct BuildInFnParam(pub ValueType, pub &'static str);
@@ -31,7 +31,7 @@ pub struct BuildInFunction {
     pub identi: BuildInFnIdenti,
 }
 
-#[derive(PartialEq, Clone)]
+#[derive(PartialEq, Clone, Debug)]
 pub struct UserDefinedFnParam {
     pub type__: ValueType,
     pub identi: String,
@@ -121,11 +121,11 @@ impl GetAddr for Function {
 
 impl From<UserDefinedFunction> for Function {
     fn from(value: UserDefinedFunction) -> Self {
-        Self::UserDefined(Rc::new(RefCell::new(value)))
+        Self::UserDefined(into_rc_refcell(value))
     }
 }
 impl From<BuildInFunction> for Function {
     fn from(value: BuildInFunction) -> Self {
-        Self::BuildIn(Rc::new(RefCell::new(value)))
+        Self::BuildIn(into_rc_refcell(value))
     }
 }

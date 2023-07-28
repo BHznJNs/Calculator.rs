@@ -15,6 +15,7 @@ use crate::public::value::function::{BuildInFnParam, BuildInFunction};
 use crate::public::value::number::Number;
 use crate::public::value::value::{Value, ValueType};
 use crate::public::value::GetAddr;
+use crate::utils::output::print_line__;
 
 use super::super::utils::get_val::get_val;
 use super::array::ArrayModule;
@@ -130,6 +131,11 @@ impl BuildInFnCall for BasicModule {
             Self::FRACTION => {
                 let upper_value = get_val("upper", scope)?;
                 let lower_value = get_val("lower", scope)?;
+
+                if lower_value.get_f64() == Ok(0.0) {
+                    print_line__("The dividend should not to be ZERO!");
+                    return Ok(Value::Number(Number::NotANumber));
+                }
 
                 if let (Value::Number(Number::Int(upper)), Value::Number(Number::Int(lower))) =
                     (upper_value, lower_value)

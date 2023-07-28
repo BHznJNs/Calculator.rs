@@ -2,6 +2,7 @@ use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::compile_time::ast::types::{ExpressionNode, ModuleType};
 use crate::public::error::{internal_error, syntax_error, type_error, InternalComponent};
 use crate::public::run_time::scope::Scope;
+use crate::public::value::into_rc_refcell;
 use crate::public::value::symbols::Symbols;
 use crate::public::value::value::{Value, ValueType, VoidSign};
 
@@ -25,7 +26,7 @@ pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> Result<Value, ()> {
             ASTNode::StringLiteral(str) => Value::from(str.clone()),
 
             ASTNode::LazyExpression(node) => {
-                Value::LazyExpression(node.sub_sequence.clone().into())
+                Value::LazyExpression(into_rc_refcell(node.sub_sequence.clone()))
             }
 
             ASTNode::ImportStatement(node) => {

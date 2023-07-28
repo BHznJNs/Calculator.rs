@@ -1,12 +1,12 @@
 use std::cmp::{self, PartialEq};
-use std::f64::INFINITY;
 use std::fmt;
 use std::ops::{Add, Div, Mul, Sub};
 
 use crate::public::error::{internal_error, InternalComponent};
 use crate::utils::output::print_line__;
 
-#[derive(PartialOrd, Clone, Copy)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Clone, Copy)]
 pub enum Number {
     NotANumber,
 
@@ -296,21 +296,18 @@ impl Div for Number {
             return Self::NotANumber;
         }
 
+        // when the divisor is ZERO
+        if other.float_value() == 0.0 {
+            print_line__("The dividend should not to be ZERO!");
+            return Number::NotANumber;
+        }
+
         // when either `self` or `other` is float
         if let (Self::Float(_), _) | (_, Self::Float(_)) = (self, other) {
             // convert num1 and num2 to float type
             let f1 = self.float_value();
             let f2 = other.float_value();
 
-            if f2 == 0.0 {
-                print_line__("The dividend should not to be ZERO!");
-                match f1 {
-                    x if x == 0.0 => return Self::Float(0.0),
-                    x if x > 0.0 => return Self::Float(INFINITY),
-                    x if x < 0.0 => return Self::Float(-INFINITY),
-                    _ => unreachable!(),
-                }
-            }
             return Self::Float(f1 / f2);
         }
 
@@ -337,6 +334,18 @@ impl Div for Number {
 }
 
 // --- --- --- --- --- ---
+
+impl PartialOrd for Number {
+    fn partial_cmp(&self, other: &Self) -> Option<cmp::Ordering> {
+        if let (Self::NotANumber, _) | (_, Self::NotANumber) = (self, other) {
+            return None;
+        }
+
+        let self_f = self.float_value();
+        let other_f = other.float_value();
+        return self_f.partial_cmp(&other_f);
+    }
+}
 
 impl PartialEq for Number {
     fn eq(&self, other: &Self) -> bool {

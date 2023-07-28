@@ -24,7 +24,7 @@ fn function_invoke(
     scope: &mut Scope,
 ) -> Result<Value, ()> {
     let invoke_result = match function_value {
-        Value::LazyExpression(le) => lazy_expression::invoke(le, scope)?,
+        Value::LazyExpression(le) => lazy_expression::invoke(&*le.borrow(), scope)?,
         Value::Function(fn_enum) => match fn_enum {
             Function::BuildIn(build_in_fn) => {
                 build_in_function::invoke(&build_in_fn.as_ref().borrow(), params, scope)?

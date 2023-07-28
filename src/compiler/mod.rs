@@ -16,5 +16,7 @@ pub fn compile(input: &String) -> Result<RootNode, ()> {
 
     let ast = analyze(tokens)?;
 
+    // println!("ast: {:#?}", ast.sub_node);
+
     Ok(ast)
 }

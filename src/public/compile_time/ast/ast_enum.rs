@@ -8,10 +8,12 @@ use super::types::{
     ObjectReadingNode, StatementNode, VariableNode,
 };
 
+#[cfg_attr(debug_assertions, derive(Debug))]
 pub struct RootNode {
     pub sub_node: ASTNode,
 }
 
+#[cfg_attr(debug_assertions, derive(Debug))]
 #[derive(PartialEq, Clone)]
 pub enum ASTNode {
     Comment,

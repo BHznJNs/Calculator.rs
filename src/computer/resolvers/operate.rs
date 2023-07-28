@@ -1,3 +1,4 @@
+use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::error::{internal_error, syntax_error, InternalComponent};
 use crate::public::value::symbols::Symbols;
 use crate::public::value::value::Value;
@@ -35,6 +36,58 @@ pub fn operate(val1: Value, val2: Value, operator: Symbols) -> Result<Value, ()>
             let val2_str = val2.to_raw_string();
             str_cloned.extend(val2_str.chars());
             Value::from(str_cloned)
+        }
+        (Value::LazyExpression(lazy_expr), Value::Number(_) | Value::String(_) | Value::LazyExpression(_), _) => {
+            // lazy expression computing
+
+            // `lazy_expr` sample structure:
+            // Expression(
+            //     ExpressionNode {
+            //         elements: [
+            //             NumberLiteral(
+            //                 Int(
+            //                     1,
+            //                 ),
+            //             ),
+            //             NumberLiteral(
+            //                 Int(
+            //                     1,
+            //                 ),
+            //             ),
+            //             SymbolLiteral(
+            //                 Plus,
+            //             ),
+            //         ],
+            //     },
+            // )
+            let mut new_lazy_expr = lazy_expr.borrow().clone();
+            let ASTNode::Expression(expr_node) = &mut new_lazy_expr else {
+                unreachable!()
+            };
+            // push added value and Symbols
+            let expr_elements = &mut expr_node.elements;
+
+            match val2 {
+                Value::Number(num) => {
+                    expr_elements.push(ASTNode::NumberLiteral(num));
+                }
+                Value::String(str) => {
+                    let cloned = str.borrow().clone();
+                    expr_elements.push(ASTNode::StringLiteral(cloned));
+                }
+                Value::LazyExpression(other_lexpr) => {
+                    let ASTNode::Expression(expr_node) = &*other_lexpr.borrow() else {
+                        unreachable!()
+                    };
+                    let cloned_elements = expr_node.elements.clone();
+                    expr_elements.extend(cloned_elements.into_iter());
+                }
+                _ => unreachable!(),
+            }
+            // expr_elements.push(ASTNode::NumberLiteral(*num));
+            expr_elements.push(ASTNode::SymbolLiteral(operator));
+
+            Value::from(new_lazy_expr)
         }
         (_, _, Symbols::NotEqual | Symbols::CompareEqual | Symbols::AndSign | Symbols::OrSign) =>
         // all typed value comparing

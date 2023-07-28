@@ -1,3 +1,5 @@
+use std::{rc::Rc, cell::RefCell};
+
 pub mod value;
 
 pub mod array;
@@ -15,4 +17,9 @@ fn display_indent(level: usize) -> String {
 pub type Addr = usize;
 pub trait GetAddr {
     fn get_addr(&self) -> Addr;
+}
+
+#[inline]
+pub fn into_rc_refcell<T>(value: T) -> Rc<RefCell<T>> {
+    return Rc::new(RefCell::new(value));
 }

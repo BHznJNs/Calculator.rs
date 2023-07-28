@@ -22,6 +22,8 @@ pub struct Class {
 
     pub completer: Option<Rc<Completer>>,
 }
+
+#[cfg_attr(debug_assertions, derive(Debug))]
 #[derive(PartialEq, Clone)]
 pub struct Property(pub ValueType, pub String);
 impl Param for Property {
