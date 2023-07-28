@@ -1,10 +1,9 @@
-use crate::public::value::value::Value;
+use crate::public::{value::value::Value, error::syntax_error};
 
 pub fn assign(obj_value: Value, property: &String, value: Value) -> Result<(), ()> {
     let Value::Object(obj_ref) =
         obj_value else {
-        println!("Invalid object reading.");
-        return Err(())
+        return Err(syntax_error("invalid object reading")?)
     };
 
     let mut obj = obj_ref.as_ref().borrow_mut();
@@ -15,8 +14,7 @@ pub fn assign(obj_value: Value, property: &String, value: Value) -> Result<(), (
 pub fn resolve(obj_value: Value, property: &String) -> Result<Value, ()> {
     let Value::Object(obj_ref) =
         obj_value else {
-        println!("Invalid object reading.");
-        return Err(())
+        return Err(syntax_error("invalid object reading")?)
     };
 
     let obj = obj_ref.as_ref().borrow();
