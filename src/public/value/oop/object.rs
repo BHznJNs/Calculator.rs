@@ -4,10 +4,9 @@ use std::rc::Rc;
 
 use crate::public::env::ENV_OPTION;
 use crate::public::error::{assignment_error, reference_error, ReferenceType};
-use crate::public::value::array::Array;
 use crate::public::value::oop::class::Class;
 use crate::public::value::value::VoidSign;
-use crate::public::value::{self, GetAddr};
+use crate::public::value::{self, GetAddr, array};
 use crate::utils::completer::Completer;
 
 use super::super::display_indent;
@@ -146,7 +145,7 @@ pub fn display(f: &mut fmt::Formatter<'_>, obj: &Rc<RefCell<Object>>, level: usi
         // print value
         match value {
             Value::String(_) => write!(f, "{}", value.str_format())?,
-            Value::Array(arr) => Array::display(f, &arr, level + 1)?,
+            Value::Array(arr) => array::display(f, &arr, level + 1)?,
             Value::Object(obj) => self::display(f, &obj, level + 1)?,
             _ => write!(f, "{}", value)?,
         }

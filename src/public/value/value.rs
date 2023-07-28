@@ -8,7 +8,7 @@ use crate::public::env::ENV_OPTION;
 use crate::public::error::{internal_error, InternalComponent};
 
 use super::super::compile_time::ast::ast_enum::ASTNode;
-use super::array::{Array, ArrayLiteral};
+use super::array::{ArrayLiteral, RawArray, self};
 use super::function::{BuildInFunction, Function, UserDefinedFunction};
 use super::number::Number;
 use super::oop::class::Class;
@@ -86,7 +86,7 @@ pub enum Value {
     Boolean(bool),
     Number(Number),
     String(Rc<RefCell<String>>),
-    Array(Rc<RefCell<ArrayLiteral>>),
+    Array(Rc<RefCell<RawArray>>),
     LazyExpression(Rc<ASTNode>),
 
     Function(Function),
@@ -155,7 +155,7 @@ impl Value {
             Self::Number(num) => num.to_string(),
             Self::String(str) => str.borrow().clone(),
             Self::Function(func) => func.to_string(),
-            Self::Array(arr) => Array::join(&arr.borrow(), ", "),
+            Self::Array(arr) => arr.borrow().join(", "),
 
             Self::LazyExpression(_) => String::from("<Lazy-Expression>"),
             Self::Class(_) => String::from("<Class>"),
@@ -187,7 +187,7 @@ impl Value {
             // for `Array` and `Object` the two complex type,
             // recursive clone is needed.
             Self::Array(arr) =>
-                Array::deep_clone(arr.clone()),
+                array::deep_clone(arr),
             Self::Object(obj) =>
                 object::deep_clone(obj.clone()),
 
@@ -238,7 +238,7 @@ impl fmt::Display for Value {
             },
 
             Self::String(str) => write!(f, "{}", str.as_ref().borrow()),
-            Self::Array(arr) => Array::display(f, arr, 1),
+            Self::Array(arr) => array::display(f, arr, 1),
             Self::Class(cls) => write!(f, "{}", cls),
             Self::Object(obj) => object::display(f, obj, 1),
 
@@ -331,7 +331,7 @@ impl From<String> for Value {
 }
 impl From<ArrayLiteral> for Value {
     fn from(value: ArrayLiteral) -> Self {
-        Self::Array(Rc::new(RefCell::new(value)))
+        Self::Array(Rc::new(RefCell::new(RawArray::new(value))))
     }
 }
 impl From<ASTNode> for Value {

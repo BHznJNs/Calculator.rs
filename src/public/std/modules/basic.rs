@@ -10,7 +10,7 @@ use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::std::utils::get_self_prop::get_self_prop;
 use crate::public::std::utils::str_to_num::str_to_num;
-use crate::public::value::array::ArrayLiteral;
+use crate::public::value::array::{ArrayLiteral, RawArray};
 use crate::public::value::function::{BuildInFnParam, BuildInFunction};
 use crate::public::value::number::Number;
 use crate::public::value::value::{Value, ValueType};
@@ -209,7 +209,7 @@ impl BuildInFnCall for BasicModule {
                     }
                     Self::LEN => {
                         #[inline]
-                        fn array_length(arr: &Rc<RefCell<ArrayLiteral>>) -> Value {
+                        fn array_length(arr: &Rc<RefCell<RawArray>>) -> Value {
                             let refer = arr.borrow();
                             let length = refer.len() as i64;
                             return Value::from(length);

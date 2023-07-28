@@ -3,7 +3,6 @@ use std::rc::Rc;
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::std::utils::get_self_prop::get_self_prop;
-use crate::public::value::array::Array;
 use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function};
 use crate::public::value::oop::class::{Class, Property};
 use crate::public::value::value::{Value, ValueType, VoidSign};
@@ -114,11 +113,11 @@ impl BuildInFnCall for ArrayModule {
         let result = match self {
             Self::PUSH => {
                 let element_value = get_val("element", scope)?;
-                arr_ref.push_back(element_value.clone());
+                arr_ref.push(element_value.clone());
                 element_value
             }
             Self::POP => {
-                let poped_el = arr_ref.pop_back();
+                let poped_el = arr_ref.pop();
                 if let Some(val) = poped_el {
                     // return poped value
                     return Ok(val);
@@ -126,7 +125,7 @@ impl BuildInFnCall for ArrayModule {
                 Value::Void(VoidSign::Empty)
             }
             Self::SHIFT => {
-                let shifted = arr_ref.pop_front();
+                let shifted = arr_ref.shift();
                 if let Some(val) = shifted {
                     // return shifted value
                     return Ok(val);
@@ -135,7 +134,7 @@ impl BuildInFnCall for ArrayModule {
             }
             Self::UNSHIFT => {
                 let element_value = get_val("element", scope)?;
-                arr_ref.push_front(element_value.clone());
+                arr_ref.unshift(element_value.clone());
                 element_value
             }
             Self::INSERT => {
@@ -159,7 +158,7 @@ impl BuildInFnCall for ArrayModule {
             Self::JOIN => {
                 let divider_value = get_val("divider", scope)?;
                 let divider_ref = divider_value.get_str()?;
-                let result_str = Array::join(&*arr_ref, &*divider_ref);
+                let result_str = arr_ref.join(&*divider_ref);
                 Value::from(result_str)
             }
         };
