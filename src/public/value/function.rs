@@ -31,7 +31,8 @@ pub struct BuildInFunction {
     pub identi: BuildInFnIdenti,
 }
 
-#[derive(PartialEq, Clone, Debug)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(PartialEq, Clone)]
 pub struct UserDefinedFnParam {
     pub type__: ValueType,
     pub identi: String,
