@@ -1,3 +1,5 @@
+import Map
+
 # Raw-Map
 # key of map can be String or identifier
 raw_map = {key1: "value1"; "key2": "value2"}
@@ -5,3 +7,30 @@ raw_map = {key1: "value1"; "key2": "value2"}
 raw_map["key1"] # "value1"
 # Raw-Map element writing
 raw_map["key1"] = 1
+
+# --- --- --- --- --- ---
+
+# Map-Object
+obj_map = new Map({key1: 1; key2: 2; key3: 3})
+
+out "--- KEYS ---"
+out obj_map.keys()
+# [
+#   "key1", "key2", "key3", 
+# ]
+
+out "--- VALUES ---"
+out obj_map.values()
+# [
+#   1, 3, 2, 
+# ]
+
+out "--- HAS_KEY ---"
+out obj_map.has_key("key1")
+# true
+
+out "--- CLEAR ---"
+obj_map.clear()
+out obj_map.v
+# {
+# }
