@@ -69,6 +69,31 @@ out obj_arr.v
 #   4, 2, 3,
 # ]
 
+out "--- CONTAINS ---"
+out obj_arr.contains(4)
+# true
+out obj_arr.contains(999)
+# false
+
+out "--- SLICE ---"
+# 获取索引从 1 到 2 的元素（不包括 2）
+out obj_arr.slice(1, 2)
+# [
+#   2, 
+# ]
+
+# `0` 指数组的末尾
+out obj_arr.slice(1, 0) 
+# [
+#   2, 3, 
+# ]
+
+# `-1` 指数组的最后一个元素
+out obj_arr.slice(0, -1)
+# [
+#   4, 2, 
+# ]
+
 out "--- LEN ---"
 out len(obj_arr)
 # 3

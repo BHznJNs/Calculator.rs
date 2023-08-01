@@ -69,6 +69,31 @@ out obj_arr.v
 #   4, 2, 3,
 # ]
 
+out "--- CONTAINS ---"
+out obj_arr.contains(4)
+# true
+out obj_arr.contains(999)
+# false
+
+out "--- SLICE ---"
+# get elements from index 1 to 2 (not contains 2)
+out obj_arr.slice(1, 2)
+# [
+#   2, 
+# ]
+
+# `0` means the end of the array
+out obj_arr.slice(1, 0) 
+# [
+#   2, 3, 
+# ]
+
+# `-1` means the last element of the array
+out obj_arr.slice(0, -1)
+# [
+#   4, 2, 
+# ]
+
 out "--- LEN ---"
 out len(obj_arr)
 # 3
