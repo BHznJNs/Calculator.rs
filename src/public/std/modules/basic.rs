@@ -8,10 +8,12 @@ use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 use crate::public::error::{internal_error, type_error, InternalComponent};
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
+use crate::public::std::modules::map::MapModule;
 use crate::public::std::utils::get_self_prop::get_self_prop;
 use crate::public::std::utils::str_to_num::str_to_num;
 use crate::public::value::array::{ArrayLiteral, RawArray};
 use crate::public::value::function::{BuildInFnParam, BuildInFunction};
+use crate::public::value::map::RawMap;
 use crate::public::value::number::Number;
 use crate::public::value::value::{Value, ValueType};
 use crate::public::value::GetAddr;
@@ -226,28 +228,46 @@ impl BuildInFnCall for BasicModule {
                             let length = refer.chars().count() as i64;
                             return Value::from(length);
                         }
+                        #[inline]
+                        fn map_length(map: &Rc<RefCell<RawMap>>) -> Value {
+                            let refer = map.borrow();
+                            let length = refer.len() as i64;
+                            return Value::from(length);
+                        }
                         match &input {
                             Value::Array(arr) => return Ok(array_length(arr)),
                             Value::String(str) => return Ok(string_length(str)),
+                            Value::Map(map) => return Ok(map_length(map)),
                             Value::Object(obj) => {
                                 if let Some(proto) = obj.borrow().get_proto() {
                                     let string_cls = StringModule::module_class();
                                     let array_cls = ArrayModule::module_class();
+                                    let map_cls = MapModule::module_class();
                                     let proto_addr = proto.get_addr();
 
-                                    if proto_addr == array_cls.get_addr() {
-                                        let arr_val = get_self_prop(&input, "v")?;
-                                        let Value::Array(arr_ref) = arr_val else {
-                                            unreachable!()
-                                        };
-                                        return Ok(array_length(&arr_ref));
-                                    }
-                                    if proto_addr == string_cls.get_addr() {
-                                        let str_val = get_self_prop(&input, "v")?;
-                                        let Value::String(str_ref) = str_val else {
-                                            unreachable!()
-                                        };
-                                        return Ok(string_length(&str_ref));
+                                    match proto_addr {
+                                        x if x == array_cls.get_addr() => {
+                                            let arr_val = get_self_prop(&input, "v")?;
+                                            let Value::Array(arr_ref) = arr_val else {
+                                                unreachable!()
+                                            };
+                                            return Ok(array_length(&arr_ref));
+                                        }
+                                        x if x == string_cls.get_addr() => {
+                                            let str_val = get_self_prop(&input, "v")?;
+                                            let Value::String(str_ref) = str_val else {
+                                                unreachable!()
+                                            };
+                                            return Ok(string_length(&str_ref));
+                                        }
+                                        x if x == map_cls.get_addr() => {
+                                            let map_val = get_self_prop(&input, "v")?;
+                                            let Value::Map(map_ref) = map_val else {
+                                                unreachable!()
+                                            };
+                                            return Ok(map_length(&map_ref));
+                                        }
+                                        _ => {}
                                     }
                                 }
                             }
@@ -255,7 +275,11 @@ impl BuildInFnCall for BasicModule {
                         };
                         return Err(type_error(
                             Some("Build-in function `len`"),
-                            vec![ValueType::Array, ValueType::String],
+                            vec![
+                                ValueType::Array,
+                                ValueType::String,
+                                ValueType::Map,
+                            ],
                             input.get_type(),
                         )?);
                     }
