@@ -1,0 +1,7 @@
+# Raw-Map
+# key of map can be String or identifier
+raw_map = {key1: "value1"; "key2": "value2"}
+# Raw-Map element reading
+raw_map["key1"] # "value1"
+# Raw-Map element writing
+raw_map["key1"] = 1

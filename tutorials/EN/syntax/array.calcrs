@@ -1,56 +1,74 @@
 import Basic
 import Array
 
-arr = new Array([1, 2, 3])
+# Raw-Array
+# Use `[` and `]` to create Raw-Array
+raw_arr = [1, 2, 3]
+# Raw-Array element reading
+raw_arr[0] # 1
+# Raw-Array element writing
+raw_arr[0] = 10
+# Raw-Array length
+len(raw_arr)
+
+# --- --- --- --- --- ---
+
+# Array-Object
+obj_arr = new Array([1, 2, 3])
+
+# Array-Object element reading
+obj_arr.v[0]
+# Array-Object element writing
+obj_arr.v[0] = 10
 
 out "--- PUSH ---"
-out arr.push(0)
-out arr.v
+out obj_arr.push(0)
+out obj_arr.v
 # 0
 # [
 #   1, 2, 3, 0,
 # ]
 
 out "--- POP ---"
-out arr.pop()
-out arr.v
+out obj_arr.pop()
+out obj_arr.v
 # 0
 # [
 #   1, 2, 3,
 # ]
 
 out "--- SHIFT ---"
-out arr.shift()
-out arr.v
+out obj_arr.shift()
+out obj_arr.v
 # 1
 # [
 #   2, 3,
 # ]
 
 out "--- UNSHIFT ---"
-out arr.unshift(4)
-out arr.v
+out obj_arr.unshift(4)
+out obj_arr.v
 # 4
 # [
 #   4, 2, 3,
 # ]
 
 out "--- INSERT ---"
-out arr.insert(1, 5)
-out arr.v
+out obj_arr.insert(1, 5)
+out obj_arr.v
 # 5
 # [
 #   4, 5, 2, 3,
 # ]
 
 out "--- REMOVE ---"
-out arr.remove(1)
-out arr.v
+out obj_arr.remove(1)
+out obj_arr.v
 # 5
 # [
 #   4, 2, 3,
 # ]
 
 out "--- LEN ---"
-out len(arr.v)
+out len(obj_arr)
 # 3

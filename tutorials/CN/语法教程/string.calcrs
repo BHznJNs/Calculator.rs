@@ -1,0 +1,46 @@
+import Basic
+import String
+
+# 原始字符串
+# 使用 `"` 和 `'` 符号以创建原始字符串
+raw_str = "abc"
+raw_str = 'abc"
+raw_str = "abc'
+raw_str = 'abc'
+
+# 原始字符串字符读取
+raw_str[0] # "a"
+# 原始字符串字符写入
+raw_str[0] = "z"
+# 原始字符串长度获取
+len(raw_str) # 3
+# 原始字符串拼接
+raw_str += "efg"
+
+# --- --- --- --- --- ---
+
+# 对象字符串
+
+obj_str = new String("abc")
+
+out "--- SPLIT ---"
+out obj_str.split("b")
+# [
+#   "a", "c", 
+# ]
+
+out "--- REPLACE ---"
+out obj_str.replace("a", "z")
+# "zbc"
+
+out "--- REPEAT ---"
+out obj_str.repeat(3)
+# "abcabcabc"
+
+out "--- START_WITH ---"
+out obj_str.start_with("a")
+# true
+
+out "--- END_WITH ---"
+out obj_str.end_with("a")
+# false

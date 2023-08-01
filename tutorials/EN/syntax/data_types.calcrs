@@ -19,6 +19,9 @@ raw_arr_var = [1, 2, 3]
 # Array-Object type
 arr_obj_var = new Array([1, 2, 3])
 
+# Raw-Map type
+raw_map_var = {a: 1; b: [ 2 ]}
+
 # Lazy-Expression type
 lazy_expr_var = { 1 + number_int_var }
 # Lazy-Expression invocation

@@ -1,0 +1,46 @@
+import Basic
+import String
+
+# Raw-String
+# Use both `"` and `'` to create Raw-String
+raw_str = "abc"
+raw_str = 'abc"
+raw_str = "abc'
+raw_str = 'abc'
+
+# Raw-String character reading
+raw_str[0] # "a"
+# Raw-String character writing
+raw_str[0] = "z"
+# Raw-String length
+len(raw_str) # 3
+# Raw-String concatenating
+raw_str += "efg"
+
+# --- --- --- --- --- ---
+
+# String-Object
+
+obj_str = new String("abc")
+
+out "--- SPLIT ---"
+out obj_str.split("b")
+# [
+#   "a", "c", 
+# ]
+
+out "--- REPLACE ---"
+out obj_str.replace("a", "z")
+# "zbc"
+
+out "--- REPEAT ---"
+out obj_str.repeat(3)
+# "abcabcabc"
+
+out "--- START_WITH ---"
+out obj_str.start_with("a")
+# true
+
+out "--- END_WITH ---"
+out obj_str.end_with("a")
+# false

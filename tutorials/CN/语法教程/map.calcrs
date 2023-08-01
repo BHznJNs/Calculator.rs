@@ -1,0 +1,7 @@
+# 原始字典
+# 字典的键可以为字符串或者标识符
+raw_map = {key1: "value1"; "key2": "value2"}
+# 原始字典元素读取
+raw_map["key1"] # "value1"
+# 原始字典元素写入
+raw_map["key1"] = 1
