@@ -1,0 +1,25 @@
+import BitOps
+
+# Def: AND(num1 $Numb, num2 $Numb)
+# Receives two int Number, applies bitwise operation AND on them.
+AND(1, 0) # 0
+
+# Def: OR(num1 $Numb, num2 $Numb)
+# Receives two int Number, applies bitwise operation OR on them.
+OR(1, 0) # 1
+
+# Def: XOR(num1 $Numb, num2 $Numb)
+# Receives two int Number, applies bitwise operation XOR on them.
+XOR(1, 1) # 0
+
+# Def: LShift(num1 $Numb, num2 $Numb)
+# Receives two int Number, applies bitwise operation LEFT-SHIFT on num1 with `num2` bits.
+LShift(1, 10) # 1024
+
+# Def: RShift(num1 $Numb, num2 $Numb)
+# Receives two int Number, applies bitwise operation RIGHT-SHIFT on num1 with `num2` bits.
+LShift(1024, 10) # 1
+
+# Def: NOT(num $Numb)
+# Receives an int Number, applies bitwise operation NOT on it.
+NOT(10) # -11

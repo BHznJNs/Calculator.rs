@@ -67,10 +67,12 @@ ascii("a") # 97
 ascii("$10") # 36
 
 # Def: len(value $_)
-# Receives Raw-Array | Array-Object | Raw-String | String-Object value and return its length,
+# Receives Raw-Array | Array-Object | Raw-String | String-Object | Raw-Map | Map-Object
+# value and return its length,
 # will throw type_error when the other typed value is received.
 len("abc") # 3
 len([1, 2, 3]) # 3
+len({a: 1}) # 1
 
 # Def: exit()
 # Directly terminate the current running script or REPL.
