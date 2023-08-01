@@ -38,6 +38,11 @@ impl RawArray {
         return self.0.remove(index);
     }
 
+    #[inline]
+    pub fn contains(&self, value: &Value) -> bool {
+        return self.0.contains(value);
+    }
+
     pub fn slice(&self, start: i64, mut end: i64) -> Self {
         let self_len = self.len() as i64;
         if start >= self_len {

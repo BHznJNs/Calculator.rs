@@ -18,6 +18,7 @@ pub enum ArrayModule {
     UNSHIFT,
     INSERT,
     REMOVE,
+    CONTAINS,
     SLICE,
     JOIN,
 }
@@ -32,23 +33,15 @@ impl ClassModule for ArrayModule {
             ],
             identi: BuildInFnIdenti::Array(Self::PUSH),
         };
-
         let pop = BuildInFunction {
             params: vec![BuildInFnParam(ValueType::Object, "self")],
             identi: BuildInFnIdenti::Array(Self::POP),
         };
+        let mut shift = pop.clone();
+        let mut unshift = push.clone();
+        shift.identi = BuildInFnIdenti::Array(Self::SHIFT);
+        unshift.identi = BuildInFnIdenti::Array(Self::UNSHIFT);
 
-        let shift = BuildInFunction {
-            params: vec![BuildInFnParam(ValueType::Object, "self")],
-            identi: BuildInFnIdenti::Array(Self::SHIFT),
-        };
-        let unshift = BuildInFunction {
-            params: vec![
-                BuildInFnParam(ValueType::Object, "self"),
-                BuildInFnParam(ValueType::Void, "element"),
-            ],
-            identi: BuildInFnIdenti::Array(Self::UNSHIFT),
-        };
         let insert = BuildInFunction {
             params: vec![
                 BuildInFnParam(ValueType::Object, "self"),
@@ -63,6 +56,13 @@ impl ClassModule for ArrayModule {
                 BuildInFnParam(ValueType::Number, "index"),
             ],
             identi: BuildInFnIdenti::Array(Self::REMOVE),
+        };
+        let contains = BuildInFunction {
+            params: vec![
+                BuildInFnParam(ValueType::Object, "self"),
+                BuildInFnParam(ValueType::Void, "value"),
+            ],
+            identi: BuildInFnIdenti::Array(Self::CONTAINS),
         };
         let slice = BuildInFunction {
             params: vec![
@@ -93,6 +93,7 @@ impl ClassModule for ArrayModule {
                         (String::from("unshift"), Function::from(unshift)),
                         (String::from("insert"), Function::from(insert)),
                         (String::from("remove"), Function::from(remove)),
+                        (String::from("contains"), Function::from(contains)),
                         (String::from("slice"), Function::from(slice)),
                         (String::from("join"), Function::from(join)),
                     ],
@@ -164,6 +165,11 @@ impl BuildInFnCall for ArrayModule {
                     Some(val) => val,
                     None => Value::Void(VoidSign::Empty),
                 }
+            }
+            Self::CONTAINS => {
+                let target_value = get_val("value", scope)?;
+                let is_contains = arr_ref.contains(&target_value);
+                Value::from(is_contains)
             }
             Self::SLICE => {
                 let start = get_val("start", scope)?.get_i64()?;
