@@ -6,16 +6,16 @@ use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
 use crate::{computer::resolvers::invocation::invocation_resolve, public::error::internal_error};
 
-use super::{array_reading, object_reading};
+use super::{element_reading, object_reading};
 
 pub fn resolve(node: &ASTNode, scope: &mut Scope) -> Result<Value, ()> {
     let result = match node {
         ASTNode::Invocation(sub_node) => invocation_resolve::resolve(sub_node.borrow(), scope)?,
-        ASTNode::ArrayElementReading(sub_node) => {
-            let sub_array_node = &sub_node.array_node;
-            let array_value = resolve(sub_array_node, scope)?;
+        ASTNode::ElementReading(sub_node) => {
+            let target_node = &sub_node.target_node;
+            let target_value = resolve(target_node, scope)?;
 
-            array_reading::resolve(array_value, &sub_node.index_node, scope)?
+            element_reading::resolve(target_value, &sub_node.index_node, scope)?
         }
         ASTNode::ObjectReading(sub_node) => {
             let sub_obj_node = &sub_node.obj_node;

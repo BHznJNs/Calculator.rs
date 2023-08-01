@@ -49,7 +49,7 @@ pub fn resolve(node: &InvocationNode, scope: &mut Scope) -> Result<Value, ()> {
 
     let fn_result = match &node.caller {
         ASTNode::Variable(sub_node) => variable_invoke(&sub_node.name, params, scope)?,
-        ASTNode::Invocation(_) | ASTNode::ObjectReading(_) | ASTNode::ArrayElementReading(_) => {
+        ASTNode::Invocation(_) | ASTNode::ObjectReading(_) | ASTNode::ElementReading(_) => {
             let caller_node = &node.caller;
             let function_value = compose::resolve(caller_node, scope)?;
             function_invoke(function_value, params, scope)?

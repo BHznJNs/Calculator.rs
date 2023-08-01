@@ -5,8 +5,7 @@ use crate::public::compile_time::parens::Paren;
 use crate::public::error::syntax_error;
 use crate::public::value::symbols::Symbols;
 
-use super::super::array;
-use super::{assignment, invocation, object_reading};
+use super::{assignment, invocation, object_reading, element_reading};
 
 pub fn resolve(var_node: ASTNode, tokens: &mut TokenVec) -> Result<ASTNode, ()> {
     let is_more_token = tokens.len() > 0;
@@ -35,8 +34,8 @@ pub fn resolve(var_node: ASTNode, tokens: &mut TokenVec) -> Result<ASTNode, ()> 
             }
             Token::Paren(Paren::LeftBracket) => {
                 // array element reading
-                let reading_node = array::reading_resolve(var_node, tokens)?;
-                ASTNode::ArrayElementReading(reading_node.into())
+                let reading_node = element_reading::resolve(var_node, tokens)?;
+                ASTNode::ElementReading(reading_node.into())
             }
             Token::Paren(_) => {
                 // examples:

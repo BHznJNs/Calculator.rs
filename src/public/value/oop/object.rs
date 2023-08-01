@@ -6,7 +6,7 @@ use crate::public::env::ENV_OPTION;
 use crate::public::error::{assignment_error, reference_error, ReferenceType};
 use crate::public::value::oop::class::Class;
 use crate::public::value::value::VoidSign;
-use crate::public::value::{self, GetAddr, array};
+use crate::public::value::{self, GetAddr, ComplexStructure};
 use crate::utils::completer::Completer;
 
 use super::super::display_indent;
@@ -132,101 +132,85 @@ pub struct BuildInObject {
     pub(self) storage: ComposeStorage<Value>,
 }
 
-pub fn display(f: &mut fmt::Formatter<'_>, obj: &Rc<RefCell<Object>>, level: usize) -> fmt::Result {
-    fn display_item(
-        f: &mut fmt::Formatter<'_>,
-        key: &str,
-        value: &Value,
-        level: usize,
-    ) -> fmt::Result {
-        // print indent and key
-        write!(f, "{}{}: ", display_indent(level), key)?;
-
-        // print value
-        match value {
-            Value::String(_) => write!(f, "{}", value.str_format())?,
-            Value::Array(arr) => array::display(f, &arr, level + 1)?,
-            Value::Object(obj) => self::display(f, &obj, level + 1)?,
-            _ => write!(f, "{}", value)?,
-        }
-
-        // next line
-        write!(f, "\r\n")
-    }
-
-    let obj_ref = obj.as_ref().borrow();
-    let store = obj_ref.get_store();
-    let ComposeStorage {
-        storage_pattern,
-        data_list,
-        data_map,
-    } = store;
-
-    write!(f, "{{\r\n")?;
-    match storage_pattern {
-        DataStoragePattern::List => {
-            let list = data_list.as_ref().unwrap();
-            for (k, v) in list {
-                display_item(f, k, v, level)?;
+impl ComplexStructure for Object {
+    fn display(f: &mut fmt::Formatter<'_>, obj: &Rc<RefCell<Self>>, level: usize) -> fmt::Result {
+        let obj_ref = obj.as_ref().borrow();
+        let store = obj_ref.get_store();
+        let ComposeStorage {
+            storage_pattern,
+            data_list,
+            data_map,
+        } = store;
+    
+        write!(f, "{{\r\n")?;
+        match storage_pattern {
+            DataStoragePattern::List => {
+                let list = data_list.as_ref().unwrap();
+                for (k, v) in list {
+                    write!(f, "{}{}: ", display_indent(level), k)?;
+                    Self::item_display(f, v, level + 1)?;
+                    write!(f, "\r\n")?;
+                }
+            }
+            DataStoragePattern::Map => {
+                let map = data_map.as_ref().unwrap();
+                for (k, v) in map {
+                    write!(f, "{}{}: ", display_indent(level), k)?;
+                    Self::item_display(f, v, level + 1)?;
+                    write!(f, "\r\n")?;
+                }
             }
         }
-        DataStoragePattern::Map => {
-            let map = data_map.as_ref().unwrap();
+        if let Some(proto) = obj_ref.get_proto() {
+            Class::display_methods(f, &proto, level)?;
+        }
+        write!(f, "{}}}", display_indent(level - 1))
+    }
 
-            for (k, v) in map {
-                display_item(f, k, v, level)?;
+    fn deep_clone(obj: &Rc<RefCell<Self>>) -> Value {
+        fn item_resolve(v: &Value) -> Value {
+            if let Value::Object(sub_obj) = v {
+                return Object::deep_clone(sub_obj);
+            } else {
+                return v.deep_clone();
             }
         }
-    }
-    if let Some(proto) = obj_ref.get_proto() {
-        Class::display_methods(f, &proto, level)?;
-    }
-    write!(f, "{}}}", display_indent(level - 1))
-}
-
-pub fn deep_clone(obj: Rc<RefCell<Object>>) -> Value {
-    fn item_resolve(v: &Value) -> Value {
-        if let Value::Object(sub_obj) = v.unwrap() {
-            return self::deep_clone(sub_obj);
-        } else {
-            return v.deep_clone();
-        }
-    }
-
-    let obj_ref = &*(obj.as_ref().borrow());
-    let store = obj_ref.get_store();
-    let ComposeStorage {
-        storage_pattern,
-        data_list,
-        data_map,
-    } = store;
-    let mut instantiation_params = Vec::<(String, Value)>::new();
-
-    match storage_pattern {
-        DataStoragePattern::List => {
-            let list = data_list.as_ref().unwrap();
-            for (k, v) in list {
-                let resolved_item_value = item_resolve(v);
-                instantiation_params.push((k.clone(), resolved_item_value));
+    
+        let obj_ref = &*(obj.as_ref().borrow());
+        let store = obj_ref.get_store();
+        let ComposeStorage {
+            storage_pattern,
+            data_list,
+            data_map,
+        } = store;
+        let mut instantiation_params = Vec::<(String, Value)>::new();
+    
+        match storage_pattern {
+            DataStoragePattern::List => {
+                let list = data_list.as_ref().unwrap();
+                for (k, v) in list {
+                    let resolved_item_value = item_resolve(v);
+                    instantiation_params.push((k.clone(), resolved_item_value));
+                }
+            }
+            DataStoragePattern::Map => {
+                let map = data_map.as_ref().unwrap();
+                for (k, v) in map {
+                    let resolved_item_value = item_resolve(v);
+                    instantiation_params.push((k.clone(), resolved_item_value));
+                }
             }
         }
-        DataStoragePattern::Map => {
-            let map = data_map.as_ref().unwrap();
-            for (k, v) in map {
-                let resolved_item_value = item_resolve(v);
-                instantiation_params.push((k.clone(), resolved_item_value));
+    
+        // the object has been passed the type check before,
+        // thus with properties of the object,
+        // the instantiation must pass the type check.
+        let res_obj = match obj_ref {
+            Object::BuildIn(_) => Object::new(instantiation_params, None),
+            Object::UserDefined(_) => {
+                Object::new(instantiation_params, Some(obj_ref.get_proto().unwrap()))
             }
-        }
+        };
+        return Value::from(res_obj);
     }
-
-    // the object has been passed the type check before,
-    // thus with properties of the object,
-    // the instantiation must pass the type check.
-    let res_obj = match obj_ref {
-        Object::BuildIn(_) => Object::new(instantiation_params, None),
-        Object::UserDefined(_) => {
-            Object::new(instantiation_params, Some(obj_ref.get_proto().unwrap()))
-        }
-    };
-    return Value::from(res_obj);
 }

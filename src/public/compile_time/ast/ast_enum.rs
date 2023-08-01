@@ -3,9 +3,9 @@ use core::fmt;
 use crate::public::value::{number::Number, symbols::Symbols};
 
 use super::types::{
-    ArrayElementReadingNode, ArrayLiteralNode, AssignmentNode, ClassDefinitionNode, ExpressionNode,
+    ElementReadingNode, ArrayLiteralNode, AssignmentNode, ClassDefinitionNode, ExpressionNode,
     FunctionDefinitionNode, ImportNode, InstantiationNode, InvocationNode, LazyExpressionNode,
-    ObjectReadingNode, StatementNode, VariableNode,
+    ObjectReadingNode, StatementNode, VariableNode, MapLiteralNode,
 };
 
 #[cfg_attr(debug_assertions, derive(Debug))]
@@ -25,7 +25,8 @@ pub enum ASTNode {
     Variable(Box<VariableNode>),
     Assignment(Box<AssignmentNode>),
     ArrayLiteral(Box<ArrayLiteralNode>),
-    ArrayElementReading(Box<ArrayElementReadingNode>),
+    ElementReading(Box<ElementReadingNode>),
+    MapLiteral(Box<MapLiteralNode>),
     Expression(Box<ExpressionNode>),
     LazyExpression(Box<LazyExpressionNode>),
 
@@ -51,7 +52,8 @@ impl fmt::Display for ASTNode {
             Self::Variable(_) => "Variable",
             Self::Assignment(_) => "Assignment",
             Self::ArrayLiteral(_) => "ArrayLiteral",
-            Self::ArrayElementReading(_) => "ArrayElementReading",
+            Self::ElementReading(_) => "ElementReading",
+            Self::MapLiteral(_) => "MapLiteral",
             Self::Expression(_) => "Expression",
             Self::LazyExpression(_) => "LazyExpression",
             Self::Invocation(_) => "Invocation",

@@ -6,6 +6,7 @@ mod statement;
 mod assignment;
 
 mod array_literal;
+mod map_literal;
 mod class_definition;
 mod function_definition;
 mod instantiation;

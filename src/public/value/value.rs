@@ -8,12 +8,13 @@ use crate::public::env::ENV_OPTION;
 use crate::public::error::{internal_error, InternalComponent};
 
 use super::super::compile_time::ast::ast_enum::ASTNode;
-use super::array::{ArrayLiteral, RawArray, self};
+use super::array::{ArrayLiteral, RawArray};
 use super::function::{BuildInFunction, Function, UserDefinedFunction};
+use super::map::{RawMap};
 use super::number::Number;
 use super::oop::class::Class;
-use super::oop::object::{self, Object};
-use super::{GetAddr, into_rc_refcell};
+use super::oop::object::Object;
+use super::{GetAddr, into_rc_refcell, ComplexStructure};
 
 #[cfg_attr(debug_assertions, derive(Debug))]
 #[derive(PartialEq, Clone, Copy)]
@@ -24,6 +25,7 @@ pub enum ValueType {
     Number,
     String,
     Array,
+    Map,
     LazyExpression,
 
     Function,
@@ -31,12 +33,13 @@ pub enum ValueType {
     Object,
 }
 
-pub const VALUE_TYPE_PAIRS: [(&'static str, ValueType); 8] = [
+pub const VALUE_TYPE_PAIRS: [(&'static str, ValueType); 9] = [
     ("_", ValueType::Void),
     ("Bool", ValueType::Boolean),
     ("Numb", ValueType::Number),
     ("Str", ValueType::String),
     ("Array", ValueType::Array),
+    ("Map", ValueType::Map),
     ("LazyExpr", ValueType::LazyExpression),
     ("Func", ValueType::Function),
     ("Obj", ValueType::Object),
@@ -61,6 +64,7 @@ impl fmt::Display for ValueType {
             ValueType::Number => write!(f, "Number"),
             ValueType::String => write!(f, "String"),
             ValueType::Array => write!(f, "Array"),
+            ValueType::Map => write!(f, "Map"),
             ValueType::LazyExpression => write!(f, "LazyExpression"),
             ValueType::Function => write!(f, "Function"),
             ValueType::Class => write!(f, "Class"),
@@ -88,6 +92,7 @@ pub enum Value {
     Number(Number),
     String(Rc<RefCell<String>>),
     Array(Rc<RefCell<RawArray>>),
+    Map(Rc<RefCell<RawMap>>),
     LazyExpression(Rc<RefCell<ASTNode>>),
 
     Function(Function),
@@ -96,12 +101,23 @@ pub enum Value {
 }
 
 impl Value {
+    pub const EMPTY: Self = Self::Void(VoidSign::Empty);
+
     // formater for string typed value
-    pub fn str_format(&self) -> String {
-        if unsafe { ENV_OPTION.support_ansi } {
-            format!("\"{}\"", self.to_string().green())
+    pub fn str_format(&self) -> Result<String, ()> {
+        if let Self::String(str) = self {
+            if unsafe { ENV_OPTION.support_ansi } {
+                let temp = str.as_ref().borrow();
+                let result = format!("\"{}\"", temp).green().to_string();
+                Ok(result)
+            } else {
+                Ok(format!("\"{}\"", str.as_ref().borrow()))
+            }
         } else {
-            format!("\"{}\"", self)
+            Err(internal_error(
+                InternalComponent::InternalFn,
+                "invalid `Value::str_format` invocation"
+            )?)
         }
     }
 
@@ -131,6 +147,7 @@ impl Value {
             Self::Number(num) => *num != Number::Int(0),
             Self::String(str) => str.as_ref().borrow().len() > 0,
             Self::Array(arr) => arr.as_ref().borrow().len() > 0,
+            Self::Map(map) => map.as_ref().borrow().len() > 0,
 
             Self::Void(_) => false,
             Self::LazyExpression(_) | Self::Function(_) | Self::Class(_) | Self::Object(_) => true,
@@ -154,10 +171,11 @@ impl Value {
             Self::Void(_) => self.to_string(),
             Self::Boolean(bool_val) => bool_val.to_string(),
             Self::Number(num) => num.to_string(),
-            Self::String(str) => str.borrow().clone(),
+            Self::String(str) => str.as_ref().borrow().clone(),
             Self::Function(func) => func.to_string(),
-            Self::Array(arr) => arr.borrow().join(", "),
+            Self::Array(arr) => arr.as_ref().borrow().join(", "),
 
+            Self::Map(_) => String::from("<Map>"),
             Self::LazyExpression(_) => String::from("<Lazy-Expression>"),
             Self::Class(_) => String::from("<Class>"),
             Self::Object(_) => String::from("<Object>"),
@@ -187,15 +205,17 @@ impl Value {
 
             // for `Array` and `Object` the two complex type,
             // recursive clone is needed.
+            Self::Map(map) =>
+                RawMap::deep_clone(map),
             Self::Array(arr) =>
-                array::deep_clone(arr),
+                RawArray::deep_clone(arr),
             Self::Object(obj) =>
-                object::deep_clone(obj.clone()),
+                Object::deep_clone(obj),
 
             Self::LazyExpression(l_expr) => {
                 let cloned_l_expr = l_expr.as_ref().borrow().clone();
                 Self::from(cloned_l_expr)
-            },
+            }
 
             // user-defined common variable can not be `void` typed,
             // so that it need not to implement
@@ -213,6 +233,7 @@ impl Value {
             Self::Number(_) => ValueType::Number,
             Self::String(_) => ValueType::String,
             Self::Array(_) => ValueType::Array,
+            Self::Map(_) => ValueType::Map,
             Self::LazyExpression(_) => ValueType::LazyExpression,
 
             Self::Function(_) => ValueType::Function,
@@ -239,9 +260,10 @@ impl fmt::Display for Value {
             },
 
             Self::String(str) => write!(f, "{}", str.as_ref().borrow()),
-            Self::Array(arr) => array::display(f, arr, 1),
+            Self::Array(arr) => RawArray::display(f, arr, 1),
+            Self::Map(map) => RawMap::display(f, map, 1),
             Self::Class(cls) => write!(f, "{}", cls),
-            Self::Object(obj) => object::display(f, obj, 1),
+            Self::Object(obj) => Object::display(f, obj, 1),
 
             _ => {
                 if unsafe { ENV_OPTION.support_ansi } {
@@ -272,10 +294,10 @@ impl GetAddr for Value {
     fn get_addr(&self) -> super::Addr {
         match self {
             Self::Array(arr) => arr.as_ptr() as super::Addr,
-            Self::LazyExpression(lexpr) => (&*lexpr.borrow() as *const ASTNode) as usize,
+            Self::LazyExpression(lexpr) => lexpr.as_ptr() as usize,
             Self::Function(func) => func.get_addr(),
             Self::Class(cls) => cls.get_addr(),
-            Self::Object(obj) => obj.borrow().get_addr(),
+            Self::Object(obj) => obj.as_ref().borrow().get_addr(),
             _ => unreachable!(),
         }
     }
@@ -292,8 +314,8 @@ impl PartialEq for Value {
             (Self::Boolean(bool_val1), Self::Boolean(bool_val2)) => *bool_val1 == *bool_val2,
             (Self::Number(num1), Self::Number(num2)) => *num1 == *num2,
             (Self::String(str_ref1), Self::String(str_ref2)) => {
-                let str1 = str_ref1.borrow();
-                let temp = str_ref2.borrow();
+                let str1 = str_ref1.as_ref().borrow();
+                let temp = str_ref2.as_ref().borrow();
                 let str2 = temp.as_str();
                 str1.eq(str2)
             }
@@ -333,6 +355,11 @@ impl From<String> for Value {
 impl From<ArrayLiteral> for Value {
     fn from(value: ArrayLiteral) -> Self {
         Self::Array(into_rc_refcell(RawArray::new(value)))
+    }
+}
+impl From<RawMap> for Value {
+    fn from(value: RawMap) -> Self {
+        Self::Map(into_rc_refcell(value))
     }
 }
 impl From<ASTNode> for Value {

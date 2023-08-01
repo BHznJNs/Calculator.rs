@@ -1,7 +1,7 @@
 use std::{cell::RefCell, collections::{VecDeque, vec_deque::Iter}, fmt, rc::Rc, ops::{Index, IndexMut}};
 
-use super::value::Value;
-use crate::public::value::{display_indent, oop::object};
+use super::{value::Value, ComplexStructure};
+use crate::public::value::display_indent;
 use crossterm::style::Stylize;
 
 pub type ArrayLiteral = VecDeque<Value>;
@@ -76,48 +76,40 @@ impl IndexMut<usize> for RawArray {
     }
 }
 
-// recursively clone array elements
-pub fn deep_clone(arr: &Rc<RefCell<RawArray>>) -> Value {
-    let mut new_array = ArrayLiteral::new();
+impl ComplexStructure for RawArray {
+    fn display(f: &mut fmt::Formatter<'_>, arr: &Rc<RefCell<Self>>, level: usize) -> fmt::Result {
+        const LINE_COUNT: i8 = 5;
+        let mut index = 0;
 
-    for v in arr.borrow().iter() {
-        let element = if let Value::Array(arr) = v {
-            self::deep_clone(arr)
-        } else {
-            v.deep_clone()
-        };
-        new_array.push_back(element);
-    }
-    return Value::from(new_array);
-}
-
-pub fn display(
-    f: &mut fmt::Formatter<'_>,
-    arr: &Rc<RefCell<RawArray>>,
-    level: usize,
-) -> fmt::Result {
-    const LINE_COUNT: i8 = 5;
-    let mut index = 0;
-
-    write!(f, "[")?;
-    for element in arr.borrow().iter() {
-        // print indent
-        if index % LINE_COUNT == 0 {
-            write!(f, "\r\n")?;
-            write!(f, "{}", "  ".repeat(level))?;
+        write!(f, "[")?;
+        for element in arr.borrow().iter() {
+            // print indent
+            if index % LINE_COUNT == 0 {
+                write!(f, "\r\n")?;
+                write!(f, "{}", "  ".repeat(level))?;
+            }
+            // print element
+            Self::item_display(f, element, level + 1)?;
+            // comma symbol print
+            write!(f, "{}", ", ".dim())?;
+            index += 1;
         }
 
-        // print elements
-        match element {
-            Value::String(_) => write!(f, "{}", element.str_format())?,
-            Value::Array(arr) => self::display(f, arr, level + 1)?,
-            Value::Object(obj) => object::display(f, obj, level + 1)?,
-            _ => write!(f, "{}", element)?,
-        }
-        write!(f, "{}", ", ".dim())?;
-        index += 1;
+        write!(f, "\r\n")?;
+        write!(f, "{}]", display_indent(level - 1))
     }
 
-    write!(f, "\r\n")?;
-    write!(f, "{}]", display_indent(level - 1))
+    fn deep_clone(arr: &Rc<RefCell<Self>>) -> Value {
+        let mut new_array = ArrayLiteral::new();
+
+        for v in arr.borrow().iter() {
+            let element = if let Value::Array(arr) = v {
+                Self::deep_clone(arr)
+            } else {
+                v.deep_clone()
+            };
+            new_array.push_back(element);
+        }
+        return Value::from(new_array);
+    }
 }

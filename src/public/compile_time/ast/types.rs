@@ -23,8 +23,14 @@ pub struct ArrayLiteralNode {
 }
 #[cfg_attr(debug_assertions, derive(Debug))]
 #[derive(PartialEq, Clone)]
-pub struct ArrayElementReadingNode {
-    pub array_node: ASTNode,
+pub struct MapLiteralNode {
+    pub keys: Vec<String>,
+    pub values: Vec<ExpressionNode>,
+}
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(PartialEq, Clone)]
+pub struct ElementReadingNode {
+    pub target_node: ASTNode,
     pub index_node: ExpressionNode,
 }
 #[cfg_attr(debug_assertions, derive(Debug))]

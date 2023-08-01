@@ -7,7 +7,7 @@ pub fn get_self_prop(self_value: &Value, prop_name: &str) -> Result<Value, ()> {
     let Value::Object(obj) = self_value else {
         return Err(internal_error(
             InternalComponent::Std,
-            "invalid object getter invocation for invalid value type"
+            "invalid value type for object getter invocation"
         )?)
     };
 

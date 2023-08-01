@@ -10,17 +10,13 @@ use crate::public::error::{import_error, syntax_error};
 use super::{expression, statement_block};
 
 fn statement_condition_resolve(tokens: &mut TokenVec) -> Result<ExpressionNode, ()> {
-    let first_index = 0;
-    let mut sub_tokens = TokenVec::new();
-    // sub condition tokens
+    let mut sub_tokens = TokenVec::new(); // sub condition tokens
 
-    while first_index < tokens.len() {
-        let current = tokens.pop_front().unwrap();
-        //                         '{'
-        if current == Token::Paren(Paren::LeftBrace) {
+    while let Some(token) = tokens.pop_front() {
+        if token == Token::Paren(Paren::LeftBrace) {
             break;
         }
-        sub_tokens.push_back(current);
+        sub_tokens.push_back(token);
     }
     Ok(expression::resolve(&mut sub_tokens)?)
 }

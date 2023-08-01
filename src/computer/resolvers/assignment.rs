@@ -4,7 +4,7 @@ use crate::public::error::assignment_error;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
 
-use super::composer::{array_reading, compose, object_reading};
+use super::composer::{element_reading, compose, object_reading};
 use super::expression;
 
 pub fn resolve(node: &AssignmentNode, scope: &mut Scope, is_global: bool) -> Result<Value, ()> {
@@ -24,11 +24,11 @@ pub fn resolve(node: &AssignmentNode, scope: &mut Scope, is_global: bool) -> Res
             }
         }
 
-        ASTNode::ArrayElementReading(sub_node) => {
-            let sub_array_node = &sub_node.array_node;
-            let array_value = compose::resolve(sub_array_node, scope)?;
-            array_reading::assign(
-                array_value,
+        ASTNode::ElementReading(sub_node) => {
+            let target_node = &sub_node.target_node;
+            let target_value = compose::resolve(target_node, scope)?;
+            element_reading::assign(
+                target_value,
                 &sub_node.index_node,
                 right_hand_value.clone(),
                 scope,

@@ -13,5 +13,5 @@ pub fn resolve(node: &ArrayLiteralNode, scope: &mut Scope) -> Result<ArrayLitera
         elements.push_back(expression_value)
     }
 
-    Ok(elements)
+    return Ok(elements);
 }

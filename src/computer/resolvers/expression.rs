@@ -6,7 +6,7 @@ use crate::public::value::into_rc_refcell;
 use crate::public::value::symbols::Symbols;
 use crate::public::value::value::{Value, ValueType, VoidSign};
 
-use super::class_definition;
+use super::{class_definition, map_literal};
 use super::operate::operate;
 use super::{array_literal, assignment, composer::compose, function_definition, instantiation};
 
@@ -74,17 +74,18 @@ pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> Result<Value, ()> {
                 }
             }
             ASTNode::ArrayLiteral(node) => Value::from(array_literal::resolve(node, scope)?),
+            ASTNode::MapLiteral(node) => Value::from(map_literal::resolve(node, scope)?),
             ASTNode::Instantiation(node) => Value::from(instantiation::resolve(node, scope)?),
             ASTNode::Assignment(node) => assignment::resolve(node, scope, false)?,
 
             ASTNode::Variable(_)
             | ASTNode::ObjectReading(_)
             | ASTNode::Invocation(_)
-            | ASTNode::ArrayElementReading(_) => compose::resolve(current_node, scope)?,
+            | ASTNode::ElementReading(_) => compose::resolve(current_node, scope)?,
 
             _ => {
                 let msg = format!("unexpected AST node: '{}'", current_node);
-                return Err(internal_error(InternalComponent::Analyzer, &msg)?);
+                return Err(internal_error(InternalComponent::Computer, &msg)?);
             }
         };
         value_stack.push(current_value);

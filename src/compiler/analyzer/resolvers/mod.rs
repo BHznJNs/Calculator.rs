@@ -3,8 +3,9 @@ pub mod sequence;
 mod composer;
 mod list;
 
-mod array;
+mod array_literal;
 mod expression;
+mod map;
 mod lazy_expression;
 
 mod statement;

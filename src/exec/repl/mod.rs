@@ -84,7 +84,7 @@ pub fn repl(scope: &mut Scope, calc_env: Env) -> io::Result<()> {
                 continue;
             } else if let Value::String(_) = val {
                 print!("= ");
-                print_line(&mut stdout, val.str_format());
+                print_line(&mut stdout, val.str_format().unwrap());
             } else {
                 print!("= ");
                 print_line(&mut stdout, val);

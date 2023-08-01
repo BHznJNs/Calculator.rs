@@ -5,6 +5,7 @@ use crate::public::compile_time::ast::ast_enum::{ASTNode, ASTVec};
 use crate::public::compile_time::ast::types::{
     ExpressionNode, ImportNode, ModuleType, VariableNode,
 };
+use crate::public::compile_time::dividers::Divider;
 use crate::public::compile_time::keywords::Keyword;
 use crate::public::compile_time::parens::Paren;
 use crate::public::error::{
@@ -13,16 +14,13 @@ use crate::public::error::{
 use crate::public::value::symbols::Symbols;
 
 use super::symbol_priority::compare;
-use super::{array, lazy_expression};
+use super::{array_literal, lazy_expression, map};
 
 pub fn resolve(tokens: &mut TokenVec) -> Result<ExpressionNode, ()> {
     let mut params = ASTVec::new();
-    let first_index = 0;
 
-    while first_index < tokens.len() {
-        let current = tokens.pop_front().unwrap();
-
-        match current {
+    while let Some(token) = tokens.pop_front() {
+        match token {
             Token::Number(num) => params.push(ASTNode::NumberLiteral(num)),
             Token::String(str) => params.push(ASTNode::StringLiteral(str)),
             Token::Symbol(sym) => {
@@ -34,13 +32,26 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ExpressionNode, ()> {
 
             Token::Paren(paren) => {
                 if paren == Paren::LeftBrace {
-                    // lazy-expression
-                    // vec[expression-node]
-                    let lazy_expression_node = lazy_expression::resolve(tokens)?;
-                    params.push(ASTNode::LazyExpression(lazy_expression_node.into()));
+                    // lazy-expression && map definition
+
+                    let mut is_map_definition = false;
+                    for token in tokens.iter() {
+                        if let Token::Divider(Divider::Colon) = token {
+                            is_map_definition = true;
+                            break;
+                        }
+                    }
+
+                    if !is_map_definition {
+                        let lazy_expression_node = lazy_expression::resolve(tokens)?;
+                        params.push(ASTNode::LazyExpression(lazy_expression_node.into()));
+                    } else {
+                        let map_literal_node = map::resolve(tokens)?;
+                        params.push(ASTNode::MapLiteral(map_literal_node.into()))
+                    }
                 } else if paren == Paren::LeftBracket {
                     // array literal
-                    let array_literal_node = array::literal_resolve(tokens)?;
+                    let array_literal_node = array_literal::resolve(tokens)?;
                     params.push(ASTNode::ArrayLiteral(array_literal_node.into()));
                 } else if paren == Paren::LeftParen {
                     // nested expression
@@ -53,7 +64,10 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ExpressionNode, ()> {
                 }
             }
             Token::Identi(name) => {
-                // variable || function invocation || array element reading
+                // variable
+                // || function invocation
+                // || array element reading
+                // || map element reading
                 // as compose
                 let compose_node =
                     compose::resolve(ASTNode::Variable(VariableNode { name }.into()), tokens)?;
@@ -91,7 +105,7 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ExpressionNode, ()> {
             }
 
             _ => {
-                let msg = format!("unexpected token {}", current);
+                let msg = format!("unexpected expression token {}", token);
                 return Err(syntax_error(&msg)?);
             }
         }
@@ -108,6 +122,7 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ExpressionNode, ()> {
             | ASTNode::NumberLiteral(_)
             | ASTNode::StringLiteral(_)
             | ASTNode::ArrayLiteral(_)
+            | ASTNode::MapLiteral(_)
             | ASTNode::Expression(_)
             | ASTNode::Invocation(_)
             | ASTNode::LazyExpression(_)
@@ -116,7 +131,7 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ExpressionNode, ()> {
             | ASTNode::ImportStatement(_)
             | ASTNode::ClassDefinition(_)
             | ASTNode::FunctionDefinition(_)
-            | ASTNode::ArrayElementReading(_) => result_stack.push(node),
+            | ASTNode::ElementReading(_) => result_stack.push(node),
 
             ASTNode::SymbolLiteral(_) => {
                 if symbol_stack.len() == 0 {

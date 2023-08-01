@@ -128,7 +128,7 @@ pub fn tokenize(source: &str) -> TokenVec {
                 continue;
             }
             // Other symbols
-            '\\' | ',' | ';' => {
+            '\\' | ',' | ';' | ':' => {
                 last_type = TokenType::Divider;
                 tokens.push(Token::new(TextType::Didider, String::from(ch)));
             }

@@ -15,7 +15,6 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ASTVec, ()> {
         Outer,
     }
 
-    let first_index = 0;
     let mut state = State::Outer;
 
     // for all type of paren: Paren | Brace | Bracket
@@ -23,16 +22,14 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ASTVec, ()> {
     let mut sub_tokens = TokenVec::new();
     let mut result_params = ASTVec::new();
 
-    while first_index < tokens.len() {
-        let current = tokens.pop_front().unwrap();
-
-        let is_divider = current == Token::Divider(Divider::Semicolon);
-        let is_left_paren = current == Token::Paren(Paren::LeftBrace)
-            || current == Token::Paren(Paren::LeftParen)
-            || current == Token::Paren(Paren::LeftBracket);
-        let is_right_paren = current == Token::Paren(Paren::RightBrace)
-            || current == Token::Paren(Paren::RightParen)
-            || current == Token::Paren(Paren::RightBracket);
+    while let Some(token) = tokens.pop_front() {
+        let is_divider = token == Token::Divider(Divider::Semicolon);
+        let is_left_paren = token == Token::Paren(Paren::LeftBrace)
+            || token == Token::Paren(Paren::LeftParen)
+            || token == Token::Paren(Paren::LeftBracket);
+        let is_right_paren = token == Token::Paren(Paren::RightBrace)
+            || token == Token::Paren(Paren::RightParen)
+            || token == Token::Paren(Paren::RightBracket);
 
         if is_left_paren {
             state = State::Inner;
@@ -57,7 +54,7 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ASTVec, ()> {
             }
         }
 
-        sub_tokens.push_back(current);
+        sub_tokens.push_back(token);
     }
     Ok(result_params)
 }
