@@ -21,6 +21,7 @@ fn import_all(scope: &mut Scope) -> Result<(), ()> {
     scope.import_std("Math")?;
     scope.import_std("String")?;
     scope.import_std("Array")?;
+    scope.import_std("Map")?;
     scope.import_std("FS")?;
     scope.import_std("BitOps")?;
     Ok(())

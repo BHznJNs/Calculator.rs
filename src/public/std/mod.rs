@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use self::modules::{
     array::ArrayModule, basic::BasicModule, bit_ops::BitOpsModule, file_system::FileSysModule,
-    math::MathModule, string::StringModule, ClassModule, FunctionModule, ObjectModule,
+    math::MathModule, string::StringModule, ClassModule, FunctionModule, ObjectModule, map::MapModule,
 };
 use super::value::{
     oop::{class::Class, object::Object},
@@ -19,6 +19,7 @@ pub enum StdModules {
     Math,
     Array,
     String,
+    Map,
     FileSystem,
     BitOps,
 }
@@ -44,6 +45,7 @@ impl StdModules {
         match self {
             StdModules::Array => ArrayModule::module_class(),
             StdModules::String => StringModule::module_class(),
+            StdModules::Map => MapModule::module_class(),
             _ => unreachable!(),
         }
     }

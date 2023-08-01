@@ -5,7 +5,7 @@ use std::{
     fmt,
 };
 
-use std::collections::hash_map::Iter;
+use std::collections::hash_map::{Iter, Keys, Values};
 use crate::public::value::{
     display_indent,
     ComplexStructure,
@@ -34,6 +34,26 @@ impl RawMap {
     #[inline]
     pub fn iter(&self) -> Iter<String, Value> {
         return self.0.iter();
+    }
+    #[inline]
+    pub fn keys(&self) -> Keys<String, Value> {
+        return self.0.keys();
+    }
+    #[inline]
+    pub fn values(&self) -> Values<String, Value> {
+        return self.0.values();
+    }
+
+    pub fn has_key(&self, key_name: &str) -> bool {
+        match self.0.get(key_name) {
+            Some(_) => true,
+            None => false,
+        }
+    }
+
+    #[inline]
+    pub fn clear(&mut self) {
+        self.0.clear();
     }
     #[inline]
     pub fn len(&self) -> usize {

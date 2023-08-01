@@ -352,9 +352,14 @@ impl From<String> for Value {
         Self::String(into_rc_refcell(value))
     }
 }
+impl From<RawArray> for Value {
+    fn from(value: RawArray) -> Self {
+        Self::Array(into_rc_refcell(value))
+    }
+}
 impl From<ArrayLiteral> for Value {
     fn from(value: ArrayLiteral) -> Self {
-        Self::Array(into_rc_refcell(RawArray::new(value)))
+        Self::Array(into_rc_refcell(RawArray::from(value)))
     }
 }
 impl From<RawMap> for Value {

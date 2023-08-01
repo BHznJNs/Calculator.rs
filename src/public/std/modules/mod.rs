@@ -1,9 +1,10 @@
-pub mod array;
 pub mod basic;
 pub mod bit_ops;
 pub mod file_system;
 pub mod math;
 pub mod string;
+pub mod array;
+pub mod map;
 
 use std::rc::Rc;
 
@@ -32,7 +33,7 @@ pub fn import_resolver(scope: &mut Scope, target_module: &StdModules, module_nam
             scope.assign(String::from(module_name), Value::from(module_obj));
         }
 
-        StdModules::String | StdModules::Array => {
+        StdModules::String | StdModules::Array | StdModules::Map => {
             let module_cls = target_module.get_cls_entry();
             scope.assign(String::from(module_name), Value::Class(module_cls));
         }

@@ -9,8 +9,8 @@ pub type ArrayLiteral = VecDeque<Value>;
 pub struct RawArray(pub(self) ArrayLiteral);
 
 impl RawArray {
-    pub fn new(value: ArrayLiteral) -> Self {
-        return Self(value);
+    pub fn new() -> Self {
+        return Self(ArrayLiteral::new());
     }
     
     #[inline]
@@ -38,6 +38,32 @@ impl RawArray {
         return self.0.remove(index);
     }
 
+    pub fn slice(&self, start: i64, mut end: i64) -> Self {
+        let self_len = self.len() as i64;
+        if start >= self_len {
+            Self::new()
+        } else {
+            // size = len - 1
+            // end > size || end == 0: get value until size
+            // end < size && end > 0: normal
+            // end < 0: get value until (size + end)
+
+            match end {
+                x if x >= self_len || x == 0 => end = self_len,
+                x if x < 0 => end += self_len,
+                x if x < self_len => {},
+                _ => unreachable!(),
+            }
+
+            let mut res_arr = ArrayLiteral::new();
+            for index in start as usize..end as usize {
+                let cloned = self.0[index].clone();
+                res_arr.push_back(cloned);
+            }
+
+            Self::from(res_arr)
+        }
+    }
 
     pub fn join(&self, div: &str) -> String {
         if self.0.is_empty() {
@@ -73,6 +99,12 @@ impl Index<usize> for RawArray {
 impl IndexMut<usize> for RawArray {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         return &mut self.0[index];
+    }
+}
+
+impl From<ArrayLiteral> for RawArray {
+    fn from(value: ArrayLiteral) -> Self {
+        return Self(value);
     }
 }
 

@@ -6,6 +6,7 @@ use crate::public::std::modules::array::ArrayModule;
 use crate::public::std::modules::basic::BasicModule;
 use crate::public::std::modules::bit_ops::BitOpsModule;
 use crate::public::std::modules::file_system::FileSysModule;
+use crate::public::std::modules::map::MapModule;
 use crate::public::std::modules::math::MathModule;
 use crate::public::std::modules::string::StringModule;
 
@@ -17,6 +18,7 @@ pub enum BuildInFnIdenti {
     Math(MathModule),
     Array(ArrayModule),
     String(StringModule),
+    Map(MapModule),
     FileSystem(FileSysModule),
     BitOps(BitOpsModule),
 }

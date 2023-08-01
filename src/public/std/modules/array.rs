@@ -18,6 +18,7 @@ pub enum ArrayModule {
     UNSHIFT,
     INSERT,
     REMOVE,
+    SLICE,
     JOIN,
 }
 
@@ -63,6 +64,14 @@ impl ClassModule for ArrayModule {
             ],
             identi: BuildInFnIdenti::Array(Self::REMOVE),
         };
+        let slice = BuildInFunction {
+            params: vec![
+                BuildInFnParam(ValueType::Object, "self"),
+                BuildInFnParam(ValueType::Number, "start"),
+                BuildInFnParam(ValueType::Number, "end"),
+            ],
+            identi: BuildInFnIdenti::Array(Self::SLICE),
+        };
         let join = BuildInFunction {
             params: vec![
                 BuildInFnParam(ValueType::Object, "self"),
@@ -84,6 +93,7 @@ impl ClassModule for ArrayModule {
                         (String::from("unshift"), Function::from(unshift)),
                         (String::from("insert"), Function::from(insert)),
                         (String::from("remove"), Function::from(remove)),
+                        (String::from("slice"), Function::from(slice)),
                         (String::from("join"), Function::from(join)),
                     ],
                 )
@@ -154,6 +164,12 @@ impl BuildInFnCall for ArrayModule {
                     Some(val) => val,
                     None => Value::Void(VoidSign::Empty),
                 }
+            }
+            Self::SLICE => {
+                let start = get_val("start", scope)?.get_i64()?;
+                let end = get_val("end", scope)?.get_i64()?;
+                let slice = arr_ref.slice(start, end);
+                Value::from(slice)
             }
             Self::JOIN => {
                 let divider_value = get_val("divider", scope)?;
