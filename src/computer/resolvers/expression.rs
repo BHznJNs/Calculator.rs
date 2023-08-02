@@ -4,7 +4,7 @@ use crate::public::error::{internal_error, syntax_error, type_error, InternalCom
 use crate::public::run_time::scope::Scope;
 use crate::public::value::into_rc_refcell;
 use crate::public::value::symbols::Symbols;
-use crate::public::value::value::{Value, ValueType, VoidSign};
+use crate::public::value::value::{Value, ValueType};
 
 use super::{class_definition, map_literal};
 use super::operate::operate;
@@ -13,7 +13,7 @@ use super::{array_literal, assignment, composer::compose, function_definition, i
 pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> Result<Value, ()> {
     let elements = &node.elements;
     if elements.len() == 0 {
-        return Ok(Value::Void(VoidSign::Empty));
+        return Ok(Value::EMPTY);
     }
 
     let mut value_stack = Vec::<Value>::new();

@@ -5,7 +5,6 @@ use std::rc::Rc;
 use crate::public::env::ENV_OPTION;
 use crate::public::error::{assignment_error, reference_error, ReferenceType};
 use crate::public::value::oop::class::Class;
-use crate::public::value::value::VoidSign;
 use crate::public::value::{self, GetAddr, ComplexStructure};
 use crate::utils::completer::Completer;
 
@@ -86,7 +85,7 @@ impl Object {
                     let target_method = prototype.get_method(prop_name)?;
                     Ok(Value::Function(target_method.clone()))
                 } else {
-                    Ok(Value::Void(VoidSign::Empty))
+                    Ok(Value::EMPTY)
                 }
             }
         }

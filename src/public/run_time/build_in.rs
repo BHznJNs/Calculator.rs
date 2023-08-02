@@ -39,6 +39,7 @@ pub fn constants() -> HashMap<String, Value> {
             Value::from(ValueType::String as i64),
         ),
         (String::from("ARRAY"), Value::from(ValueType::Array as i64)),
+        (String::from("MAP"), Value::from(ValueType::Map as i64)),
         (
             String::from("LAZYEXPR"),
             Value::from(ValueType::LazyExpression as i64),

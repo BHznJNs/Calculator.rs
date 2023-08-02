@@ -14,7 +14,7 @@ pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> Result<Valu
         StatementNode::Output(expression_node) => {
             let output_value = expression::resolve(expression_node, scope)?;
             print_line(&mut stdout(), output_value);
-            Value::Void(VoidSign::Empty)
+            Value::EMPTY
         }
         StatementNode::ForLoop(for_statement) => {
             let loop_count_value = expression::resolve(&for_statement.loop_count, scope)?;
@@ -61,7 +61,7 @@ pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> Result<Valu
                 }
             }
 
-            Value::Void(VoidSign::Empty)
+            Value::EMPTY
         }
         StatementNode::Condition(if_statement) => {
             let condition_value = expression::resolve(&if_statement.condition, scope)?;
@@ -76,12 +76,12 @@ pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> Result<Valu
                 }
             }
 
-            Value::Void(VoidSign::Empty)
+            Value::EMPTY
         }
         StatementNode::Import(import_node) => {
             // import_node.type__ must be `ModuleType::BuildIn`
             scope.import_std(&import_node.target)?;
-            Value::Void(VoidSign::Empty)
+            Value::EMPTY
         }
         StatementNode::GlobalAssignment(assignment_node) => {
             assignment::resolve(assignment_node, scope, true)?
@@ -90,8 +90,8 @@ pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> Result<Valu
         StatementNode::Continue => Value::Void(VoidSign::Continue),
         StatementNode::Break(expression_node) => {
             let expression_value = expression::resolve(expression_node, scope)?;
-            if expression_value == Value::Void(VoidSign::Empty) {
-                Value::Void(VoidSign::Empty)
+            if let Value::Void(VoidSign::Empty) = expression_value {
+                Value::EMPTY
             } else {
                 Value::Void(VoidSign::Break(expression_value.into()))
             }

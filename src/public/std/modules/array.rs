@@ -5,7 +5,7 @@ use crate::public::run_time::scope::Scope;
 use crate::public::std::utils::get_self_prop::get_self_prop;
 use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function};
 use crate::public::value::oop::class::{Class, Property};
-use crate::public::value::value::{Value, ValueType, VoidSign};
+use crate::public::value::value::{Value, ValueType};
 
 use super::super::utils::get_val::get_val;
 use super::{BuildInFnCall, ClassModule};
@@ -133,7 +133,7 @@ impl BuildInFnCall for ArrayModule {
                     // return poped value
                     return Ok(val);
                 }
-                Value::Void(VoidSign::Empty)
+                Value::EMPTY
             }
             Self::SHIFT => {
                 let shifted = arr_ref.shift();
@@ -141,7 +141,7 @@ impl BuildInFnCall for ArrayModule {
                     // return shifted value
                     return Ok(val);
                 }
-                Value::Void(VoidSign::Empty)
+                Value::EMPTY
             }
             Self::UNSHIFT => {
                 let element_value = get_val("element", scope)?;
@@ -163,7 +163,7 @@ impl BuildInFnCall for ArrayModule {
                 let removed_element = arr_ref.remove(index);
                 match removed_element {
                     Some(val) => val,
-                    None => Value::Void(VoidSign::Empty),
+                    None => Value::EMPTY,
                 }
             }
             Self::CONTAINS => {

@@ -1,14 +1,17 @@
 use std::rc::Rc;
 
 use crate::public::{
+    run_time::{build_in::BuildInFnIdenti, scope::Scope},
+    std::utils::{get_self_prop::get_self_prop, get_val::get_val},
     value::{
+        array::ArrayLiteral,
+        function::{BuildInFnParam, BuildInFunction, Function},
         oop::class::{Class, Property},
-        value::{Value, ValueType, VoidSign}, function::{Function, BuildInFunction, BuildInFnParam}, array::ArrayLiteral,
+        value::{Value, ValueType},
     },
-    run_time::{scope::Scope, build_in::BuildInFnIdenti}, std::utils::{get_val::get_val, get_self_prop::get_self_prop},
 };
 
-use super::{ClassModule, BuildInFnCall};
+use super::{BuildInFnCall, ClassModule};
 
 #[derive(PartialEq, Clone)]
 pub enum MapModule {
@@ -38,7 +41,7 @@ impl ClassModule for MapModule {
             ],
             identi: BuildInFnIdenti::Map(Self::HASKEY),
         };
-        
+
         unsafe {
             MODULE_CLASS = Some(
                 Class::new(
@@ -75,7 +78,7 @@ impl BuildInFnCall for MapModule {
         let result = match self {
             MapModule::CLEAR => {
                 map_ref.clear();
-                Value::Void(VoidSign::Empty)
+                Value::EMPTY
             }
             MapModule::KEYS => {
                 let mut res_arr = ArrayLiteral::new();
@@ -83,20 +86,20 @@ impl BuildInFnCall for MapModule {
                     res_arr.push_back(Value::from(key.to_owned()));
                 }
                 Value::from(res_arr)
-            },
+            }
             MapModule::VALUES => {
                 let mut res_arr = ArrayLiteral::new();
                 for val in map_ref.values() {
                     res_arr.push_back(val.clone());
                 }
                 Value::from(res_arr)
-            },
+            }
             MapModule::HASKEY => {
                 let key_name_value = get_val("key_name", scope)?;
                 let key_name = key_name_value.get_str()?;
                 let is_has_key = map_ref.has_key(&*key_name);
                 Value::from(is_has_key)
-            },
+            }
         };
         return Ok(result);
     }

@@ -5,7 +5,6 @@ use crate::exec::script;
 use crate::public::error::{import_error, reference_error, ReferenceType};
 use crate::public::std::StdModules;
 use crate::public::value::oop::module::module_create;
-use crate::public::value::value::VoidSign;
 use crate::utils::completer::Completer;
 
 use super::super::std::modules;
@@ -149,7 +148,7 @@ impl Scope {
             let module_obj = module_create(module_scope.global);
             Ok(Value::from(module_obj))
         } else {
-            Ok(Value::Void(VoidSign::Empty))
+            Ok(Value::EMPTY)
         }
     }
 }

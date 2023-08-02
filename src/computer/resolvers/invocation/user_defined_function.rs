@@ -13,7 +13,7 @@ fn call(function: &UserDefinedFunction, scope: &mut Scope) -> Result<Value, ()> 
         }
     }
 
-    Ok(Value::Void(VoidSign::Empty))
+    Ok(Value::EMPTY)
 }
 
 pub fn invoke(

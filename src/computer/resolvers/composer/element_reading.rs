@@ -5,7 +5,7 @@ use crate::public::error::{range_error, type_error, syntax_error};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::array::RawArray;
 use crate::public::value::map::RawMap;
-use crate::public::value::value::{Value, ValueType, VoidSign};
+use crate::public::value::value::{Value, ValueType};
 
 use super::super::expression;
 
@@ -78,7 +78,7 @@ pub fn resolve(
             let res = map_ref.get(key);
             match res {
                 Some(value) => Ok(value),
-                None => Ok(Value::Void(VoidSign::Empty)),
+                None => Ok(Value::EMPTY),
             }
         }
     )?;
@@ -96,7 +96,7 @@ pub fn assign(
         target_value, index_value,
         |mut arr_ref, index| {
             arr_ref[index] = value.clone();
-            Ok(Value::Void(VoidSign::Empty))
+            Ok(Value::EMPTY)
         },
         |mut str_ref, index| {
             let Value::String(target) = value.clone() else {
@@ -108,11 +108,11 @@ pub fn assign(
             };
             let char_str = &target.borrow();
             str_ref.replace_range(index..index + 1, char_str);
-            Ok(Value::Void(VoidSign::Empty))
+            Ok(Value::EMPTY)
         },
         |mut map_ref, key| {
             map_ref.set(String::from(key), value.clone());
-            Ok(Value::Void(VoidSign::Empty))
+            Ok(Value::EMPTY)
         }
     )?;
     return Ok(());

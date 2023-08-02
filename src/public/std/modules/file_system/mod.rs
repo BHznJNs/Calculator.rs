@@ -13,7 +13,7 @@ use crate::public::value::array::ArrayLiteral;
 use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function};
 use crate::public::value::oop::class::{Class, Property};
 use crate::public::value::oop::object::Object;
-use crate::public::value::value::{Value, ValueType, VoidSign};
+use crate::public::value::value::{Value, ValueType};
 
 use self::file_ops::file_append;
 use self::fs_ops::{dir_create, dir_delete, file_create, file_delete};
@@ -139,7 +139,7 @@ impl BuildInFnCall for FileSysModule {
                         } else {
                             file_create(path_str)?;
                         }
-                        Value::Void(VoidSign::Empty)
+                        Value::EMPTY
                     }
                     Self::Delete => {
                         let path = Path::new(path_str);
@@ -148,7 +148,7 @@ impl BuildInFnCall for FileSysModule {
                         } else {
                             file_delete(path_str)?;
                         }
-                        Value::Void(VoidSign::Empty)
+                        Value::EMPTY
                     }
                     _ => unreachable!(),
                 }
@@ -171,12 +171,12 @@ impl BuildInFnCall for FileSysModule {
                     Self::Write => {
                         let content_value = get_val("content", scope)?;
                         file_write(file_path, content_value, file_info)?;
-                        Value::Void(VoidSign::Empty)
+                        Value::EMPTY
                     }
                     Self::Append => {
                         let content_value = get_val("content", scope)?;
                         file_append(file_path, content_value, file_info)?;
-                        Value::Void(VoidSign::Empty)
+                        Value::EMPTY
                     }
                     _ => unreachable!(),
                 }
