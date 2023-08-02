@@ -5,7 +5,7 @@ use crate::public::compile_time::parens::Paren;
 use crate::public::error::syntax_error;
 use crate::public::value::symbols::Symbols;
 
-use super::{assignment, invocation, object_reading, element_reading};
+use super::{assignment, element_reading, invocation, object_reading};
 
 pub fn resolve(var_node: ASTNode, tokens: &mut TokenVec) -> Result<ASTNode, ()> {
     let is_more_token = tokens.len() > 0;

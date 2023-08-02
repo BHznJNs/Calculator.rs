@@ -1,4 +1,10 @@
-use std::{cell::RefCell, collections::{VecDeque, vec_deque::Iter}, fmt, rc::Rc, ops::{Index, IndexMut}};
+use std::{
+    cell::RefCell,
+    collections::{vec_deque::Iter, VecDeque},
+    fmt,
+    ops::{Index, IndexMut},
+    rc::Rc,
+};
 
 use super::{value::Value, ComplexStructure};
 use crate::public::value::display_indent;
@@ -12,7 +18,7 @@ impl RawArray {
     pub fn new() -> Self {
         return Self(ArrayLiteral::new());
     }
-    
+
     #[inline]
     pub fn push(&mut self, value: Value) {
         self.0.push_back(value);
@@ -56,7 +62,7 @@ impl RawArray {
             match end {
                 x if x >= self_len || x == 0 => end = self_len,
                 x if x < 0 => end += self_len,
-                x if x < self_len => {},
+                x if x < self_len => {}
                 _ => unreachable!(),
             }
 
@@ -74,10 +80,10 @@ impl RawArray {
         if self.0.is_empty() {
             return String::new();
         }
-    
+
         let mut arr_iter = self.0.iter();
         let mut result_str = arr_iter.next().unwrap().to_raw_string();
-    
+
         for v in arr_iter {
             result_str.extend(div.chars());
             result_str.extend(v.to_raw_string().chars());

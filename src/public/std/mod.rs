@@ -2,7 +2,8 @@ use std::rc::Rc;
 
 use self::modules::{
     array::ArrayModule, basic::BasicModule, bit_ops::BitOpsModule, file_system::FileSysModule,
-    math::MathModule, string::StringModule, ClassModule, FunctionModule, ObjectModule, map::MapModule,
+    map::MapModule, math::MathModule, string::StringModule, ClassModule, FunctionModule,
+    ObjectModule,
 };
 use super::value::{
     oop::{class::Class, object::Object},

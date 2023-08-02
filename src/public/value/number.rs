@@ -47,7 +47,9 @@ impl Number {
                     Self::Float(f_value.powf(num2))
                 }
                 Self::Fraction(_, _) => {
-                    Self::Float(self.float_value().powf(target.float_value()))
+                    let self_f = self.float_value();
+                    let target_f = target.float_value();
+                    Self::Float(self_f.powf(target_f))
                 }
                 _ => Self::NotANumber,
             },
@@ -123,9 +125,9 @@ impl Number {
                 "invalid `Number::reduce` invocation"
             )?);
         };
-        let gcd_val = Self::gcd(upper, lower);
-        upper /= gcd_val;
-        lower /= gcd_val;
+        let gcd_result = Self::gcd(upper, lower);
+        upper /= gcd_result;
+        lower /= gcd_result;
         return Ok(Self::Fraction(upper, lower));
     }
     // greatest common divisor
@@ -367,9 +369,7 @@ impl PartialEq for Number {
             },
             Self::Fraction(_, _) => match other {
                 Self::Int(num2) => self.int_value() == *num2,
-                Self::Fraction(_, _) => {
-                    Self::float_cmp(self.float_value(), other.float_value())
-                }
+                Self::Fraction(_, _) => Self::float_cmp(self.float_value(), other.float_value()),
                 _ => unreachable!(),
             },
             _ => unreachable!(),

@@ -10,11 +10,11 @@ use crate::public::error::{internal_error, InternalComponent};
 use super::super::compile_time::ast::ast_enum::ASTNode;
 use super::array::{ArrayLiteral, RawArray};
 use super::function::{BuildInFunction, Function, UserDefinedFunction};
-use super::map::{RawMap};
+use super::map::RawMap;
 use super::number::Number;
 use super::oop::class::Class;
 use super::oop::object::Object;
-use super::{GetAddr, into_rc_refcell, ComplexStructure};
+use super::{into_rc_refcell, ComplexStructure, GetAddr};
 
 #[cfg_attr(debug_assertions, derive(Debug))]
 #[derive(PartialEq, Clone, Copy)]
@@ -116,7 +116,7 @@ impl Value {
         } else {
             Err(internal_error(
                 InternalComponent::InternalFn,
-                "invalid `Value::str_format` invocation"
+                "invalid `Value::str_format` invocation",
             )?)
         }
     }

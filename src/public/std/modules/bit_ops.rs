@@ -57,7 +57,7 @@ impl BuildInFnCall for BitOpsModule {
             let num_val2 = get_val("num2", scope)?;
             let (compute_num1, compute_num2) = (num_val1.get_i64()?, num_val2.get_i64()?);
 
-            let compute_res = match self {
+            let compute_result = match self {
                 Self::AND => compute_num1 & compute_num2,
                 Self::OR => compute_num1 | compute_num2,
                 Self::XOR => compute_num1 ^ compute_num2,
@@ -65,7 +65,7 @@ impl BuildInFnCall for BitOpsModule {
                 Self::RShift => compute_num1 >> compute_num2,
                 _ => unreachable!(),
             };
-            Value::from(compute_res)
+            Value::from(compute_result)
         } else {
             // NOT
             let input = get_val("input", scope)?;

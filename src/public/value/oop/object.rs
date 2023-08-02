@@ -5,7 +5,7 @@ use std::rc::Rc;
 use crate::public::env::ENV_OPTION;
 use crate::public::error::{assignment_error, reference_error, ReferenceType};
 use crate::public::value::oop::class::Class;
-use crate::public::value::{self, GetAddr, ComplexStructure};
+use crate::public::value::{self, ComplexStructure, GetAddr};
 use crate::utils::completer::Completer;
 
 use super::super::display_indent;
@@ -140,7 +140,7 @@ impl ComplexStructure for Object {
             data_list,
             data_map,
         } = store;
-    
+
         write!(f, "{{\r\n")?;
         match storage_pattern {
             DataStoragePattern::List => {
@@ -174,7 +174,7 @@ impl ComplexStructure for Object {
                 return v.deep_clone();
             }
         }
-    
+
         let obj_ref = &*(obj.as_ref().borrow());
         let store = obj_ref.get_store();
         let ComposeStorage {
@@ -183,7 +183,7 @@ impl ComplexStructure for Object {
             data_map,
         } = store;
         let mut instantiation_params = Vec::<(String, Value)>::new();
-    
+
         match storage_pattern {
             DataStoragePattern::List => {
                 let list = data_list.as_ref().unwrap();
@@ -200,7 +200,7 @@ impl ComplexStructure for Object {
                 }
             }
         }
-    
+
         // the object has been passed the type check before,
         // thus with properties of the object,
         // the instantiation must pass the type check.

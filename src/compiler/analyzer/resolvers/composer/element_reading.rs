@@ -1,16 +1,10 @@
-use crate::public::compile_time::ast::{
-    types::ElementReadingNode,
-    ast_enum::ASTNode
-};
-use crate::compiler::tokenizer::token::{TokenVec, Token};
+use crate::compiler::tokenizer::token::{Token, TokenVec};
+use crate::public::compile_time::ast::{ast_enum::ASTNode, types::ElementReadingNode};
 use crate::public::compile_time::parens::Paren;
 
 use super::super::expression;
 
-pub fn resolve(
-    target_node: ASTNode,
-    tokens: &mut TokenVec,
-) -> Result<ElementReadingNode, ()> {
+pub fn resolve(target_node: ASTNode, tokens: &mut TokenVec) -> Result<ElementReadingNode, ()> {
     // example for ArrayReading:
     // 1] | from `arr[1]`
     // 1][2] | from `arr[1][2]`

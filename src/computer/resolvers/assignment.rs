@@ -4,7 +4,7 @@ use crate::public::error::assignment_error;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
 
-use super::composer::{element_reading, compose, object_reading};
+use super::composer::{compose, element_reading, object_reading};
 use super::expression;
 
 pub fn resolve(node: &AssignmentNode, scope: &mut Scope, is_global: bool) -> Result<Value, ()> {

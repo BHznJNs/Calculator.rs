@@ -1,15 +1,7 @@
-use std::{
-    collections::HashMap,
-    rc::Rc,
-    cell::RefCell,
-    fmt,
-};
+use std::{cell::RefCell, collections::HashMap, fmt, rc::Rc};
 
+use crate::public::value::{display_indent, ComplexStructure};
 use std::collections::hash_map::{Iter, Keys, Values};
-use crate::public::value::{
-    display_indent,
-    ComplexStructure,
-};
 
 use super::value::Value;
 
@@ -24,7 +16,7 @@ impl RawMap {
 
     #[inline]
     pub fn get(&self, k: &str) -> Option<Value> {
-        return self.0.get(k).cloned()
+        return self.0.get(k).cloned();
     }
     #[inline]
     pub fn set(&mut self, k: String, v: Value) {

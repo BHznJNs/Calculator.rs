@@ -6,9 +6,9 @@ use crate::public::value::into_rc_refcell;
 use crate::public::value::symbols::Symbols;
 use crate::public::value::value::{Value, ValueType};
 
-use super::{class_definition, map_literal};
 use super::operate::operate;
 use super::{array_literal, assignment, composer::compose, function_definition, instantiation};
+use super::{class_definition, map_literal};
 
 pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> Result<Value, ()> {
     let elements = &node.elements;

@@ -11,7 +11,7 @@ use crate::public::run_time::scope::{LocalScope, Scope};
 use crate::public::Param;
 
 use super::value::{Value, ValueType};
-use super::{GetAddr, into_rc_refcell};
+use super::{into_rc_refcell, GetAddr};
 
 #[derive(PartialEq, Clone)]
 pub struct BuildInFnParam(pub ValueType, pub &'static str);

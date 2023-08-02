@@ -1,5 +1,5 @@
-use crate::compiler::tokenizer::token::{TokenVec, Token};
-use crate::public::compile_time::ast::types::{MapLiteralNode, ExpressionNode};
+use crate::compiler::tokenizer::token::{Token, TokenVec};
+use crate::public::compile_time::ast::types::{ExpressionNode, MapLiteralNode};
 use crate::public::compile_time::dividers::Divider;
 use crate::public::compile_time::parens::Paren;
 use crate::public::error::syntax_error;
@@ -32,8 +32,7 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<MapLiteralNode, ()> {
             while let Some(token) = tokens.pop_front() {
                 if let Token::Paren(paren) = token {
                     match paren {
-                        Paren::LeftBrace =>
-                            brace_count += 1,
+                        Paren::LeftBrace => brace_count += 1,
                         Paren::RightBrace => {
                             brace_count -= 1;
                             if brace_count == 0 {

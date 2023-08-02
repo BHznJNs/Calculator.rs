@@ -1,4 +1,4 @@
-use crate::public::{value::value::Value, error::syntax_error};
+use crate::public::{error::syntax_error, value::value::Value};
 
 pub fn assign(obj_value: Value, property: &String, value: Value) -> Result<(), ()> {
     let Value::Object(obj_ref) =

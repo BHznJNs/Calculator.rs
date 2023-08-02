@@ -1,9 +1,9 @@
+use super::expression;
 use crate::public::{
     compile_time::ast::types::MapLiteralNode,
     run_time::scope::Scope,
-    value::map::{RawMap, InternalMap},
+    value::map::{InternalMap, RawMap},
 };
-use super::expression;
 
 pub fn resolve(node: &MapLiteralNode, scope: &mut Scope) -> Result<RawMap, ()> {
     let mut internal_map = InternalMap::new();

@@ -5,8 +5,8 @@ mod list;
 
 mod array_literal;
 mod expression;
-mod map;
 mod lazy_expression;
+mod map;
 
 mod statement;
 mod statement_block;

@@ -1,12 +1,12 @@
-use std::{rc::Rc, cell::RefCell, fmt};
+use std::{cell::RefCell, fmt, rc::Rc};
 
-use self::{value::Value, array::RawArray, map::RawMap, oop::object::Object};
+use self::{array::RawArray, map::RawMap, oop::object::Object, value::Value};
 
 pub mod value;
 
 pub mod array;
-pub mod map;
 pub mod function;
+pub mod map;
 pub mod number;
 pub mod symbols;
 
@@ -18,7 +18,11 @@ pub(super) trait GetAddr {
 }
 
 pub trait ComplexStructure {
-    fn display(f: &mut fmt::Formatter<'_>, self_val: &Rc<RefCell<Self>>, level: usize) -> fmt::Result;
+    fn display(
+        f: &mut fmt::Formatter<'_>,
+        self_val: &Rc<RefCell<Self>>,
+        level: usize,
+    ) -> fmt::Result;
     fn deep_clone(self_val: &Rc<RefCell<Self>>) -> Value;
 
     fn item_display(f: &mut fmt::Formatter, value: &Value, level: usize) -> fmt::Result {

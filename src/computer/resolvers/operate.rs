@@ -37,7 +37,11 @@ pub fn operate(val1: Value, val2: Value, operator: Symbols) -> Result<Value, ()>
             str_cloned.extend(val2_str.chars());
             Value::from(str_cloned)
         }
-        (Value::LazyExpression(lazy_expr), Value::Number(_) | Value::String(_) | Value::LazyExpression(_), _) => {
+        (
+            Value::LazyExpression(lazy_expr),
+            Value::Number(_) | Value::String(_) | Value::LazyExpression(_),
+            _,
+        ) => {
             // lazy expression computing
 
             // `lazy_expr` sample structure:

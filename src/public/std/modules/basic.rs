@@ -275,11 +275,7 @@ impl BuildInFnCall for BasicModule {
                         };
                         return Err(type_error(
                             Some("Build-in function `len`"),
-                            vec![
-                                ValueType::Array,
-                                ValueType::String,
-                                ValueType::Map,
-                            ],
+                            vec![ValueType::Array, ValueType::String, ValueType::Map],
                             input.get_type(),
                         )?);
                     }

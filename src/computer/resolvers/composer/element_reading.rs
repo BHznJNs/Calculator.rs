@@ -1,7 +1,7 @@
 use std::cell::RefMut;
 
 use crate::public::compile_time::ast::types::ExpressionNode;
-use crate::public::error::{range_error, type_error, syntax_error};
+use crate::public::error::{range_error, syntax_error, type_error};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::array::RawArray;
 use crate::public::value::map::RawMap;
@@ -55,7 +55,7 @@ fn middle_ware(
             Value::String(_) => Err(syntax_error("String indexing must be Number typed")?),
             Value::Map(_) => Err(syntax_error("Map key must be String typed")?),
             _ => Err(syntax_error("invalid indexing")?),
-        }
+        },
     }
 }
 
@@ -66,12 +66,11 @@ pub fn resolve(
 ) -> Result<Value, ()> {
     let index_value = expression::resolve(index_node, scope)?;
     let result = middle_ware(
-        target_value, index_value,
-        |arr_ref, index| {
-            Ok(arr_ref[index].clone())
-        },
+        target_value,
+        index_value,
+        |arr_ref, index| Ok(arr_ref[index].clone()),
         |str_ref, index| {
-            let slice = &(&*str_ref)[index..index+1];
+            let slice = &(&*str_ref)[index..index + 1];
             Ok(String::from(slice).into())
         },
         |map_ref, key| {
@@ -80,7 +79,7 @@ pub fn resolve(
                 Some(value) => Ok(value),
                 None => Ok(Value::EMPTY),
             }
-        }
+        },
     )?;
     return Ok(result);
 }
@@ -93,7 +92,8 @@ pub fn assign(
 ) -> Result<(), ()> {
     let index_value = expression::resolve(index_node, scope)?;
     middle_ware(
-        target_value, index_value,
+        target_value,
+        index_value,
         |mut arr_ref, index| {
             arr_ref[index] = value.clone();
             Ok(Value::EMPTY)
@@ -113,7 +113,7 @@ pub fn assign(
         |mut map_ref, key| {
             map_ref.set(String::from(key), value.clone());
             Ok(Value::EMPTY)
-        }
+        },
     )?;
     return Ok(());
 }

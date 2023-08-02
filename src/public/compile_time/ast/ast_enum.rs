@@ -3,9 +3,9 @@ use core::fmt;
 use crate::public::value::{number::Number, symbols::Symbols};
 
 use super::types::{
-    ElementReadingNode, ArrayLiteralNode, AssignmentNode, ClassDefinitionNode, ExpressionNode,
+    ArrayLiteralNode, AssignmentNode, ClassDefinitionNode, ElementReadingNode, ExpressionNode,
     FunctionDefinitionNode, ImportNode, InstantiationNode, InvocationNode, LazyExpressionNode,
-    ObjectReadingNode, StatementNode, VariableNode, MapLiteralNode,
+    MapLiteralNode, ObjectReadingNode, StatementNode, VariableNode,
 };
 
 #[cfg_attr(debug_assertions, derive(Debug))]

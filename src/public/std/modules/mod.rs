@@ -1,10 +1,10 @@
+pub mod array;
 pub mod basic;
 pub mod bit_ops;
 pub mod file_system;
+pub mod map;
 pub mod math;
 pub mod string;
-pub mod array;
-pub mod map;
 
 use std::rc::Rc;
 

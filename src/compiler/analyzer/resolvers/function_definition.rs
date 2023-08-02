@@ -25,7 +25,9 @@ fn params_resolve(tokens: &mut TokenVec) -> Result<Vec<UserDefinedFnParam>, ()> 
                 };
                 if let Token::Annotation(type__) = next {
                     params.push(UserDefinedFnParam { type__, identi })
-                } else if let Token::Divider(Divider::Comma) | Token::Paren(Paren::RightParen) = next {
+                } else if let Token::Divider(Divider::Comma) | Token::Paren(Paren::RightParen) =
+                    next
+                {
                     tokens.push_front(next);
                     params.push(UserDefinedFnParam {
                         type__: ValueType::Void,
