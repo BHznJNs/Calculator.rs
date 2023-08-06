@@ -29,16 +29,6 @@ use candidate::Candidate;
 use analyzer::analyze;
 use tokenizer::TextType;
 
-// output something into file
-// this function is used to debug.
-// fn log(content: &str) -> io::Result<()> {
-//     File::create("log.txt")?;
-//     let mut file = OpenOptions::new().write(true).open("log.txt")?;
-//     file.write(content.as_bytes())?;
-//     file.flush()?;
-//     Ok(())
-// }
-
 pub struct LineEditor {
     prompt: &'static str,
     terminal: Terminal,
@@ -76,7 +66,7 @@ impl LineEditor {
     #[inline]
     fn display_prompt(&mut self) -> io::Result<()> {
         print!("{}", self.prompt);
-        self.terminal.flush()
+        return self.terminal.flush();
     }
     #[inline]
     fn move_cursor_to_prompt(&mut self) -> io::Result<()> {
@@ -87,13 +77,13 @@ impl LineEditor {
         self.terminal.cursor.save_pos()?;
         self.render()?;
         self.terminal.cursor.restore_pos()?;
-        Ok(())
+        return Ok(());
     }
     #[inline]
     fn clear_line(&mut self) -> io::Result<()> {
         self.move_cursor_to_prompt()?;
         self.terminal.clear_after_cursor();
-        Ok(())
+        return Ok(());
     }
 
     fn back_operate(&mut self) -> io::Result<()> {
@@ -112,7 +102,7 @@ impl LineEditor {
         } else {
             self.remove_edit()?;
         }
-        Ok(())
+        return Ok(());
     }
 
     // recompute the states
@@ -135,7 +125,7 @@ impl LineEditor {
             == (self.current_line.len() - self.overflow_left))
             || (self.is_at.right_end && self.overflow_right == 0);
 
-        Ok(())
+        return Ok(());
     }
 
     // display & hide hint
@@ -174,8 +164,7 @@ impl LineEditor {
                 return Ok(());
             }
         }
-
-        Ok(())
+        return Ok(());
     }
     fn hide_hint(&mut self) -> io::Result<()> {
         if let Some(hint_text) = self.candidate.current_hint() {
@@ -192,7 +181,7 @@ impl LineEditor {
             self.candidate.clear();
             self.render_with_fixed_pos()?;
         }
-        Ok(())
+        return Ok(());
     }
 
     // --- --- --- --- ---
@@ -269,7 +258,8 @@ impl LineEditor {
 
         print!("{}{}", buffer, &self.current_line.label);
         self.terminal.cursor.show()?;
-        self.terminal.flush()
+        self.terminal.flush()?;
+        return Ok(());
     }
 
     // --- --- --- --- --- ---
@@ -298,7 +288,7 @@ impl LineEditor {
         } else {
             self.terminal.cursor.right(1)?;
         }
-        Ok(())
+        return Ok(());
     }
     fn remove_edit(&mut self) -> io::Result<()> {
         let cursor_pos = self.terminal.cursor_col()?;
@@ -315,7 +305,7 @@ impl LineEditor {
         }
 
         self.current_line.remove(remove_pos);
-        Ok(())
+        return Ok(());
     }
 
     // --- --- --- --- --- ---
