@@ -4,6 +4,7 @@ use crate::public::value::function::{BuildInFnParam, BuildInFunction};
 use crate::public::value::number::Number;
 use crate::public::value::oop::object::Object;
 use crate::public::value::value::{Value, ValueType};
+use crate::utils::output::print_line__;
 
 use super::super::utils::get_val::get_val;
 use super::{BuildInFnCall, ObjectModule};
@@ -162,9 +163,6 @@ impl BuildInFnCall for MathModule {
                     Self::SIN => f.sin(),
                     Self::COS => f.cos(),
                     Self::TAN => f.tan(),
-                    Self::ASIN => f.asin(),
-                    Self::ACOS => f.acos(),
-                    Self::ATAN => f.atan(),
                     Self::SINH => f.sinh(),
                     Self::COSH => f.cosh(),
                     Self::TANH => f.tanh(),
@@ -178,10 +176,24 @@ impl BuildInFnCall for MathModule {
                     Self::SQRT => f.sqrt(),
                     Self::FLOOR => f.floor(),
                     Self::ROUND => f.round(),
+
+                    Self::ASIN | Self::ACOS | Self::ATAN => {
+                        if f < -1.0 || f > 1.0 {
+                            // inverse trigonometric function error.
+                            print_line__("The input for inverse trigonometric function should be less than 1 and greater than -1!");
+                            return Ok(Value::Number(Number::NotANumber));
+                        }
+                        match self {
+                            Self::ASIN => f.asin(),
+                            Self::ACOS => f.acos(),
+                            Self::ATAN => f.atan(),
+                            _ => unreachable!(),
+                        }
+                    }
                     _ => unreachable!(),
                 }
             }
         };
-        Ok(Value::from(result))
+        return Ok(Value::from(result));
     }
 }
