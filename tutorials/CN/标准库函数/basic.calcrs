@@ -19,26 +19,26 @@ input("Please input something: ")
 # - OBJECT
 type(1) == NUMBER # true
 
-# Def: clone(value $_)
+# 定义: clone(value $_)
 # 创建并返回一个值的深拷贝。
 arr1 = [1, 2, 3]
 arr2 = clone(arr)
 
-# Def: int(value $_)
+# 定义: int(value $_)
 # 将 Number | Boolean | String 类型的值转换为整型数值,
 # 当收到其它类型的值或者不合法的字符串时会抛出类型错误。
 int(1.1) # 1
 
-# Def: float(value $_)
+# 定义: float(value $_)
 # 将 Number | Boolean | String 类型的值转换为浮点型数值,
 # 当收到其它类型的值或者不合法的字符串时会抛出类型错误。
 float("1.1") # 1.1
 
-# Def: fraction(upper $Numb, lower $Numb)
+# 定义: fraction(upper $Numb, lower $Numb)
 # 接收两个 Number 类型的值作为分子和分母, 返回 (upper / lower)。
 fraction(1, 2) # (1 / 2)
 
-# Def: bool(value $_)
+# 定义: bool(value $_)
 # 将值转换为 Boolean 类型，当接收到
 # Lazy-Expression | Function | Class | Object 类型的值时，
 # 返回 true。
@@ -47,13 +47,13 @@ bool(0) # false
 bool("") # false
 bool([1, 2, 3]) # true
 
-# Def: str(value $_)
+# 定义: str(value $_)
 # 将输入的值转换成 String 类型。
 string(10) # "10"
 string(true) # "true"
 string(arr2) # "1, 2, 3"
 
-# Def: array(size $Numb)
+# 定义: array(size $Numb)
 # 返回一个具有 `size` 大小的数组。
 array(10)
 # [
@@ -61,13 +61,13 @@ array(10)
 #   0, 0, 0, 0, 0,
 # ]
 
-# Def: ascii(str $Str)
+# 定义: ascii(str $Str)
 # 返回输入的字符串的首字母的 ASCII 码，
 # 当输入的字符串为非 ASCII 字符时，将报错。
 ascii("a") # 97
 ascii("$10") # 36
 
-# Def: len(value $_)
+# 定义: len(value $_)
 # 接收 原始数组 | 数组对象 | 原始字符串 | 字符串对象 | 原始字典 | 字典对象 类型
 # 的值并返回其大小，
 # 当接收到其它类型的值时则抛出类型错误。
@@ -75,6 +75,6 @@ len("abc") # 3
 len([1, 2, 3]) # 3
 len({a: 1}) # 1
 
-# Def: exit()
+# 定义: exit()
 # 直接退出当前程序运行。
 exit()

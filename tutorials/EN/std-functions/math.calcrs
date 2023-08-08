@@ -1,0 +1,76 @@
+import Math
+
+# Trigonometric Functions
+
+# sine | cosine | tangent function:
+# Receives a Number typed value as radian measure,
+# returns its sine | cosine | tangent value.
+Math.sin(1) # 0.8414709848
+Math.cos(1) # 0.5403023059
+Math.tan(1) # 1.5574077247
+
+# arcsine | arccosine | arctangent function:
+# Receives a Number typed value who is between -1 and 1, as radian measure,
+# returns its arcsine | arccosine | arctangent value.
+Math.asin(0.8414709848) # 1.0000000000
+Math.acos(0.5403023059) # 1.0000000000
+Math.atan(1.5574077247) # 1.0000000000
+
+# hyperbolic sine | hyperbolic cosine | hyperbolic tangent function:
+# Receives a Number typed value as radian measure,
+# returns its hyperbolic sine | hyperbolic cosine | hyperbolic tangent value.
+Math.sinh(1) # 1.1752011936
+Math.cosh(1) # 1.5430806348
+Math.tanh(1) # 0.7615941560
+
+# Def: red(input $Number)
+# Receives a Number typed value as degree measure, convert it to radian measure.
+Math.rad(90) == PI / 2 # true
+
+# Def: deg(input $Number)
+# Receives a Number typed value as radian measure, convert it to degree measure.
+Math.deg(PI) # 180
+
+# --- --- --- --- --- ---
+
+# Exponent && Logarithm calculation
+
+# Def: exp(input $Number)
+# Returns E raised to the power of `input` (E ^ `input`).
+Math.exp(10) # 22026.4657948067
+
+# Def: log(base $Number, natural $Number)
+# Receives base number and antilogarithm number,
+# returns the logarithm of `natural` to `base`.
+Math.log(3, 27) # 3
+
+# Returns the natural logarithm of input.
+Math.ln(E ^ 2) # 2
+
+# Returns the logarithm of input with base of 2.
+Math.log2(8) # 3
+
+# Returns the logarithm of input with base of 10.
+Math.log10(100) # 2
+
+# --- --- --- --- --- ---
+
+# Others
+
+# Def: abs(input $Number)
+# Returns the absolute value of `input` number.
+Math.abs(-1) # 1
+
+# Def: sqrt(input $Number)
+# Returns the square root of `input` number.
+Math.sqrt(2) # 1.4142135624
+
+# Def: floor(input $Number)
+# Returns the largest integer less than or equal to `input` number.
+Math.floor(1.5) # 1
+
+# Def: round(input $Number)
+# Returns the nearest integer to `input`.
+# If a value is half-way between two integers, round away from 0.0.
+Math.round(1.4) # 1
+Math.round(1.5) # 2
