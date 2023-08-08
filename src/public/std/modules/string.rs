@@ -96,17 +96,17 @@ impl BuildInFnCall for StringModule {
                 let divider_value = get_val("divider", scope)?;
                 let divider_ref = divider_value.get_str()?;
 
-                // splited chars
+                // splited string
                 let res_split = if divider_ref.is_empty() {
-                    str_ref.split(' ')
+                    str_ref.split(" ")
                 } else {
-                    let first_ch = divider_ref.chars().next().unwrap();
-                    str_ref.split(first_ch)
+                    let div_str = divider_ref.as_str();
+                    str_ref.split(div_str)
                 };
                 // convert splited to VecDeque<String>
                 let mut res_vec = VecDeque::new();
-                for c in res_split {
-                    let c_value = Value::from(c.to_string());
+                for item in res_split {
+                    let c_value = Value::from(String::from(item));
                     res_vec.push_back(c_value);
                 }
                 Value::from(res_vec)
