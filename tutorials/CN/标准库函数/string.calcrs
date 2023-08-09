@@ -1,0 +1,31 @@
+import String
+
+# 字符串对象创建
+str_obj = new String("abbc")
+
+# 定义: split(divider $Str)
+# 使用输入的分隔符对字符串进行切片，返回由切片后字符串组成的原始数组。
+str_obj.split("bb")
+# [
+#   "a", "c", 
+# ]
+
+# 定义: replace(from $Str, to $Str)
+# 将原字符串中的 `from` 字符串替换为 `to` 字符串，
+# 返回替换后的原始字符串。
+
+str_obj.replace("b", "dd")
+# "addddc"
+
+# 定义: repeat(count $Numb)
+# 返回在原字符串基础上重复 `count` 次的原始字符串。
+str_obj.repeat(2)
+# "abbcabbc"
+
+# 定义: start_with(pattern $Str)
+# 返回原字符串是否以 `pattern` 开头。
+、str_obj.start_with("ab") # true
+
+# 定义: end_with(pattern $Str)
+# 返回原字符串是否以 `pattern` 结尾。
+str_obj.end_with("bc") # true

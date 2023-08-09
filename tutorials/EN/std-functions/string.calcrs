@@ -1,0 +1,31 @@
+import String
+
+# Create String-Object
+str_obj = new String("abbc")
+
+# Def: split(divider $Str)
+# Split String with inputed `divider`,
+# returns an Raw-Array consists of splited String.
+str_obj.split("bb")
+# [
+#   "a", "c", 
+# ]
+
+# Def: replace(from $Str, to $Str)
+# Replace `from` phrase in origin String with `to` phrase,
+# returns new replaced Raw-String.
+str_obj.replace("b", "dd")
+# "addddc"
+
+# Def: repeat(count $Numb)
+# Returns new Raw-String with `count` repeated based on origin String. 
+str_obj.repeat(2)
+# "abbcabbc"
+
+# Def: start_with(pattern $Str)
+# Returns whether the String is start with `pattern` String.
+str_obj.start_with("ab") # true
+
+# Def: end_with(pattern $Str)
+# Returns whether the String is end with `pattern` String.
+str_obj.end_with("bc") # true

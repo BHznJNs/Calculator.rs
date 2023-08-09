@@ -3,3 +3,4 @@
 - [基础库](./basic.calcrs)
 - [位运算库](./bit_ops.calcrs)
 - [数学运算库](./math.calcrs)
+- [字符串库](./string.calcrs)
