@@ -35,7 +35,7 @@ int(1.1) # 1
 float("1.1") # 1.1
 
 # Def: fraction(upper $Numb, lower $Numb)
-# Receive two int typed Number value as dividend and divisor, returns (upper / lower).
+# Receives two int typed Number value as dividend and divisor, returns (upper / lower).
 fraction(1, 2) # (1 / 2)
 
 # Def: bool(value $_)

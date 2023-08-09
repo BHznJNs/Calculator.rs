@@ -88,7 +88,7 @@ out obj_arr.slice(1, 0)
 #   2, 3, 
 # ]
 
-# `-1` means the last element of the array
+# `-1` means the last element (not included) of the array
 out obj_arr.slice(0, -1)
 # [
 #   4, 2, 

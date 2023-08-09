@@ -1,0 +1,59 @@
+import Array
+
+# Create Array-Object
+arr_obj = new Array([1, 2, 3])
+
+# Def: push(value $_)
+# Adds value at end of Array, returns a ref of inputed value.
+arr_obj.push(4) # 4
+
+# Def: pop()
+# Removes the last element of Array, and returns it.
+arr_obj.pop() # 4
+
+# Def: unshift(value $_)
+# Adds value at start of Array, returns a ref of inputed value.
+arr_obj.unshift(0) # 0
+
+# Def: shift()
+# Removes the first element of Array, and returns it.
+arr_obj.pop() # 4
+
+# Def: insert(index $Numb, value $_)
+# Adds value at `index` position of Array, returns a ref of inputed value.
+arr_obj.insert(1, 2) # 2
+
+# Def: remove(index $Numb)
+# Removes value at `index` position of Array, and returns it.
+arr_obj.remove(1) # 2
+
+# Def: contains(value $_)
+# Returns whether the Array contains inputed value.
+arr_obj.contains(1) # true
+
+# Def: slice(start $Numb, end $Numb)
+# Returns new Raw-Array consists of shallow copy of elements
+# in origin Array from `start` to `end` - 1;
+arr_obj.slice(0, 1)
+# [
+#   1,
+# ]
+
+# when `end` equals 0, get elements from `start` to the last one;
+arr_obj.slice(1, 0)
+# [
+#   2, 3,
+# ]
+
+# when `end` is less than 0, get elements from `start` to `length` + `end`,
+# where `length` equals `len(arr_obj)`.
+arr_obj.slice(1, -1)
+# [
+#   2,
+# ]
+
+# Def: join(divider $Str)
+# Returns new Raw-String which is concatenated with all elements in the Array
+# and separated by `divider` string.
+arr_obj.join(" / ") 
+# "1 / 2 / 3"
