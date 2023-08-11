@@ -5,3 +5,4 @@
 - [Math Module](./math.calcrs)
 - [String Module](./string.calcrs)
 - [Array Module](./array.calcrs)
+- [Map Module](./map.calcrs)

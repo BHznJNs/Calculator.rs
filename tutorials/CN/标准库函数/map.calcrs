@@ -1,0 +1,26 @@
+import Map
+
+# 创建字典对象
+map_obj = new Map({a: "a", b: "b"})
+
+# Def: keys()
+# 返回由当前字典中所有的键组成的原始数组。
+map_obj.keys()
+# [
+#   "a", "b",
+# ]
+
+# Def: values()
+# 返回由当前字典中所有的值组成的原始数组。
+map_obj.values()
+# [
+#   "a", "b",
+# ]
+
+# Def: has_key(key_name $Str)
+# 返回字典中是否存在输入的键。
+map_obj.has_key("a") # true
+
+# Def: clear()
+# 移除字典中所有的键值对。
+map_obj.clear()

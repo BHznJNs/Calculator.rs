@@ -5,3 +5,4 @@
 - [数学运算库](./math.calcrs)
 - [字符串库](./string.calcrs)
 - [数组库](./array.calcrs)
+- [字典库](./map.calcrs)

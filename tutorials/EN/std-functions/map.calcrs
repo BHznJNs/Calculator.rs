@@ -1,0 +1,26 @@
+import Map
+
+# Create Map-Object
+map_obj = new Map({a: "a", b: "b"})
+
+# Def: keys()
+# Returns a Raw-Array that consists of keys in the Map.
+map_obj.keys()
+# [
+#   "a", "b",
+# ]
+
+# Def: values()
+# Returns a Raw-Array that consists of values in the Map.
+map_obj.values()
+# [
+#   "a", "b",
+# ]
+
+# Def: has_key(key_name $Str)
+# Returns whether the `key_name` exist in the Map.
+map_obj.has_key("a") # true
+
+# Def: clear()
+# Removes all key-value pairs in the Map.
+map_obj.clear()
