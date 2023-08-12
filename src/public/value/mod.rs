@@ -1,6 +1,15 @@
-use std::{cell::RefCell, fmt, rc::Rc};
+use std::{
+    cell::RefCell,
+    fmt,
+    rc::Rc
+};
 
-use self::{array::RawArray, map::RawMap, oop::object::Object, value::Value};
+use self::{
+    array::RawArray,
+    map::RawMap,
+    oop::object::Object,
+    value::Value,
+};
 
 pub mod value;
 
@@ -8,6 +17,7 @@ pub mod array;
 pub mod function;
 pub mod map;
 pub mod number;
+pub mod unique;
 pub mod symbols;
 
 pub mod oop;

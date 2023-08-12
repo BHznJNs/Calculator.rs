@@ -6,7 +6,7 @@ use std::{
     rc::Rc,
 };
 
-use super::{value::Value, ComplexStructure};
+use super::{value::Value, ComplexStructure, GetAddr};
 use crate::public::value::display_indent;
 use crossterm::style::Stylize;
 
@@ -116,6 +116,13 @@ impl IndexMut<usize> for RawArray {
 impl From<ArrayLiteral> for RawArray {
     fn from(value: ArrayLiteral) -> Self {
         return Self(value);
+    }
+}
+
+impl GetAddr for RawArray {
+    fn get_addr(&self) -> super::Addr {
+        let ptr = self as *const Self;
+        return ptr as super::Addr;
     }
 }
 

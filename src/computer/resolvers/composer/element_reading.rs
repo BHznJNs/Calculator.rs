@@ -1,11 +1,11 @@
 use std::cell::RefMut;
 
 use crate::public::compile_time::ast::types::ExpressionNode;
-use crate::public::error::{range_error, syntax_error, type_error};
+use crate::public::error::{range_error, syntax_error, assignment_error};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::array::RawArray;
 use crate::public::value::map::RawMap;
-use crate::public::value::value::{Value, ValueType};
+use crate::public::value::value::Value;
 
 use super::super::expression;
 
@@ -68,10 +68,15 @@ pub fn resolve(
     let result = middle_ware(
         target_value,
         index_value,
-        |arr_ref, index| Ok(arr_ref[index].clone()),
+        |arr_ref, index| {
+            Ok(arr_ref[index].clone())
+        },
         |str_ref, index| {
-            let slice = &(&*str_ref)[index..index + 1];
-            Ok(String::from(slice).into())
+            let ch = str_ref
+                .chars()
+                .nth(index)
+                .unwrap();
+            Ok(String::from(ch).into())
         },
         |map_ref, key| {
             let res = map_ref.get(key);
@@ -85,9 +90,9 @@ pub fn resolve(
 }
 
 pub fn assign(
-    target_value: Value,
+    target_value: Value, // left-hand value
     index_node: &ExpressionNode,
-    value: Value,
+    value: Value, // right-hand value
     scope: &mut Scope,
 ) -> Result<(), ()> {
     let index_value = expression::resolve(index_node, scope)?;
@@ -98,17 +103,10 @@ pub fn assign(
             arr_ref[index] = value.clone();
             Ok(Value::EMPTY)
         },
-        |mut str_ref, index| {
-            let Value::String(target) = value.clone() else {
-                return Err(type_error(
-                    Some("string assignment"),
-                    vec![ValueType::String],
-                    value.get_type(),
-                )?)
-            };
-            let char_str = &target.borrow();
-            str_ref.replace_range(index..index + 1, char_str);
-            Ok(Value::EMPTY)
+        |_, _| {
+            return Err(
+                assignment_error("Raw-String type does not support element assignment")?
+            );
         },
         |mut map_ref, key| {
             map_ref.set(String::from(key), value.clone());

@@ -15,6 +15,7 @@ use crate::public::value::array::{ArrayLiteral, RawArray};
 use crate::public::value::function::{BuildInFnParam, BuildInFunction};
 use crate::public::value::map::RawMap;
 use crate::public::value::number::Number;
+use crate::public::value::unique::Unique;
 use crate::public::value::value::{Value, ValueType};
 use crate::public::value::GetAddr;
 use crate::utils::output::print_line__;
@@ -34,6 +35,7 @@ pub enum BasicModule {
     FLOAT,
     FRACTION,
     BOOLEAN,
+    UNIQUE,
     STRING,
 
     ARRAY,
@@ -63,6 +65,10 @@ impl FunctionModule for BasicModule {
                 BuildInFnParam(ValueType::Number, "lower"),
             ],
             identi: BuildInFnIdenti::Basic(Self::FRACTION),
+        };
+        let unique = BuildInFunction {
+            params: vec![BuildInFnParam(ValueType::String, "input")],
+            identi: BuildInFnIdenti::Basic(Self::UNIQUE),
         };
 
         // --- --- --- --- --- ---
@@ -95,6 +101,7 @@ impl FunctionModule for BasicModule {
             (String::from("float"), Value::from(float)),
             (String::from("fraction"), Value::from(fraction)),
             (String::from("bool"), Value::from(boolean)),
+            (String::from("unique"), Value::from(unique)),
             (String::from("string"), Value::from(string)),
             (String::from("array"), Value::from(array)),
             (String::from("ascii"), Value::from(ascii)),
@@ -194,6 +201,7 @@ impl BuildInFnCall for BasicModule {
 
                     Self::BOOLEAN => Value::Boolean(input.get_bool()),
                     Self::STRING => Value::from(input.to_raw_string()),
+                    Self::UNIQUE => Value::from(Unique::from(input.to_raw_string())),
                     Self::ARRAY => {
                         let Value::Number(num) = input else {
                             unreachable!()
