@@ -124,9 +124,9 @@ impl BuildInFnCall for FileSysModule {
                                 FILE_CLASS.as_ref().unwrap().clone(),
                                 ArrayLiteral::from([
                                     path_value,
-                                    Value::Boolean(path_exist),
-                                    Value::Boolean(path_is_dir),
-                                    Value::Boolean(path_is_file),
+                                    Value::from(path_exist),
+                                    Value::from(path_is_dir),
+                                    Value::from(path_is_file),
                                 ]),
                             )?
                         };

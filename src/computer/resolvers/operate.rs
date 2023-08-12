@@ -16,14 +16,14 @@ pub fn operate(val1: Value, val2: Value, operator: Symbols) -> Result<Value, ()>
                 Symbols::Multiply => Value::Number(num1 * num2),
                 Symbols::Divide => Value::Number(num1 / num2),
                 Symbols::Power => Value::Number(num1.pow(num2)),
-                Symbols::LessThan => Value::Boolean(num1 < num2),
-                Symbols::MoreThan => Value::Boolean(num1 > num2),
-                Symbols::NotEqual => Value::Boolean(num1 != num2),
-                Symbols::CompareEqual => Value::Boolean(num1 == num2),
-                Symbols::LessThanEqual => Value::Boolean(num1 <= num2),
-                Symbols::MoreThanEqual => Value::Boolean(num1 >= num2),
-                Symbols::AndSign => Value::Boolean(num1.int_value() != 0 && num2.int_value() != 0),
-                Symbols::OrSign => Value::Boolean(num1.int_value() != 0 || num2.int_value() != 0),
+                Symbols::LessThan => Value::from(num1 < num2),
+                Symbols::MoreThan => Value::from(num1 > num2),
+                Symbols::NotEqual => Value::from(num1 != num2),
+                Symbols::CompareEqual => Value::from(num1 == num2),
+                Symbols::LessThanEqual => Value::from(num1 <= num2),
+                Symbols::MoreThanEqual => Value::from(num1 >= num2),
+                Symbols::AndSign => Value::from(num1.int_value() != 0 && num2.int_value() != 0),
+                Symbols::OrSign => Value::from(num1.int_value() != 0 || num2.int_value() != 0),
                 _ => {
                     let msg = format!("unexpected symbol `{}` for operating", operator);
                     return Err(internal_error(InternalComponent::Computer, &msg)?);
@@ -97,10 +97,10 @@ pub fn operate(val1: Value, val2: Value, operator: Symbols) -> Result<Value, ()>
         // all typed value comparing
         {
             match operator {
-                Symbols::NotEqual => Value::Boolean(val1 != val2),
-                Symbols::CompareEqual => Value::Boolean(val1 == val2),
-                Symbols::AndSign => Value::Boolean(val1.get_bool() && val2.get_bool()),
-                Symbols::OrSign => Value::Boolean(val1.get_bool() || val2.get_bool()),
+                Symbols::NotEqual => Value::from(val1 != val2),
+                Symbols::CompareEqual => Value::from(val1 == val2),
+                Symbols::AndSign => Value::from(val1.get_bool() && val2.get_bool()),
+                Symbols::OrSign => Value::from(val1.get_bool() || val2.get_bool()),
                 _ => unreachable!(),
             }
         }

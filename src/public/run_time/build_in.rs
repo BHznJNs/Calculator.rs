@@ -55,7 +55,7 @@ pub fn constants() -> HashMap<String, Value> {
         ),
         (String::from("PI"), Value::from(PI)),
         (String::from("E"), Value::from(E)),
-        (String::from("true"), Value::Boolean(true)),
-        (String::from("false"), Value::Boolean(false)),
+        (String::from("true"), Value::from(true)),
+        (String::from("false"), Value::from(false)),
     ])
 }

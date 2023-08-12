@@ -46,7 +46,7 @@ pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> Result<Value, ()> {
                         if let Value::Number(num) = val {
                             Value::Number(num.not())
                         } else if let Value::Boolean(bool_val) = val {
-                            Value::Boolean(!bool_val)
+                            Value::from(!bool_val)
                         } else {
                             return Err(type_error(
                                 Some("Not operator"),
