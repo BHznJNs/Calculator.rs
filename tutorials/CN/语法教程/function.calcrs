@@ -3,14 +3,62 @@ add1 = fn(i $Numb) {
     #  param-type
 
     # 参数类型列表 :
-    # AnyType         -> $_       
-    # Boolean         -> $Bool
-    # Number          -> $Numb
-    # String          -> $Str
-    # Array           -> $Array
-    # Lazy-Expression -> $LazyExpr
-    # Function        -> $Func
-    # Object          -> $Obj
+
+    # 类型     |  可选的类型标注 
+
+    # AnyType -> $_
+    #         -> $any
+    #         -> $Any
+
+    # Boolean -> $bool
+    #         -> $Bool
+    #         -> $boolean
+    #         -> $Boolean
+
+    # Number -> $num
+    #        -> $Num
+    #        -> $numb
+    #        -> $Numb
+    #        -> $number
+    #        -> $Number
+
+    # Unique -> $uni
+    #        -> $Uni
+    #        -> $unique
+    #        -> $Unique
+
+    # String -> $str
+    #        -> $Str
+    #        -> $string
+    #        -> $String
+
+    # Array -> $arr
+    #       -> $Arr
+    #       -> $array
+    #       -> $Array
+
+    # Map   -> $map
+    #       -> $Map
+
+    # Lazy-Expression -> $lExpr
+    #                 -> $LazyExpr
+
+    # Function -> $Fn
+    #          -> $func
+    #          -> $Func
+    #          -> $function
+    #          -> $Function
+
+    # Object -> $obj
+    #        -> $Obj
+    #        -> $object
+    #        -> $Object
+
+    # Class -> $Cl
+    #       -> $class
+    #       -> $Class
+
+    # --- --- --- --- --- ---
 
     # 使用 `brk` 关键字从函数中返回值。
     brk i + 1

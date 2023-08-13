@@ -1,4 +1,5 @@
 use std::cell::{RefCell, RefMut};
+use std::collections::HashMap;
 use std::fmt;
 use std::rc::Rc;
 
@@ -25,6 +26,7 @@ pub enum ValueType {
     Boolean,
     Number,
     Unique,
+
     String,
     Array,
     Map,
@@ -35,27 +37,77 @@ pub enum ValueType {
     Object,
 }
 
-pub const VALUE_TYPE_PAIRS: [(&'static str, ValueType); 10] = [
-    ("_", ValueType::Void),
-    ("Bool", ValueType::Boolean),
-    ("Numb", ValueType::Number),
-    ("Uni", ValueType::Unique),
-    ("Str", ValueType::String),
-    ("Array", ValueType::Array),
-    ("Map", ValueType::Map),
-    ("LazyExpr", ValueType::LazyExpression),
-    ("Func", ValueType::Function),
-    ("Obj", ValueType::Object),
-];
-
+static mut VALUE_TYPE_MAP: Option<HashMap<&str, ValueType>> = None;
 impl ValueType {
-    pub fn is_valid_type(identi: &String) -> Option<ValueType> {
-        for (type_name, type__) in VALUE_TYPE_PAIRS {
-            if identi.eq(type_name) {
-                return Some(type__);
+    pub fn is_valid_type(identi: &str) -> Option<ValueType> {
+        unsafe {
+            if VALUE_TYPE_MAP.is_none() {
+                VALUE_TYPE_MAP = Some(HashMap::from([
+                    ("_", ValueType::Void),
+                    ("any", ValueType::Void),
+                    ("Any", ValueType::Void),
+
+                    ("bool", ValueType::Boolean),
+                    ("Bool", ValueType::Boolean),
+                    ("boolean", ValueType::Boolean),
+                    ("Boolean", ValueType::Boolean),
+
+                    ("num", ValueType::Number),
+                    ("Num", ValueType::Number),
+                    ("numb", ValueType::Number),
+                    ("Numb", ValueType::Number),
+                    ("number", ValueType::Number),
+                    ("Number", ValueType::Number),
+
+                    ("uni", ValueType::Unique),
+                    ("Uni", ValueType::Unique),
+                    ("unique", ValueType::Unique),
+                    ("Unique", ValueType::Unique),
+
+                    ("str", ValueType::String),
+                    ("Str", ValueType::String),
+                    ("string", ValueType::String),
+                    ("String", ValueType::String),
+
+                    ("arr", ValueType::Array),
+                    ("Arr", ValueType::Array),
+                    ("array", ValueType::Array),
+                    ("Array", ValueType::Array),
+
+                    ("map", ValueType::Map),
+                    ("Map", ValueType::Map),
+
+                    ("lExpr", ValueType::LazyExpression),
+                    ("LazyExpr", ValueType::LazyExpression),
+
+                    ("Fn", ValueType::Function),
+                    ("func", ValueType::Function),
+                    ("Func", ValueType::Function),
+                    ("function", ValueType::Function),
+                    ("Function", ValueType::Function),
+
+                    ("obj", ValueType::Object),
+                    ("Obj", ValueType::Object),
+                    ("object", ValueType::Object),
+                    ("Object", ValueType::Object),
+
+                    ("Cl", ValueType::Class),
+                    ("class", ValueType::Class),
+                    ("Class", ValueType::Class),
+                ]))
             }
+        };
+
+        let target_type = unsafe {
+            let Some(map) = &VALUE_TYPE_MAP else {
+                unreachable!()
+            };
+            map.get(identi)
+        };
+        match target_type {
+            Some(t) => Some(*t),
+            None => None,
         }
-        return None;
     }
 }
 
