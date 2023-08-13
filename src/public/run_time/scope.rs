@@ -9,7 +9,7 @@ use crate::utils::completer::Completer;
 
 use super::super::std::modules;
 use super::super::value::value::Value;
-use super::build_in;
+use super::constants;
 
 pub struct GlobalScope {
     pub variables: HashMap<String, Value>,
@@ -17,7 +17,9 @@ pub struct GlobalScope {
 impl GlobalScope {
     pub fn init() -> Self {
         Self {
-            variables: build_in::constants(),
+            variables:  unsafe {
+                constants::entry()
+            }
         }
     }
 }

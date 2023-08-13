@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use crate::public::run_time::{build_in, scope::Scope};
+use crate::public::run_time::{scope::Scope, constants};
 
 use super::script;
 
@@ -12,7 +12,9 @@ pub fn resolve(headfiles: VecDeque<String>, scope: &mut Scope) {
         let headfile_vars = headfile_scope.global.variables;
 
         // init headfile_scope.global.variables
-        headfile_scope.global.variables = build_in::constants();
+        headfile_scope.global.variables = unsafe {
+            constants::entry()
+        };
         // insert variables into global scope
         scope.global.variables.extend(headfile_vars);
     }

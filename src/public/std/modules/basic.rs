@@ -7,6 +7,19 @@ use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 
 use crate::public::error::{internal_error, type_error, InternalComponent};
 use crate::public::run_time::build_in::BuildInFnIdenti;
+use crate::public::run_time::constants::{
+    VOID_T,
+    BOOL_T,
+    NUMBER_T,
+    UNIQUE_T,
+    STRING_T,
+    ARRAY_T,
+    MAP_T,
+    LAZYEXPR_T,
+    FUNCTION_T,
+    CLASS_T,
+    OBJECT_T,
+};
 use crate::public::run_time::scope::Scope;
 use crate::public::std::modules::map::MapModule;
 use crate::public::std::utils::get_self_prop::get_self_prop;
@@ -163,7 +176,24 @@ impl BuildInFnCall for BasicModule {
                 let input = get_val("input", scope)?;
 
                 match self {
-                    Self::TYPE => Value::from(input.get_type() as i64),
+                    Self::TYPE => {
+                        let type_uni = unsafe {
+                            match input.get_type() {
+                                ValueType::Void => &VOID_T,
+                                ValueType::Boolean => &BOOL_T,
+                                ValueType::Number => &NUMBER_T,
+                                ValueType::Unique => &UNIQUE_T,
+                                ValueType::String => &STRING_T,
+                                ValueType::Array => &ARRAY_T,
+                                ValueType::Map => &MAP_T,
+                                ValueType::LazyExpression => &LAZYEXPR_T,
+                                ValueType::Function => &FUNCTION_T,
+                                ValueType::Class => &CLASS_T,
+                                ValueType::Object => &OBJECT_T,
+                            }
+                        };
+                        Value::from(type_uni.unwrap())
+                    }
                     Self::CLONE => input.deep_clone(),
 
                     Self::INT => match input {

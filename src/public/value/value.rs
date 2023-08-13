@@ -94,7 +94,7 @@ pub enum Value {
 
     Boolean(bool),
     Number(Number),
-    Unique(Rc<Unique>),
+    Unique(Unique),
     String(Rc<RefCell<String>>),
     Array(Rc<RefCell<RawArray>>),
     Map(Rc<RefCell<RawMap>>),
@@ -364,7 +364,7 @@ impl From<f64> for Value {
 }
 impl From<Unique> for Value {
     fn from(value: Unique) -> Self {
-        Self::Unique(Rc::new(value))
+        Self::Unique(value)
     }
 }
 impl From<String> for Value {
