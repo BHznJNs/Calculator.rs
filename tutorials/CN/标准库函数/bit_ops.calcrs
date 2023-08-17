@@ -1,25 +1,25 @@
 import BitOps
 
-# 定义: AND(num1 $Numb, num2 $Numb)
+# 定义: AND(num1 $Number, num2 $Number)
 # 接收两个整型数字，对其使用”和“位运算。
 AND(1, 0) # 0
 
-# 定义: OR(num1 $Numb, num2 $Numb)
+# 定义: OR(num1 $Number, num2 $Number)
 # 接收两个整型数字，对其使用”或“位运算。
 OR(1, 0) # 1
 
-# 定义: XOR(num1 $Numb, num2 $Numb)
+# 定义: XOR(num1 $Number, num2 $Number)
 # 接收两个整型数字，对其使用”异或“位运算。
 XOR(1, 1) # 0
 
-# 定义: LShift(num1 $Numb, num2 $Numb)
+# 定义: LShift(num1 $Number, num2 $Number)
 # 接收两个整型数字，对 `num1` ”左移“ `num2` 位。
 LShift(1, 10) # 1024
 
-# 定义: RShift(num1 $Numb, num2 $Numb)
+# 定义: RShift(num1 $Number, num2 $Number)
 # 接收两个整型数字，对 `num1` ”右移“ `num2` 位。
 LShift(1024, 10) # 1
 
-# 定义: NOT(num $Numb)
+# 定义: NOT(num $Number)
 # 接收一个整形数字，对其使用”非“运算。
 NOT(10) # -11

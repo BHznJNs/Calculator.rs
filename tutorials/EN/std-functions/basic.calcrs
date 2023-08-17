@@ -1,6 +1,6 @@
 import Basic
 
-# Def: input(prompt $Str)
+# Def: input(prompt $String)
 # Read a String value from standard input with `prompt`.
 input("Please input something: ")
 
@@ -34,11 +34,11 @@ int(1.1) # 1
 # will throw type_error when received other typed value or invalid string.
 float("1.1") # 1.1
 
-# Def: fraction(upper $Numb, lower $Numb)
+# Def: fraction(upper $Number, lower $Number)
 # Receives two int typed Number value as dividend and divisor, returns (upper / lower).
 fraction(1, 2) # (1 / 2)
 
-# Def: unique(identifier $Str)
+# Def: unique(identifier $String)
 # Receives a Raw-String,
 # returns Unique typed value with inputed value as identifier.
 unique("identi str")
@@ -57,7 +57,7 @@ string(10) # "10"
 string(true) # "true"
 string(arr2) # "1, 2, 3"
 
-# Def: array(size $Numb)
+# Def: array(size $Number)
 # Returns an array with `size`.
 array(10)
 # [
@@ -65,7 +65,7 @@ array(10)
 #   0, 0, 0, 0, 0,
 # ]
 
-# Def: ascii(str $Str)
+# Def: ascii(str $String)
 # Returns the ASCII code of the first character of `str`,
 # will throw an error when inputed Non-ASCII character.
 ascii("a") # 97

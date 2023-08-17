@@ -1,6 +1,6 @@
 import Basic
 
-# 定义: input(prompt $Str)
+# 定义: input(prompt $String)
 # 从标准输入读取一个 String 类型的数值，使用参数 `prompt` 作为输入提示。
 input("Please input something: ")
 
@@ -36,11 +36,11 @@ int(1.1) # 1
 # 当收到其它类型的值或者不合法的字符串时会抛出类型错误。
 float("1.1") # 1.1
 
-# 定义: fraction(upper $Numb, lower $Numb)
+# 定义: fraction(upper $Number, lower $Number)
 # 接收两个 Number 类型的值作为分子和分母, 返回 (upper / lower)。
 fraction(1, 2) # (1 / 2)
 
-# 定义: unique(identifier $Str)
+# 定义: unique(identifier $String)
 # 接收一个原始字符串值，
 # 返回以该字符串为标识符的 Unique 类型值。
 unique("identi str")
@@ -60,7 +60,7 @@ string(10) # "10"
 string(true) # "true"
 string(arr2) # "1, 2, 3"
 
-# 定义: array(size $Numb)
+# 定义: array(size $Number)
 # 返回一个具有 `size` 大小的数组。
 array(10)
 # [
@@ -68,7 +68,7 @@ array(10)
 #   0, 0, 0, 0, 0,
 # ]
 
-# 定义: ascii(str $Str)
+# 定义: ascii(str $String)
 # 返回输入的字符串的首字母的 ASCII 码，
 # 当输入的字符串为非 ASCII 字符时，将报错。
 ascii("a") # 97

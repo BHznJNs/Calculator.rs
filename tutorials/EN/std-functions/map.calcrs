@@ -17,7 +17,7 @@ map_obj.values()
 #   "a", "b",
 # ]
 
-# Def: has_key(key_name $Str)
+# Def: has_key(key_name $String)
 # Returns whether the `key_name` exist in the Map.
 map_obj.has_key("a") # true
 

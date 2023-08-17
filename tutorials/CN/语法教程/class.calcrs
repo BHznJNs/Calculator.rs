@@ -1,8 +1,8 @@
 # 类定义
 Person = cl {
     # 类属性
-    age $Numb;
-    name $Str;
+    age $Number;
+    name $String;
 
     # 类方法
     greet = () {

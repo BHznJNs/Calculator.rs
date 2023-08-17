@@ -19,11 +19,11 @@ arr_obj.unshift(0) # 0
 # 移除并返回数组第一个元素。
 arr_obj.pop() # 4
 
-# 定义: insert(index $Numb, value $_)
+# 定义: insert(index $Number, value $_)
 # 在数组第 `index` 处插入元素，返回该元素的引用。
 arr_obj.insert(1, 2) # 2
 
-# 定义: remove(index $Numb)
+# 定义: remove(index $Number)
 # 移除并返回在数组第 `index` 处的元素。
 arr_obj.remove(1) # 2
 
@@ -31,7 +31,7 @@ arr_obj.remove(1) # 2
 # 返回数组中是否存在输入的值。
 arr_obj.contains(1) # true
 
-# 定义: slice(start $Numb, end $Numb)
+# 定义: slice(start $Number, end $Number)
 # 返回新的原始数组，该原始数组由原数组中从位置 `start` 到 `end` - 1 的元素的浅拷贝组成。
 arr_obj.slice(0, 1)
 # [
@@ -51,7 +51,7 @@ arr_obj.slice(1, -1)
 #   2,
 # ]
 
-# 定义: join(divider $Str)
+# 定义: join(divider $String)
 # 返回新的原始字符串，该字符串由原数组中的所有元素以 `divider` 字符串连接后组成。
 arr_obj.join(" / ") 
 # "1 / 2 / 3"

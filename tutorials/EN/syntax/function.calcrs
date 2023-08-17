@@ -1,4 +1,4 @@
-add1 = fn(i $Numb) {
+add1 = fn(i $Number) {
     #        ^^^^
     #  param-type
 

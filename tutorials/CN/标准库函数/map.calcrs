@@ -17,7 +17,7 @@ map_obj.values()
 #   "a", "b",
 # ]
 
-# Def: has_key(key_name $Str)
+# Def: has_key(key_name $String)
 # 返回字典中是否存在输入的键。
 map_obj.has_key("a") # true
 

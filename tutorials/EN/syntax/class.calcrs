@@ -1,8 +1,8 @@
 # class definition
 Person = cl {
     # class properties
-    age $Numb;
-    name $Str;
+    age $Number;
+    name $String;
 
     # class method
     greet = () {
