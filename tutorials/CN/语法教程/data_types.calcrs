@@ -1,3 +1,4 @@
+import Basic
 import String
 import Array
 
@@ -8,6 +9,9 @@ number_float_var = 1.2 # 浮点型数字
 # 布尔类型
 bool_true_var = true
 bool_false_var = false
+
+# Unique 类型
+unique_var = unique("identi str")
 
 # 原始字符串类型
 raw_str_var = "abcd"

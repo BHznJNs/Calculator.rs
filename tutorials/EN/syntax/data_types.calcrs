@@ -1,3 +1,4 @@
+import Basic
 import String
 import Array
 
@@ -8,6 +9,9 @@ number_float_var = 1.2 # float number
 # Boolean type
 bool_true_var = true
 bool_false_var = false
+
+# Unique type
+unique_var = unique("identi str")
 
 # Raw-String type
 raw_str_var = "abcd"
@@ -37,4 +41,3 @@ class_var = cl {prop $_}
 
 # Object type
 object_var = new class_var(1)
-

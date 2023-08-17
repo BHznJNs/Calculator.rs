@@ -38,6 +38,11 @@ float("1.1") # 1.1
 # Receives two int typed Number value as dividend and divisor, returns (upper / lower).
 fraction(1, 2) # (1 / 2)
 
+# Def: unique(identifier $Str)
+# Receives a Raw-String,
+# returns Unique typed value with inputed value as identifier.
+unique("identi str")
+
 # Def: bool(value $_)
 # Convert value to Boolean type, will return true when received
 # Lazy-Expression typed, Function typed, Class typed or Object typed value.

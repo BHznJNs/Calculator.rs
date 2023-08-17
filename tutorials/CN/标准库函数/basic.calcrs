@@ -12,7 +12,9 @@ input("Please input something: ")
 # 其它类型代码常量：
 # - STRING
 # - BOOLEAN
+# - UNIQUE
 # - ARRAY
+# - MAP
 # - LAZYEXPR
 # - FUNCION
 # - CLASS
@@ -37,6 +39,11 @@ float("1.1") # 1.1
 # 定义: fraction(upper $Numb, lower $Numb)
 # 接收两个 Number 类型的值作为分子和分母, 返回 (upper / lower)。
 fraction(1, 2) # (1 / 2)
+
+# 定义: unique(identifier $Str)
+# 接收一个原始字符串值，
+# 返回以该字符串为标识符的 Unique 类型值。
+unique("identi str")
 
 # 定义: bool(value $_)
 # 将值转换为 Boolean 类型，当接收到
