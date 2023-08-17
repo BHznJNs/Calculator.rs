@@ -13,6 +13,9 @@ use std::{
 
 use terminal::Terminal;
 
+// this function is used to replace Rust macro `println!`
+// since the println! macro can not normally
+// make new line in raw_mode.
 pub fn print_line<T: Display>(content: T) {
     print!("{}\r\n", content);
     Terminal::flush().expect("IO Error");
