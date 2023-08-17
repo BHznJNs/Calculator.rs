@@ -18,6 +18,8 @@ pub(super) trait GetAddr {
     fn get_addr(&self) -> Addr;
 }
 
+// --- --- --- --- --- ---
+
 pub trait ComplexStructure {
     fn display(
         f: &mut fmt::Formatter<'_>,

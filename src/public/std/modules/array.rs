@@ -2,6 +2,7 @@ use std::rc::Rc;
 
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
+use crate::public::std::{ModuleClass, EMPTY_MODULE_CLASS};
 use crate::public::std::utils::get_self_prop::get_self_prop;
 use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function};
 use crate::public::value::oop::class::{Class, Property};
@@ -23,9 +24,9 @@ pub enum ArrayModule {
     JOIN,
 }
 
-static mut MODULE_CLASS: Option<Rc<Class>> = None;
+pub static mut MODULE_CLASS: ModuleClass = EMPTY_MODULE_CLASS;
 impl ClassModule for ArrayModule {
-    fn __static_class_init() {
+    fn __static_class__() -> Class {
         let push = BuildInFunction {
             params: vec![
                 BuildInFnParam(ValueType::Object, "self"),
@@ -82,32 +83,27 @@ impl ClassModule for ArrayModule {
 
         // --- --- --- --- --- ---
 
-        unsafe {
-            MODULE_CLASS = Some(
-                Class::new(
-                    vec![Property(ValueType::Array, String::from("v"))],
-                    vec![
-                        (String::from("push"), Function::from(push)),
-                        (String::from("pop"), Function::from(pop)),
-                        (String::from("shift"), Function::from(shift)),
-                        (String::from("unshift"), Function::from(unshift)),
-                        (String::from("insert"), Function::from(insert)),
-                        (String::from("remove"), Function::from(remove)),
-                        (String::from("contains"), Function::from(contains)),
-                        (String::from("slice"), Function::from(slice)),
-                        (String::from("join"), Function::from(join)),
-                    ],
-                )
-                .into(),
-            )
-        }
+        return Class::new(
+            vec![Property(ValueType::Array, String::from("v"))],
+            vec![
+                (String::from("push"), Function::from(push)),
+                (String::from("pop"), Function::from(pop)),
+                (String::from("shift"), Function::from(shift)),
+                (String::from("unshift"), Function::from(unshift)),
+                (String::from("insert"), Function::from(insert)),
+                (String::from("remove"), Function::from(remove)),
+                (String::from("contains"), Function::from(contains)),
+                (String::from("slice"), Function::from(slice)),
+                (String::from("join"), Function::from(join)),
+            ],
+        );
     }
 
     fn module_class() -> Rc<Class> {
-        if unsafe { MODULE_CLASS.is_none() } {
-            Self::__static_class_init();
-        }
-        let class = unsafe { MODULE_CLASS.as_ref().unwrap().clone() };
+        let class = unsafe {
+            MODULE_CLASS.is_some_or_init(Self::__static_class__);
+            MODULE_CLASS.unwrap()
+        };
         return class;
     }
 }

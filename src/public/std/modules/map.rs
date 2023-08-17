@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use crate::public::{
     run_time::{build_in::BuildInFnIdenti, scope::Scope},
-    std::utils::{get_self_prop::get_self_prop, get_val::get_val},
+    std::{utils::{get_self_prop::get_self_prop, get_val::get_val}, ModuleClass, EMPTY_MODULE_CLASS},
     value::{
         array::ArrayLiteral,
         function::{BuildInFnParam, BuildInFunction, Function},
@@ -21,9 +21,9 @@ pub enum MapModule {
     HASKEY,
 }
 
-static mut MODULE_CLASS: Option<Rc<Class>> = None;
+static mut MODULE_CLASS: ModuleClass = EMPTY_MODULE_CLASS;
 impl ClassModule for MapModule {
-    fn __static_class_init() {
+    fn __static_class__() -> Class {
         let clear = BuildInFunction {
             params: vec![BuildInFnParam(ValueType::Object, "self")],
             identi: BuildInFnIdenti::Map(Self::CLEAR),
@@ -42,26 +42,21 @@ impl ClassModule for MapModule {
             identi: BuildInFnIdenti::Map(Self::HASKEY),
         };
 
-        unsafe {
-            MODULE_CLASS = Some(
-                Class::new(
-                    vec![Property(ValueType::Map, String::from("v"))],
-                    vec![
-                        (String::from("clear"), Function::from(clear)),
-                        (String::from("keys"), Function::from(keys)),
-                        (String::from("values"), Function::from(values)),
-                        (String::from("has_key"), Function::from(has_key)),
-                    ],
-                )
-                .into(),
-            )
-        }
+        return Class::new(
+            vec![Property(ValueType::Map, String::from("v"))],
+            vec![
+                (String::from("clear"), Function::from(clear)),
+                (String::from("keys"), Function::from(keys)),
+                (String::from("values"), Function::from(values)),
+                (String::from("has_key"), Function::from(has_key)),
+            ],
+        );
     }
     fn module_class() -> Rc<Class> {
-        if unsafe { MODULE_CLASS.is_none() } {
-            Self::__static_class_init();
-        }
-        let class = unsafe { MODULE_CLASS.as_ref().unwrap().clone() };
+        let class = unsafe {
+            MODULE_CLASS.is_some_or_init(Self::__static_class__);
+            MODULE_CLASS.unwrap()
+        };
         return class;
     }
 }

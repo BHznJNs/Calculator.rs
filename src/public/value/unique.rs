@@ -37,16 +37,16 @@ impl GetAddr for Unique {
 
 // --- --- --- --- --- ---
 
-pub struct GlobalUnique {
-    pub value: Option<Unique>,
-}
+pub struct GlobalUnique(Option<Unique>);
+pub const EMPTY_GLOBAL_UNIQUE: GlobalUnique = GlobalUnique(None); 
+
 impl GlobalUnique {
     pub fn init(&mut self, identi: &str) {
-        self.value = Some(Unique::from(identi));
+        self.0 = Some(Unique::from(identi));
     }
 
     pub fn unwrap(&self) -> Unique {
-        let value_ref = self.value.as_ref();
+        let value_ref = self.0.as_ref();
         let Some(wraped) = value_ref else {
             unreachable!()
         };

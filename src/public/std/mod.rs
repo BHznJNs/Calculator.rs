@@ -51,3 +51,25 @@ impl StdModules {
         }
     }
 }
+
+// --- --- --- --- --- ---
+
+pub struct ModuleClass(Option<Rc<Class>>);
+pub const EMPTY_MODULE_CLASS: ModuleClass = ModuleClass(None);
+
+impl ModuleClass {
+    pub fn is_some_or_init(&mut self, class_cb: fn() -> Class) {
+        if self.0.is_none() {
+            let class = class_cb();
+            self.0 = Some(class.into());
+        }
+    }
+
+    pub fn unwrap(&self) -> Rc<Class> {
+        let value_ref = self.0.as_ref();
+        let Some(wraped) = value_ref else {
+            unreachable!()
+        };
+        return wraped.clone();
+    }
+}

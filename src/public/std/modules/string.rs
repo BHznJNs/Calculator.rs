@@ -3,6 +3,7 @@ use std::rc::Rc;
 
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
+use crate::public::std::{ModuleClass, EMPTY_MODULE_CLASS};
 use crate::public::std::utils::get_self_prop::get_self_prop;
 use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function};
 use crate::public::value::oop::class::{Class, Property};
@@ -20,9 +21,9 @@ pub enum StringModule {
     ENDWITH,
 }
 
-static mut MODULE_CLASS: Option<Rc<Class>> = None;
+static mut MODULE_CLASS: ModuleClass = EMPTY_MODULE_CLASS;
 impl ClassModule for StringModule {
-    fn __static_class_init() {
+    fn __static_class__() -> Class{
         let split = BuildInFunction {
             params: vec![
                 BuildInFnParam(ValueType::Object, "self"),
@@ -59,28 +60,22 @@ impl ClassModule for StringModule {
             ],
             identi: BuildInFnIdenti::String(Self::ENDWITH),
         };
-
-        unsafe {
-            MODULE_CLASS = Some(
-                Class::new(
-                    vec![Property(ValueType::String, String::from("v"))],
-                    vec![
-                        (String::from("split"), Function::from(split)),
-                        (String::from("replace"), Function::from(replace)),
-                        (String::from("repeat"), Function::from(repeat)),
-                        (String::from("start_with"), Function::from(start_with)),
-                        (String::from("end_with"), Function::from(end_with)),
-                    ],
-                )
-                .into(),
-            )
-        }
+        return Class::new(
+            vec![Property(ValueType::String, String::from("v"))],
+            vec![
+                (String::from("split"), Function::from(split)),
+                (String::from("replace"), Function::from(replace)),
+                (String::from("repeat"), Function::from(repeat)),
+                (String::from("start_with"), Function::from(start_with)),
+                (String::from("end_with"), Function::from(end_with)),
+            ],
+        );
     }
     fn module_class() -> Rc<Class> {
-        if unsafe { MODULE_CLASS.is_none() } {
-            Self::__static_class_init();
-        }
-        let class = unsafe { MODULE_CLASS.as_ref().unwrap().clone() };
+        let class = unsafe {
+            MODULE_CLASS.is_some_or_init(Self::__static_class__);
+            MODULE_CLASS.unwrap()
+        };
         return class;
     }
 }

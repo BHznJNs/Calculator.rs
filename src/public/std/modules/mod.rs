@@ -49,7 +49,7 @@ pub trait FunctionModule: BuildInFnCall {
 }
 
 pub trait ClassModule: BuildInFnCall {
-    fn __static_class_init();
+    fn __static_class__() -> Class;
     fn module_class() -> Rc<Class>;
 }
 pub trait ObjectModule: BuildInFnCall {
