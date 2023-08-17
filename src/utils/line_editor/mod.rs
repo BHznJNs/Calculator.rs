@@ -2,7 +2,6 @@ mod analyzer;
 mod line;
 mod signal;
 mod state;
-mod terminal;
 mod tokenizer;
 
 mod candidate;
@@ -19,19 +18,23 @@ use history::History;
 use line::Line;
 pub use signal::Signal;
 use state::LineState;
-use terminal::Terminal;
 
-use crate::{public::env::ENV_OPTION, utils::line_editor::tokenizer::Token};
-use crate::{public::run_time::scope::Scope, utils::output::print_line};
+use crate::public::env::ENV_OPTION;
+use crate::public::run_time::scope::Scope;
 
 use candidate::Candidate;
 
 use analyzer::analyze;
-use tokenizer::TextType;
+use tokenizer::{
+    Token,
+    TextType,
+};
+
+use super::{print_line, terminal::Terminal, cursor::Cursor};
 
 pub struct LineEditor {
     prompt: &'static str,
-    terminal: Terminal,
+    // terminal: Terminal,
     history: History,
     candidate: Candidate,
     is_at: LineState,
@@ -45,12 +48,10 @@ pub struct LineEditor {
 
 impl LineEditor {
     pub fn new(prompt: &'static str) -> Self {
-        let terminal = Terminal::new();
-        let term_width = terminal.width();
+        let term_width = Terminal::width();
 
         Self {
             prompt,
-            terminal,
             history: History::new(),
             candidate: Candidate::new(),
             is_at: LineState::new(),
@@ -66,29 +67,28 @@ impl LineEditor {
     #[inline]
     fn display_prompt(&mut self) -> io::Result<()> {
         print!("{}", self.prompt);
-        return self.terminal.flush();
+        Terminal::flush()
     }
     #[inline]
     fn move_cursor_to_prompt(&mut self) -> io::Result<()> {
-        self.terminal.cursor.move_to_col(self.prompt.len())
+        Cursor::move_to_col(self.prompt.len())
     }
     #[inline]
     fn render_with_fixed_pos(&mut self) -> io::Result<()> {
-        self.terminal.cursor.save_pos()?;
+        Cursor::save_pos()?;
         self.render()?;
-        self.terminal.cursor.restore_pos()?;
+        Cursor::restore_pos()?;
         return Ok(());
     }
     #[inline]
     fn clear_line(&mut self) -> io::Result<()> {
         self.move_cursor_to_prompt()?;
-        self.terminal.clear_after_cursor();
-        return Ok(());
+        Terminal::clear_after_cursor()
     }
 
     fn back_operate(&mut self) -> io::Result<()> {
         if self.overflow_left == 0 {
-            self.terminal.cursor.left(1)?;
+            Cursor::left(1)?;
         }
 
         let line = &mut self.current_line;
@@ -107,8 +107,8 @@ impl LineEditor {
 
     // recompute the states
     fn refresh(&mut self) -> io::Result<()> {
-        let cursor_pos = self.terminal.cursor_col()?;
-        let term_width = self.terminal.width();
+        let cursor_pos = Cursor::pos_col()?;
+        let term_width = Terminal::width();
         let prompt_len = self.prompt.len();
         let line_label_width = self.current_line.label_width;
 
@@ -144,7 +144,7 @@ impl LineEditor {
                 let cursor_move = offset - self.overflow_left;
 
                 if cursor_move > 0 {
-                    self.terminal.cursor.left(cursor_move)?;
+                    Cursor::left(cursor_move)?;
                 }
                 self.overflow_left = offset;
             }
@@ -176,7 +176,7 @@ impl LineEditor {
                 let offset = std::cmp::min(overflow, hint_width);
 
                 self.overflow_left -= offset;
-                self.terminal.cursor.right(offset)?;
+                Cursor::right(offset)?;
             }
             self.candidate.clear();
             self.render_with_fixed_pos()?;
@@ -207,9 +207,7 @@ impl LineEditor {
             }
         }
 
-        // log(&format!("overflow_left: {}, overflow_right: {}", self.overflow_left, self.overflow_right))?;
-
-        self.terminal.cursor.hide()?;
+        Cursor::hide()?;
         self.clear_line()?;
 
         let mut offset = self.overflow_left;
@@ -257,8 +255,8 @@ impl LineEditor {
         }
 
         print!("{}{}", buffer, &self.current_line.label);
-        self.terminal.cursor.show()?;
-        self.terminal.flush()?;
+        Cursor::show()?;
+        Terminal::flush()?;
         return Ok(());
     }
 
@@ -280,18 +278,18 @@ impl LineEditor {
     // --- --- --- --- --- ---
 
     fn insert_edit(&mut self, ch: char) -> io::Result<()> {
-        let insert_pos = self.terminal.cursor_col()? - self.prompt.len() + self.overflow_left;
+        let insert_pos = Cursor::pos_col()? - self.prompt.len() + self.overflow_left;
         self.current_line.insert(insert_pos, ch);
 
         if self.current_line.len() - 1 >= self.visible_area_width {
             self.overflow_left += 1;
         } else {
-            self.terminal.cursor.right(1)?;
+            Cursor::right(1)?;
         }
         return Ok(());
     }
     fn remove_edit(&mut self) -> io::Result<()> {
-        let cursor_pos = self.terminal.cursor_col()?;
+        let cursor_pos = Cursor::pos_col()?;
         if cursor_pos == 0 {
             return Ok(());
         }
@@ -318,7 +316,7 @@ impl LineEditor {
         let hint_width = hint_text.chars().count();
         self.current_line.push_str(hint_text);
         self.candidate.clear();
-        self.terminal.cursor.right(hint_width)?;
+        Cursor::right(hint_width)?;
         self.render_with_fixed_pos()
     }
 
@@ -327,14 +325,14 @@ impl LineEditor {
         self.current_line = Line::new(self.line_count);
 
         let result = loop {
-            let Some(key) = self.terminal.get_key() else {
+            let Some(key) = Terminal::get_key() else {
                 continue;
             };
             // ctrl + c -> Interrupt
             if key.modifiers == KeyModifiers::CONTROL
                 && (key.code == KeyCode::Char('c') || key.code == KeyCode::Char('d'))
             {
-                print_line(&mut self.terminal.stdout, "\nKeyboard Interrupt");
+                print_line("\nKeyboard Interrupt");
                 break Signal::Interrupt;
             }
 
@@ -387,7 +385,7 @@ impl LineEditor {
                             self.scroll_left();
                         } else {
                             self.hide_hint()?;
-                            self.terminal.cursor.left(1)?;
+                            Cursor::left(1)?;
                             continue; // skip rerender
                         }
                     }
@@ -400,7 +398,7 @@ impl LineEditor {
                         if self.is_at.right_end {
                             self.scroll_right();
                         } else {
-                            self.terminal.cursor.right(1)?;
+                            Cursor::right(1)?;
                             continue; // skip rerender
                         }
                     }
@@ -410,7 +408,7 @@ impl LineEditor {
                         self.overflow_left = 0;
                         self.overflow_right = 0;
 
-                        print_line(&mut self.terminal.stdout, "");
+                        print_line("");
                         let line_content =
                             mem::replace(&mut self.current_line.content, String::new());
 
@@ -434,7 +432,7 @@ impl LineEditor {
                     KeyCode::Char(ch) => {
                         if !ch.is_ascii() {
                             // avoid Non-ASCII character
-                            print_line(&mut self.terminal.stdout, "");
+                            print_line("");
                             break Signal::NonASCII;
                         }
 
@@ -444,7 +442,7 @@ impl LineEditor {
                             self.hide_hint()?;
                             self.refresh()?;
                             if !self.is_at.right_end {
-                                self.terminal.cursor.right(1)?;
+                                Cursor::right(1)?;
                             }
                             if self.current_line.len() > self.visible_area_width {
                                 self.overflow_left =

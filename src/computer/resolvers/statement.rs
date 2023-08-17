@@ -1,11 +1,9 @@
-use std::io::stdout;
-
 use crate::computer::resolvers::{assignment, expression};
 use crate::public::compile_time::ast::types::StatementNode;
 use crate::public::error::syntax_error;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::{Value, VoidSign};
-use crate::utils::output::print_line;
+use crate::utils::print_line;
 
 use super::sequence;
 
@@ -13,7 +11,7 @@ pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> Result<Valu
     let result = match statement_node {
         StatementNode::Output(expression_node) => {
             let output_value = expression::resolve(expression_node, scope)?;
-            print_line(&mut stdout(), output_value);
+            print_line(output_value);
             Value::EMPTY
         }
         StatementNode::ForLoop(for_statement) => {

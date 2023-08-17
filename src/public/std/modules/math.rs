@@ -4,7 +4,7 @@ use crate::public::value::function::{BuildInFnParam, BuildInFunction};
 use crate::public::value::number::Number;
 use crate::public::value::oop::object::Object;
 use crate::public::value::value::{Value, ValueType};
-use crate::utils::output::print_line__;
+use crate::utils::print_line;
 
 use super::super::utils::get_val::get_val;
 use super::{BuildInFnCall, ObjectModule};
@@ -180,7 +180,7 @@ impl BuildInFnCall for MathModule {
                     Self::ASIN | Self::ACOS | Self::ATAN => {
                         if f < -1.0 || f > 1.0 {
                             // inverse trigonometric function error.
-                            print_line__("The input for inverse trigonometric function should be less than 1 and greater than -1!");
+                            print_line("The input for inverse trigonometric function should be less than 1 and greater than -1!");
                             return Ok(Value::Number(Number::NotANumber));
                         }
                         match self {

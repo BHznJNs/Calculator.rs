@@ -3,7 +3,7 @@ use std::fmt;
 use std::ops::{Add, Div, Mul, Sub};
 
 use crate::public::error::{internal_error, InternalComponent};
-use crate::utils::output::print_line__;
+use crate::utils::print_line;
 
 #[cfg_attr(debug_assertions, derive(Debug))]
 #[derive(Clone, Copy)]
@@ -300,7 +300,7 @@ impl Div for Number {
 
         // when the divisor is ZERO
         if other.float_value() == 0.0 {
-            print_line__("The dividend should not to be ZERO!");
+            print_line("The dividend should not to be ZERO!");
             return Number::NotANumber;
         }
 

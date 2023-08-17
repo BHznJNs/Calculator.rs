@@ -31,7 +31,7 @@ use crate::public::value::number::Number;
 use crate::public::value::unique::Unique;
 use crate::public::value::value::{Value, ValueType};
 use crate::public::value::GetAddr;
-use crate::utils::output::print_line__;
+use crate::utils::print_line;
 
 use super::super::utils::get_val::get_val;
 use super::array::ArrayModule;
@@ -155,7 +155,7 @@ impl BuildInFnCall for BasicModule {
                 let lower_value = get_val("lower", scope)?;
 
                 if lower_value.get_f64() == Ok(0.0) {
-                    print_line__("The dividend should not to be ZERO!");
+                    print_line("The dividend should not to be ZERO!");
                     return Ok(Value::Number(Number::NotANumber));
                 }
 
