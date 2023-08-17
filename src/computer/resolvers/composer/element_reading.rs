@@ -1,7 +1,7 @@
 use std::cell::RefMut;
 
 use crate::public::compile_time::ast::types::ExpressionNode;
-use crate::public::error::{range_error, syntax_error, assignment_error};
+use crate::public::error::{assignment_error, range_error, syntax_error};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::array::RawArray;
 use crate::public::value::map::RawMap;
@@ -68,14 +68,9 @@ pub fn resolve(
     let result = middle_ware(
         target_value,
         index_value,
-        |arr_ref, index| {
-            Ok(arr_ref[index].clone())
-        },
+        |arr_ref, index| Ok(arr_ref[index].clone()),
         |str_ref, index| {
-            let ch = str_ref
-                .chars()
-                .nth(index)
-                .unwrap();
+            let ch = str_ref.chars().nth(index).unwrap();
             Ok(String::from(ch).into())
         },
         |map_ref, key| {
@@ -104,9 +99,9 @@ pub fn assign(
             Ok(Value::EMPTY)
         },
         |_, _| {
-            return Err(
-                assignment_error("Raw-String type does not support element assignment")?
-            );
+            return Err(assignment_error(
+                "Raw-String type does not support element assignment",
+            )?);
         },
         |mut map_ref, key| {
             map_ref.set(String::from(key), value.clone());

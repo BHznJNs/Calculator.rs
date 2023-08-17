@@ -1,17 +1,7 @@
-use std::{
-    io::{
-        self,
-        Write,
-    },
-};
+use std::io::{self, Write};
 
 use crossterm::{
-    event::{
-        self,
-        Event,
-        KeyEvent,
-        KeyEventKind,
-    },
+    event::{self, Event, KeyEvent, KeyEventKind},
     terminal::size,
 };
 

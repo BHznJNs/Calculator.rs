@@ -25,12 +25,9 @@ use crate::public::run_time::scope::Scope;
 use candidate::Candidate;
 
 use analyzer::analyze;
-use tokenizer::{
-    Token,
-    TextType,
-};
+use tokenizer::{TextType, Token};
 
-use super::{print_line, terminal::Terminal, cursor::Cursor};
+use super::{cursor::Cursor, print_line, terminal::Terminal};
 
 pub struct LineEditor {
     prompt: &'static str,

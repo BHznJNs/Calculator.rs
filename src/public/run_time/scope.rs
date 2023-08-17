@@ -17,9 +17,7 @@ pub struct GlobalScope {
 impl GlobalScope {
     pub fn init() -> Self {
         Self {
-            variables:  unsafe {
-                constants::entry()
-            }
+            variables: unsafe { constants::entry() },
         }
     }
 }

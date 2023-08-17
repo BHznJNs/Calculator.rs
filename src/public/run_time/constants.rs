@@ -55,7 +55,7 @@ pub unsafe fn entry() -> HashMap<String, Value> {
         (String::from("FUNCION"), Value::from(FUNCTION_T.unwrap())),
         (String::from("CLASS"), Value::from(CLASS_T.unwrap())),
         (String::from("OBJECT"), Value::from(OBJECT_T.unwrap())),
-
+        // --- --- --- --- --- ---
         (String::from("PI"), PI),
         (String::from("E"), E),
         (String::from("true"), TRUE),

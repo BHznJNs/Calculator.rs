@@ -46,51 +46,51 @@ impl ValueType {
                     ("_", ValueType::Void),
                     ("any", ValueType::Void),
                     ("Any", ValueType::Void),
-
+                    // --- --- --- --- --- ---
                     ("bool", ValueType::Boolean),
                     ("Bool", ValueType::Boolean),
                     ("boolean", ValueType::Boolean),
                     ("Boolean", ValueType::Boolean),
-
+                    // --- --- --- --- --- ---
                     ("num", ValueType::Number),
                     ("Num", ValueType::Number),
                     ("numb", ValueType::Number),
                     ("Numb", ValueType::Number),
                     ("number", ValueType::Number),
                     ("Number", ValueType::Number),
-
+                    // --- --- --- --- --- ---
                     ("uni", ValueType::Unique),
                     ("Uni", ValueType::Unique),
                     ("unique", ValueType::Unique),
                     ("Unique", ValueType::Unique),
-
+                    // --- --- --- --- --- ---
                     ("str", ValueType::String),
                     ("Str", ValueType::String),
                     ("string", ValueType::String),
                     ("String", ValueType::String),
-
+                    // --- --- --- --- --- ---
                     ("arr", ValueType::Array),
                     ("Arr", ValueType::Array),
                     ("array", ValueType::Array),
                     ("Array", ValueType::Array),
-
+                    // --- --- --- --- --- ---
                     ("map", ValueType::Map),
                     ("Map", ValueType::Map),
-
+                    // --- --- --- --- --- ---
                     ("lExpr", ValueType::LazyExpression),
                     ("LazyExpr", ValueType::LazyExpression),
-
+                    // --- --- --- --- --- ---
                     ("Fn", ValueType::Function),
                     ("func", ValueType::Function),
                     ("Func", ValueType::Function),
                     ("function", ValueType::Function),
                     ("Function", ValueType::Function),
-
+                    // --- --- --- --- --- ---
                     ("obj", ValueType::Object),
                     ("Obj", ValueType::Object),
                     ("object", ValueType::Object),
                     ("Object", ValueType::Object),
-
+                    // --- --- --- --- --- ---
                     ("Cl", ValueType::Class),
                     ("class", ValueType::Class),
                     ("Class", ValueType::Class),

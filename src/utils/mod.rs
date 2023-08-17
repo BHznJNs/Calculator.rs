@@ -1,21 +1,14 @@
-mod terminal;
 mod cursor;
+mod terminal;
 
 pub mod ascii;
 pub mod completer;
 pub mod line_editor;
 
-
 use std::{
-    io::{
-        self,
-        Write,
-    },
     fmt::Display,
-    fs::{
-        File,
-        OpenOptions,
-    },
+    fs::{File, OpenOptions},
+    io::{self, Write},
 };
 
 use terminal::Terminal;
