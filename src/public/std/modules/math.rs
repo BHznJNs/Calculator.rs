@@ -1,10 +1,10 @@
+use crate::public::error::math_error;
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::function::{BuildInFnParam, BuildInFunction};
 use crate::public::value::number::Number;
 use crate::public::value::oop::object::Object;
 use crate::public::value::value::{Value, ValueType};
-use crate::utils::print_line;
 
 use super::super::utils::get_val::get_val;
 use super::{BuildInFnCall, ObjectModule};
@@ -180,8 +180,11 @@ impl BuildInFnCall for MathModule {
                     Self::ASIN | Self::ACOS | Self::ATAN => {
                         if f < -1.0 || f > 1.0 {
                             // inverse trigonometric function error.
-                            print_line("The input for inverse trigonometric function should be less than 1 and greater than -1!");
-                            return Ok(Value::Number(Number::NotANumber));
+                            return Err(
+                                math_error(
+                                    "the input for inverse trigonometric function should be less than 1 and greater than -1"
+                                )?
+                            );
                         }
                         match self {
                             Self::ASIN => f.asin(),

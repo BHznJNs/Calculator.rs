@@ -35,14 +35,20 @@ pub fn type_error(param: Option<&str>, expected: Vec<ValueType>, found: ValueTyp
         print!(" for \"{}\"", name);
     }
     print_line(format!(": expected {}, found {}.", join(expected), found));
-    Err(())
+    return Err(());
+}
+
+const MATH_ERROR_NAME: &'static str = " MathError ";
+pub fn math_error(msg: &str) -> ErrorResult {
+    print_line(format!("{}: {}.", error_name_output(MATH_ERROR_NAME), msg));
+    return Err(());
 }
 
 const RANGE_ERROR_NAME: &'static str = " RangeError ";
 pub fn range_error<T: Display>(param: &str, expected: T, found: usize) -> ErrorResult {
     print!("{} for \"{}\"", error_name_output(RANGE_ERROR_NAME), param);
     print_line(format!(": expected {}, found {}.", expected, found));
-    Err(())
+    return Err(());
 }
 
 const SYNTAX_ERROR_NAME: &'static str = " SyntaxError ";
@@ -52,7 +58,7 @@ pub fn syntax_error(msg: &str) -> ErrorResult {
         error_name_output(SYNTAX_ERROR_NAME),
         msg
     ));
-    Err(())
+    return Err(());
 }
 
 const ASSIGNMENT_ERROR_NAME: &'static str = " SyntaxError ";
@@ -62,7 +68,7 @@ pub fn assignment_error(msg: &str) -> ErrorResult {
         error_name_output(ASSIGNMENT_ERROR_NAME),
         msg
     ));
-    Err(())
+    return Err(());
 }
 
 const REFERENCE_ERROR_NAME: &'static str = " ReferenceError ";
@@ -80,7 +86,7 @@ pub fn reference_error(type__: ReferenceType, target_name: &str) -> ErrorResult 
         },
         target_name,
     ));
-    Err(())
+    return Err(());
 }
 
 const IMPORT_ERROR_NAME: &'static str = " ImportError ";
@@ -90,7 +96,7 @@ pub fn import_error(msg: &str) -> ErrorResult {
         error_name_output(IMPORT_ERROR_NAME),
         msg
     ));
-    Err(())
+    return Err(());
 }
 
 // --- --- --- --- --- ---
@@ -124,5 +130,6 @@ pub fn internal_error(from: InternalComponent, msg: &str) -> ErrorResult {
         from,
         msg
     ));
-    Err(())
+    return Err(());
 }
+

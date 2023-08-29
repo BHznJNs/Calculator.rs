@@ -5,7 +5,7 @@ use std::rc::Rc;
 
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 
-use crate::public::error::{internal_error, type_error, InternalComponent};
+use crate::public::error::{internal_error, type_error, InternalComponent, math_error};
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::constants::{
     ARRAY_T, BOOL_T, CLASS_T, FUNCTION_T, LAZYEXPR_T, MAP_T, NUMBER_T, OBJECT_T, STRING_T,
@@ -22,7 +22,6 @@ use crate::public::value::number::Number;
 use crate::public::value::unique::Unique;
 use crate::public::value::value::{Value, ValueType};
 use crate::public::value::GetAddr;
-use crate::utils::print_line;
 
 use super::super::utils::get_val::get_val;
 use super::array::ArrayModule;
@@ -146,8 +145,7 @@ impl BuildInFnCall for BasicModule {
                 let lower_value = get_val("lower", scope)?;
 
                 if lower_value.get_f64() == Ok(0.0) {
-                    print_line("The dividend should not to be ZERO!");
-                    return Ok(Value::Number(Number::NotANumber));
+                    return Err(math_error("the dividend should not to be ZERO")?);
                 }
 
                 if let (Value::Number(Number::Int(upper)), Value::Number(Number::Int(lower))) =
