@@ -2,7 +2,6 @@ use crate::public::error::math_error;
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::function::{BuildInFnParam, BuildInFunction};
-use crate::public::value::number::Number;
 use crate::public::value::oop::object::Object;
 use crate::public::value::value::{Value, ValueType};
 
@@ -31,7 +30,6 @@ pub enum MathModule {
     SQRT,
     FLOOR,
     ROUND,
-    MOD,
 }
 
 impl ObjectModule for MathModule {
@@ -89,14 +87,6 @@ impl ObjectModule for MathModule {
             ],
             identi: BuildInFnIdenti::Math(Self::LOG),
         };
-        let modulo = BuildInFunction {
-            params: vec![
-                BuildInFnParam(ValueType::Object, "self"),
-                BuildInFnParam(ValueType::Number, "base"),
-                BuildInFnParam(ValueType::Number, "target"),
-            ],
-            identi: BuildInFnIdenti::Math(Self::MOD),
-        };
 
         let module_obj_props = vec![
             (String::from("sin"), Value::from(sin)),
@@ -119,7 +109,6 @@ impl ObjectModule for MathModule {
             (String::from("sqrt"), Value::from(sqrt)),
             (String::from("floor"), Value::from(floor)),
             (String::from("round"), Value::from(round)),
-            (String::from("mod"), Value::from(modulo)),
         ];
         return Object::new(module_obj_props, None);
     }
@@ -135,25 +124,6 @@ impl BuildInFnCall for MathModule {
                 let base_f = base.get_f64()?;
                 let nature_f = natural.get_f64()?;
                 nature_f.log(base_f)
-            }
-            Self::MOD => {
-                let base = get_val("base", scope)?;
-                let target = get_val("target", scope)?;
-
-                let (Value::Number(number1), Value::Number(number2)) = (base, target) else {
-                    unreachable!()
-                };
-                // the latter number can not be ZERO
-                if number2.float_value() == 0.0 {
-                    return Ok(Value::Number(Number::NotANumber));
-                }
-                if let (Number::Int(i1), Number::Int(i2)) = (number1, number2) {
-                    return Ok(Value::Number(Number::Int(i1 % i2)));
-                } else {
-                    let f1 = number1.float_value();
-                    let f2 = number2.float_value();
-                    f1 % f2
-                }
             }
             _ => {
                 let input = get_val("input", scope)?;

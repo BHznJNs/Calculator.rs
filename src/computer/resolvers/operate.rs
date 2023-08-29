@@ -1,5 +1,6 @@
 use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::error::{internal_error, syntax_error, InternalComponent};
+use crate::public::value::number::Number;
 use crate::public::value::symbols::Symbols;
 use crate::public::value::value::Value;
 
@@ -15,7 +16,8 @@ pub fn operate(val1: Value, val2: Value, operator: Symbols) -> Result<Value, ()>
                 Symbols::Minus => Value::Number(num1 - num2),
                 Symbols::Multiply => Value::Number(num1 * num2),
                 Symbols::Divide => Value::Number(num1 / num2),
-                Symbols::Power => Value::Number(num1.pow(num2)),
+                Symbols::Mod => Value::Number(Number::modulo(num1, num2)),
+                Symbols::Power => Value::Number(Number::pow(num1, num2)),
                 Symbols::LessThan => Value::from(num1 < num2),
                 Symbols::MoreThan => Value::from(num1 > num2),
                 Symbols::NotEqual => Value::from(num1 != num2),

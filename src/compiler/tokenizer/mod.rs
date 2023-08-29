@@ -176,7 +176,7 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
                     tokens.push_back(Token::Symbol(Symbols::Minus));
                 }
             }
-            '*' | '/' | '^' | '!' | '<' | '>' | '&' | '|' => {
+            '*' | '/' | '%' | '^' | '!' | '<' | '>' | '&' | '|' => {
                 last_type = TokenType::Symbol;
                 tokens.push_back(Token::Symbol(Symbols::from(ch)));
             }

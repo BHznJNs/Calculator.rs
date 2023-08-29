@@ -145,7 +145,7 @@ impl BuildInFnCall for BasicModule {
                 let lower_value = get_val("lower", scope)?;
 
                 if lower_value.get_f64() == Ok(0.0) {
-                    return Err(math_error("the dividend should not to be ZERO")?);
+                    return Err(math_error("the divisor should not to be ZERO")?);
                 }
 
                 if let (Value::Number(Number::Int(upper)), Value::Number(Number::Int(lower))) =

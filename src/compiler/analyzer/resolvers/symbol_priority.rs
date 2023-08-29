@@ -3,11 +3,12 @@ use crate::public::{
     error::{internal_error, InternalComponent},
 };
 
-const PRIORITY: [i8; 14] = [
+const PRIORITY: [i8; 15] = [
     2, // Symbols::Plus
     2, // Symbols::Minus
     3, // Symbols::Multiply
     3, // Symbols::Divide
+    3, // Symbols::Mod
     4, // Symbols::Power
     5, // Symbols::Not
     1, // Symbols::LessThan

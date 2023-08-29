@@ -8,6 +8,7 @@ pub enum Symbols {
     Minus,
     Multiply,
     Divide,
+    Mod,
     Power,
 
     Not,
@@ -103,6 +104,7 @@ impl From<char> for Symbols {
             '-' => Self::Minus,
             '*' => Self::Multiply,
             '/' => Self::Divide,
+            '%' => Self::Mod,
             '^' => Self::Power,
             '!' => Self::Not,
             '&' => Self::AndSign,
@@ -122,6 +124,7 @@ impl fmt::Display for Symbols {
             Self::Minus => write!(f, "Minus"),
             Self::Multiply => write!(f, "Multiply"),
             Self::Divide => write!(f, "Divide"),
+            Self::Mod => write!(f, "Mod"),
             Self::Power => write!(f, "Power"),
 
             Self::Not => write!(f, "Not"),

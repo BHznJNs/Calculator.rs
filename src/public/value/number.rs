@@ -3,7 +3,6 @@ use std::fmt;
 use std::ops::{Add, Div, Mul, Sub};
 
 use crate::public::error::{internal_error, InternalComponent, math_error};
-use crate::utils::print_line;
 
 #[cfg_attr(debug_assertions, derive(Debug))]
 #[derive(Clone, Copy)]
@@ -16,8 +15,41 @@ pub enum Number {
 }
 
 impl Number {
-    pub fn pow(self, target: Self) -> Self {
-        match self {
+    pub fn modulo(dividend: Self, divisor: Self) -> Self{
+        if let (Self::NotANumber, _) | (_, Self::NotANumber) = (dividend, divisor) {
+            return Self::NotANumber;
+        }
+
+        // the divisor can not be ZERO
+        if divisor.float_value() == 0.0 {
+            math_error("modulo by zero").unwrap_err();
+            return Self::NotANumber;
+        }
+
+        if let (Self::Float(_), _) | (_, Self::Float(_)) = (dividend, divisor) {
+            let f1 = dividend.float_value();
+            let f2 = divisor.float_value();
+            return Number::Float(f1 % f2);
+        }
+
+        match (dividend, divisor) {
+            (Self::Int(i), Self::Fraction(upper, lower)) | (Self::Fraction(upper, lower), Self::Int(i)) => {
+                let temp1 = i * lower;
+                let temp2 = upper * lower;
+                Number::Fraction(temp1 % temp2, lower)
+            }
+            (Self::Fraction(upper1, lower1), Self::Fraction(upper2, lower2)) => {
+                let lower_lcm = Self::lcm(lower1, lower2);
+                let multed_upper1 = upper1 * (lower_lcm / lower1);
+                let multed_upper2 = upper2 * (lower_lcm / lower2);
+                Number::Fraction(multed_upper1 % multed_upper2, lower_lcm).reduce().unwrap() 
+            }
+            _ => unreachable!()
+        }
+    }
+
+    pub fn pow(base: Self, target: Self) -> Self {
+        match base {
             Self::Int(num1) => match target {
                 Self::Int(num2) => {
                     if num2 >= 0 {
@@ -43,11 +75,11 @@ impl Number {
                     Self::Fraction(upper_powed, lower_powed).reduce().unwrap()
                 }
                 Self::Float(num2) => {
-                    let f_value = self.float_value();
+                    let f_value = base.float_value();
                     Self::Float(f_value.powf(num2))
                 }
                 Self::Fraction(_, _) => {
-                    let self_f = self.float_value();
+                    let self_f = base.float_value();
                     let target_f = target.float_value();
                     Self::Float(self_f.powf(target_f))
                 }
@@ -300,7 +332,7 @@ impl Div for Number {
 
         // when the divisor is ZERO
         if other.float_value() == 0.0 {
-            math_error("the dividend should not to be ZERO").unwrap_err();
+            math_error("the divisor should not to be ZERO").unwrap_err();
             return Number::NotANumber;
         }
 

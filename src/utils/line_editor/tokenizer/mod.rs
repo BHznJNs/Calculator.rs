@@ -96,7 +96,7 @@ pub fn tokenize(source: &str) -> TokenVec {
                 tokens.push(Token::new(TextType::Paren, String::from(ch)));
             }
             // Computing symbols
-            '+' | '-' | '*' | '/' | '^' | '!' | '<' | '>' | '=' | '.' | '&' | '|' => {
+            '+' | '-' | '*' | '/' | '%' | '^' | '!' | '<' | '>' | '=' | '.' | '&' | '|' => {
                 last_type = TokenType::Symbol;
                 tokens.push(Token::new(TextType::Symbol, String::from(ch)));
             }
