@@ -3,6 +3,10 @@ out 1 + 2 # 3
 out 1 - 2 # -1
 out 1 * 2 # 2
 out 1 / 2 # 0.5000000000
+
+# modular operator
+out 8 % 2 # 0
+# power operator
 out 2 ^ 2 # 4
 
 # not operator

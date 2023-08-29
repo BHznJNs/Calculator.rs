@@ -33,6 +33,7 @@ impl Number {
         }
 
         match (dividend, divisor) {
+            (Self::Int(i1), Self::Int(i2)) => Number::Int(i1 % i2),
             (Self::Int(i), Self::Fraction(upper, lower)) | (Self::Fraction(upper, lower), Self::Int(i)) => {
                 let temp1 = i * lower;
                 let temp2 = upper * lower;
