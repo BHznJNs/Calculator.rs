@@ -3,7 +3,8 @@ enum State {
     Code,
 }
 
-pub fn process(source: String) -> String {
+// remove indents and comments in code line
+pub fn process(source: &str) -> String {
     let mut result = String::new();
     let mut state = State::Indent;
 

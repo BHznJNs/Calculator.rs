@@ -19,7 +19,7 @@ use line::Line;
 pub use signal::Signal;
 use state::LineState;
 
-use crate::public::env::ENV_OPTION;
+use crate::{public::env::ENV, utils::{terminal::Terminal, cursor::Cursor, print_line}};
 use crate::public::run_time::scope::Scope;
 
 use candidate::Candidate;
@@ -27,7 +27,7 @@ use candidate::Candidate;
 use analyzer::analyze;
 use tokenizer::{TextType, Token};
 
-use super::{cursor::Cursor, print_line, terminal::Terminal};
+// use super::{cursor::Cursor, print_line, terminal::Terminal};
 
 pub struct LineEditor {
     prompt: &'static str,
@@ -191,7 +191,7 @@ impl LineEditor {
             token: &Token,
             range: Range<usize>,
         ) {
-            if unsafe { ENV_OPTION.support_ansi } {
+            if unsafe { ENV.options.support_ansi } {
                 let mut colored = token.colored(range);
                 // if is history, line text will be darken
                 if is_history {

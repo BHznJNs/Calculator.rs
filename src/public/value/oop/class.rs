@@ -3,7 +3,7 @@ use std::rc::Rc;
 
 use crossterm::style::Stylize;
 
-use crate::public::env::ENV_OPTION;
+use crate::public::env::ENV;
 use crate::public::error::{reference_error, type_error, ReferenceType};
 use crate::public::value::array::ArrayLiteral;
 use crate::public::value::function::Function;
@@ -50,7 +50,7 @@ impl Class {
 
         // init completer
         let mut completer = None;
-        if unsafe { ENV_OPTION.is_repl } {
+        if unsafe { ENV.options.use_repl } {
             let mut temp = Completer::new();
             temp.extend(prop_name_vec);
             completer = Some(temp.into())
@@ -105,7 +105,7 @@ impl Class {
     }
 
     pub fn display_methods(f: &mut fmt::Formatter<'_>, cls: &Class, level: usize) -> fmt::Result {
-        let class_method_disp = if unsafe { ENV_OPTION.support_ansi } {
+        let class_method_disp = if unsafe { ENV.options.support_ansi } {
             Class::METHOD_DISP_STR.cyan().to_string()
         } else {
             String::from(Class::METHOD_DISP_STR)

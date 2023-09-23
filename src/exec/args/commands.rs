@@ -6,20 +6,23 @@ pub enum CommandArg {
     Help,
     Timer,
     Headfile,
+    Editor,
 }
 
-pub const COMMAND_COUNT: usize = 4;
+pub const COMMAND_COUNT: usize = 5;
 pub const COMMANDS: [[&'static str; 2]; COMMAND_COUNT] = [
     ["-v", "--version"],
     ["-h", "--help"],
     ["-t", "--timer"],
     ["-hf", "--headfile"],
+    ["-e", "--editor"],
 ];
 pub const COMMAND_DESCRIPTIONS: [&'static str; COMMAND_COUNT] = [
     "print current executable file version and exit.",
     "print this help message.",
     "print extra execute duration message code execution.",
     "directly import variables in head files, must with script paths following.",
+    "open build-in code editor",
 ];
 
 impl CommandArg {
@@ -33,6 +36,8 @@ impl CommandArg {
             (COMMANDS[2][1], CommandArg::Timer),
             (COMMANDS[3][0], CommandArg::Headfile),
             (COMMANDS[3][1], CommandArg::Headfile),
+            (COMMANDS[4][0], CommandArg::Editor),
+            (COMMANDS[4][1], CommandArg::Editor),
         ])
     }
 }

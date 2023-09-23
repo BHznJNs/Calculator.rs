@@ -2,7 +2,7 @@ use std::cell::RefCell;
 use std::fmt;
 use std::rc::Rc;
 
-use crate::public::env::ENV_OPTION;
+use crate::public::env::ENV;
 use crate::public::error::{assignment_error, reference_error, ReferenceType};
 use crate::public::value::oop::class::Class;
 use crate::public::value::{self, ComplexStructure, GetAddr};
@@ -32,7 +32,7 @@ impl Object {
             }
             None => {
                 let completer = {
-                    if unsafe { ENV_OPTION.is_repl } {
+                    if unsafe { ENV.options.use_repl } {
                         let mut words = vec![];
                         let mut temp = Completer::new();
                         for (k, _) in &params {

@@ -1,9 +1,10 @@
 mod cursor;
 mod terminal;
+mod loop_traverser;
 
 pub mod ascii;
 pub mod completer;
-pub mod line_editor;
+pub mod editor;
 
 use std::{
     fmt::Display,
@@ -11,7 +12,25 @@ use std::{
     io::{self, Write},
 };
 
+use cursor::Cursor;
 use terminal::Terminal;
+use loop_traverser::LoopTraverser;
+
+// returns the bit count of number
+// e.g. `10` -> 2
+//      `1`  -> 1
+pub fn number_bit_count(mut num: usize) -> usize {
+    if num == 0 {
+        return 1;
+    }
+
+    let mut count = 0;
+    while num > 0 {
+        num /= 10;
+        count += 1;
+    }
+    return count;
+}
 
 // this function is used to replace Rust macro `println!`
 // since the println! macro can not normally
@@ -23,6 +42,7 @@ pub fn print_line<T: Display>(content: T) {
 
 // output something into file
 // this function is used to debug.
+#[allow(dead_code)]
 pub fn log(content: &str) -> io::Result<()> {
     File::create("log.txt")?;
     let mut file = OpenOptions::new().write(true).open("log.txt")?;

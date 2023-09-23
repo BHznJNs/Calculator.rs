@@ -1,85 +1,69 @@
 pub mod commands;
 
-use std::{collections::VecDeque, io, process};
+use std::{collections::VecDeque, io};
 
-use crate::public::{
-    env::{Env, ENV_OPTION},
-    run_time::scope::Scope,
+use crate::{
+    public::{
+        env::{Env, ENV},
+        error::{internal_error, InternalComponent},
+        run_time::scope::Scope,
+    },
+    ProgramMode,
 };
 
-use super::{headfile, repl::repl, script};
+use super::headfile;
 use commands::CommandArg;
 
-enum Mode {
-    REPL,
-    Script,
-}
+pub fn args_resolve(mut args: VecDeque<String>, scope: &mut Scope) -> io::Result<ProgramMode> {
+    if args.len() == 0 {
+        return Ok(ProgramMode::REPL);
+    }
 
-fn args_resolve(
-    mode: Mode,
-    mut args: VecDeque<String>,
-    mut calc_env: Env,
-    mut scope: Scope,
-) -> io::Result<()> {
+    let mut mode;
     let command_map = CommandArg::map();
+    if args[0].starts_with('-') || args[0].starts_with("--") {
+        mode = ProgramMode::REPL;
+        unsafe { ENV.options.use_repl = true };
+    } else {
+        // first argument as file path
+        mode = ProgramMode::Script;
+        let script_path = args.pop_front().unwrap();
+        let static_path = Box::leak(Box::new(script_path));
+        unsafe { ENV.script_path = Some(static_path) };
+    }
 
-    loop {
-        // ensure index is not out of range
-        if args.len() == 0 {
-            break;
-        }
-
-        let current_arg = args.pop_front().unwrap();
-        if let Some(command) = command_map.get::<str>(&current_arg) {
+    for arg in args.iter() {
+        if let Some(command) = command_map.get::<str>(arg) {
             match command {
-                CommandArg::Timer => unsafe { ENV_OPTION.timer = true },
-                CommandArg::Help => {
-                    calc_env.help_output();
-                    process::exit(0);
+                CommandArg::Help | CommandArg::Version => {
+                    match command {
+                        CommandArg::Help => Env::help_output(),
+                        CommandArg::Version => Env::version_output(),
+                        _ => unreachable!(),
+                    }
+                    mode = ProgramMode::ToBeExited;
                 }
-                CommandArg::Version => {
-                    calc_env.version_output();
-                    process::exit(0);
-                }
+                CommandArg::Timer => unsafe { ENV.options.timer = true },
                 CommandArg::Headfile => {
-                    // remaining args as headfile
-                    calc_env.headfiles = args.clone();
-                    headfile::resolve(args, &mut scope);
+                    // regard remain arguments as headfile path.
+                    let headfile_paths = args;
+                    headfile::resolve(&headfile_paths, scope);
+
+                    let temp = Vec::from(headfile_paths);
+                    unsafe { ENV.headfiles = Box::leak(Box::new(temp)) };
                     break;
+                }
+                CommandArg::Editor => {
+                    if mode != ProgramMode::ToBeExited {
+                        mode = ProgramMode::Editor;
+                    }
                 }
             }
         } else {
-            println!("Invalid command: {}.", current_arg);
-            process::exit(0);
+            let msg = format!("Invalid argument: {}.", arg);
+            internal_error(InternalComponent::InternalFn, &msg).unwrap_err();
+            mode = ProgramMode::ToBeExited;
         }
     }
-
-    match mode {
-        Mode::REPL => repl(&mut scope, calc_env)?,
-        Mode::Script => script::env_resolve(calc_env, &mut scope),
-    }
-    return Ok(());
-}
-
-pub fn entry(mut args: VecDeque<String>, mut calc_env: Env) -> io::Result<()> {
-    let mut scope = Scope::init();
-
-    if args.len() == 0 {
-        // if no argument, enter REPL directly.
-        repl(&mut scope, calc_env)?;
-        return Ok(());
-    }
-
-    // consider execute mode
-    let mode = if args[0].starts_with('-') || args[0].starts_with("--") {
-        // REPL mode
-        Mode::REPL
-    } else {
-        // first arg is script path
-        let script_path = args.pop_front().unwrap();
-        calc_env.script_path = Some(script_path);
-        Mode::Script
-    };
-
-    return args_resolve(mode, args, calc_env, scope);
+    return Ok(mode);
 }

@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::public::env::ENV_OPTION;
+use crate::public::env::ENV;
 use crossterm::style::Stylize;
 
 use super::tokenizer::{tokenize, TokenVec};
@@ -18,7 +18,7 @@ impl Line {
     pub fn new(line_count: usize) -> Self {
         let label_str = line_count.to_string();
         let label_fmted_width = label_str.len() + 1; // `1` is space width
-        let label_fmted = if unsafe { ENV_OPTION.support_ansi } {
+        let label_fmted = if unsafe { ENV.options.support_ansi } {
             format!(" {}", label_str.black().on_white())
         } else {
             format!(" {}", label_str)

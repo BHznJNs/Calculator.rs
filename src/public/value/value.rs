@@ -5,7 +5,7 @@ use std::rc::Rc;
 
 use crossterm::style::Stylize;
 
-use crate::public::env::ENV_OPTION;
+use crate::public::env::ENV;
 use crate::public::error::{internal_error, InternalComponent};
 
 use super::super::compile_time::ast::ast_enum::ASTNode;
@@ -163,7 +163,7 @@ impl Value {
     // formater for string typed value
     pub fn str_format(&self) -> Result<String, ()> {
         if let Self::String(str) = self {
-            if unsafe { ENV_OPTION.support_ansi } {
+            if unsafe { ENV.options.support_ansi } {
                 let temp = str.as_ref().borrow();
                 let result = format!("\"{}\"", temp).green().to_string();
                 Ok(result)
@@ -331,7 +331,7 @@ impl fmt::Display for Value {
             Self::Class(cls) => write!(f, "{}", cls),
 
             _ => {
-                if unsafe { ENV_OPTION.support_ansi } {
+                if unsafe { ENV.options.support_ansi } {
                     match self {
                         Self::Boolean(bool_val) => {
                             write!(f, "{}", bool_val.to_string().dark_yellow())

@@ -5,13 +5,13 @@ use std::time::Instant;
 
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 
-use super::attempt::attempt;
-use crate::public::env::{Env, ENV_OPTION};
+use super::attempt;
+use crate::public::env::{Env, ENV};
 use crate::public::error::{import_error, syntax_error};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
 use crate::utils::completer::Completer;
-use crate::utils::line_editor::{LineEditor, Signal};
+use crate::utils::editor::{LineEditor, Signal};
 use crate::utils::print_line;
 
 const PROMPT: &'static str = "> ";
@@ -24,26 +24,26 @@ fn import_all(scope: &mut Scope) -> Result<(), ()> {
     scope.import_std("Map")?;
     scope.import_std("FS")?;
     scope.import_std("BitOps")?;
-    Ok(())
+    return Ok(());
 }
 
 #[cfg(windows)]
 fn is_ansi_supported_setter() {
     use crossterm::ansi_support::supports_ansi;
-    unsafe { ENV_OPTION.support_ansi = supports_ansi() };
+
+    unsafe { ENV.options.support_ansi = supports_ansi() };
 }
 
 #[cfg(not(windows))]
 fn is_ansi_supported_setter() {
-    unsafe { ENV_OPTION.support_ansi = true };
+    unsafe { ENV.options.support_ansi = true };
 }
 
-pub fn repl(scope: &mut Scope, calc_env: Env) -> io::Result<()> {
-    unsafe { ENV_OPTION.is_repl = true };
+pub fn repl(scope: &mut Scope) -> io::Result<()> {
     scope.completer = Some(Completer::new());
 
     // print program name and version
-    println!("Calculator.rs v{}", calc_env.version);
+    println!("Calculator.rs v{}", Env::VERSION);
     // set is terminal support ANSI
     is_ansi_supported_setter();
     // import stantard libraries
@@ -69,7 +69,7 @@ pub fn repl(scope: &mut Scope, calc_env: Env) -> io::Result<()> {
         };
 
         let result: Result<Value, ()>;
-        if unsafe { ENV_OPTION.timer } {
+        if unsafe { ENV.options.timer } {
             let now = Instant::now();
             result = attempt(&line_content, scope);
             let elapsed_time = now.elapsed();

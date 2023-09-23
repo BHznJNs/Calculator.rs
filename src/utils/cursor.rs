@@ -25,6 +25,12 @@ impl Cursor {
         execute!(io::stdout(), cursor::MoveToRow(target_row as u16))
     }
 
+    pub fn up(cell: usize) -> io::Result<()> {
+        execute!(io::stdout(), cursor::MoveUp(cell as u16))
+    }
+    pub fn down(cell: usize) -> io::Result<()> {
+        execute!(io::stdout(), cursor::MoveDown(cell as u16))
+    }
     pub fn left(cell: usize) -> io::Result<()> {
         execute!(io::stdout(), cursor::MoveLeft(cell as u16))
     }

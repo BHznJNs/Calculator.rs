@@ -1,45 +1,42 @@
-use std::collections::VecDeque;
-
 use crate::exec::args::commands;
+
+pub struct Env {
+    pub self_name: &'static str,
+
+    pub script_path: Option<&'static str>,
+    pub headfiles: &'static[String],
+
+    pub options: EnvOption,
+}
 
 pub struct EnvOption {
     pub timer: bool,
-    pub is_repl: bool,
+    pub use_repl: bool,
+    pub use_editor: bool,
     pub support_ansi: bool,
 }
 
-pub static mut ENV_OPTION: EnvOption = EnvOption {
-    timer: false,
-    is_repl: false,
-    support_ansi: false,
+pub static mut ENV: Env = Env {
+    self_name: "",
+    script_path: None,
+    headfiles: &[],
+
+    options: EnvOption {
+        timer: false,
+        use_repl: false,
+        use_editor: false,
+        support_ansi: false,
+    },
 };
 
-// --- --- --- --- --- ---
-
-pub struct Env {
-    pub self_name: String,
-    pub version: &'static str,
-
-    pub script_path: Option<String>,
-    pub headfiles: VecDeque<String>,
-}
-
 impl Env {
-    pub fn init(self_name: String) -> Self {
-        Self {
-            self_name,
-            version: env!("CARGO_PKG_VERSION"),
+    pub const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
-            script_path: None,
-            headfiles: VecDeque::<String>::new(),
-        }
+    pub fn version_output() {
+        println!("Calculator.rs version {}", Self::VERSION);
     }
 
-    pub fn version_output(&self) {
-        println!("Calculator.rs version {}", self.version);
-    }
-
-    pub fn help_output(&self) {
+    pub fn help_output() {
         println!("Usage: calculator [SCRIPT_PATH] [OPTIONS]\n");
 
         println!("Options:");
