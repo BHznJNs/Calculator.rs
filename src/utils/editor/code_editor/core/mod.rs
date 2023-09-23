@@ -14,7 +14,7 @@ use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
 
-use crate::utils::{number_bit_count, Cursor, Terminal};
+use crate::{utils::{number_bit_count, Cursor, Terminal}, exec::script::{run_entry, run}, public::run_time::scope::Scope};
 
 use dashboard::EditorDashboard;
 use init::EditorInit;
@@ -742,7 +742,7 @@ impl CodeEditor {
         return Ok(());
     }
 
-    pub fn cycle(&mut self) -> io::Result<Option<String>> {
+    pub fn cycle(&mut self, scope: &mut Scope) -> io::Result<()> {
         loop {
             let Some(key) = Terminal::get_key() else {
                 continue;
@@ -763,8 +763,13 @@ impl CodeEditor {
                     'f' => self.toggle_state(EditorState::Finding)?,
                     'r' => self.toggle_state(EditorState::Replacing)?,
 
-                    'e' => return Ok(Some(self.content())),
-                    
+                    'e' => {
+                        self.close()?;
+                        let codes = self.content();
+                        run_entry(&codes, scope, run);
+                        return Ok(())
+                    }
+
                     // ignore other Ctrl shotcuts
                     _ => {}
                 }
@@ -823,6 +828,6 @@ impl CodeEditor {
             self.dashboard_cursor_pos_refresh()?;
         }
         self.close()?;
-        return Ok(None);
+        return Ok(());
     }
 }

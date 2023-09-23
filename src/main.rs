@@ -45,7 +45,7 @@ fn main() -> io::Result<()> {
                 editor.read_file(p)?;
             }
             editor.init()?;
-            editor.cycle()?;
+            editor.cycle(&mut scope)?;
         }
     }
     return Ok(());
