@@ -8,4 +8,4 @@ repository = "https://github.com/BHznJNs/Calculator.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-crossterm = "0.26.1"
+crossterm = "0.27.0"
