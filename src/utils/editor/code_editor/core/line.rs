@@ -2,12 +2,13 @@ use std::io;
 
 use crossterm::style::Stylize;
 
-use crate::utils::{number_bit_count, Cursor, Terminal};
-
-use super::super::{direction::Direction, text_area::TextArea};
+use crate::utils::{
+    editor::{direction::Direction, text_area::TextArea, tokenizer::TokenSequence},
+    number_bit_count, Cursor, Terminal,
+};
 
 pub struct EditorLine {
-    text_area: TextArea,
+    text_area: TextArea<TokenSequence>,
 }
 
 // state methods

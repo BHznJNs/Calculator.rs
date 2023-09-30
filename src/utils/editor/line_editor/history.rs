@@ -1,60 +1,50 @@
-use std::rc::Rc;
+use crate::utils::LoopTraverser;
 
-pub struct History {
-    index: usize,
-    content_list: Vec<Rc<String>>,
+pub struct EditorHistory {
+    list: LoopTraverser<String>,
+    cached_content: String,
+
+    // is using history content
+    pub use_history: bool,
 }
 
-impl History {
+impl EditorHistory {
     pub fn new() -> Self {
         Self {
-            index: 0,
-            content_list: vec![],
+            list: LoopTraverser::new(false),
+            cached_content: String::new(),
+            use_history: false,
         }
     }
 
-    pub fn previous(&mut self) -> Option<Rc<String>> {
-        let index = self.index;
-        let content_len = self.content_list.len();
-
-        if index < content_len {
-            self.index += 1;
-            Some(self.content_list[content_len - index - 1].clone())
+    pub fn next<'a>(&'a mut self) -> Option<&'a String> {
+        let previous = self.list.previous();
+        if previous.is_none() {
+            self.use_history = false;
+            return Some(&self.cached_content);
         } else {
-            None
+            return previous;
         }
     }
-    pub fn next(&mut self) -> Option<Rc<String>> {
-        if self.index > 0 {
-            self.index -= 1;
-        }
-
-        if self.index > 0 {
-            Some(self.content_list[self.content_list.len() - self.index].clone())
-        } else {
-            None
-        }
+    pub fn previous<'a>(&'a mut self) -> Option<&'a String> {
+        self.use_history = true;
+        self.list.next()
     }
 
-    // --- --- --- --- --- ---
+    #[inline]
+    pub fn set_cached(&mut self, content: String) {
+        self.cached_content = content.to_owned();
+    }
 
+    #[inline]
+    pub fn append(&mut self, element: String) {
+        self.reset_index();
+        self.list.push_front(element);
+    }
+
+    #[inline]
     pub fn reset_index(&mut self) {
-        self.index = 0;
-    }
-
-    pub fn get_current(&self) -> Option<String> {
-        let (index, content_list) = (self.index, &self.content_list);
-
-        if index != 0 {
-            let current_candidate_ref = content_list[content_list.len() - index].as_ref();
-            Some(current_candidate_ref.clone())
-        } else {
-            None
-        }
-    }
-
-    pub fn append(&mut self, line_content: String) {
-        self.index = 0;
-        self.content_list.push(Rc::new(line_content));
+        self.cached_content.clear();
+        self.list.reset_index();
     }
 }

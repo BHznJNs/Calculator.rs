@@ -14,8 +14,6 @@ use crate::utils::completer::Completer;
 use crate::utils::editor::{LineEditor, Signal};
 use crate::utils::print_line;
 
-const PROMPT: &'static str = "> ";
-
 fn import_all(scope: &mut Scope) -> Result<(), ()> {
     scope.import_std("Basic")?;
     scope.import_std("Math")?;
@@ -52,23 +50,23 @@ pub fn repl(scope: &mut Scope) -> io::Result<()> {
         panic!()
     }
 
+    let mut editor = LineEditor::new()?;
     enable_raw_mode()?;
 
-    let mut le = LineEditor::new(PROMPT);
     loop {
         support_keyboard_enhancement::resolve()?;
 
-        let sig = le.readline(scope)?;
+        let sig = editor.readline(scope)?;
         let line_content = match sig {
             Signal::NewLine(line) => line,
             Signal::Interrupt => break,
             Signal::NonASCII => {
-                syntax_error("non-ASCII character").unwrap_err();
+                syntax_error("Non-ASCII character").unwrap_err();
                 continue;
             }
         };
 
-        let result: Result<Value, ()>;
+        let result;
         if unsafe { ENV.options.timer } {
             let now = Instant::now();
             result = attempt(&line_content, scope);
@@ -91,5 +89,6 @@ pub fn repl(scope: &mut Scope) -> io::Result<()> {
             }
         }
     }
-    disable_raw_mode()
+    disable_raw_mode()?;
+    return Ok(());
 }

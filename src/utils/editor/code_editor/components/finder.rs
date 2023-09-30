@@ -3,7 +3,7 @@ use std::io;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
 use crate::utils::{
-    editor::code_editor::cursor_pos::EditorCursorPos, loop_traverser::LoopTraverser,
+    editor::{code_editor::cursor_pos::EditorCursorPos, text_area::TextArea}, LoopTraverser,
 };
 
 use super::{
@@ -20,12 +20,15 @@ pub struct Finder {
 
 impl Finder {
     pub fn new() -> Self {
-        Self {
+        let mut controller = Self::init_controller();
+        controller.text_area.set_placeholder(ComponentHistory::HISTORY_PLACEHOLDER);
+
+        return Self {
             match_list: LoopTraverser::new(true),
 
             history: ComponentHistory::new(),
-            comp: Self::init_controller(),
-        }
+            comp: controller,
+        };
     }
 
     #[inline]
@@ -85,7 +88,13 @@ impl Component for Finder {
         match key.code {
             KeyCode::Up | KeyCode::Down => {
                 let history_content = match key.code {
-                    KeyCode::Up => self.history.previous(),
+                    KeyCode::Up => {
+                        if !self.history.use_history {
+                            let current_content = self.content().to_owned();
+                            self.history.set_cached(current_content);
+                        }
+                        self.history.previous()
+                    }
                     KeyCode::Down => self.history.next(),
                     _ => unreachable!(),
                 };
@@ -98,9 +107,15 @@ impl Component for Finder {
             }
             KeyCode::Enter => {
                 let current_target = self.content();
+                if let Some(last_appended) = self.history.last() {
+                    // avoid repetitive history content
+                    if current_target == last_appended {
+                        return Ok(());
+                    }
+                }
                 self.history.append(current_target.to_owned());
             }
-            k if ComponentController::is_editing_key(k) => {
+            k if TextArea::is_editing_key(k) => {
                 self.history.reset_index();
                 self.comp.edit(k)?;
             }

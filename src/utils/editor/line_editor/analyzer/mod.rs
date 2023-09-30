@@ -1,7 +1,6 @@
 use crate::public::run_time::scope::Scope;
 use crate::public::value::value::Value;
-
-use super::tokenizer::{TextType, TokenVec};
+use crate::utils::editor::tokenizer::{TokenVec, TokenType};
 
 fn get_end_part(tokens: &TokenVec) -> Option<Vec<String>> {
     // example:
@@ -21,7 +20,7 @@ fn get_end_part(tokens: &TokenVec) -> Option<Vec<String>> {
     }
 
     let mut result = vec![];
-    let mut last_type = TextType::Comment;
+    let mut last_type = TokenType::Comment;
 
     // traverse the inputed TokenVec reversedly
     for t in tokens.iter().rev() {
@@ -31,9 +30,9 @@ fn get_end_part(tokens: &TokenVec) -> Option<Vec<String>> {
         }
 
         // only allow "." and identifier
-        if t.type__ == TextType::Variable {
+        if t.type__ == TokenType::Identifier {
             result.push(t.content.clone());
-        } else if t.type__ == TextType::Symbol && t.content.eq(".") {
+        } else if t.type__ == TokenType::Symbol && t.content.eq(".") {
             // do nothing
         } else {
             break;

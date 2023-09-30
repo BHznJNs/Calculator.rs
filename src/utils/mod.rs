@@ -1,6 +1,6 @@
 mod cursor;
-mod terminal;
 mod loop_traverser;
+mod terminal;
 
 pub mod ascii;
 pub mod completer;
@@ -13,8 +13,8 @@ use std::{
 };
 
 use cursor::Cursor;
-use terminal::Terminal;
 use loop_traverser::LoopTraverser;
+use terminal::Terminal;
 
 // returns the bit count of number
 // e.g. `10` -> 2
@@ -43,10 +43,10 @@ pub fn print_line<T: Display>(content: T) {
 // output something into file
 // this function is used to debug.
 #[allow(dead_code)]
-pub fn log(content: &str) -> io::Result<()> {
+pub fn log<T: Display>(content: T) -> io::Result<()> {
     File::create("log.txt")?;
     let mut file = OpenOptions::new().write(true).open("log.txt")?;
-    file.write(content.as_bytes())?;
+    file.write(content.to_string().as_bytes())?;
     file.flush()?;
     return Ok(());
 }

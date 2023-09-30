@@ -20,5 +20,5 @@ pub fn resolve() -> io::Result<()> {
             )
         )?;
     }
-    Ok(())
+    return Ok(());
 }

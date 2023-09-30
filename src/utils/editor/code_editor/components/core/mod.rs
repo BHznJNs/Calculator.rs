@@ -8,7 +8,7 @@ use std::io;
 
 use crossterm::event::KeyEvent;
 
-use crate::utils::editor::code_editor::text_area::TextArea;
+use crate::utils::editor::text_area::TextArea;
 
 pub trait Component {
     const PROMPT: &'static str;

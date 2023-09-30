@@ -2,7 +2,7 @@ use std::io;
 
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
-use crate::utils::editor::code_editor::cursor_pos::EditorCursorPos;
+use crate::utils::editor::{code_editor::cursor_pos::EditorCursorPos, text_area::TextArea};
 
 use super::{core::ComponentController, Component};
 
@@ -68,7 +68,7 @@ impl Component for Positioner {
                     self.target = pos
                 }
             }
-            k if ComponentController::is_editing_key(k) => self.comp.edit(k)?,
+            k if TextArea::is_editing_key(k) => self.comp.edit(k)?,
             _ => {}
         }
         return Ok(());

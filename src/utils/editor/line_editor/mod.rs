@@ -1,460 +1,104 @@
 mod analyzer;
 mod line;
 mod signal;
-mod state;
-mod tokenizer;
 
 mod candidate;
 mod history;
 
-use std::{io, mem, ops::Range};
+use std::{io, mem};
 
 use crossterm::{
     event::{KeyCode, KeyModifiers},
     style::Stylize,
 };
 
-use history::History;
-use line::Line;
-pub use signal::Signal;
-use state::LineState;
-
-use crate::{public::env::ENV, utils::{terminal::Terminal, cursor::Cursor, print_line}};
 use crate::public::run_time::scope::Scope;
+use crate::utils::{cursor::Cursor, print_line, terminal::Terminal};
 
-use candidate::Candidate;
+use super::text_area::TextArea;
 
-use analyzer::analyze;
-use tokenizer::{TextType, Token};
-
-// use super::{cursor::Cursor, print_line, terminal::Terminal};
+pub use signal::Signal;
+use history::EditorHistory;
+use line::EditorLine;
 
 pub struct LineEditor {
-    prompt: &'static str,
-    // terminal: Terminal,
-    history: History,
-    candidate: Candidate,
-    is_at: LineState,
-
-    current_line: Line,
-    line_count: usize,
-    overflow_left: usize,
-    overflow_right: usize,
-    visible_area_width: usize,
+    current_line: EditorLine,
+    history: EditorHistory,
 }
 
 impl LineEditor {
-    pub fn new(prompt: &'static str) -> Self {
-        let term_width = Terminal::width();
+    const PROMPT: &'static str = "> ";
 
-        Self {
-            prompt,
-            history: History::new(),
-            candidate: Candidate::new(),
-            is_at: LineState::new(),
+    pub fn new() -> io::Result<Self> {
+        let initial_line = EditorLine::new(Self::PROMPT.len(), 1);
 
-            current_line: Line::new(1),
-            line_count: 1,
-            overflow_left: 0,
-            overflow_right: 0,
-            visible_area_width: term_width - prompt.len() - 2,
-        }
+        return Ok(Self {
+            current_line: initial_line,
+            history: EditorHistory::new(),
+        });
     }
 
-    #[inline]
-    fn display_prompt(&mut self) -> io::Result<()> {
-        print!("{}", self.prompt);
-        Terminal::flush()
-    }
-    #[inline]
-    fn move_cursor_to_prompt(&mut self) -> io::Result<()> {
-        Cursor::move_to_col(self.prompt.len())
-    }
-    #[inline]
-    fn render_with_fixed_pos(&mut self) -> io::Result<()> {
-        Cursor::save_pos()?;
-        self.render()?;
-        Cursor::restore_pos()?;
-        return Ok(());
-    }
-    #[inline]
-    fn clear_line(&mut self) -> io::Result<()> {
-        self.move_cursor_to_prompt()?;
-        Terminal::clear_after_cursor()
-    }
+    fn init_render(&self) -> io::Result<()> {
+        let line_label = self.current_line.index.to_string();
 
-    fn back_operate(&mut self) -> io::Result<()> {
-        if self.overflow_left == 0 {
-            Cursor::left(1)?;
-        }
+        Cursor::move_to_col(Terminal::width() - line_label.len())?;
+        print!("{}", line_label.bold().black().on_white());
+        Cursor::move_to_col(0)?;
+        print!("{}", Self::PROMPT);
 
-        let line = &mut self.current_line;
-        if self.is_at.line_end {
-            line.pop();
-            if line.len() > self.visible_area_width {
-                self.overflow_left = line.len() - self.visible_area_width;
-            } else {
-                self.overflow_left = 0;
-            };
-        } else {
-            self.remove_edit()?;
-        }
-        return Ok(());
-    }
-
-    // recompute the states
-    fn refresh(&mut self) -> io::Result<()> {
-        let cursor_pos = Cursor::pos_col()?;
-        let term_width = Terminal::width();
-        let prompt_len = self.prompt.len();
-        let line_label_width = self.current_line.label_width;
-
-        // refresh `self.visible_area_width`
-        self.visible_area_width = term_width - prompt_len - line_label_width;
-
-        // visible left & right end
-        self.is_at.left_end = cursor_pos == prompt_len;
-        self.is_at.right_end = cursor_pos == term_width - self.current_line.label_width;
-
-        // virtual line left & right end
-        self.is_at.line_start = self.is_at.left_end && (self.overflow_left == 0);
-        self.is_at.line_end = ((cursor_pos - prompt_len)
-            == (self.current_line.len() - self.overflow_left))
-            || (self.is_at.right_end && self.overflow_right == 0);
-
-        return Ok(());
-    }
-
-    // display & hide hint
-    fn display_hint(&mut self, scope: &Scope) -> io::Result<()> {
-        if let Some(hint_text) = self.candidate.next() {
-            let hint_token = Token::new(TextType::Hint, String::from(hint_text));
-
-            // temporarily push hint token
-            self.current_line.tokens.push(hint_token);
-
-            let hint_width = hint_text.len();
-            let content_width = self.current_line.len() + hint_width;
-
-            if content_width > self.visible_area_width {
-                let offset = content_width - self.visible_area_width;
-                let cursor_move = offset - self.overflow_left;
-
-                if cursor_move > 0 {
-                    Cursor::left(cursor_move)?;
-                }
-                self.overflow_left = offset;
-            }
-
-            self.render_with_fixed_pos()?;
-            self.current_line.tokens.pop().unwrap();
-        } else {
-            let Ok(candidate_hints) = analyze(&self.current_line.tokens, scope) else {
-                return Ok(())
-            };
-
-            if !candidate_hints.is_empty() {
-                self.candidate.set(candidate_hints);
-                self.display_hint(scope)?;
-            } else {
-                // no hint
-                return Ok(());
-            }
-        }
-        return Ok(());
-    }
-    fn hide_hint(&mut self) -> io::Result<()> {
-        if let Some(hint_text) = self.candidate.current_hint() {
-            let hint_width = hint_text.chars().count();
-            let overflow = self.overflow_left;
-
-            if overflow > 0 {
-                // min(self.overflow_left, hint_width)
-                let offset = std::cmp::min(overflow, hint_width);
-
-                self.overflow_left -= offset;
-                Cursor::right(offset)?;
-            }
-            self.candidate.clear();
-            self.render_with_fixed_pos()?;
-        }
-        return Ok(());
-    }
-
-    // --- --- --- --- ---
-
-    fn render(&mut self) -> io::Result<()> {
-        #[inline]
-        fn buffer_extend_colored(
-            buffer: &mut String,
-            is_history: bool,
-            token: &Token,
-            range: Range<usize>,
-        ) {
-            if unsafe { ENV.options.support_ansi } {
-                let mut colored = token.colored(range);
-                // if is history, line text will be darken
-                if is_history {
-                    colored = colored.dim();
-                }
-
-                buffer.extend(colored.to_string().chars());
-            } else {
-                *buffer += &token.content;
-            }
-        }
-
-        Cursor::hide()?;
-        self.clear_line()?;
-
-        let mut offset = self.overflow_left;
-        let mut remain_space = self.visible_area_width;
-        let mut buffer = String::new();
-        let is_history = self.current_line.is_history;
-        for token in &self.current_line.tokens {
-            if remain_space == 0 {
-                break;
-            }
-
-            if offset > 0 {
-                if offset >= token.len() {
-                    // token is out of visible area
-                    offset -= token.len();
-                } else {
-                    // token has part in unvisible area
-                    let actual_print_len = token.len() - offset;
-
-                    // when a token is going to be overflow left side and right side
-                    if actual_print_len > remain_space {
-                        // print middle part of this token
-                        buffer_extend_colored(
-                            &mut buffer,
-                            is_history,
-                            token,
-                            offset..offset + remain_space,
-                        );
-                        break;
-                    }
-
-                    remain_space -= token.len() - offset;
-                    buffer_extend_colored(&mut buffer, is_history, token, offset..token.len());
-                    offset = 0;
-                }
-            } else {
-                if remain_space >= token.len() {
-                    remain_space -= token.len();
-                    buffer_extend_colored(&mut buffer, is_history, token, 0..token.len());
-                } else {
-                    buffer_extend_colored(&mut buffer, is_history, token, 0..remain_space);
-                    remain_space = 0;
-                }
-            }
-        }
-
-        print!("{}{}", buffer, &self.current_line.label);
-        Cursor::show()?;
         Terminal::flush()?;
         return Ok(());
     }
 
-    // --- --- --- --- --- ---
-
-    fn scroll_left(&mut self) {
-        if self.overflow_left > 0 {
-            self.overflow_left -= 1;
-            self.overflow_right += 1;
-        }
-    }
-    fn scroll_right(&mut self) {
-        if self.overflow_right > 0 {
-            self.overflow_right -= 1;
-            self.overflow_left += 1;
-        }
-    }
-
-    // --- --- --- --- --- ---
-
-    fn insert_edit(&mut self, ch: char) -> io::Result<()> {
-        let insert_pos = Cursor::pos_col()? - self.prompt.len() + self.overflow_left;
-        self.current_line.insert(insert_pos, ch);
-
-        if self.current_line.len() - 1 >= self.visible_area_width {
-            self.overflow_left += 1;
-        } else {
-            Cursor::right(1)?;
-        }
-        return Ok(());
-    }
-    fn remove_edit(&mut self) -> io::Result<()> {
-        let cursor_pos = Cursor::pos_col()?;
-        if cursor_pos == 0 {
-            return Ok(());
-        }
-
-        let mut remove_pos = cursor_pos - self.prompt.len() + self.overflow_left;
-        if self.overflow_left > 0 {
-            remove_pos -= 1;
-            self.overflow_left -= 1;
-        } else if self.overflow_right > 0 {
-            self.overflow_right -= 1;
-        }
-
-        self.current_line.remove(remove_pos);
-        return Ok(());
-    }
-
-    // --- --- --- --- --- ---
-
-    fn complete(&mut self) -> io::Result<()> {
-        let Some(hint_text) = self.candidate.current_hint() else {
-            return Ok(());
-        };
-
-        let hint_width = hint_text.chars().count();
-        self.current_line.push_str(hint_text);
-        self.candidate.clear();
-        Cursor::right(hint_width)?;
-        self.render_with_fixed_pos()
-    }
-
-    pub fn readline(&mut self, scope: &Scope) -> io::Result<Signal> {
-        self.display_prompt()?;
-        self.current_line = Line::new(self.line_count);
+    pub fn readline(&mut self, scope: &mut Scope) -> io::Result<Signal> {
+        self.init_render()?;
 
         let result = loop {
             let Some(key) = Terminal::get_key() else {
                 continue;
             };
-            // ctrl + c -> Interrupt
-            if key.modifiers == KeyModifiers::CONTROL
-                && (key.code == KeyCode::Char('c') || key.code == KeyCode::Char('d'))
-            {
-                print_line("\nKeyboard Interrupt");
-                break Signal::Interrupt;
+
+            if key.modifiers == KeyModifiers::CONTROL {
+                if key.code == KeyCode::Char('c') || key.code == KeyCode::Char('d') {
+                    break Signal::Interrupt;
+                } else {
+                    continue;
+                }
             }
 
-            self.refresh()?;
-
-            // control to display history
             match key.code {
-                KeyCode::Up => {
-                    if let Some(last_line) = self.history.previous() {
-                        self.move_cursor_to_prompt()?;
-                        self.current_line.use_history(last_line);
-                    }
-                }
-
-                KeyCode::Down => {
-                    if let Some(next_line) = self.history.next() {
-                        self.move_cursor_to_prompt()?;
-                        self.current_line.use_history(next_line);
-                    } else {
-                        self.current_line.reset();
-                    }
-                }
-
-                KeyCode::Tab => {
-                    if let Some(new_content) = self.history.get_current() {
-                        if new_content.len() > self.visible_area_width {
-                            self.overflow_left = 0;
-                            self.overflow_right = new_content.len() - self.visible_area_width;
+                KeyCode::Up | KeyCode::Down => {
+                    let target_item = match key.code {
+                        KeyCode::Up => {
+                            if !self.history.use_history {
+                                let current_content = self.current_line.content().to_owned();
+                                self.history.set_cached(current_content);
+                            }
+                            self.history.previous()
                         }
-                        self.history.reset_index();
-                        self.current_line.reset_with(new_content);
-                        self.render_with_fixed_pos()?;
-                        continue;
+                        KeyCode::Down => self.history.next(),
+                        _ => unreachable!()
+                    };
+                    if let Some(str) = target_item {
+                        self.current_line.set_content(str)?;
                     }
                 }
+                KeyCode::Enter => {
+                    print_line("");
 
-                // else: do nothing and continue execute
+                    let current_line_index = self.current_line.index;
+                    let new_line = EditorLine::new(Self::PROMPT.len(), current_line_index + 1);
+                    let line = mem::replace(&mut self.current_line, new_line);
+                    self.history.append(line.content().to_owned());
+                    break Signal::NewLine(line.content().to_owned());
+                }
+
+                // avoid Non-ASCII characters
+                KeyCode::Char(ch) if !ch.is_ascii() => break Signal::NonASCII,
+                k if TextArea::is_editing_key(k) => self.current_line.edit(k)?,
                 _ => {}
             }
-
-            // when displaying history content, disable editing.
-            if !self.current_line.is_history {
-                match key.code {
-                    KeyCode::Left => {
-                        if self.is_at.line_start {
-                            continue;
-                        }
-
-                        if self.is_at.left_end {
-                            self.scroll_left();
-                        } else {
-                            self.hide_hint()?;
-                            Cursor::left(1)?;
-                            continue; // skip rerender
-                        }
-                    }
-                    KeyCode::Right => {
-                        if self.is_at.line_end {
-                            self.complete()?;
-                            continue;
-                        }
-
-                        if self.is_at.right_end {
-                            self.scroll_right();
-                        } else {
-                            Cursor::right(1)?;
-                            continue; // skip rerender
-                        }
-                    }
-
-                    KeyCode::Enter => {
-                        self.line_count += 1;
-                        self.overflow_left = 0;
-                        self.overflow_right = 0;
-
-                        print_line("");
-                        let line_content =
-                            mem::replace(&mut self.current_line.content, String::new());
-
-                        self.history.append(line_content.clone());
-                        break Signal::NewLine(line_content);
-                    }
-                    KeyCode::Tab => {
-                        if self.is_at.line_end {
-                            self.display_hint(scope)?;
-                            continue;
-                        }
-                    }
-                    KeyCode::Backspace => {
-                        if self.is_at.line_start {
-                            continue;
-                        }
-                        self.hide_hint()?;
-                        self.back_operate()?;
-                    }
-
-                    KeyCode::Char(ch) => {
-                        if !ch.is_ascii() {
-                            // avoid Non-ASCII character
-                            print_line("");
-                            break Signal::NonASCII;
-                        }
-
-                        if self.is_at.line_end {
-                            self.current_line.push(ch);
-
-                            self.hide_hint()?;
-                            self.refresh()?;
-                            if !self.is_at.right_end {
-                                Cursor::right(1)?;
-                            }
-                            if self.current_line.len() > self.visible_area_width {
-                                self.overflow_left =
-                                    self.current_line.len() - self.visible_area_width;
-                            } else {
-                                self.overflow_left = 0;
-                            };
-                        } else {
-                            self.insert_edit(ch)?;
-                        }
-                    }
-                    _ => {}
-                }
-            }
-            self.render_with_fixed_pos()?;
+            Terminal::flush()?;
         };
         return Ok(result);
     }

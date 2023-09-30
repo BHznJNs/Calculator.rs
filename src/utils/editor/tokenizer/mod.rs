@@ -1,8 +1,11 @@
 mod token;
+mod sequence;
 
 use crate::{public::compile_time::keywords::Keyword, utils::ascii::is_identi_ascii};
 
-pub use token::{TextType, Token, TokenType, TokenVec};
+pub use sequence::TokenSequence;
+pub use token::{TokenVec, TokenType};
+use token::Token;
 
 pub fn tokenize(source: &str) -> TokenVec {
     // is used for check is number minus OR
@@ -51,7 +54,7 @@ pub fn tokenize(source: &str) -> TokenVec {
                 }
             }
 
-            let current_token = Token::new(TextType::NumberLiteral, value);
+            let current_token = Token::new(TokenType::Number, value);
             tokens.push(current_token);
             continue;
         }
@@ -71,17 +74,17 @@ pub fn tokenize(source: &str) -> TokenVec {
 
             if last_type == TokenType::Annotation {
                 // Type annotation
-                tokens.push(Token::new(TextType::Annotation, value));
+                tokens.push(Token::new(TokenType::Annotation, value));
             } else {
                 let option_keyword = Keyword::is_keyword(&value);
                 let is_keyword = option_keyword.is_some() || value.eq("true") || value.eq("false");
 
                 if is_keyword {
                     last_type = TokenType::Keyword;
-                    tokens.push(Token::new(TextType::Keyword, value));
+                    tokens.push(Token::new(TokenType::Keyword, value));
                 } else {
                     last_type = TokenType::Identifier;
-                    tokens.push(Token::new(TextType::Variable, value));
+                    tokens.push(Token::new(TokenType::Identifier, value));
                 }
             }
             continue;
@@ -93,12 +96,12 @@ pub fn tokenize(source: &str) -> TokenVec {
             // Parenthesis
             '(' | ')' | '[' | ']' | '{' | '}' => {
                 last_type = TokenType::Paren;
-                tokens.push(Token::new(TextType::Paren, String::from(ch)));
+                tokens.push(Token::new(TokenType::Paren, String::from(ch)));
             }
             // Computing symbols
             '+' | '-' | '*' | '/' | '%' | '^' | '!' | '<' | '>' | '=' | '.' | '&' | '|' => {
                 last_type = TokenType::Symbol;
-                tokens.push(Token::new(TextType::Symbol, String::from(ch)));
+                tokens.push(Token::new(TokenType::Symbol, String::from(ch)));
             }
             // String literal
             '\'' | '\"' => {
@@ -123,23 +126,22 @@ pub fn tokenize(source: &str) -> TokenVec {
                 }
 
                 last_type = TokenType::String;
-                let current_token = Token::new(TextType::StringLiteral, value);
+                let current_token = Token::new(TokenType::String, value);
                 tokens.push(current_token);
                 continue;
             }
+
             // Other symbols
-            '\\' | ',' | ';' | ':' => {
+            '\\' | ',' | ';' | ':' | ' ' => {
                 last_type = TokenType::Divider;
-                tokens.push(Token::new(TextType::Didider, String::from(ch)));
+                tokens.push(Token::new(TokenType::Divider, String::from(ch)));
             }
 
             '$' => {
                 // type annotation
                 last_type = TokenType::Annotation;
-                tokens.push(Token::new(TextType::Annotation, String::from('$')))
+                tokens.push(Token::new(TokenType::Annotation, String::from('$')))
             }
-
-            ' ' => tokens.push(Token::new(TextType::Didider, String::from(' '))),
 
             // comment symbol: # (Number Sign)
             '#' => {
@@ -149,12 +151,12 @@ pub fn tokenize(source: &str) -> TokenVec {
             _ => {
                 // is not allowed character
                 last_type = TokenType::Unknown;
-                tokens.push(Token::new(TextType::Unknown, String::from(ch)));
+                tokens.push(Token::new(TokenType::Unknown, String::from(ch)));
             }
         }
     }
     if !comment.is_empty() {
-        tokens.push(Token::new(TextType::Comment, comment));
+        tokens.push(Token::new(TokenType::Comment, comment));
     }
     return tokens;
 }

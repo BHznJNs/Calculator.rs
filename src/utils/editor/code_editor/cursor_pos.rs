@@ -15,6 +15,7 @@ impl EditorCursorPos {
         format!("{}: {}", self.row, self.col)
     }
 
+    #[allow(unused_assignments)]
     pub fn parse(value: &str) -> Option<Self> {
         fn str_to_num(s: &str) -> Option<usize> {
             match s.parse::<usize>() {

@@ -12,7 +12,7 @@ pub fn run_with_path(path: &str, scope: &mut Scope) {
         "head file \"{}\" read error",
         path,
     ));
-    run(&file_content, scope);
+    self::run(&file_content, scope);
 }
 
 pub fn run(codes: &str, scope: &mut Scope) {

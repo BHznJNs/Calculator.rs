@@ -6,6 +6,8 @@ use std::{
 
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
+use crate::utils::editor::text_area::TextArea;
+
 use super::core::{Component, ComponentController};
 
 pub struct FileSaver {
@@ -68,7 +70,7 @@ impl Component for FileSaver {
         if key.modifiers == KeyModifiers::NONE || key.modifiers == KeyModifiers::SHIFT {
             match key.code {
                 KeyCode::Enter => self.save()?,
-                k if ComponentController::is_editing_key(k) => self.comp.edit(k)?,
+                k if TextArea::is_editing_key(k) => self.comp.edit(k)?,
                 _ => {}
             }
         }

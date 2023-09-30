@@ -3,11 +3,14 @@ use std::io;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
 use crate::utils::{
-    editor::code_editor::{cursor_pos::EditorCursorPos, text_area::TextArea},
+    editor::{code_editor::cursor_pos::EditorCursorPos, text_area::TextArea},
     LoopTraverser,
 };
 
-use super::{core::ComponentController, Component};
+use super::{
+    core::{ComponentController, ComponentHistory},
+    Component,
+};
 
 #[derive(PartialEq)]
 enum ReplacerState {
@@ -19,6 +22,9 @@ pub struct Replacer {
     state: ReplacerState,
     match_list: LoopTraverser<EditorCursorPos>,
 
+    search_history: ComponentHistory,
+    replace_history: ComponentHistory,
+
     searcher: ComponentController,
     replacer: ComponentController,
 }
@@ -28,19 +34,27 @@ impl Replacer {
     const REPLACE_BUTTON: &'static str = "[Ctrl + S / N / A]";
 
     pub fn new() -> Self {
-        Self {
+        let mut searcher_controller = Self::init_controller();
+        let mut replacer_controller = ComponentController {
+            prompt: Self::REPLACE_PROMPT,
+            button: Self::REPLACE_BUTTON,
+            text_area: TextArea::new(Self::REPLACE_PROMPT.len(), Self::REPLACE_BUTTON.len()),
+            position: -1,
+            editable: true,
+        };
+        searcher_controller.text_area.set_placeholder(ComponentHistory::HISTORY_PLACEHOLDER);
+        replacer_controller.text_area.set_placeholder(ComponentHistory::HISTORY_PLACEHOLDER);
+
+        return Self {
             state: ReplacerState::Searching,
             match_list: LoopTraverser::new(false),
 
-            searcher: Self::init_controller(),
-            replacer: ComponentController {
-                prompt: Self::REPLACE_PROMPT,
-                button: Self::REPLACE_BUTTON,
-                text_area: TextArea::new(Self::REPLACE_PROMPT.len(), Self::REPLACE_BUTTON.len()),
-                position: -1,
-                editable: true,
-            },
-        }
+            search_history: ComponentHistory::new(),
+            replace_history: ComponentHistory::new(),
+
+            searcher: searcher_controller,
+            replacer: replacer_controller,
+        };
     }
 
     #[inline]
@@ -58,15 +72,6 @@ impl Replacer {
         self.match_list.next()
     }
 
-    // when pressed `search_key` (Enter) and exists search result,
-    // this handler will be called.
-    pub fn search_handler(&mut self, pos_list: Vec<EditorCursorPos>) -> io::Result<()> {
-        self.match_list.set_content(pos_list);
-        self.replacer.open()?;
-        self.state = ReplacerState::Replacing;
-        return Ok(());
-    }
-
     #[inline]
     pub fn search_text<'a>(&'a self) -> &'a str {
         self.searcher.text_area.content()
@@ -74,6 +79,33 @@ impl Replacer {
     #[inline]
     pub fn replace_text<'a>(&'a self) -> &'a str {
         self.replacer.text_area.content()
+    }
+
+    // when pressed `search_key` (Enter) and exists search result,
+    // this handler will be called.
+    pub fn search_handler(&mut self, pos_list: Vec<EditorCursorPos>) -> io::Result<()> {
+        self.search_history.append(self.search_text().to_owned());
+        self.match_list.set_content(pos_list);
+
+        self.searcher.text_area.clear();
+        self.replacer.text_area.clear();
+        self.replacer.open()?;
+
+        self.state = ReplacerState::Replacing;
+        return Ok(());
+    }
+
+    // when pressed `replace_one_key` or `replace_all_key`,
+    // this handler will be called.
+    pub fn replace_handler(&mut self) {
+        let current_content = self.replace_text();
+        if let Some(last_content) = self.replace_history.last() {
+            // avoid repetitive content
+            if current_content == last_content {
+                return;
+            }
+        }
+        self.replace_history.append(current_content.to_owned());
     }
 
     #[inline]
@@ -124,16 +156,45 @@ impl Component for Replacer {
         .open()
     }
     fn key_resolve(&mut self, key: KeyEvent) -> io::Result<()> {
-        match key.modifiers {
-            KeyModifiers::NONE | KeyModifiers::SHIFT
-                if ComponentController::is_editing_key(key.code) =>
-            {
-                match self.state {
-                    ReplacerState::Searching => &mut self.searcher,
-                    ReplacerState::Replacing => &mut self.replacer,
+        if !(key.modifiers == KeyModifiers::NONE || key.modifiers == KeyModifiers::SHIFT) {
+            return Ok(());
+        }
+
+        match key.code {
+            KeyCode::Up | KeyCode::Down => {
+                let (current_content, target_history) = match self.state {
+                    ReplacerState::Searching => {
+                        (self.search_text().to_owned(), &mut self.search_history)
+                    }
+                    ReplacerState::Replacing => {
+                        (self.replace_text().to_owned(), &mut self.replace_history)
+                    }
+                };
+                let history_content = match key.code {
+                    KeyCode::Up => {
+                        if !target_history.use_history {
+                            target_history.set_cached(current_content);
+                        }
+                        target_history.previous()
+                    }
+                    KeyCode::Down => target_history.next(),
+                    _ => unreachable!(),
+                };
+                if let Some(str) = history_content {
+                    let text_area = match self.state {
+                        ReplacerState::Searching => &mut self.searcher.text_area,
+                        ReplacerState::Replacing => &mut self.replacer.text_area,
+                    };
+                    text_area.set_content(str);
+                    text_area.render()?;
+                    text_area.move_cursor_to_end()?;
                 }
-                .edit(key.code)?
             }
+            k if TextArea::is_editing_key(k) => match self.state {
+                ReplacerState::Searching => &mut self.searcher,
+                ReplacerState::Replacing => &mut self.replacer,
+            }
+            .edit(key.code)?,
             _ => {}
         }
         return Ok(());

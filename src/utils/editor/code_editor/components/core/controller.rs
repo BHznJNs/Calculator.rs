@@ -3,15 +3,14 @@ use std::io;
 use crossterm::{event::KeyCode, style::Stylize};
 
 use crate::utils::{
-    editor::code_editor::{direction::Direction, text_area::TextArea},
+    editor::{text_area::TextArea, direction::Direction},
     Cursor, Terminal,
 };
 
-#[derive(Clone)]
 pub struct ComponentController {
     pub prompt: &'static str,
     pub button: &'static str,
-    pub text_area: TextArea,
+    pub text_area: TextArea<String>,
 
     // verticle position to show,
     // if less than zero, equal to
@@ -39,14 +38,6 @@ impl ComponentController {
         self.text_area.render()?;
         self.text_area.move_cursor_to_end()?;
         return Ok(());
-    }
-
-    #[inline]
-    pub fn is_editing_key(key: KeyCode) -> bool {
-        match key {
-            KeyCode::Backspace | KeyCode::Left | KeyCode::Right | KeyCode::Char(_) => true,
-            _ => false,
-        }
     }
 
     pub fn edit(&mut self, key: KeyCode) -> io::Result<()> {

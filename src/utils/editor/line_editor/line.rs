@@ -1,106 +1,55 @@
-use std::rc::Rc;
+use std::io;
 
-use crate::public::env::ENV;
-use crossterm::style::Stylize;
+use crossterm::event::KeyCode;
 
-use super::tokenizer::{tokenize, TokenVec};
+use crate::utils::{
+    editor::{direction::Direction, text_area::TextArea, tokenizer::TokenSequence},
+    number_bit_count,
+};
 
-pub struct Line {
-    pub content: String,
-
-    pub is_history: bool,
-    pub label: String,
-    pub label_width: usize,
-    pub tokens: TokenVec,
+pub struct EditorLine {
+    text_area: TextArea<TokenSequence>,
+    pub index: usize,
 }
 
-impl Line {
-    pub fn new(line_count: usize) -> Self {
-        let label_str = line_count.to_string();
-        let label_fmted_width = label_str.len() + 1; // `1` is space width
-        let label_fmted = if unsafe { ENV.options.support_ansi } {
-            format!(" {}", label_str.black().on_white())
-        } else {
-            format!(" {}", label_str)
-        };
-
+impl EditorLine {
+    pub fn new(prompt_width: usize, line_index: usize) -> Self {
+        let line_label_width = number_bit_count(line_index) + 1;
         Self {
-            content: String::new(),
-
-            is_history: false,
-            label_width: label_fmted_width,
-            label: label_fmted,
-            tokens: TokenVec::new(),
+            text_area: TextArea::new(prompt_width, line_label_width),
+            index: line_index,
         }
     }
 
-    fn refresh(&mut self) {
-        // token vector refresh
-        self.tokens = tokenize(&self.content);
-    }
+    pub fn edit(&mut self, key: KeyCode) -> io::Result<()> {
+        let text_area = &mut self.text_area;
+        match key {
+            KeyCode::Backspace => {
+                text_area.delete_char()?;
+            }
 
-    // push / pop
-    pub fn push(&mut self, ch: char) {
-        // in: '('; pushed: "()"
-        // in: '['; pushed: "[]"
-        // in: '#'; pushed: '#'
-
-        // if character is to paired
-        let paired_ch = match ch {
-            '(' => ')',
-            '[' => ']',
-            '{' => '}',
-            '\'' | '\"' => ch,
-            _ => '\0',
-        };
-        self.content.push(ch);
-
-        // output this character with paired
-        if paired_ch != '\0' {
-            self.content.push(paired_ch);
+            KeyCode::Left => text_area.move_cursor_horizontal(Direction::Left)?,
+            KeyCode::Right => text_area.move_cursor_horizontal(Direction::Right)?,
+            KeyCode::Char(ch) => text_area.insert_char(ch)?,
+            _ => unreachable!(),
         }
-        self.refresh();
-    }
-    pub fn push_str(&mut self, str: &str) {
-        self.content.push_str(str);
-        self.refresh();
-    }
-    pub fn pop(&mut self) {
-        self.content.pop();
-        self.refresh();
+        return Ok(());
     }
 
-    // insert / remove
-    pub fn insert(&mut self, index: usize, ch: char) {
-        self.content.insert(index, ch);
-        self.refresh();
-    }
-    pub fn remove(&mut self, index: usize) {
-        self.content.remove(index);
-        self.refresh();
+    #[inline]
+    pub fn rerender(&self) -> io::Result<()> {
+        self.text_area.render()
     }
 
-    // --- --- --- --- --- ---
-
-    // borrow to use history content
-    pub fn use_history(&mut self, content: Rc<String>) {
-        self.is_history = true;
-        self.tokens = tokenize(content.as_str());
-    }
-    // return to use self content
-    pub fn reset(&mut self) {
-        self.is_history = false;
-        // self.tokens = tokenize(self.content);
-        self.refresh();
-    }
-    // use history content to replace self content
-    pub fn reset_with(&mut self, new_content: String) {
-        self.content = new_content;
-        self.is_history = false;
-        self.refresh();
+    pub fn set_content(&mut self, new_content: &str) -> io::Result<()> {
+        self.text_area.set_content(new_content);
+        self.text_area.move_cursor_to_end()?;
+        self.rerender()?;
+        return Ok(());
     }
 
-    pub fn len(&self) -> usize {
-        self.content.len()
+    #[inline]
+    pub fn content<'a>(&'a self) -> &'a str {
+        self.text_area.content()
     }
 }

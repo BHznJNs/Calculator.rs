@@ -1,15 +1,40 @@
+mod content;
+
 use std::io;
 
-use crossterm::style::Stylize;
+use crossterm::{event::KeyCode, style::Stylize};
 
 use crate::utils::{Cursor, Terminal};
 
 use super::direction::Direction;
-#[derive(Clone)]
 
-pub struct TextArea {
+pub use content::TextAreaContent;
+
+pub(super) struct Placeholder {
     content: String,
-    placeholder: String,
+}
+
+impl TextAreaContent for Placeholder {
+    fn new() -> Self {
+        Placeholder {
+            content: String::new(),
+        }
+    }
+    #[inline]
+    fn get(&self) -> &String {
+        &self.content
+    }
+    #[inline]
+    fn get_mut(&mut self) -> &mut String {
+        &mut self.content
+    }
+    #[inline]
+    fn change_handler(&mut self) {}
+}
+
+pub struct TextArea<C: TextAreaContent> {
+    content: C,
+    placeholder: Placeholder,
 
     pub margin_left: usize,
     pub margin_right: usize,
@@ -27,8 +52,18 @@ pub struct TextAreaStateRight {
     pub is_at_area_end: bool,
 }
 
+impl TextArea<String> {
+    #[inline]
+    pub fn is_editing_key(key: KeyCode) -> bool {
+        match key {
+            KeyCode::Backspace | KeyCode::Left | KeyCode::Right | KeyCode::Char(_) => true,
+            _ => false,
+        }
+    }
+}
+
 // state calculating methods
-impl TextArea {
+impl<C: TextAreaContent> TextArea<C> {
     #[inline]
     pub fn is_at_left_side(&self) -> io::Result<bool> {
         return Ok(Cursor::pos_col()? == self.margin_left);
@@ -59,7 +94,7 @@ impl TextArea {
 }
 
 // editing methods
-impl TextArea {
+impl<C: TextAreaContent> TextArea<C> {
     pub fn visible_area_width(&self) -> usize {
         let term_width = Terminal::width();
         return term_width - self.margin_left - self.margin_right;
@@ -134,11 +169,11 @@ impl TextArea {
     }
 }
 
-impl TextArea {
+impl<C: TextAreaContent> TextArea<C> {
     pub fn new(margin_left: usize, margin_right: usize) -> Self {
         Self {
-            content: String::new(),
-            placeholder: String::new(),
+            content: C::new(),
+            placeholder: Placeholder::new(),
 
             overflow_left: 0,
             overflow_right: 0,
@@ -152,27 +187,18 @@ impl TextArea {
         let visible_area_width = self.visible_area_width();
 
         let rendered_content = if self.len() == 0 && !self.placeholder.is_empty() {
-            if self.placeholder.len() > visible_area_width {
-                let rendered_range = 0..visible_area_width;
-                self.placeholder[rendered_range].dim()
-            } else {
-                self.placeholder.as_str().dim()
-            }
+            self.placeholder
+                .rendered_content(0, visible_area_width)
+                .dim()
         } else {
-            if self.len() > visible_area_width {
-                let rendered_range = self.overflow_left..(self.len() - self.overflow_right);
-                self.content[rendered_range].stylize()
-            } else {
-                self.content.as_str().stylize()
-            }
+            self.content
+                .rendered_content(self.overflow_left, visible_area_width)
+                .stylize()
         };
-        let remain_area_width = visible_area_width - rendered_content.content().len();
-        let remain_space_str = " ".repeat(remain_area_width);
 
         let saved_cursor_pos = Cursor::pos_col()?;
         Cursor::move_to_col(self.margin_left)?;
-        print!("{}{}", rendered_content, remain_space_str);
-        Terminal::flush()?;
+        print!("{}", rendered_content);
         Cursor::move_to_col(saved_cursor_pos)?;
         return Ok(());
     }
@@ -215,21 +241,18 @@ impl TextArea {
 
     #[inline]
     pub fn set_content(&mut self, str: &str) {
-        self.content = str.to_owned();
+        self.content.set(str);
         self.overflow_refresh();
     }
 
     #[inline]
     pub fn set_placeholder(&mut self, str: &str) {
-        self.placeholder = str.to_owned();
+        self.placeholder.set(str);
     }
 
     pub fn truncate(&mut self) -> io::Result<String> {
         let truncate_pos = self.cursor_pos()?;
-        let mut res_str = String::new();
-
-        self.content[truncate_pos..].clone_into(&mut res_str);
-        self.content.truncate(truncate_pos);
+        let res_str = self.content.truncate(truncate_pos);
         self.overflow_refresh();
         return Ok(res_str);
     }
@@ -242,7 +265,7 @@ impl TextArea {
 
     #[inline]
     pub fn content<'a>(&'a self) -> &'a str {
-        &self.content
+        &self.content.get()
     }
 
     pub fn clear(&mut self) {

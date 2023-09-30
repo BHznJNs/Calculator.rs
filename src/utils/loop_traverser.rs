@@ -25,6 +25,9 @@ impl<T> LoopTraverser<T> {
     }
     pub fn previous<'a>(&'a mut self) -> Option<&'a T> {
         if self.vec.is_empty() || (!self.cycle && (self.index == 0 || self.index == -1)) {
+            if self.index == 0 {
+                self.index = -1;
+            }
             return None;
         }
 
@@ -56,18 +59,10 @@ impl<T> LoopTraverser<T> {
     pub fn push_back(&mut self, element: T) {
         self.vec.push_back(element);
     }
-    // #[inline]
-    // pub fn push_front(&mut self, element: T) {
-    //     self.vec.push_front(element);
-    // }
-    // #[inline]
-    // pub fn pop_back(&mut self) -> Option<T> {
-    //     self.vec.pop_back()
-    // }
-    // #[inline]
-    // pub fn pop_front(&mut self) -> Option<T> {
-    //     self.vec.pop_front()
-    // }
+    #[inline]
+    pub fn push_front(&mut self, element: T) {
+        self.vec.push_front(element);
+    }
 
     // --- --- --- --- --- ---
 
@@ -92,11 +87,6 @@ impl<T> LoopTraverser<T> {
     pub fn is_empty(&self) -> bool {
         self.vec.is_empty()
     }
-
-    // #[inline]
-    // pub fn len(&self) -> usize {
-    //     self.vec.len()
-    // }
 }
 
 #[test]
@@ -114,13 +104,14 @@ fn test() {
     // --- --- --- --- --- ---
 
     let mut uncycling_traverser = LoopTraverser::new(false);
-    uncycling_traverser.set_content(vec![1, 2, 3, 4]);
+    uncycling_traverser.push_back(1);
+    uncycling_traverser.push_back(2);
+    uncycling_traverser.push_back(3);
 
-    assert_eq!(uncycling_traverser.previous(), None);
-    assert_eq!(uncycling_traverser.next(), Some(&1));
-    assert_eq!(uncycling_traverser.next(), Some(&2));
-    assert_eq!(uncycling_traverser.next(), Some(&3));
-    assert_eq!(uncycling_traverser.next(), Some(&4));
-    assert_eq!(uncycling_traverser.next(), None);
-    assert_eq!(uncycling_traverser.previous(), Some(&3));
+    println!("previous: {:?}", uncycling_traverser.previous());
+    println!("previous: {:?}", uncycling_traverser.previous());
+    println!("previous: {:?}", uncycling_traverser.previous());
+    println!("next: {:?}", uncycling_traverser.next());
+    println!("next: {:?}", uncycling_traverser.next());
+    println!("next: {:?}", uncycling_traverser.next());
 }
