@@ -16,7 +16,7 @@ pub fn resolve(
 
     let mut right_hand_node = expression::resolve(tokens)?;
 
-    if right_hand_node.elements.len() == 0 {
+    if right_hand_node.elements.is_empty() {
         // example:
         // var =
         return Err(assignment_error("missing right-hand value")?);

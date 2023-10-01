@@ -8,7 +8,7 @@ use crate::public::value::symbols::Symbols;
 use super::{assignment, element_reading, invocation, object_reading};
 
 pub fn resolve(var_node: ASTNode, tokens: &mut TokenVec) -> Result<ASTNode, ()> {
-    let is_more_token = tokens.len() > 0;
+    let is_more_token = !tokens.is_empty();
 
     let result_node = if is_more_token {
         let next_token = tokens.pop_front().unwrap();

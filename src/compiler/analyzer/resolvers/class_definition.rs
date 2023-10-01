@@ -8,7 +8,7 @@ use crate::public::error::syntax_error;
 use crate::public::value::function::UserDefinedFnParam;
 use crate::public::value::oop::class::Property;
 use crate::public::value::symbols::Symbols;
-use crate::public::value::value::ValueType;
+use crate::public::value::ValueType;
 
 use super::function_definition;
 
@@ -17,7 +17,7 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ClassDefinitionNode, ()> {
     // example:
     // { prop $_, method=(self $_){do something...} }
 
-    if tokens.len() == 0 {
+    if tokens.is_empty() {
         return Err(syntax_error("missing class body")?);
     }
 
@@ -28,7 +28,7 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ClassDefinitionNode, ()> {
 
     if first_token == Token::Paren(Paren::LeftBrace) {
         loop {
-            if tokens.len() == 0 {
+            if tokens.is_empty() {
                 return Err(syntax_error("unmatched brace")?);
             }
 

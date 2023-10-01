@@ -8,10 +8,8 @@ use crate::{
 use super::{pre_processer, read_file};
 
 pub fn run_with_path(path: &str, scope: &mut Scope) {
-    let file_content = read_file(path).expect(&format!(
-        "head file \"{}\" read error",
-        path,
-    ));
+    let file_content =
+        read_file(path).unwrap_or_else(|_| panic!("head file \"{}\" read error", path));
     self::run(&file_content, scope);
 }
 
@@ -43,7 +41,7 @@ pub fn run(codes: &str, scope: &mut Scope) {
                 let line_to_exec = if cached_multiline.is_empty() {
                     &current_line
                 } else {
-                    cached_multiline.extend(current_line.chars());
+                    cached_multiline.push_str(&current_line);
                     &cached_multiline
                 };
                 // execuse the line
@@ -57,7 +55,7 @@ pub fn run(codes: &str, scope: &mut Scope) {
                     break;
                 }
             }
-            x if x > 0 => cached_multiline.extend(current_line.chars()),
+            x if x > 0 => cached_multiline.push_str(&current_line),
             _ => unreachable!(),
         }
     }

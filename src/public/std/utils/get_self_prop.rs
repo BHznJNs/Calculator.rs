@@ -1,6 +1,6 @@
 use crate::public::{
     error::{internal_error, InternalComponent},
-    value::value::Value,
+    value::Value,
 };
 
 pub fn get_self_prop(self_value: &Value, prop_name: &str) -> Result<Value, ()> {

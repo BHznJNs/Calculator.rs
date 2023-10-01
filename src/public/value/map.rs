@@ -3,7 +3,7 @@ use std::{cell::RefCell, collections::HashMap, fmt, rc::Rc};
 use crate::public::value::{display_indent, ComplexStructure};
 use std::collections::hash_map::{Iter, Keys, Values};
 
-use super::value::Value;
+use super::core::Value;
 
 pub type InternalMap = HashMap<String, Value>;
 pub struct RawMap(pub(self) InternalMap);
@@ -11,12 +11,12 @@ pub struct RawMap(pub(self) InternalMap);
 impl RawMap {
     #[inline]
     pub fn new(map: InternalMap) -> Self {
-        return Self(map);
+        Self(map)
     }
 
     #[inline]
     pub fn get(&self, k: &str) -> Option<Value> {
-        return self.0.get(k).cloned();
+        self.0.get(k).cloned()
     }
     #[inline]
     pub fn set(&mut self, k: String, v: Value) {
@@ -25,22 +25,19 @@ impl RawMap {
 
     #[inline]
     pub fn iter(&self) -> Iter<String, Value> {
-        return self.0.iter();
+        self.0.iter()
     }
     #[inline]
     pub fn keys(&self) -> Keys<String, Value> {
-        return self.0.keys();
+        self.0.keys()
     }
     #[inline]
     pub fn values(&self) -> Values<String, Value> {
-        return self.0.values();
+        self.0.values()
     }
-
+    #[inline]
     pub fn has_key(&self, key_name: &str) -> bool {
-        match self.0.get(key_name) {
-            Some(_) => true,
-            None => false,
-        }
+        self.0.get(key_name).is_some()
     }
 
     #[inline]
@@ -49,7 +46,7 @@ impl RawMap {
     }
     #[inline]
     pub fn len(&self) -> usize {
-        return self.0.len();
+        self.0.len()
     }
 }
 

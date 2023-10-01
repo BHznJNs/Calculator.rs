@@ -13,7 +13,7 @@ use crate::public::value::array::ArrayLiteral;
 use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function};
 use crate::public::value::oop::class::{Class, Property};
 use crate::public::value::oop::object::Object;
-use crate::public::value::value::{Value, ValueType};
+use crate::public::value::{Value, ValueType};
 
 use self::file_ops::file_append;
 use self::fs_ops::{dir_create, dir_delete, file_create, file_delete};
@@ -76,7 +76,7 @@ fn static_class_setter() {
 
 impl ObjectModule for FileSysModule {
     fn module_object() -> Object {
-        if unsafe { FILE_CLASS == None } {
+        if unsafe { FILE_CLASS.is_none() } {
             static_class_setter();
         }
 

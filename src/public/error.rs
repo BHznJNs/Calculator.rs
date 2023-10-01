@@ -5,7 +5,7 @@ use crossterm::style::{StyledContent, Stylize};
 
 use crate::utils::print_line;
 
-use super::value::value::ValueType;
+use super::value::ValueType;
 
 type ErrorResult = Result<(), ()>;
 fn error_name_output(name: &str) -> StyledContent<&str> {
@@ -19,9 +19,9 @@ pub fn type_error(param: Option<&str>, expected: Vec<ValueType>, found: ValueTyp
         let mut res_string = String::new();
         loop {
             let current = type_vec.remove(0);
-            res_string.extend(current.to_string().chars());
+            res_string.push_str(&current.to_string());
 
-            if type_vec.len() != 0 {
+            if !type_vec.is_empty() {
                 res_string.push('/');
             } else {
                 break;

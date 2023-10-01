@@ -36,14 +36,15 @@ fn get_priority(symbol_node: &ASTNode) -> Result<i8, ()> {
 }
 
 pub fn compare(symbol_node1: &ASTNode, symbol_node2: &ASTNode) -> Result<i8, ()> {
+    use std::cmp::Ordering;
+
     let priority1 = get_priority(symbol_node1)?;
     let priority2 = get_priority(symbol_node2)?;
 
-    if priority1 > priority2 {
-        Ok(1)
-    } else if priority1 == priority2 {
-        Ok(0)
-    } else {
-        Ok(-1)
-    }
+    let result = match priority1.cmp(&priority2) {
+        Ordering::Less => -1,
+        Ordering::Equal => 0,
+        Ordering::Greater => 1,
+    };
+    return Ok(result);
 }

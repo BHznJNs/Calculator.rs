@@ -7,18 +7,18 @@ use crate::public::std::{ModuleClass, EMPTY_MODULE_CLASS};
 use crate::public::std::utils::get_self_prop::get_self_prop;
 use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function};
 use crate::public::value::oop::class::{Class, Property};
-use crate::public::value::value::{Value, ValueType};
+use crate::public::value::{Value, ValueType};
 
 use super::super::utils::get_val::get_val;
 use super::{BuildInFnCall, ClassModule};
 
 #[derive(PartialEq, Clone)]
 pub enum StringModule {
-    SPLIT,
-    REPLACE,
-    REPEAT,
-    STARTWITH,
-    ENDWITH,
+    Split,
+    Replace,
+    Repeat,
+    StartWith,
+    EndWith,
 }
 
 static mut MODULE_CLASS: ModuleClass = EMPTY_MODULE_CLASS;
@@ -29,7 +29,7 @@ impl ClassModule for StringModule {
                 BuildInFnParam(ValueType::Object, "self"),
                 BuildInFnParam(ValueType::String, "divider"),
             ],
-            identi: BuildInFnIdenti::String(Self::SPLIT),
+            identi: BuildInFnIdenti::String(Self::Split),
         };
         let replace = BuildInFunction {
             params: vec![
@@ -37,28 +37,28 @@ impl ClassModule for StringModule {
                 BuildInFnParam(ValueType::Void, "from"),
                 BuildInFnParam(ValueType::Void, "to"),
             ],
-            identi: BuildInFnIdenti::String(Self::REPLACE),
+            identi: BuildInFnIdenti::String(Self::Replace),
         };
         let repeat = BuildInFunction {
             params: vec![
                 BuildInFnParam(ValueType::Object, "self"),
                 BuildInFnParam(ValueType::Void, "num"),
             ],
-            identi: BuildInFnIdenti::String(Self::REPEAT),
+            identi: BuildInFnIdenti::String(Self::Repeat),
         };
         let start_with = BuildInFunction {
             params: vec![
                 BuildInFnParam(ValueType::Object, "self"),
                 BuildInFnParam(ValueType::String, "pat"),
             ],
-            identi: BuildInFnIdenti::String(Self::STARTWITH),
+            identi: BuildInFnIdenti::String(Self::StartWith),
         };
         let end_with = BuildInFunction {
             params: vec![
                 BuildInFnParam(ValueType::Object, "self"),
                 BuildInFnParam(ValueType::String, "pat"),
             ],
-            identi: BuildInFnIdenti::String(Self::ENDWITH),
+            identi: BuildInFnIdenti::String(Self::EndWith),
         };
         return Class::new(
             vec![Property(ValueType::String, String::from("v"))],
@@ -81,13 +81,14 @@ impl ClassModule for StringModule {
 }
 
 impl BuildInFnCall for StringModule {
+    #[allow(clippy::single_char_pattern)]
     fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
         let self_value = get_val("self", scope)?;
         let str_value = get_self_prop(&self_value, "v")?;
         let str_ref = str_value.get_str()?;
 
         let result = match self {
-            Self::SPLIT => {
+            Self::Split => {
                 let divider_value = get_val("divider", scope)?;
                 let divider_ref = divider_value.get_str()?;
 
@@ -107,26 +108,26 @@ impl BuildInFnCall for StringModule {
                 Value::from(res_vec)
             }
 
-            Self::REPLACE => {
+            Self::Replace => {
                 let from_value = get_val("from", scope)?;
                 let to_value = get_val("to", scope)?;
                 let (from_ref, to_ref) = (from_value.get_str()?, to_value.get_str()?);
                 let replaced_str = str_ref.replace(&*from_ref, &to_ref);
                 Value::from(replaced_str)
             }
-            Self::REPEAT => {
+            Self::Repeat => {
                 let num_value = get_val("num", scope)?;
                 let repeat_count = num_value.get_i64()?;
                 let repeated_str = str_ref.repeat(repeat_count as usize);
                 Value::from(repeated_str)
             }
 
-            Self::STARTWITH | Self::ENDWITH => {
+            Self::StartWith | Self::EndWith => {
                 let pat_value = get_val("pat", scope)?;
                 let pat_ref = pat_value.get_str()?;
                 let result = match self {
-                    Self::STARTWITH => str_ref.starts_with(&*pat_ref),
-                    Self::ENDWITH => str_ref.ends_with(&*pat_ref),
+                    Self::StartWith => str_ref.starts_with(&*pat_ref),
+                    Self::EndWith => str_ref.ends_with(&*pat_ref),
                     _ => unreachable!(),
                 };
                 Value::from(result)

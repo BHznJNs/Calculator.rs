@@ -10,7 +10,7 @@ use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::{LocalScope, Scope};
 use crate::public::Param;
 
-use super::value::{Value, ValueType};
+use super::core::{Value, ValueType};
 use super::{into_rc_refcell, GetAddr};
 
 #[derive(PartialEq, Clone)]
@@ -81,7 +81,7 @@ impl Function {
             let formal_param = &formal_params[index];
 
             // compute actual_param_value
-            let actual_param_node = (&actual_params[index]).clone();
+            let actual_param_node = actual_params[index].clone();
             let actual_param_value = expr_resolver(actual_param_node.borrow(), whole_scope)?;
 
             // param type check
@@ -91,7 +91,7 @@ impl Function {
                     .insert(formal_param.identi().to_string(), actual_param_value);
             } else {
                 type_error(
-                    Some(&formal_param.identi()),
+                    Some(formal_param.identi()),
                     vec![formal_param.type__()],
                     actual_param_value.get_type(),
                 )?

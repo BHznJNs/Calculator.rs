@@ -5,7 +5,7 @@ use crate::public::error::{assignment_error, range_error, syntax_error};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::array::RawArray;
 use crate::public::value::map::RawMap;
-use crate::public::value::value::Value;
+use crate::public::value::Value;
 
 use super::super::expression;
 

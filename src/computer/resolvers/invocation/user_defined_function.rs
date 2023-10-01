@@ -2,7 +2,7 @@ use crate::computer::resolvers::{expression, sequence};
 use crate::public::compile_time::ast::types::ExpressionNode;
 use crate::public::run_time::scope::{LocalScope, Scope};
 use crate::public::value::function::{Function, UserDefinedFunction};
-use crate::public::value::value::{Value, VoidSign};
+use crate::public::value::{Value, VoidSign};
 
 fn call(function: &UserDefinedFunction, scope: &mut Scope) -> Result<Value, ()> {
     for node in &function.body {
@@ -36,9 +36,8 @@ pub fn invoke(
 
     // assign new scope
     scope.local = Some(local_scope);
-    let fn_result = call(&function, scope)?;
+    let fn_result = call(function, scope)?;
 
     scope.local = local_scope_cached.take();
-
-    Ok(fn_result)
+    return Ok(fn_result);
 }

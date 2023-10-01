@@ -2,7 +2,7 @@ use crate::computer::resolvers::{assignment, expression};
 use crate::public::compile_time::ast::types::StatementNode;
 use crate::public::error::syntax_error;
 use crate::public::run_time::scope::Scope;
-use crate::public::value::value::{Value, VoidSign};
+use crate::public::value::{Value, VoidSign};
 use crate::utils::print_line;
 
 use super::sequence;

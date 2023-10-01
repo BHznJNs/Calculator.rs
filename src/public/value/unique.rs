@@ -6,7 +6,7 @@ use super::GetAddr;
 pub struct Unique(Rc<String>);
 
 impl Unique {
-    pub fn get_identi<'a>(&'a self) -> &'a str {
+    pub fn get_identi(&self) -> &str {
         return &self.0;
     }
 }

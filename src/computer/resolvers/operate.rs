@@ -2,7 +2,7 @@ use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::error::{internal_error, syntax_error, InternalComponent};
 use crate::public::value::number::Number;
 use crate::public::value::symbols::Symbols;
-use crate::public::value::value::Value;
+use crate::public::value::Value;
 
 pub fn operate(val1: Value, val2: Value, operator: Symbols) -> Result<Value, ()> {
     let result = match (&val1, &val2, operator) {
@@ -36,7 +36,7 @@ pub fn operate(val1: Value, val2: Value, operator: Symbols) -> Result<Value, ()>
             // stringify computing
             let mut str_cloned = str_ref.borrow().clone();
             let val2_str = val2.to_raw_string();
-            str_cloned.extend(val2_str.chars());
+            str_cloned.push_str(&val2_str);
             Value::from(str_cloned)
         }
         (
@@ -86,7 +86,7 @@ pub fn operate(val1: Value, val2: Value, operator: Symbols) -> Result<Value, ()>
                         unreachable!()
                     };
                     let cloned_elements = expr_node.elements.clone();
-                    expr_elements.extend(cloned_elements.into_iter());
+                    expr_elements.extend(cloned_elements);
                 }
                 _ => unreachable!(),
             }

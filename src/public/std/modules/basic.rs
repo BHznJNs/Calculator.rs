@@ -20,7 +20,7 @@ use crate::public::value::function::{BuildInFnParam, BuildInFunction};
 use crate::public::value::map::RawMap;
 use crate::public::value::number::Number;
 use crate::public::value::unique::Unique;
-use crate::public::value::value::{Value, ValueType};
+use crate::public::value::{Value, ValueType};
 use crate::public::value::GetAddr;
 
 use super::super::utils::get_val::get_val;
@@ -30,55 +30,55 @@ use super::{BuildInFnCall, ClassModule, FunctionModule};
 
 #[derive(PartialEq, Clone)]
 pub enum BasicModule {
-    INPUT,
-    TYPE,
-    CLONE,
+    Input,
+    Type,
+    Clone,
 
-    INT,
-    FLOAT,
-    FRACTION,
-    BOOLEAN,
-    UNIQUE,
-    STRING,
+    Int,
+    Float,
+    Fraction,
+    Boolean,
+    Unique,
+    String,
 
-    ARRAY,
-    ASCII,
-    LEN,
+    Array,
+    Ascii,
+    Len,
 
-    EXIT,
+    Exit,
 }
 
 impl FunctionModule for BasicModule {
     fn function_list() -> Vec<(String, Value)> {
         let input = BuildInFunction {
             params: vec![BuildInFnParam(ValueType::String, "prompt")],
-            identi: BuildInFnIdenti::Basic(Self::INPUT),
+            identi: BuildInFnIdenti::Basic(Self::Input),
         };
         let exit = BuildInFunction {
             params: vec![],
-            identi: BuildInFnIdenti::Basic(Self::EXIT),
+            identi: BuildInFnIdenti::Basic(Self::Exit),
         };
         let array = BuildInFunction {
             params: vec![BuildInFnParam(ValueType::Number, "input")],
-            identi: BuildInFnIdenti::Basic(Self::ARRAY),
+            identi: BuildInFnIdenti::Basic(Self::Array),
         };
         let fraction = BuildInFunction {
             params: vec![
                 BuildInFnParam(ValueType::Number, "upper"),
                 BuildInFnParam(ValueType::Number, "lower"),
             ],
-            identi: BuildInFnIdenti::Basic(Self::FRACTION),
+            identi: BuildInFnIdenti::Basic(Self::Fraction),
         };
         let unique = BuildInFunction {
             params: vec![BuildInFnParam(ValueType::String, "input")],
-            identi: BuildInFnIdenti::Basic(Self::UNIQUE),
+            identi: BuildInFnIdenti::Basic(Self::Unique),
         };
 
         // --- --- --- --- --- ---
 
         let function_template = BuildInFunction {
             params: vec![BuildInFnParam(ValueType::Void, "input")],
-            identi: BuildInFnIdenti::Basic(Self::TYPE),
+            identi: BuildInFnIdenti::Basic(Self::Type),
         };
         let type__ = function_template.clone();
         let mut clone = function_template.clone();
@@ -88,13 +88,13 @@ impl FunctionModule for BasicModule {
         let mut string = function_template.clone();
         let mut ascii = function_template.clone();
         let mut len = function_template.clone();
-        clone.identi = BuildInFnIdenti::Basic(Self::CLONE);
-        int.identi = BuildInFnIdenti::Basic(Self::INT);
-        float.identi = BuildInFnIdenti::Basic(Self::FLOAT);
-        boolean.identi = BuildInFnIdenti::Basic(Self::BOOLEAN);
-        string.identi = BuildInFnIdenti::Basic(Self::STRING);
-        ascii.identi = BuildInFnIdenti::Basic(Self::ASCII);
-        len.identi = BuildInFnIdenti::Basic(Self::LEN);
+        clone.identi = BuildInFnIdenti::Basic(Self::Clone);
+        int.identi = BuildInFnIdenti::Basic(Self::Int);
+        float.identi = BuildInFnIdenti::Basic(Self::Float);
+        boolean.identi = BuildInFnIdenti::Basic(Self::Boolean);
+        string.identi = BuildInFnIdenti::Basic(Self::String);
+        ascii.identi = BuildInFnIdenti::Basic(Self::Ascii);
+        len.identi = BuildInFnIdenti::Basic(Self::Len);
 
         return vec![
             (String::from("input"), Value::from(input)),
@@ -117,7 +117,7 @@ impl FunctionModule for BasicModule {
 impl BuildInFnCall for BasicModule {
     fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
         let result = match self {
-            Self::INPUT => {
+            Self::Input => {
                 let prompt_value = get_val("prompt", scope)?;
                 // show prompt
                 let prompt_ref = prompt_value.get_str()?;
@@ -140,7 +140,7 @@ impl BuildInFnCall for BasicModule {
 
                 Value::from(input)
             }
-            Self::FRACTION => {
+            Self::Fraction => {
                 let upper_value = get_val("upper", scope)?;
                 let lower_value = get_val("lower", scope)?;
 
@@ -159,13 +159,13 @@ impl BuildInFnCall for BasicModule {
                     )?);
                 }
             }
-            Self::EXIT => process::exit(0),
+            Self::Exit => process::exit(0),
 
             _ => {
                 let input = get_val("input", scope)?;
 
                 match self {
-                    Self::TYPE => {
+                    Self::Type => {
                         let type_uni = unsafe {
                             match input.get_type() {
                                 ValueType::Void => &VOID_T,
@@ -183,9 +183,9 @@ impl BuildInFnCall for BasicModule {
                         };
                         Value::from(type_uni.unwrap())
                     }
-                    Self::CLONE => input.deep_clone(),
+                    Self::Clone => input.deep_clone(),
 
-                    Self::INT => match input {
+                    Self::Int => match input {
                         Value::Number(num) => Value::Number(num.int()),
                         Value::String(str) => {
                             let refer = str.as_ref().borrow();
@@ -201,7 +201,7 @@ impl BuildInFnCall for BasicModule {
                             )?)
                         }
                     },
-                    Self::FLOAT => match input {
+                    Self::Float => match input {
                         Value::Number(num) => Value::Number(num.float()),
                         Value::String(str) => {
                             let refer = str.as_ref().borrow();
@@ -218,10 +218,10 @@ impl BuildInFnCall for BasicModule {
                         }
                     },
 
-                    Self::BOOLEAN => Value::Boolean(input.get_bool()),
-                    Self::STRING => Value::from(input.to_raw_string()),
-                    Self::UNIQUE => Value::from(Unique::from(input.to_raw_string())),
-                    Self::ARRAY => {
+                    Self::Boolean => Value::Boolean(input.get_bool()),
+                    Self::String => Value::from(input.to_raw_string()),
+                    Self::Unique => Value::from(Unique::from(input.to_raw_string())),
+                    Self::Array => {
                         let Value::Number(num) = input else {
                             unreachable!()
                         };
@@ -229,7 +229,7 @@ impl BuildInFnCall for BasicModule {
                         let arr_literal: ArrayLiteral = vec![Value::from(0); size].into();
                         Value::from(arr_literal)
                     }
-                    Self::ASCII => {
+                    Self::Ascii => {
                         let input_ref = input.get_str()?;
                         let Some(first_char) = input_ref.chars().next() else {
                             return Ok(Value::from(0));
@@ -238,11 +238,11 @@ impl BuildInFnCall for BasicModule {
                         if first_char.is_ascii() {
                             Value::from(first_char as i64)
                         } else {
-                            println!("Invalid ASCII character");
+                            println!("Invalid Ascii character");
                             return Err(());
                         }
                     }
-                    Self::LEN => {
+                    Self::Len => {
                         #[inline]
                         fn array_length(arr: &Rc<RefCell<RawArray>>) -> Value {
                             let refer = arr.borrow();

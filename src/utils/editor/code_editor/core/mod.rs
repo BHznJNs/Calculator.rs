@@ -333,7 +333,7 @@ impl CodeEditor {
 
     fn undo(&mut self) -> io::Result<()> {
         if let Some(ev) = self.history.undo() {
-            let target_pos = ev.pos_after.clone();
+            let target_pos = ev.pos_after;
             let target_op = ev.op.rev();
 
             self.jump_to(target_pos)?;
@@ -343,7 +343,7 @@ impl CodeEditor {
     }
     fn redo(&mut self) -> io::Result<()> {
         if let Some(ev) = self.history.redo() {
-            let target_pos = ev.pos_before.clone();
+            let target_pos = ev.pos_before;
             let target_op = ev.op.clone();
 
             self.jump_to(target_pos)?;
@@ -445,8 +445,8 @@ impl CodeEditor {
                 self.toggle_state(EditorState::Positioning)?;
 
                 let target_pos = self.components.positioner.get_target();
-                if self.check_cursor_pos(target_pos.clone()) {
-                    self.jump_to(target_pos.clone())?;
+                if self.check_cursor_pos(target_pos) {
+                    self.jump_to(target_pos)?;
                     self.dashboard.set_cursor_pos(target_pos)?;
                 }
             }
@@ -466,7 +466,7 @@ impl CodeEditor {
                 };
 
                 if let Some(pos) = option_target_pos {
-                    let pos = pos.clone();
+                    let pos = *pos;
                     self.component_exec(|e| e.jump_to(pos))?;
                 }
             }
@@ -503,20 +503,20 @@ impl CodeEditor {
                         let replacer = &mut self.components.replacer;
                         replacer.search_handler(pos_list)?;
 
-                        let first_target_pos = replacer.first().unwrap().clone();
+                        let first_target_pos = *replacer.first().unwrap();
                         self.component_exec(|e| e.jump_to(first_target_pos))?;
                     }
                 } else if self.components.replacer.is_next_key(key) {
                     // jump to next position
                     let next_pos = self.components.replacer.next();
                     if let Some(pos) = next_pos {
-                        let pos = pos.clone();
+                        let pos = *pos;
                         self.component_exec(|e| e.jump_to(pos))?;
                     }
                 } else if self.components.replacer.is_replace_one_key(key) {
                     self.component_exec(|e| {
                         let replacer = &mut e.components.replacer;
-                        let current_pos = replacer.current().clone();
+                        let current_pos = *replacer.current();
 
                         if let Some(mut next_pos) = replacer.next().cloned() {
                             if let Some(ev) = e.history.previous_event() {
@@ -549,7 +549,7 @@ impl CodeEditor {
                     );
                     replacer.replace_handler();
 
-                    let mut current_pos = replacer.current().clone();
+                    let mut current_pos = *replacer.current();
 
                     while let Some(mut next_pos) = self.components.replacer.next().cloned() {
                         if let Some(ev) = self.history.previous_event() {
@@ -561,7 +561,7 @@ impl CodeEditor {
                             e.replace(replace_count, replace_text)
                         })?;
 
-                        current_pos = self.components.replacer.current().clone();
+                        current_pos = *self.components.replacer.current();
                     }
                 }
             }
@@ -660,16 +660,13 @@ impl CodeEditor {
     fn search(&self, target: &str) -> Option<Vec<EditorCursorPos>> {
         let mut result_pos_list = Vec::<EditorCursorPos>::new();
         for (index, line) in self.lines.iter().enumerate() {
-            match line.find_all(target) {
-                Some(pos_list) => {
-                    for pos in pos_list {
-                        result_pos_list.push(EditorCursorPos {
-                            row: index + 1,
-                            col: pos + 1,
-                        })
-                    }
+            if let Some(pos_list) = line.find_all(target) {
+                for pos in pos_list {
+                    result_pos_list.push(EditorCursorPos {
+                        row: index + 1,
+                        col: pos + 1,
+                    })
                 }
-                None => {}
             }
         }
 

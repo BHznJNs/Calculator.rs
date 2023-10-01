@@ -15,7 +15,7 @@ use super::headfile;
 use commands::CommandArg;
 
 pub fn args_resolve(mut args: VecDeque<String>, scope: &mut Scope) -> io::Result<ProgramMode> {
-    if args.len() == 0 {
+    if args.is_empty() {
         return Ok(ProgramMode::REPL);
     }
 

@@ -3,12 +3,13 @@ use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::function::{BuildInFnParam, BuildInFunction};
 use crate::public::value::oop::object::Object;
-use crate::public::value::value::{Value, ValueType};
+use crate::public::value::{Value, ValueType};
 
 use super::super::utils::get_val::get_val;
 use super::{BuildInFnCall, ObjectModule};
 
 #[derive(PartialEq, Clone)]
+#[allow(clippy::upper_case_acronyms)]
 pub enum MathModule {
     SIN,
     COS,
@@ -148,7 +149,8 @@ impl BuildInFnCall for MathModule {
                     Self::ROUND => f.round(),
 
                     Self::ASIN | Self::ACOS | Self::ATAN => {
-                        if f < -1.0 || f > 1.0 {
+                        // `f` less than -1 and greater than 1
+                        if !(-1.0..=1.0).contains(&f) {
                             // inverse trigonometric function error.
                             return Err(
                                 math_error(

@@ -6,7 +6,7 @@ use std::{
     rc::Rc,
 };
 
-use super::{value::Value, ComplexStructure, GetAddr};
+use super::{core::Value, ComplexStructure, GetAddr};
 use crate::public::value::display_indent;
 use crossterm::style::Stylize;
 
@@ -85,8 +85,8 @@ impl RawArray {
         let mut result_str = arr_iter.next().unwrap().to_raw_string();
 
         for v in arr_iter {
-            result_str.extend(div.chars());
-            result_str.extend(v.to_raw_string().chars());
+            result_str.push_str(div);
+            result_str.push_str(&v.to_raw_string());
         }
         return result_str;
     }
@@ -128,11 +128,10 @@ impl GetAddr for RawArray {
 
 impl ComplexStructure for RawArray {
     fn display(f: &mut fmt::Formatter<'_>, arr: &Rc<RefCell<Self>>, level: usize) -> fmt::Result {
-        const LINE_COUNT: i8 = 5;
-        let mut index = 0;
+        const LINE_COUNT: usize = 5;
 
         write!(f, "[")?;
-        for element in arr.borrow().iter() {
+        for (index, element) in arr.borrow().iter().enumerate() {
             // print indent
             if index % LINE_COUNT == 0 {
                 write!(f, "\r\n")?;
@@ -142,7 +141,6 @@ impl ComplexStructure for RawArray {
             Self::item_display(f, element, level + 1)?;
             // comma symbol print
             write!(f, "{}", ", ".dim())?;
-            index += 1;
         }
 
         write!(f, "\r\n")?;

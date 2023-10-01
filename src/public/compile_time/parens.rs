@@ -1,4 +1,5 @@
 #[derive(PartialEq, Debug, Clone, Copy)]
+#[allow(clippy::enum_variant_names)]
 pub enum Paren {
     // ()
     LeftParen,

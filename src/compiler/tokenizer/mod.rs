@@ -9,7 +9,7 @@ use crate::public::compile_time::keywords::Keyword;
 use crate::public::compile_time::parens::Paren;
 use crate::public::error::{assignment_error, syntax_error};
 use crate::public::value::symbols::Symbols;
-use crate::public::value::{number::Number, value::ValueType};
+use crate::public::value::{number::Number, ValueType};
 use crate::utils::ascii::{ascii_to_num, is_identi_ascii};
 
 use token::{Token, TokenType, TokenVec};
@@ -25,7 +25,7 @@ fn number_resolver(chars: &mut Chars, first_ch: char, index: &mut usize) -> (cha
     let mut value = Number::Int(ascii_to_num(first_ch));
     let mut cached_ch = '\0';
 
-    while let Some(ch) = chars.next() {
+    for ch in chars {
         *index += 1;
 
         if ch.is_ascii_digit() {
@@ -58,7 +58,7 @@ fn identi_resolver(chars: &mut Chars, first_ch: char, index: &mut usize) -> (cha
     let mut value = String::from(first_ch);
     let mut cached_ch = '\0';
 
-    while let Some(ch) = chars.next() {
+    for ch in chars {
         *index += 1;
 
         if is_identi_ascii(ch) || ch.is_ascii_digit() {
@@ -71,7 +71,7 @@ fn identi_resolver(chars: &mut Chars, first_ch: char, index: &mut usize) -> (cha
     return (cached_ch, value);
 }
 
-pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
+pub fn tokenize(source: &str) -> Result<TokenVec, ()> {
     // is used for check is number minus OR
     // check is in annotation state.
     let mut last_type = TokenType::Unknown;
@@ -181,7 +181,7 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
                 tokens.push_back(Token::Symbol(Symbols::from(ch)));
             }
             '=' => {
-                if tokens.len() == 0 {
+                if tokens.is_empty() {
                     return Err(assignment_error("left-hand value missing")?);
                 }
 
@@ -210,7 +210,7 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
                 let mut value = String::new();
                 let mut is_escape_char = false;
 
-                while let Some(mut ch) = chars.next() {
+                for mut ch in chars.by_ref() {
                     index += 1;
 
                     if is_escape_char || (ch != '\'' && ch != '\"') {

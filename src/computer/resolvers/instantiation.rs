@@ -3,7 +3,7 @@ use crate::public::error::type_error;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::oop::class::Class;
 use crate::public::value::oop::object::Object;
-use crate::public::value::value::{Value, ValueType};
+use crate::public::value::{Value, ValueType};
 
 use super::array_literal;
 

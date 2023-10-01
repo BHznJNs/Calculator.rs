@@ -24,11 +24,11 @@ impl EditorCursorPos {
             }
         }
 
-        let mut chars = value.chars();
+        let chars = value.chars();
         let mut number_str = String::new();
         let (mut row, mut col) = (1, 1);
 
-        while let Some(ch) = chars.next() {
+        for ch in chars {
             if ch.is_ascii_digit() {
                 number_str.push(ch);
             } else {

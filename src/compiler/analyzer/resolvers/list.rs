@@ -22,12 +22,12 @@ pub fn resolve(tokens: &mut TokenVec, identi_paren: Paren) -> Result<Vec<Express
         sub_tokens: &mut TokenVec,
         elements: &mut Vec<ExpressionNode>,
     ) -> Result<(), ()> {
-        if sub_tokens.len() > 0 {
+        if !sub_tokens.is_empty() {
             let element = expression::resolve(sub_tokens)?;
             sub_tokens.clear();
             elements.push(element);
         }
-        Ok(())
+        return Ok(());
     }
 
     let mut state = State::Outer;
@@ -36,7 +36,7 @@ pub fn resolve(tokens: &mut TokenVec, identi_paren: Paren) -> Result<Vec<Express
     let mut sub_tokens = TokenVec::new();
 
     loop {
-        if tokens.len() == 0 {
+        if tokens.is_empty() {
             return Err(syntax_error("Unmatched parentheses")?);
         }
 

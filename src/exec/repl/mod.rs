@@ -9,7 +9,7 @@ use super::attempt;
 use crate::public::env::{Env, ENV};
 use crate::public::error::{import_error, syntax_error};
 use crate::public::run_time::scope::Scope;
-use crate::public::value::value::Value;
+use crate::public::value::Value;
 use crate::utils::completer::Completer;
 use crate::utils::editor::{LineEditor, Signal};
 use crate::utils::print_line;

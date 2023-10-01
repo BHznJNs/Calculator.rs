@@ -14,10 +14,7 @@ pub enum EditorState {
 
 impl EditorState {
     pub fn is_component_state(&self) -> bool {
-        match self {
-            Self::Saved | Self::Modified => false,
-            _ => true,
-        }
+        !matches!(self, Self::Saved | Self::Modified)
     }
 }
 

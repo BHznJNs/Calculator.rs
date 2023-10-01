@@ -6,6 +6,7 @@ use crate::public::error::{internal_error, InternalComponent, math_error};
 
 #[cfg_attr(debug_assertions, derive(Debug))]
 #[derive(Clone, Copy)]
+#[allow(clippy::enum_variant_names)]
 pub enum Number {
     NotANumber,
 
@@ -92,8 +93,8 @@ impl Number {
 
     pub fn not(&self) -> Self {
         match self {
-            Self::Int(i) => Self::Int(!(*i > 0) as i64),
-            Self::Float(f) => Self::Int(!(*f > 0.0) as i64),
+            Self::Int(i) => Self::Int((*i <= 0) as i64),
+            Self::Float(f) => Self::Int((*f <= 0.0) as i64),
             Self::Fraction(upper, _) => {
                 if *upper == 0 {
                     Self::Int(1)
@@ -109,14 +110,14 @@ impl Number {
         match self {
             Self::Float(f) => Self::Int(*f as i64),
             Self::Fraction(_, _) => Self::Int(self.int_value()),
-            _ => self.clone(),
+            _ => *self,
         }
     }
     pub fn float(&self) -> Self {
         match self {
             Self::Int(i) => Self::Float(*i as f64),
             Self::Fraction(_, _) => Self::Float(self.float_value()),
-            _ => self.clone(),
+            _ => *self,
         }
     }
 
@@ -407,8 +408,5 @@ impl PartialEq for Number {
             },
             _ => unreachable!(),
         }
-    }
-    fn ne(&self, other: &Self) -> bool {
-        !(self == other)
     }
 }

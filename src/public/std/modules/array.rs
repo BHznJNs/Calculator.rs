@@ -6,22 +6,22 @@ use crate::public::std::{ModuleClass, EMPTY_MODULE_CLASS};
 use crate::public::std::utils::get_self_prop::get_self_prop;
 use crate::public::value::function::{BuildInFnParam, BuildInFunction, Function};
 use crate::public::value::oop::class::{Class, Property};
-use crate::public::value::value::{Value, ValueType};
+use crate::public::value::{Value, ValueType};
 
 use super::super::utils::get_val::get_val;
 use super::{BuildInFnCall, ClassModule};
 
 #[derive(PartialEq, Clone)]
 pub enum ArrayModule {
-    PUSH,
-    POP,
-    SHIFT,
-    UNSHIFT,
-    INSERT,
-    REMOVE,
-    CONTAINS,
-    SLICE,
-    JOIN,
+    Push,
+    Pop,
+    Shift,
+    Unshift,
+    Insert,
+    Remove,
+    Contains,
+    Slice,
+    Join,
 }
 
 pub static mut MODULE_CLASS: ModuleClass = EMPTY_MODULE_CLASS;
@@ -32,16 +32,16 @@ impl ClassModule for ArrayModule {
                 BuildInFnParam(ValueType::Object, "self"),
                 BuildInFnParam(ValueType::Void, "element"),
             ],
-            identi: BuildInFnIdenti::Array(Self::PUSH),
+            identi: BuildInFnIdenti::Array(Self::Push),
         };
         let pop = BuildInFunction {
             params: vec![BuildInFnParam(ValueType::Object, "self")],
-            identi: BuildInFnIdenti::Array(Self::POP),
+            identi: BuildInFnIdenti::Array(Self::Pop),
         };
         let mut shift = pop.clone();
         let mut unshift = push.clone();
-        shift.identi = BuildInFnIdenti::Array(Self::SHIFT);
-        unshift.identi = BuildInFnIdenti::Array(Self::UNSHIFT);
+        shift.identi = BuildInFnIdenti::Array(Self::Shift);
+        unshift.identi = BuildInFnIdenti::Array(Self::Unshift);
 
         let insert = BuildInFunction {
             params: vec![
@@ -49,21 +49,21 @@ impl ClassModule for ArrayModule {
                 BuildInFnParam(ValueType::Number, "index"),
                 BuildInFnParam(ValueType::Void, "element"),
             ],
-            identi: BuildInFnIdenti::Array(Self::INSERT),
+            identi: BuildInFnIdenti::Array(Self::Insert),
         };
         let remove = BuildInFunction {
             params: vec![
                 BuildInFnParam(ValueType::Object, "self"),
                 BuildInFnParam(ValueType::Number, "index"),
             ],
-            identi: BuildInFnIdenti::Array(Self::REMOVE),
+            identi: BuildInFnIdenti::Array(Self::Remove),
         };
         let contains = BuildInFunction {
             params: vec![
                 BuildInFnParam(ValueType::Object, "self"),
                 BuildInFnParam(ValueType::Void, "value"),
             ],
-            identi: BuildInFnIdenti::Array(Self::CONTAINS),
+            identi: BuildInFnIdenti::Array(Self::Contains),
         };
         let slice = BuildInFunction {
             params: vec![
@@ -71,14 +71,14 @@ impl ClassModule for ArrayModule {
                 BuildInFnParam(ValueType::Number, "start"),
                 BuildInFnParam(ValueType::Number, "end"),
             ],
-            identi: BuildInFnIdenti::Array(Self::SLICE),
+            identi: BuildInFnIdenti::Array(Self::Slice),
         };
         let join = BuildInFunction {
             params: vec![
                 BuildInFnParam(ValueType::Object, "self"),
                 BuildInFnParam(ValueType::String, "divider"),
             ],
-            identi: BuildInFnIdenti::Array(Self::JOIN),
+            identi: BuildInFnIdenti::Array(Self::Join),
         };
 
         // --- --- --- --- --- ---
@@ -118,12 +118,12 @@ impl BuildInFnCall for ArrayModule {
         let mut arr_ref = arr.borrow_mut();
 
         let result = match self {
-            Self::PUSH => {
+            Self::Push => {
                 let element_value = get_val("element", scope)?;
                 arr_ref.push(element_value.clone());
                 element_value
             }
-            Self::POP => {
+            Self::Pop => {
                 let poped_el = arr_ref.pop();
                 if let Some(val) = poped_el {
                     // return poped value
@@ -131,7 +131,7 @@ impl BuildInFnCall for ArrayModule {
                 }
                 Value::EMPTY
             }
-            Self::SHIFT => {
+            Self::Shift => {
                 let shifted = arr_ref.shift();
                 if let Some(val) = shifted {
                     // return shifted value
@@ -139,12 +139,12 @@ impl BuildInFnCall for ArrayModule {
                 }
                 Value::EMPTY
             }
-            Self::UNSHIFT => {
+            Self::Unshift => {
                 let element_value = get_val("element", scope)?;
                 arr_ref.unshift(element_value.clone());
                 element_value
             }
-            Self::INSERT => {
+            Self::Insert => {
                 let index_value = get_val("index", scope)?;
                 let element_value = get_val("element", scope)?;
 
@@ -152,7 +152,7 @@ impl BuildInFnCall for ArrayModule {
                 arr_ref.insert(index, element_value.clone());
                 element_value
             }
-            Self::REMOVE => {
+            Self::Remove => {
                 let index_value = get_val("index", scope)?;
 
                 let index = index_value.get_i64()? as usize;
@@ -162,21 +162,21 @@ impl BuildInFnCall for ArrayModule {
                     None => Value::EMPTY,
                 }
             }
-            Self::CONTAINS => {
+            Self::Contains => {
                 let target_value = get_val("value", scope)?;
                 let is_contains = arr_ref.contains(&target_value);
                 Value::from(is_contains)
             }
-            Self::SLICE => {
+            Self::Slice => {
                 let start = get_val("start", scope)?.get_i64()?;
                 let end = get_val("end", scope)?.get_i64()?;
                 let slice = arr_ref.slice(start, end);
                 Value::from(slice)
             }
-            Self::JOIN => {
+            Self::Join => {
                 let divider_value = get_val("divider", scope)?;
                 let divider_ref = divider_value.get_str()?;
-                let result_str = arr_ref.join(&*divider_ref);
+                let result_str = arr_ref.join(&divider_ref);
                 Value::from(result_str)
             }
         };

@@ -6,7 +6,7 @@ use crate::public::compile_time::keywords::Keyword;
 use crate::public::compile_time::parens::Paren;
 use crate::public::value::number::Number;
 use crate::public::value::symbols::Symbols;
-use crate::public::value::value::ValueType;
+use crate::public::value::ValueType;
 
 #[derive(PartialEq, Clone, Copy)]
 pub enum TokenType {

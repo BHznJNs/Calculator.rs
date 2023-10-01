@@ -7,7 +7,7 @@ use crate::public::env::ENV;
 use crate::public::error::{reference_error, type_error, ReferenceType};
 use crate::public::value::array::ArrayLiteral;
 use crate::public::value::function::Function;
-use crate::public::value::value::{Value, ValueType};
+use crate::public::value::{Value, ValueType};
 use crate::public::value::{self, display_indent, GetAddr};
 use crate::public::Param;
 use crate::utils::completer::Completer;
@@ -92,7 +92,7 @@ impl Class {
                             val.get_type(),
                         )?);
                     }
-                    val.into()
+                    val
                 }
                 None => break,
             };
@@ -133,7 +133,7 @@ impl Class {
             DataStoragePattern::Map => {
                 let map = data_map.as_ref().unwrap();
 
-                for (key, _) in map {
+                for key in map.keys() {
                     write!(
                         f,
                         "{}{}: {}\r\n",

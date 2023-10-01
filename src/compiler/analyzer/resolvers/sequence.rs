@@ -4,7 +4,7 @@ use crate::public::compile_time::ast::ast_enum::ASTNode;
 use super::{expression, statement};
 
 pub fn resolve(tokens: &mut TokenVec) -> Result<ASTNode, ()> {
-    if tokens.len() == 0 {
+    if tokens.is_empty() {
         // blank line || line comment
         Ok(ASTNode::Comment)
     } else if let Token::Keyword(keyword) = tokens[0] {

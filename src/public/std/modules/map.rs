@@ -7,7 +7,7 @@ use crate::public::{
         array::ArrayLiteral,
         function::{BuildInFnParam, BuildInFunction, Function},
         oop::class::{Class, Property},
-        value::{Value, ValueType},
+        {Value, ValueType},
     },
 };
 
@@ -15,10 +15,10 @@ use super::{BuildInFnCall, ClassModule};
 
 #[derive(PartialEq, Clone)]
 pub enum MapModule {
-    CLEAR,
-    KEYS,
-    VALUES,
-    HASKEY,
+    Clear,
+    Keys,
+    Values,
+    HasKey,
 }
 
 static mut MODULE_CLASS: ModuleClass = EMPTY_MODULE_CLASS;
@@ -26,20 +26,20 @@ impl ClassModule for MapModule {
     fn __static_class__() -> Class {
         let clear = BuildInFunction {
             params: vec![BuildInFnParam(ValueType::Object, "self")],
-            identi: BuildInFnIdenti::Map(Self::CLEAR),
+            identi: BuildInFnIdenti::Map(Self::Clear),
         };
         // `clear` as function template
         let mut keys = clear.clone();
         let mut values = clear.clone();
-        keys.identi = BuildInFnIdenti::Map(Self::KEYS);
-        values.identi = BuildInFnIdenti::Map(Self::VALUES);
+        keys.identi = BuildInFnIdenti::Map(Self::Keys);
+        values.identi = BuildInFnIdenti::Map(Self::Values);
 
         let has_key = BuildInFunction {
             params: vec![
                 BuildInFnParam(ValueType::Object, "self"),
                 BuildInFnParam(ValueType::String, "key_name"),
             ],
-            identi: BuildInFnIdenti::Map(Self::HASKEY),
+            identi: BuildInFnIdenti::Map(Self::HasKey),
         };
 
         return Class::new(
@@ -71,28 +71,28 @@ impl BuildInFnCall for MapModule {
         let mut map_ref = map_temp.borrow_mut();
 
         let result = match self {
-            MapModule::CLEAR => {
+            MapModule::Clear => {
                 map_ref.clear();
                 Value::EMPTY
             }
-            MapModule::KEYS => {
+            MapModule::Keys => {
                 let mut res_arr = ArrayLiteral::new();
                 for key in map_ref.keys() {
                     res_arr.push_back(Value::from(key.to_owned()));
                 }
                 Value::from(res_arr)
             }
-            MapModule::VALUES => {
+            MapModule::Values => {
                 let mut res_arr = ArrayLiteral::new();
                 for val in map_ref.values() {
                     res_arr.push_back(val.clone());
                 }
                 Value::from(res_arr)
             }
-            MapModule::HASKEY => {
+            MapModule::HasKey => {
                 let key_name_value = get_val("key_name", scope)?;
                 let key_name = key_name_value.get_str()?;
-                let is_has_key = map_ref.has_key(&*key_name);
+                let is_has_key = map_ref.has_key(&key_name);
                 Value::from(is_has_key)
             }
         };

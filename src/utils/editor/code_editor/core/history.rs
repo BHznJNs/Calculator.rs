@@ -25,11 +25,11 @@ impl EditorHistory {
 
     #[inline]
     // returns the last appended event
-    pub fn previous_event<'a>(&'a self) -> Option<&'a EditorEvent> {
+    pub fn previous_event(&self) -> Option<&EditorEvent> {
         self.events.back()
     }
 
-    pub fn undo<'a>(&'a mut self) -> Option<&'a EditorEvent> {
+    pub fn undo(&mut self) -> Option<&EditorEvent> {
         let option_op = if !self.redo_events.is_empty() {
             self.redo_events.pop()
         } else {
@@ -45,7 +45,7 @@ impl EditorHistory {
         }
     }
 
-    pub fn redo<'a>(&'a mut self) -> Option<&'a EditorEvent> {
+    pub fn redo(&mut self) -> Option<&EditorEvent> {
         match self.undo_events.pop() {
             Some(op) => {
                 self.redo_events.push(op);

@@ -38,7 +38,7 @@ impl Positioner {
 
     #[inline]
     pub fn get_target(&self) -> EditorCursorPos {
-        self.target.clone()
+        self.target
     }
 }
 

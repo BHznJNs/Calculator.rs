@@ -1,6 +1,6 @@
-use crate::public::{error::syntax_error, value::value::Value};
+use crate::public::{error::syntax_error, value::Value};
 
-pub fn assign(obj_value: Value, property: &String, value: Value) -> Result<(), ()> {
+pub fn assign(obj_value: Value, property: &str, value: Value) -> Result<(), ()> {
     let Value::Object(obj_ref) =
         obj_value else {
         return Err(syntax_error("invalid object reading")?)
@@ -11,7 +11,7 @@ pub fn assign(obj_value: Value, property: &String, value: Value) -> Result<(), (
     Ok(())
 }
 
-pub fn resolve(obj_value: Value, property: &String) -> Result<Value, ()> {
+pub fn resolve(obj_value: Value, property: &str) -> Result<Value, ()> {
     let Value::Object(obj_ref) =
         obj_value else {
         return Err(syntax_error("invalid object reading")?)

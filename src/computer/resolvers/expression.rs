@@ -4,7 +4,7 @@ use crate::public::error::{internal_error, syntax_error, type_error, InternalCom
 use crate::public::run_time::scope::Scope;
 use crate::public::value::into_rc_refcell;
 use crate::public::value::symbols::Symbols;
-use crate::public::value::value::{Value, ValueType};
+use crate::public::value::{Value, ValueType};
 
 use super::operate::operate;
 use super::{array_literal, assignment, composer::compose, function_definition, instantiation};
@@ -12,7 +12,7 @@ use super::{class_definition, map_literal};
 
 pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> Result<Value, ()> {
     let elements = &node.elements;
-    if elements.len() == 0 {
+    if elements.is_empty(){
         return Ok(Value::EMPTY);
     }
 
@@ -22,7 +22,7 @@ pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> Result<Value, ()> {
         let current_value = match current_node {
             ASTNode::Expression(node) => resolve(node, scope)?,
 
-            ASTNode::NumberLiteral(num) => Value::Number(num.clone()),
+            ASTNode::NumberLiteral(num) => Value::Number(*num),
             ASTNode::StringLiteral(str) => Value::from(str.clone()),
 
             ASTNode::LazyExpression(node) => {

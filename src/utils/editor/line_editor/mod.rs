@@ -50,7 +50,7 @@ impl LineEditor {
         return Ok(());
     }
 
-    pub fn readline(&mut self, scope: &mut Scope) -> io::Result<Signal> {
+    pub fn readline(&mut self, _scope: &mut Scope) -> io::Result<Signal> {
         self.init_render()?;
 
         let result = loop {

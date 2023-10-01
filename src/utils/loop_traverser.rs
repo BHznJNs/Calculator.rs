@@ -15,7 +15,7 @@ impl<T> LoopTraverser<T> {
         }
     }
 
-    pub fn next<'a>(&'a mut self) -> Option<&'a T> {
+    pub fn next(&mut self) -> Option<&T> {
         if self.vec.is_empty() || (!self.cycle && self.index == (self.vec.len() - 1) as isize) {
             return None;
         }
@@ -23,7 +23,7 @@ impl<T> LoopTraverser<T> {
         self.index = (self.index + 1) % (self.vec.len() as isize);
         return Some(self.current());
     }
-    pub fn previous<'a>(&'a mut self) -> Option<&'a T> {
+    pub fn previous(&mut self) -> Option<&T> {
         if self.vec.is_empty() || (!self.cycle && (self.index == 0 || self.index == -1)) {
             if self.index == 0 {
                 self.index = -1;
@@ -40,12 +40,12 @@ impl<T> LoopTraverser<T> {
     }
 
     #[inline]
-    pub fn first<'a>(&'a self) -> Option<&'a T> {
+    pub fn first(&self) -> Option<&T> {
         self.vec.front()
     }
 
     #[inline]
-    pub fn current<'a>(&'a self) -> &'a T {
+    pub fn current(&self) -> &T {
         if self.index == -1 {
             &self.vec[0]
         } else {

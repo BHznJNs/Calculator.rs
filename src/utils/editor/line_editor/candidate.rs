@@ -20,14 +20,14 @@ impl Candidate {
         self.list.clear();
     }
 
-    pub fn current_hint<'a>(&'a self) -> Option<&'a str> {
+    pub fn current_hint(&self) -> Option<&str> {
         if !self.list.is_empty() && self.index >= 0 {
             Some(&self.list[self.index as usize])
         } else {
             None
         }
     }
-    pub fn next<'a>(&'a mut self) -> Option<&'a str> {
+    pub fn next(&mut self) -> Option<&str> {
         let index = self.index;
         let len = self.list.len() as isize;
 

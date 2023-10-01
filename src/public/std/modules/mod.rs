@@ -11,7 +11,7 @@ use std::rc::Rc;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::oop::class::Class;
 use crate::public::value::oop::object::Object;
-use crate::public::value::value::Value;
+use crate::public::value::Value;
 
 use super::StdModules;
 

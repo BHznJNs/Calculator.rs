@@ -4,7 +4,7 @@ use crate::public::compile_time::dividers::Divider;
 use crate::public::compile_time::parens::Paren;
 use crate::public::error::syntax_error;
 use crate::public::value::function::UserDefinedFnParam;
-use crate::public::value::value::ValueType;
+use crate::public::value::ValueType;
 
 use super::statement_block;
 
@@ -55,7 +55,7 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<FunctionDefinitionNode, ()> {
     // example:
     // (param $_) {out param}
 
-    if tokens.len() == 0 {
+    if tokens.is_empty() {
         return Err(syntax_error("missing function definition")?);
     }
 

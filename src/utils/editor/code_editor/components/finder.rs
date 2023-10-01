@@ -37,16 +37,16 @@ impl Finder {
     }
 
     #[inline]
-    pub fn next<'a>(&'a mut self) -> Option<&'a EditorCursorPos> {
+    pub fn next(&mut self) -> Option<&EditorCursorPos> {
         self.match_list.next()
     }
     #[inline]
-    pub fn previous<'a>(&'a mut self) -> Option<&'a EditorCursorPos> {
+    pub fn previous(&mut self) -> Option<&EditorCursorPos> {
         self.match_list.previous()
     }
 
     #[inline]
-    pub fn content<'a>(&'a self) -> &'a str {
+    pub fn content(&self) -> &str {
         self.comp.text_area.content()
     }
     #[inline]

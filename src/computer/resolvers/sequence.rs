@@ -1,6 +1,6 @@
 use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::run_time::scope::Scope;
-use crate::public::value::value::Value;
+use crate::public::value::Value;
 
 use super::{expression, statement};
 

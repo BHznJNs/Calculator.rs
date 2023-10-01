@@ -1,5 +1,5 @@
 use crate::public::run_time::scope::Scope;
-use crate::public::value::value::Value;
+use crate::public::value::Value;
 use crate::utils::editor::tokenizer::{TokenVec, TokenType};
 
 fn get_end_part(tokens: &TokenVec) -> Option<Vec<String>> {

@@ -1,11 +1,12 @@
 use super::super::utils::get_val::get_val;
 use crate::public::run_time::{build_in::BuildInFnIdenti, scope::Scope};
 use crate::public::value::function::{BuildInFnParam, BuildInFunction};
-use crate::public::value::value::{Value, ValueType};
+use crate::public::value::{Value, ValueType};
 
 use super::{BuildInFnCall, FunctionModule};
 
 #[derive(PartialEq, Clone)]
+#[allow(clippy::upper_case_acronyms)]
 pub enum BitOpsModule {
     AND,
     OR,

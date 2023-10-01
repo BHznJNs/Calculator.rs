@@ -5,7 +5,7 @@ use std::{
 
 use crate::public::{
     error::{internal_error, InternalComponent},
-    value::{array::ArrayLiteral, value::Value},
+    value::{array::ArrayLiteral, Value},
 };
 
 const TRUE_VALUE: Value = Value::Boolean(true);

@@ -7,7 +7,7 @@ pub mod env;
 pub mod error;
 pub mod value;
 
-use value::value::ValueType;
+use value::ValueType;
 
 pub trait Param {
     fn type__(&self) -> ValueType;

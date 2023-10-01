@@ -1,8 +1,6 @@
 use std::{cell::RefCell, fmt, rc::Rc};
 
-use self::{array::RawArray, map::RawMap, oop::object::Object, value::Value};
-
-pub mod value;
+use self::{array::RawArray, map::RawMap, oop::object::Object};
 
 pub mod array;
 pub mod function;
@@ -12,6 +10,9 @@ pub mod symbols;
 pub mod unique;
 
 pub mod oop;
+mod core;
+
+pub use core::{Value, ValueType, VoidSign};
 
 pub(super) type Addr = usize;
 pub(super) trait GetAddr {

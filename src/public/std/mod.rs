@@ -7,7 +7,7 @@ use self::modules::{
 };
 use super::value::{
     oop::{class::Class, object::Object},
-    value::Value,
+    Value,
 };
 
 pub mod modules;

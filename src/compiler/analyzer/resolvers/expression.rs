@@ -133,7 +133,7 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ExpressionNode, ()> {
             | ASTNode::ElementReading(_) => result_stack.push(node),
 
             ASTNode::SymbolLiteral(_) => {
-                if symbol_stack.len() == 0 {
+                if symbol_stack.is_empty() {
                     symbol_stack.push(node);
                     continue;
                 }
@@ -169,12 +169,11 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ExpressionNode, ()> {
 
     // pop the remain elements in the symbol_stack
     // and push them into the result_stack
-    while symbol_stack.len() > 0 {
-        let last_symbol_node = symbol_stack.pop().unwrap();
+    while let Some(last_symbol_node) = symbol_stack.pop() {
         result_stack.push(last_symbol_node);
     }
 
-    Ok(ExpressionNode {
+    return Ok(ExpressionNode {
         elements: result_stack,
-    })
+    });
 }

@@ -58,26 +58,26 @@ impl Replacer {
     }
 
     #[inline]
-    pub fn first<'a>(&'a self) -> Option<&'a EditorCursorPos> {
+    pub fn first(&self) -> Option<&EditorCursorPos> {
         self.match_list.first()
     }
 
     #[inline]
-    pub fn current<'a>(&'a self) -> &'a EditorCursorPos {
+    pub fn current(&self) -> &EditorCursorPos {
         self.match_list.current()
     }
 
     #[inline]
-    pub fn next<'a>(&'a mut self) -> Option<&'a EditorCursorPos> {
+    pub fn next(&mut self) -> Option<&EditorCursorPos> {
         self.match_list.next()
     }
 
     #[inline]
-    pub fn search_text<'a>(&'a self) -> &'a str {
+    pub fn search_text(&self) -> &str {
         self.searcher.text_area.content()
     }
     #[inline]
-    pub fn replace_text<'a>(&'a self) -> &'a str {
+    pub fn replace_text(&self) -> &str {
         self.replacer.text_area.content()
     }
 

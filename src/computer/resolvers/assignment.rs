@@ -2,7 +2,7 @@ use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::compile_time::ast::types::AssignmentNode;
 use crate::public::error::assignment_error;
 use crate::public::run_time::scope::Scope;
-use crate::public::value::value::Value;
+use crate::public::value::Value;
 
 use super::composer::{compose, element_reading, object_reading};
 use super::expression;

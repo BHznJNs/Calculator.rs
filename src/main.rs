@@ -1,3 +1,5 @@
+#![allow(clippy::needless_return)]
+
 mod compiler;
 mod computer;
 mod exec;

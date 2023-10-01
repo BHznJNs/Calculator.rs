@@ -52,7 +52,7 @@ impl EditorDashboard {
 
     #[inline]
     pub fn state(&self) -> EditorState {
-        self.state.clone()
+        self.state
     }
 
     pub fn set_state(&mut self, new_state: EditorState) -> io::Result<()> {

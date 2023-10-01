@@ -4,7 +4,7 @@ use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::{LocalScope, Scope};
 use crate::public::std::modules::BuildInFnCall;
 use crate::public::value::function::{BuildInFunction, Function};
-use crate::public::value::value::Value;
+use crate::public::value::Value;
 
 fn call(function: &BuildInFunction, scope: &mut Scope) -> Result<Value, ()> {
     match &function.identi {
@@ -37,10 +37,9 @@ pub fn invoke(
     let mut local_scope_cached = scope.local.take();
 
     scope.local = Some(local_scope);
-    let fn_result = call(&function, scope)?;
+    let fn_result = call(function, scope)?;
     scope.local = None;
 
     scope.local = local_scope_cached.take();
-
-    Ok(fn_result)
+    return Ok(fn_result);
 }

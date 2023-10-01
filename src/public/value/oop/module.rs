@@ -2,7 +2,7 @@ use crate::public::run_time::scope::GlobalScope;
 use crate::public::value::array::ArrayLiteral;
 use crate::public::value::function::{Function, UserDefinedFnParam};
 use crate::public::value::oop::class::{Class, Property};
-use crate::public::value::value::{Value, ValueType};
+use crate::public::value::{Value, ValueType};
 
 use super::object::Object;
 

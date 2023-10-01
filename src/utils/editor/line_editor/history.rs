@@ -17,7 +17,7 @@ impl EditorHistory {
         }
     }
 
-    pub fn next<'a>(&'a mut self) -> Option<&'a String> {
+    pub fn next(&mut self) -> Option<&String> {
         let previous = self.list.previous();
         if previous.is_none() {
             self.use_history = false;
@@ -26,7 +26,7 @@ impl EditorHistory {
             return previous;
         }
     }
-    pub fn previous<'a>(&'a mut self) -> Option<&'a String> {
+    pub fn previous(&mut self) -> Option<&String> {
         self.use_history = true;
         self.list.next()
     }

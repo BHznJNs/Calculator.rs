@@ -1,6 +1,6 @@
 use crate::public::error::syntax_error;
 use crate::public::run_time::scope::Scope;
-use crate::public::value::value::Value;
+use crate::public::value::Value;
 
 // used to get value of function actual param.
 pub fn get_val(val_name: &str, scope: &mut Scope) -> Result<Value, ()> {

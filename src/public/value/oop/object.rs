@@ -9,7 +9,7 @@ use crate::public::value::{self, ComplexStructure, GetAddr};
 use crate::utils::completer::Completer;
 
 use super::super::display_indent;
-use super::super::value::Value;
+use super::super::core::Value;
 use super::data_storage::{ComposeStorage, DataStoragePattern, ListStorage};
 
 #[derive(PartialEq, Clone)]
@@ -50,7 +50,7 @@ impl Object {
         }
     }
 
-    fn get_store<'obj>(&'obj self) -> &'obj ComposeStorage<Value> {
+    fn get_store(&self) -> &ComposeStorage<Value> {
         match self {
             Self::BuildIn(obj) => &obj.storage,
             Self::UserDefined(obj) => &obj.storage,

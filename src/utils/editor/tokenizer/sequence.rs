@@ -67,7 +67,7 @@ impl TextAreaContent for TokenSequence {
         }
 
         if remain_width > 0 {
-            buffer.extend(" ".repeat(remain_width).chars());
+            buffer.push_str(&" ".repeat(remain_width));
         }
 
         return buffer;

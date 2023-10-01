@@ -45,7 +45,7 @@ pub fn tokenize(source: &str) -> TokenVec {
                 value.insert(0, '-');
             }
 
-            while let Some(ch) = chars.next() {
+            for ch in chars.by_ref() {
                 if ch.is_ascii_digit() || ch == '.' {
                     value.push(ch);
                 } else {
@@ -63,7 +63,7 @@ pub fn tokenize(source: &str) -> TokenVec {
         if is_identi_ascii(ch) {
             let mut value = String::from(ch);
 
-            while let Some(ch) = chars.next() {
+            for ch in chars.by_ref() {
                 if is_identi_ascii(ch) || ch.is_ascii_digit() {
                     value.push(ch)
                 } else {
@@ -109,7 +109,7 @@ pub fn tokenize(source: &str) -> TokenVec {
                 let mut value = String::from(ch);
                 let mut is_escape_char = false;
 
-                while let Some(ch) = chars.next() {
+                for ch in chars.by_ref() {
                     if !is_escape_char && (ch == '\'' || ch == '\"') {
                         value.push(ch);
                         break;

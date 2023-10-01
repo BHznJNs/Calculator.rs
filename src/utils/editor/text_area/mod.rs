@@ -53,12 +53,8 @@ pub struct TextAreaStateRight {
 }
 
 impl TextArea<String> {
-    #[inline]
     pub fn is_editing_key(key: KeyCode) -> bool {
-        match key {
-            KeyCode::Backspace | KeyCode::Left | KeyCode::Right | KeyCode::Char(_) => true,
-            _ => false,
-        }
+        matches!(key, KeyCode::Backspace | KeyCode::Left | KeyCode::Right | KeyCode::Char(_))
     }
 }
 
@@ -277,8 +273,8 @@ impl<C: TextAreaContent> TextArea<C> {
     }
 
     #[inline]
-    pub fn content<'a>(&'a self) -> &'a str {
-        &self.content.get()
+    pub fn content(&self) -> &str {
+        self.content.get()
     }
 
     pub fn clear(&mut self) {

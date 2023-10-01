@@ -4,12 +4,12 @@ use crate::public::compile_time::ast::types::{ExpressionNode, InvocationNode};
 use crate::public::error::{syntax_error, type_error};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::function::Function;
-use crate::public::value::value::{Value, ValueType};
+use crate::public::value::{Value, ValueType};
 
 use super::{build_in_function, lazy_expression, user_defined_function};
 
 fn variable_invoke(
-    fn_name: &String,
+    fn_name: &str,
     params: &Vec<ExpressionNode>,
     scope: &mut Scope,
 ) -> Result<Value, ()> {
@@ -24,7 +24,7 @@ fn function_invoke(
     scope: &mut Scope,
 ) -> Result<Value, ()> {
     let invoke_result = match function_value {
-        Value::LazyExpression(le) => lazy_expression::invoke(&*le.borrow(), scope)?,
+        Value::LazyExpression(le) => lazy_expression::invoke(&le.borrow(), scope)?,
         Value::Function(fn_enum) => match fn_enum {
             Function::BuildIn(build_in_fn) => {
                 build_in_function::invoke(&build_in_fn.as_ref().borrow(), params, scope)?

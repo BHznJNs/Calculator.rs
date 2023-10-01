@@ -3,7 +3,7 @@ use std::f64::consts::E as STD_E;
 use std::f64::consts::PI as STD_PI;
 
 use crate::public::value::unique::EMPTY_GLOBAL_UNIQUE;
-use crate::public::value::{number::Number, unique::GlobalUnique, value::Value};
+use crate::public::value::{number::Number, unique::GlobalUnique, Value};
 
 pub const PI: Value = Value::Number(Number::Float(STD_PI));
 pub const E: Value = Value::Number(Number::Float(STD_E));

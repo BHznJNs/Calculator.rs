@@ -49,7 +49,7 @@ impl EditorLine {
     }
 
     #[inline]
-    pub fn content<'a>(&'a self) -> &'a str {
+    pub fn content(&self) -> &str {
         self.text_area.content()
     }
 }

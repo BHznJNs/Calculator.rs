@@ -8,7 +8,7 @@ use crate::public::value::oop::module::module_create;
 use crate::utils::completer::Completer;
 
 use super::super::std::modules;
-use super::super::value::value::Value;
+use super::super::value::Value;
 use super::constants;
 
 pub struct GlobalScope {
@@ -66,7 +66,7 @@ impl Scope {
         }
     }
     // inherit self to create new scope
-    pub fn new(&self) -> Self {
+    pub fn new_from(&self) -> Self {
         Self {
             global: GlobalScope::init(),
             local: None,
@@ -125,10 +125,10 @@ impl Scope {
     }
     // import user defined module
     pub fn import_from_path(&mut self, module_path: &str) -> Result<Value, ()> {
-        let mut module_scope = self.new();
+        let mut module_scope = self.new_from();
 
         // if module has not been imported
-        if self.user_module_imported.get(module_path) == None {
+        if self.user_module_imported.get(module_path).is_none() {
             // execute the module file
             script::run_with_path(module_path, &mut module_scope);
 

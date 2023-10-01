@@ -18,7 +18,8 @@ fn statement_condition_resolve(tokens: &mut TokenVec) -> Result<ExpressionNode, 
         }
         sub_tokens.push_back(token);
     }
-    Ok(expression::resolve(&mut sub_tokens)?)
+    let expression_node = expression::resolve(&mut sub_tokens)?;
+    return Ok(expression_node);
 }
 
 pub fn resolve(keyword: Keyword, tokens: &mut TokenVec) -> Result<StatementNode, ()> {
@@ -41,7 +42,7 @@ pub fn resolve(keyword: Keyword, tokens: &mut TokenVec) -> Result<StatementNode,
 
         Keyword::Import => {
             let Some(next_token) = tokens.pop_front() else {
-                return Err(())
+                return Err(());
             };
             let Token::Identi(module_name) = next_token else {
                 return Err(import_error("invalid module name")?);
