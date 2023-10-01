@@ -46,7 +46,7 @@ pub fn print_line<T: Display>(content: T) {
 pub fn log<T: Display>(content: T) -> io::Result<()> {
     File::create("log.txt")?;
     let mut file = OpenOptions::new().write(true).open("log.txt")?;
-    file.write(content.to_string().as_bytes())?;
+    file.write_all(content.to_string().as_bytes())?;
     file.flush()?;
     return Ok(());
 }

@@ -10,14 +10,14 @@ pub enum CommandArg {
 }
 
 pub const COMMAND_COUNT: usize = 5;
-pub const COMMANDS: [[&'static str; 2]; COMMAND_COUNT] = [
+pub const COMMANDS: [[&str; 2]; COMMAND_COUNT] = [
     ["-v", "--version"],
     ["-h", "--help"],
     ["-t", "--timer"],
     ["-hf", "--headfile"],
     ["-e", "--editor"],
 ];
-pub const COMMAND_DESCRIPTIONS: [&'static str; COMMAND_COUNT] = [
+pub const COMMAND_DESCRIPTIONS: [&str; COMMAND_COUNT] = [
     "print current executable file version and exit.",
     "print this help message.",
     "print extra execute duration message code execution.",

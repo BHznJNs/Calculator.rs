@@ -36,7 +36,7 @@ impl LocalScope {
 // --- --- --- --- --- ---
 
 const STD_MODULE_COUNT: usize = 7;
-const STD_MODULE_DATA: [(&'static str, StdModules); STD_MODULE_COUNT] = [
+const STD_MODULE_DATA: [(&str, StdModules); STD_MODULE_COUNT] = [
     ("Basic", StdModules::Basic),
     ("Math", StdModules::Math),
     ("Array", StdModules::Array),

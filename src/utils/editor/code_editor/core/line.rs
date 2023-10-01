@@ -21,6 +21,11 @@ impl EditorLine {
     pub fn is_at_line_end(&self) -> io::Result<bool> {
         Ok(self.text_area.state_right()?.is_at_area_end)
     }
+
+    #[inline]
+    pub fn indent_count(&self) -> usize {
+        self.text_area.indent_count()
+    }
 }
 
 // editing methods
@@ -93,6 +98,11 @@ impl EditorLine {
     #[inline]
     fn update_label_width(&mut self, new_width: usize) {
         self.text_area.margin_left = new_width;
+    }
+
+    #[inline]
+    pub fn init_indent(&mut self, indent: usize) {
+        self.text_area.push_str(&" ".repeat(indent));
     }
 
     #[inline]

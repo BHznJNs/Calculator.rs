@@ -57,9 +57,8 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ExpressionNode, ()> {
                     // nested expression
                     let current_node = resolve(tokens)?.into();
                     params.push(ASTNode::Expression(current_node));
-                } else
-                // breaks when encount `)`
-                if paren == Paren::RightParen {
+                } else if paren == Paren::RightParen {
+                    // breaks when encount `)`
                     break;
                 }
             }

@@ -17,7 +17,7 @@ use crossterm::{
 use crate::{
     exec::script::{run, run_entry},
     public::run_time::scope::Scope,
-    utils::{editor::direction::Direction, number_bit_count, Cursor, Terminal},
+    utils::{editor::direction::Direction, number_bit_count, Cursor, Terminal, log},
 };
 
 use super::{
@@ -182,9 +182,14 @@ impl CodeEditor {
     fn insert_line(&mut self) -> io::Result<()> {
         let label_width = self.label_width_with(self.lines.len() + 1);
         let current_line = &mut self.lines[self.index - 1];
+        let current_indent = current_line.indent_count();
 
         let is_at_line_end = current_line.is_at_line_end()?;
         let mut new_line = EditorLine::new(label_width);
+
+        log(format!("indent: {}", current_indent))?;
+
+        new_line.init_indent(current_indent);
         if !is_at_line_end {
             // when input Enter, if cursor is not at line end,
             // truncate current line and push truncated string
@@ -225,10 +230,14 @@ impl CodeEditor {
             (previous_line, removed_line)
         };
         if let Some(line) = previous_line {
-            line.push_str(deleted_line.content());
+            // avoid push indent in deleted line into previous line.
+            let deleted_line_indent = deleted_line.indent_count();
+            let remained_content = &deleted_line.content()[deleted_line_indent..];
+
+            line.push_str(remained_content);
             line.move_cursor_to_end(label_width)?;
 
-            for _ in 0..deleted_line.len() {
+            for _ in 0..remained_content.len() {
                 line.move_cursor_horizontal(Direction::Left)?;
             }
         }
@@ -804,7 +813,12 @@ impl CodeEditor {
                 KeyCode::Left | KeyCode::Right => {
                     self.move_cursor_horizontal(Direction::from(key.code))?;
                 }
-                KeyCode::Backspace | KeyCode::Enter | KeyCode::Char(_) => {
+
+                KeyCode::Backspace
+                | KeyCode::Enter
+                | KeyCode::Tab
+                | KeyCode::BackTab
+                | KeyCode::Char(_) => {
                     self.dashboard.set_state(EditorState::Modified)?;
                     match key.code {
                         KeyCode::Backspace => self.delete()?,

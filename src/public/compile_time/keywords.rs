@@ -37,7 +37,7 @@ impl Keyword {
     }
 }
 
-pub const KEYWORD_PAIRS: [(&'static str, Keyword); 10] = [
+pub const KEYWORD_PAIRS: [(&str, Keyword); 10] = [
     ("out", Keyword::Out),
     ("for", Keyword::For),
     ("if", Keyword::If),

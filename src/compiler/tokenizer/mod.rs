@@ -218,9 +218,8 @@ pub fn tokenize(source: &String) -> Result<TokenVec, ()> {
                         if is_escape_char {
                             is_escape_char = false;
                             ch = char_converter(ch)?;
-                        } else
-                        // when meet '\'
-                        if ch == '\\' {
+                        } else if ch == '\\' {
+                            // when meet '\'
                             is_escape_char = true;
                             continue;
                         }

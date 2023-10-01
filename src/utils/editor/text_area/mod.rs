@@ -91,6 +91,18 @@ impl<C: TextAreaContent> TextArea<C> {
             is_at_area_end,
         });
     }
+
+    pub fn indent_count(&self) -> usize {
+        let mut result = 0;
+        for ch in self.content().chars() {
+            if ch == ' ' {
+                result += 1;
+            } else {
+                break;
+            }
+        }
+        return result;
+    }
 }
 
 // editing methods
@@ -116,7 +128,8 @@ impl<C: TextAreaContent> TextArea<C> {
             self.overflow_left = 0;
             self.render()?;
         }
-        Cursor::move_to_col(self.margin_left)?;
+        let indent_size = self.indent_count();
+        Cursor::move_to_col(self.margin_left + indent_size)?;
         return Ok(());
     }
     pub fn move_cursor_to_end(&mut self) -> io::Result<()> {

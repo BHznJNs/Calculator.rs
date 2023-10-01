@@ -12,7 +12,7 @@ fn error_name_output(name: &str) -> StyledContent<&str> {
     name.white().on_red().bold()
 }
 
-const TYPE_ERROR_NAME: &'static str = " TypeError ";
+const TYPE_ERROR_NAME: &str = " TypeError ";
 pub fn type_error(param: Option<&str>, expected: Vec<ValueType>, found: ValueType) -> ErrorResult {
     // Vec<ValueType> -> "{type}/{type} ..."
     fn join(mut type_vec: Vec<ValueType>) -> String {
@@ -38,20 +38,20 @@ pub fn type_error(param: Option<&str>, expected: Vec<ValueType>, found: ValueTyp
     return Err(());
 }
 
-const MATH_ERROR_NAME: &'static str = " MathError ";
+const MATH_ERROR_NAME: &str = " MathError ";
 pub fn math_error(msg: &str) -> ErrorResult {
     print_line(format!("{}: {}.", error_name_output(MATH_ERROR_NAME), msg));
     return Err(());
 }
 
-const RANGE_ERROR_NAME: &'static str = " RangeError ";
+const RANGE_ERROR_NAME: &str = " RangeError ";
 pub fn range_error<T: Display>(param: &str, expected: T, found: usize) -> ErrorResult {
     print!("{} for \"{}\"", error_name_output(RANGE_ERROR_NAME), param);
     print_line(format!(": expected {}, found {}.", expected, found));
     return Err(());
 }
 
-const SYNTAX_ERROR_NAME: &'static str = " SyntaxError ";
+const SYNTAX_ERROR_NAME: &str = " SyntaxError ";
 pub fn syntax_error(msg: &str) -> ErrorResult {
     print_line(format!(
         "{}: {}.\r",
@@ -61,7 +61,7 @@ pub fn syntax_error(msg: &str) -> ErrorResult {
     return Err(());
 }
 
-const ASSIGNMENT_ERROR_NAME: &'static str = " SyntaxError ";
+const ASSIGNMENT_ERROR_NAME: &str = " SyntaxError ";
 pub fn assignment_error(msg: &str) -> ErrorResult {
     print_line(format!(
         "{}: {}.",
@@ -71,7 +71,7 @@ pub fn assignment_error(msg: &str) -> ErrorResult {
     return Err(());
 }
 
-const REFERENCE_ERROR_NAME: &'static str = " ReferenceError ";
+const REFERENCE_ERROR_NAME: &str = " ReferenceError ";
 pub enum ReferenceType {
     Variable,
     Property,
@@ -89,7 +89,7 @@ pub fn reference_error(type__: ReferenceType, target_name: &str) -> ErrorResult 
     return Err(());
 }
 
-const IMPORT_ERROR_NAME: &'static str = " ImportError ";
+const IMPORT_ERROR_NAME: &str = " ImportError ";
 pub fn import_error(msg: &str) -> ErrorResult {
     print_line(format!(
         "{}: {}.",
@@ -122,7 +122,7 @@ impl fmt::Display for InternalComponent {
     }
 }
 
-const INTERNAL_ERROR_NAME: &'static str = " InternalError ";
+const INTERNAL_ERROR_NAME: &str = " InternalError ";
 pub fn internal_error(from: InternalComponent, msg: &str) -> ErrorResult {
     print_line(format!(
         "{} from {}: {}.",
