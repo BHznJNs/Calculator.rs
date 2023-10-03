@@ -315,10 +315,12 @@ impl CodeEditor {
             EditorOperation::InsertLine => self.insert_line()?,
             EditorOperation::DeleteLine => self.delete_line()?,
 
+            EditorOperation::AppendIndent => self.append_indent()?,
+            EditorOperation::RemoveIndent => self.remove_indent()?,
+
             EditorOperation::Replace(from, to) => {
                 self.replace(from.len(), to.as_str())?;
             }
-            _ => todo!()
         }
         return Ok(());
     }
@@ -834,10 +836,14 @@ impl CodeEditor {
                         KeyCode::Tab => {
                             let current_line = &self.lines[self.index - 1];
                             if current_line.is_at_after_indent()? {
-                                self.append_indent()?;
+                                self.append_event(EditorOperation::AppendIndent, |e| {
+                                    e.append_indent()
+                                })?
                             }
                         }
-                        KeyCode::BackTab => self.remove_indent()?,
+                        KeyCode::BackTab => {
+                            self.append_event(EditorOperation::RemoveIndent, |e| e.remove_indent())?
+                        }
 
                         KeyCode::Char(ch) => {
                             if !ch.is_ascii() {
