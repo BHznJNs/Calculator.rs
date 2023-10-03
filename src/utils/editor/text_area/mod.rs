@@ -4,7 +4,7 @@ use std::io;
 
 use crossterm::{event::KeyCode, style::Stylize};
 
-use crate::utils::{Cursor, Terminal};
+use crate::{utils::{Cursor, Terminal}, public::env::ENV};
 
 use super::direction::Direction;
 
@@ -44,17 +44,32 @@ pub struct TextArea<C: TextAreaContent> {
 }
 
 pub struct TextAreaStateLeft {
+    // cursor is at left side of text_area,
+    // but may not at content start.
     pub is_at_left_side: bool,
-    pub is_at_area_start: bool,
+    // cursor is at left side of indent.
+    pub is_at_indent_start: bool,
+    // cursor is at right side of indent and
+    // start of actual content (content without indent).
+    pub is_at_content_start: bool,
 }
 pub struct TextAreaStateRight {
+    // cursor is at right side of text_area,
+    // but may not at content end.
     pub is_at_right_side: bool,
-    pub is_at_area_end: bool,
+    // cursor is at content end.
+    pub is_at_content_end: bool,
 }
 
 impl TextArea<String> {
+    // this static method is used when TextArea uses
+    // `String` and `TokenSequence` as content,
+    // use `String` here is just for easier to call this method.
     pub fn is_editing_key(key: KeyCode) -> bool {
-        matches!(key, KeyCode::Backspace | KeyCode::Left | KeyCode::Right | KeyCode::Char(_))
+        matches!(
+            key,
+            KeyCode::Backspace | KeyCode::Left | KeyCode::Right | KeyCode::Char(_)
+        )
     }
 }
 
@@ -62,32 +77,35 @@ impl TextArea<String> {
 impl<C: TextAreaContent> TextArea<C> {
     #[inline]
     pub fn is_at_left_side(&self) -> io::Result<bool> {
-        return Ok(Cursor::pos_col()? == self.margin_left);
+        Ok(Cursor::pos_col()? == self.margin_left)
     }
     #[inline]
     pub fn is_at_right_side(&self) -> io::Result<bool> {
-        return Ok(Cursor::pos_col()? == Terminal::width() - 1);
+        Ok(Cursor::pos_col()? == Terminal::width() - 1)
     }
 
     pub fn state_left(&self) -> io::Result<TextAreaStateLeft> {
         let is_at_left_side = self.is_at_left_side()?;
-        let is_at_area_start = is_at_left_side && self.overflow_left == 0;
+        let is_at_indent_start = is_at_left_side && self.overflow_left == 0;
+        let is_at_content_start = self.cursor_pos()? == self.indent_count();
         return Ok(TextAreaStateLeft {
             is_at_left_side,
-            is_at_area_start,
+            is_at_indent_start,
+            is_at_content_start,
         });
     }
     pub fn state_right(&self) -> io::Result<TextAreaStateRight> {
         let cursor_pos_col = Cursor::pos_col()?;
         let is_at_right_side = self.is_at_right_side()?;
-        let is_at_area_end = cursor_pos_col == (self.len() + self.margin_left)
+        let is_at_content_end = cursor_pos_col == (self.len() + self.margin_left)
             || cursor_pos_col == (self.len() - self.overflow_left + self.margin_left);
         return Ok(TextAreaStateRight {
             is_at_right_side,
-            is_at_area_end,
+            is_at_content_end,
         });
     }
 
+    // returns the space count at the start of content
     pub fn indent_count(&self) -> usize {
         let mut result = 0;
         for ch in self.content().chars() {
@@ -118,14 +136,20 @@ impl<C: TextAreaContent> TextArea<C> {
         }
     }
 
+    pub fn move_cursor_after_indent(&mut self) -> io::Result<()> {
+        self.move_cursor_to_start()?;
+        for _ in 0..self.indent_count() {
+            self.move_cursor_horizontal(Direction::Right)?;
+        }
+        return Ok(());
+    }
     pub fn move_cursor_to_start(&mut self) -> io::Result<()> {
         if self.len() >= self.visible_area_width() {
             self.overflow_right += self.overflow_left;
             self.overflow_left = 0;
             self.render()?;
         }
-        let indent_size = self.indent_count();
-        Cursor::move_to_col(self.margin_left + indent_size)?;
+        Cursor::move_to_col(self.margin_left)?;
         return Ok(());
     }
     pub fn move_cursor_to_end(&mut self) -> io::Result<()> {
@@ -145,7 +169,7 @@ impl<C: TextAreaContent> TextArea<C> {
         match dir {
             Direction::Left => {
                 let state = self.state_left()?;
-                if state.is_at_area_start {
+                if state.is_at_indent_start {
                     return Ok(());
                 }
 
@@ -159,7 +183,7 @@ impl<C: TextAreaContent> TextArea<C> {
             }
             Direction::Right => {
                 let state = self.state_right()?;
-                if state.is_at_area_end {
+                if state.is_at_content_end {
                     return Ok(());
                 }
 
@@ -226,7 +250,7 @@ impl<C: TextAreaContent> TextArea<C> {
     }
 
     pub fn delete_char(&mut self) -> io::Result<Option<char>> {
-        if self.state_left()?.is_at_area_start {
+        if self.state_left()?.is_at_indent_start {
             return Ok(None);
         }
 
@@ -240,6 +264,39 @@ impl<C: TextAreaContent> TextArea<C> {
         }
         self.render()?;
         return Ok(Some(removed_ch));
+    }
+
+    pub fn append_indent(&mut self) -> io::Result<()> {
+        let current_indent = self.indent_count();
+        let default_indent_size = unsafe { ENV.options.indent_size };
+        let indent_size_to_append = default_indent_size - current_indent % default_indent_size;
+
+        for _ in 0..indent_size_to_append {
+            self.content.insert(0, ' ');
+            self.move_cursor_horizontal(Direction::Right)?;
+        }
+        self.render()?;
+        return Ok(());
+    }
+    pub fn remove_indent(&mut self) -> io::Result<()> {
+        let current_indent = self.indent_count();
+        if current_indent == 0 {
+            // if no indent, directly return.
+            return Ok(());
+        }
+
+        let default_indent_size = unsafe { ENV.options.indent_size };
+        let mut indent_size_to_remove = current_indent % default_indent_size;
+        if indent_size_to_remove == 0 {
+            indent_size_to_remove += default_indent_size;
+        }
+
+        for _ in 0..indent_size_to_remove {
+            self.content.remove(0);
+            self.move_cursor_horizontal(Direction::Left)?;
+        }
+        self.render()?;
+        return Ok(());
     }
 
     #[inline]

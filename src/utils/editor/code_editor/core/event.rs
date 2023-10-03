@@ -7,6 +7,9 @@ pub enum EditorOperation {
     InsertLine,
     DeleteLine,
 
+    AppendIndent,
+    RemoveIndent,
+
     //      from  , to
     Replace(String, String),
 }
@@ -18,6 +21,9 @@ impl EditorOperation {
             Self::DeleteChar(ch) => Self::InsertChar(*ch),
             Self::InsertLine => Self::DeleteLine,
             Self::DeleteLine => Self::InsertLine,
+
+            Self::AppendIndent => Self::RemoveIndent,
+            Self::RemoveIndent => Self::AppendIndent,
 
             Self::Replace(from, to) => Self::Replace(to.clone(), from.clone()),
         }

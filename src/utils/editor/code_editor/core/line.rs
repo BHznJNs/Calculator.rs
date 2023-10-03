@@ -15,11 +15,15 @@ pub struct EditorLine {
 impl EditorLine {
     #[inline]
     pub fn is_at_line_start(&self) -> io::Result<bool> {
-        Ok(self.text_area.state_left()?.is_at_area_start)
+        Ok(self.text_area.state_left()?.is_at_indent_start)
     }
     #[inline]
     pub fn is_at_line_end(&self) -> io::Result<bool> {
-        Ok(self.text_area.state_right()?.is_at_area_end)
+        Ok(self.text_area.state_right()?.is_at_content_end)
+    }
+    #[inline]
+    pub fn is_at_after_indent(&self) -> io::Result<bool> {
+        Ok(self.text_area.state_left()?.is_at_content_start)
     }
 
     #[inline]
@@ -34,6 +38,11 @@ impl EditorLine {
     pub fn move_cursor_to_start(&mut self, label_width: usize) -> io::Result<()> {
         self.update_label_width(label_width);
         self.text_area.move_cursor_to_start()
+    }
+    #[inline]
+    pub fn move_cursor_after_indent(&mut self, label_width: usize) -> io::Result<()> {
+        self.update_label_width(label_width);
+        self.text_area.move_cursor_after_indent()
     }
     #[inline]
     pub fn move_cursor_to_end(&mut self, label_width: usize) -> io::Result<()> {
@@ -52,6 +61,15 @@ impl EditorLine {
     #[inline]
     pub fn delete_char(&mut self) -> io::Result<Option<char>> {
         self.text_area.delete_char()
+    }
+
+    #[inline]
+    pub fn append_indent(&mut self) -> io::Result<()> {
+        self.text_area.append_indent()
+    }
+    #[inline]
+    pub fn remove_indent(&mut self) -> io::Result<()> {
+        self.text_area.remove_indent()
     }
 }
 

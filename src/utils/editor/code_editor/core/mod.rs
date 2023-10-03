@@ -17,7 +17,7 @@ use crossterm::{
 use crate::{
     exec::script::{run, run_entry},
     public::run_time::scope::Scope,
-    utils::{editor::direction::Direction, number_bit_count, Cursor, Terminal, log},
+    utils::{editor::direction::Direction, number_bit_count, Cursor, Terminal},
 };
 
 use super::{
@@ -186,9 +186,6 @@ impl CodeEditor {
 
         let is_at_line_end = current_line.is_at_line_end()?;
         let mut new_line = EditorLine::new(label_width);
-
-        log(format!("indent: {}", current_indent))?;
-
         new_line.init_indent(current_indent);
         if !is_at_line_end {
             // when input Enter, if cursor is not at line end,
@@ -197,7 +194,7 @@ impl CodeEditor {
             let truncated_str = current_line.truncate()?;
             new_line.push_str(&truncated_str);
         }
-        new_line.move_cursor_to_start(label_width)?;
+        new_line.move_cursor_after_indent(label_width)?;
 
         // insert new line
         let insert_pos = Cursor::pos_row()? + self.overflow_top;
@@ -281,6 +278,17 @@ impl CodeEditor {
         return Ok(());
     }
 
+    fn append_indent(&mut self) -> io::Result<()> {
+        let current_line = &mut self.lines[self.index - 1];
+        current_line.append_indent()?;
+        return Ok(());
+    }
+    fn remove_indent(&mut self) -> io::Result<()> {
+        let current_line = &mut self.lines[self.index - 1];
+        current_line.remove_indent()?;
+        return Ok(());
+    }
+
     fn replace(&mut self, count: usize, to: &str) -> io::Result<()> {
         let current_line = &mut self.lines[self.index - 1];
         for _ in 0..count {
@@ -310,6 +318,7 @@ impl CodeEditor {
             EditorOperation::Replace(from, to) => {
                 self.replace(from.len(), to.as_str())?;
             }
+            _ => todo!()
         }
         return Ok(());
     }
@@ -820,8 +829,16 @@ impl CodeEditor {
                     match key.code {
                         KeyCode::Backspace => self.delete()?,
                         KeyCode::Enter => {
-                            self.append_event(EditorOperation::InsertLine, |e| e.insert_line())?;
+                            self.append_event(EditorOperation::InsertLine, |e| e.insert_line())?
                         }
+                        KeyCode::Tab => {
+                            let current_line = &self.lines[self.index - 1];
+                            if current_line.is_at_after_indent()? {
+                                self.append_indent()?;
+                            }
+                        }
+                        KeyCode::BackTab => self.remove_indent()?,
+
                         KeyCode::Char(ch) => {
                             if !ch.is_ascii() {
                                 // avoid Non-ASCII characters
