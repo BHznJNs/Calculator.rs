@@ -41,7 +41,7 @@ impl TextAreaContent for TokenSequence {
                 if hidden_width >= token.len() {
                     hidden_width -= token.len()
                 } else {
-                    let colored_token = token.get(..hidden_width);
+                    let colored_token = token.get(hidden_width..);
                     let binding = colored_token.to_string();
                     let colored_chars = binding.chars();
                     buffer.extend(colored_chars);
@@ -69,7 +69,6 @@ impl TextAreaContent for TokenSequence {
         if remain_width > 0 {
             buffer.push_str(&" ".repeat(remain_width));
         }
-
         return buffer;
     }
 }

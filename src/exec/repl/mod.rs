@@ -61,6 +61,7 @@ pub fn repl(scope: &mut Scope) -> io::Result<()> {
             Signal::NewLine(line) => line,
             Signal::Interrupt => break,
             Signal::NonASCII => {
+                print_line("");
                 syntax_error("Non-ASCII character").unwrap_err();
                 continue;
             }

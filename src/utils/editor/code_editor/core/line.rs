@@ -55,6 +55,11 @@ impl EditorLine {
     }
 
     #[inline]
+    pub fn jump_to_word_edge(&mut self, dir: Direction) -> io::Result<()> {
+        self.text_area.jump_to_word_edge(dir)
+    }
+
+    #[inline]
     pub fn insert_char(&mut self, ch: char) -> io::Result<()> {
         self.text_area.insert_char(ch)
     }

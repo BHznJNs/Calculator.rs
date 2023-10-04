@@ -61,6 +61,7 @@ pub fn run(codes: &str, scope: &mut Scope) {
     }
 }
 
+// callback here can be `run` and `run_with_path`.
 pub fn run_entry(s: &str, scope: &mut Scope, callback: fn(s: &str, scope: &mut Scope)) {
     if unsafe { ENV.options.timer } {
         let now = Instant::now();

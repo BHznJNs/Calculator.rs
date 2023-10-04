@@ -1,6 +1,6 @@
 use crossterm::event::KeyCode;
 
-#[derive(Clone, Copy)]
+#[derive(PartialEq, Clone, Copy)]
 pub enum Direction {
     Up,
     Down,

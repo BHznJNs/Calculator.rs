@@ -41,6 +41,11 @@ impl EditorLine {
         self.text_area.render()
     }
 
+    #[inline]
+    pub fn jump_to_word_edge(&mut self, dir: Direction) -> io::Result<()> {
+        self.text_area.jump_to_word_edge(dir)
+    }
+
     pub fn set_content(&mut self, new_content: &str) -> io::Result<()> {
         self.text_area.set_content(new_content);
         self.text_area.move_cursor_to_end()?;

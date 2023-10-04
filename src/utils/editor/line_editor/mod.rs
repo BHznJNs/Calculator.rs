@@ -15,7 +15,7 @@ use crossterm::{
 use crate::public::run_time::scope::Scope;
 use crate::utils::{cursor::Cursor, print_line, terminal::Terminal};
 
-use super::text_area::TextArea;
+use super::{text_area::TextArea, direction::Direction};
 
 pub use signal::Signal;
 use history::EditorHistory;
@@ -59,11 +59,16 @@ impl LineEditor {
             };
 
             if key.modifiers == KeyModifiers::CONTROL {
-                if key.code == KeyCode::Char('c') || key.code == KeyCode::Char('d') {
-                    break Signal::Interrupt;
-                } else {
-                    continue;
+                match key.code {
+                    KeyCode::Char('c' | 'd') => {
+                        break Signal::Interrupt;
+                    }
+                    KeyCode::Left | KeyCode::Right => {
+                        self.current_line.jump_to_word_edge(Direction::from(key.code))?;
+                    }
+                    _ => {}
                 }
+                continue;
             }
 
             match key.code {

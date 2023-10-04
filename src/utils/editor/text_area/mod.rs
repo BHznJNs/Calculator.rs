@@ -4,7 +4,10 @@ use std::io;
 
 use crossterm::{event::KeyCode, style::Stylize};
 
-use crate::{utils::{Cursor, Terminal}, public::env::ENV};
+use crate::{
+    public::env::ENV,
+    utils::{Cursor, Terminal},
+};
 
 use super::direction::Direction;
 
@@ -43,6 +46,7 @@ pub struct TextArea<C: TextAreaContent> {
     overflow_right: usize,
 }
 
+#[derive(Debug)]
 pub struct TextAreaStateLeft {
     // cursor is at left side of text_area,
     // but may not at content start.
@@ -53,6 +57,8 @@ pub struct TextAreaStateLeft {
     // start of actual content (content without indent).
     pub is_at_content_start: bool,
 }
+
+#[derive(Debug)]
 pub struct TextAreaStateRight {
     // cursor is at right side of text_area,
     // but may not at content end.
@@ -64,7 +70,8 @@ pub struct TextAreaStateRight {
 impl TextArea<String> {
     // this static method is used when TextArea uses
     // `String` and `TokenSequence` as content,
-    // use `String` here is just for easier to call this method.
+    // use `String` here is just for easier to call this method
+    // in external scope.
     pub fn is_editing_key(key: KeyCode) -> bool {
         matches!(
             key,
@@ -75,6 +82,20 @@ impl TextArea<String> {
 
 // state calculating methods
 impl<C: TextAreaContent> TextArea<C> {
+    // returns number of continuous alphabetic char.
+    // e.g.
+    //   in : ['a', 'b', ' ', 'c']
+    //   out: 2
+    // --- --- --- --- --- ---
+    //   in : [' ', 'a', 'b']
+    //   out: 1
+    fn continuous_word_count(chars: impl Iterator<Item = char>) -> usize {
+        let counter = chars
+            .map_while(|ch| ch.is_alphabetic().then_some(()))
+            .count();
+        return counter;
+    }
+
     #[inline]
     pub fn is_at_left_side(&self) -> io::Result<bool> {
         Ok(Cursor::pos_col()? == self.margin_left)
@@ -97,6 +118,7 @@ impl<C: TextAreaContent> TextArea<C> {
     pub fn state_right(&self) -> io::Result<TextAreaStateRight> {
         let cursor_pos_col = Cursor::pos_col()?;
         let is_at_right_side = self.is_at_right_side()?;
+        // let is_at_content_end = self.cursor_pos()? == self.len();
         let is_at_content_end = cursor_pos_col == (self.len() + self.margin_left)
             || cursor_pos_col == (self.len() - self.overflow_left + self.margin_left);
         return Ok(TextAreaStateRight {
@@ -166,6 +188,8 @@ impl<C: TextAreaContent> TextArea<C> {
     }
 
     pub fn move_cursor_horizontal(&mut self, dir: Direction) -> io::Result<()> {
+        // log(format!("state_left: {:#?}, state_right: {:#?}", self.state_left()?, self.state_right()?))?;
+
         match dir {
             Direction::Left => {
                 let state = self.state_left()?;
@@ -200,6 +224,34 @@ impl<C: TextAreaContent> TextArea<C> {
         self.render()?;
         return Ok(());
     }
+
+    pub fn jump_to_word_edge(&mut self, dir: Direction) -> io::Result<()> {
+        let cursor_pos = self.cursor_pos()?;
+        let mut displacement = match dir {
+            Direction::Left => {
+                let iter = self.content()[..cursor_pos].chars().rev();
+                Self::continuous_word_count(iter)
+            }
+            Direction::Right => {
+                let iter = self.content()[cursor_pos..].chars();
+                Self::continuous_word_count(iter)
+            }
+            _ => unreachable!(),
+        };
+
+        // when displacement is 0 and cursor is not at left and right end
+        if displacement == 0
+            && !(dir == Direction::Left && self.state_left()?.is_at_indent_start)
+            && !(dir == Direction::Right && self.state_right()?.is_at_content_end)
+        {
+            displacement = 1;
+        }
+
+        for _ in 0..displacement {
+            self.move_cursor_horizontal(dir)?;
+        }
+        return Ok(());
+    }
 }
 
 impl<C: TextAreaContent> TextArea<C> {
@@ -218,7 +270,6 @@ impl<C: TextAreaContent> TextArea<C> {
 
     pub fn render(&self) -> io::Result<()> {
         let visible_area_width = self.visible_area_width();
-
         let rendered_content = if self.len() == 0 && !self.placeholder.is_empty() {
             self.placeholder
                 .rendered_content(0, visible_area_width)

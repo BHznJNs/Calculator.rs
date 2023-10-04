@@ -9,7 +9,7 @@ pub struct EditorInit;
 impl EditorInit {
     pub fn display_title() {
         let term_width = Terminal::width();
-        let title_str = format!("Rusditor v{}", env!("CARGO_PKG_VERSION"));
+        let title_str = format!("Calculator.rs Editor v{}", env!("CARGO_PKG_VERSION"));
         let esc_button_str = " [Esc] ";
 
         let elements_width = title_str.len() + esc_button_str.len();

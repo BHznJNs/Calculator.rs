@@ -767,24 +767,27 @@ impl CodeEditor {
 
             // ctrl shotcuts
             if key.modifiers == KeyModifiers::CONTROL {
-                let KeyCode::Char(ch) = key.code else {
-                    continue;
-                };
-
-                match ch {
-                    'z' => self.undo()?,
-                    'y' => self.redo()?,
-
-                    's' => self.toggle_state(EditorState::Saving)?,
-                    'g' => self.toggle_state(EditorState::Positioning)?,
-                    'f' => self.toggle_state(EditorState::Finding)?,
-                    'r' => self.toggle_state(EditorState::Replacing)?,
-
-                    'e' => {
-                        self.close()?;
-                        let codes = self.content();
-                        run_entry(&codes, scope, run);
-                        return Ok(());
+                match key.code {
+                    KeyCode::Left | KeyCode::Right => {
+                        let current_line = &mut self.lines[self.index - 1];
+                        current_line.jump_to_word_edge(Direction::from(key.code))?;
+                    }
+                    KeyCode::Char(ch) => match ch {
+                        'z' => self.undo()?,
+                        'y' => self.redo()?,
+    
+                        's' => self.toggle_state(EditorState::Saving)?,
+                        'g' => self.toggle_state(EditorState::Positioning)?,
+                        'f' => self.toggle_state(EditorState::Finding)?,
+                        'r' => self.toggle_state(EditorState::Replacing)?,
+    
+                        'e' => {
+                            self.close()?;
+                            let codes = self.content();
+                            run_entry(&codes, scope, run);
+                            return Ok(());
+                        }
+                        _ => {}
                     }
 
                     // ignore other Ctrl shotcuts
@@ -792,6 +795,7 @@ impl CodeEditor {
                 }
 
                 if !self.components.is_in_component {
+                    // when is using component, 
                     continue;
                 }
             }
