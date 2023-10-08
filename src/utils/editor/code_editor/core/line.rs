@@ -1,14 +1,17 @@
 use std::io;
 
-use crossterm::style::Stylize;
 
 use crate::utils::{
-    editor::{direction::Direction, text_area::TextArea, tokenizer::TokenSequence},
+    editor::{direction::Direction, text_area::TextArea, tokenizer::TokenSequence, code_editor::core::color::EditorColor},
     number_bit_count, Cursor, Terminal,
 };
 
 pub struct EditorLine {
     text_area: TextArea<TokenSequence>,
+    is_active: bool,
+
+    cached_index: usize,
+    cached_label_width: usize,
 }
 
 // state methods
@@ -79,25 +82,49 @@ impl EditorLine {
 }
 
 impl EditorLine {
-    pub fn new(width: usize) -> Self {
+    pub fn new(width: usize, is_active: bool) -> Self {
         Self {
             text_area: TextArea::new(width, 1),
+            is_active,
+
+            cached_index: 0,
+            cached_label_width: width,
         }
     }
 
     pub fn render(&mut self, index: usize, label_width: usize) -> io::Result<()> {
-        Cursor::move_to_col(0)?;
-        Terminal::clear_after_cursor()?;
-
-        // display label
-        let index_width = number_bit_count(index);
-        let space_width = label_width - index_width;
-        let line_label_str =
-            format!("{}{}", index.to_string().black(), " ".repeat(space_width)).on_white();
-        print!("{}", line_label_str);
-
+        (self.cached_index, self.cached_label_width) = (index, label_width);
+        self.render_label()?;
         self.text_area.margin_left = label_width;
         self.text_area.render()?;
+        return Ok(());
+    }
+
+    fn render_label(&self) -> io::Result<()> {
+        let saved_cursor_pos = Cursor::pos_col()?;
+        Cursor::move_to_col(0)?;
+
+        let index_width = number_bit_count(self.cached_index);
+        let space_width = self.cached_label_width - index_width;
+        let line_label_str = format!("{}{}", self.cached_index, " ".repeat(space_width));
+        let line_label_styled = if self.is_active {
+            EditorColor::line_active_style(&*line_label_str)
+        } else {
+            EditorColor::line_disabled_style(&*line_label_str)
+        };
+        print!("{}", line_label_styled);
+        Cursor::move_to_col(saved_cursor_pos)?;
+        return Ok(());
+    }
+
+    pub fn active(&mut self) -> io::Result<()> {
+        self.is_active = true;
+        self.render_label()?;
+        return Ok(());
+    }
+    pub fn disable(&mut self) -> io::Result<()> {
+        self.is_active = false;
+        self.render_label()?;
         return Ok(());
     }
 
@@ -156,7 +183,7 @@ impl EditorLine {
 
 #[test]
 fn editorline_find_all_test() {
-    let mut line = EditorLine::new(0);
+    let mut line = EditorLine::new(0, false);
     line.push_str("abc  abc  abc");
 
     assert_eq!(line.find_all("abc"), Some(vec![0, 5, 10]));
