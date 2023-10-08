@@ -775,12 +775,12 @@ impl CodeEditor {
                     KeyCode::Char(ch) => match ch {
                         'z' => self.undo()?,
                         'y' => self.redo()?,
-    
+
                         's' => self.toggle_state(EditorState::Saving)?,
                         'g' => self.toggle_state(EditorState::Positioning)?,
                         'f' => self.toggle_state(EditorState::Finding)?,
                         'r' => self.toggle_state(EditorState::Replacing)?,
-    
+
                         'e' => {
                             self.close()?;
                             let codes = self.content();
@@ -795,7 +795,7 @@ impl CodeEditor {
                 }
 
                 if !self.components.is_in_component {
-                    // when is using component, 
+                    // when is using component,
                     continue;
                 }
             }

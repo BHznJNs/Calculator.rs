@@ -35,8 +35,8 @@ impl ComponentController {
         Cursor::move_to_col(Terminal::width() - self.button.len())?;
         print!("{}", self.button.bold().black().on_white());
 
+        self.text_area.move_cursor_to_end(false)?;
         self.text_area.render()?;
-        self.text_area.move_cursor_to_end()?;
         return Ok(());
     }
 
@@ -48,12 +48,12 @@ impl ComponentController {
         let text_area = &mut self.text_area;
         match key {
             KeyCode::Backspace => {
-                text_area.delete_char()?;
+                text_area.delete_char(true)?;
             }
 
-            KeyCode::Left => text_area.move_cursor_horizontal(Direction::Left)?,
-            KeyCode::Right => text_area.move_cursor_horizontal(Direction::Right)?,
-            KeyCode::Char(ch) => text_area.insert_char(ch)?,
+            KeyCode::Left => text_area.move_cursor_horizontal(Direction::Left, true)?,
+            KeyCode::Right => text_area.move_cursor_horizontal(Direction::Right, true)?,
+            KeyCode::Char(ch) => text_area.insert_char(ch, true)?,
             _ => unreachable!(),
         }
         return Ok(());

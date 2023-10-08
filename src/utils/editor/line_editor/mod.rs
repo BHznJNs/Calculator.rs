@@ -15,11 +15,11 @@ use crossterm::{
 use crate::public::run_time::scope::Scope;
 use crate::utils::{cursor::Cursor, print_line, terminal::Terminal};
 
-use super::{text_area::TextArea, direction::Direction};
+use super::{direction::Direction, text_area::TextArea};
 
-pub use signal::Signal;
 use history::EditorHistory;
 use line::EditorLine;
+pub use signal::Signal;
 
 pub struct LineEditor {
     current_line: EditorLine,
@@ -50,7 +50,7 @@ impl LineEditor {
         return Ok(());
     }
 
-    pub fn readline(&mut self, _scope: &mut Scope) -> io::Result<Signal> {
+    pub fn readline(&mut self, scope: &Scope) -> io::Result<Signal> {
         self.init_render()?;
 
         let result = loop {
@@ -64,7 +64,8 @@ impl LineEditor {
                         break Signal::Interrupt;
                     }
                     KeyCode::Left | KeyCode::Right => {
-                        self.current_line.jump_to_word_edge(Direction::from(key.code))?;
+                        self.current_line
+                            .jump_to_word_edge(Direction::from(key.code))?;
                     }
                     _ => {}
                 }
@@ -82,7 +83,7 @@ impl LineEditor {
                             self.history.previous()
                         }
                         KeyCode::Down => self.history.next(),
-                        _ => unreachable!()
+                        _ => unreachable!(),
                     };
                     if let Some(str) = target_item {
                         self.current_line.set_content(str)?;
@@ -100,7 +101,7 @@ impl LineEditor {
 
                 // avoid Non-ASCII characters
                 KeyCode::Char(ch) if !ch.is_ascii() => break Signal::NonASCII,
-                k if TextArea::is_editing_key(k) => self.current_line.edit(k)?,
+                k if TextArea::is_editing_key(k) => self.current_line.edit(k, scope)?,
                 _ => {}
             }
             Terminal::flush()?;

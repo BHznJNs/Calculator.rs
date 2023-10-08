@@ -28,7 +28,7 @@ impl Completer {
 impl<'a> Extend<&'a str> for Completer {
     fn extend<T: IntoIterator<Item = &'a str>>(&mut self, iter: T) {
         for item in iter {
-            self.insert(&item);
+            self.insert(item);
         }
     }
 }

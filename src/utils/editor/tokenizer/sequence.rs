@@ -23,6 +23,10 @@ impl TextAreaContent for TokenSequence {
         &mut self.raw
     }
     #[inline]
+    fn tokens(&self) -> Option<&TokenVec> {
+        Some(&self.tokens)
+    }
+    #[inline]
     fn change_handler(&mut self) {
         self.tokens = tokenize(&self.raw);
     }

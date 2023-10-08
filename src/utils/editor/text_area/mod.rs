@@ -9,7 +9,7 @@ use crate::{
     utils::{Cursor, Terminal},
 };
 
-use super::direction::Direction;
+use super::{direction::Direction, tokenizer::TokenVec};
 
 pub use content::TextAreaContent;
 
@@ -31,8 +31,6 @@ impl TextAreaContent for Placeholder {
     fn get_mut(&mut self) -> &mut String {
         &mut self.content
     }
-    #[inline]
-    fn change_handler(&mut self) {}
 }
 
 pub struct TextArea<C: TextAreaContent> {
@@ -158,28 +156,37 @@ impl<C: TextAreaContent> TextArea<C> {
         }
     }
 
-    pub fn move_cursor_after_indent(&mut self) -> io::Result<()> {
-        self.move_cursor_to_start()?;
+    pub fn move_cursor_after_indent(&mut self, rerender: bool) -> io::Result<()> {
+        self.move_cursor_to_start(rerender)?;
         for _ in 0..self.indent_count() {
-            self.move_cursor_horizontal(Direction::Right)?;
+            self.move_cursor_horizontal(Direction::Right, false)?;
+        }
+        if rerender {
+            self.render()?;
         }
         return Ok(());
     }
-    pub fn move_cursor_to_start(&mut self) -> io::Result<()> {
+    pub fn move_cursor_to_start(&mut self, rerender: bool) -> io::Result<()> {
         if self.len() >= self.visible_area_width() {
             self.overflow_right += self.overflow_left;
             self.overflow_left = 0;
-            self.render()?;
+
+            if rerender {
+                self.render()?;
+            }
         }
         Cursor::move_to_col(self.margin_left)?;
         return Ok(());
     }
-    pub fn move_cursor_to_end(&mut self) -> io::Result<()> {
+    pub fn move_cursor_to_end(&mut self, rerender: bool) -> io::Result<()> {
         if self.len() >= self.visible_area_width() {
             Cursor::move_to_col(Terminal::width() - 1)?;
             self.overflow_left += self.overflow_right;
             self.overflow_right = 0;
-            self.render()?;
+
+            if rerender {
+                self.render()?;
+            }
         } else {
             let line_end_pos = self.margin_left + self.len();
             Cursor::move_to_col(line_end_pos)?;
@@ -187,9 +194,7 @@ impl<C: TextAreaContent> TextArea<C> {
         return Ok(());
     }
 
-    pub fn move_cursor_horizontal(&mut self, dir: Direction) -> io::Result<()> {
-        // log(format!("state_left: {:#?}, state_right: {:#?}", self.state_left()?, self.state_right()?))?;
-
+    pub fn move_cursor_horizontal(&mut self, dir: Direction, rerender: bool) -> io::Result<()> {
         match dir {
             Direction::Left => {
                 let state = self.state_left()?;
@@ -221,11 +226,14 @@ impl<C: TextAreaContent> TextArea<C> {
             }
             _ => unreachable!(),
         }
-        self.render()?;
+
+        if rerender {
+            self.render()?;
+        }
         return Ok(());
     }
 
-    pub fn jump_to_word_edge(&mut self, dir: Direction) -> io::Result<()> {
+    pub fn jump_to_word_edge(&mut self, dir: Direction, rerender: bool) -> io::Result<()> {
         let cursor_pos = self.cursor_pos()?;
         let mut displacement = match dir {
             Direction::Left => {
@@ -248,7 +256,7 @@ impl<C: TextAreaContent> TextArea<C> {
         }
 
         for _ in 0..displacement {
-            self.move_cursor_horizontal(dir)?;
+            self.move_cursor_horizontal(dir, rerender)?;
         }
         return Ok(());
     }
@@ -287,7 +295,7 @@ impl<C: TextAreaContent> TextArea<C> {
         return Ok(());
     }
 
-    pub fn insert_char(&mut self, ch: char) -> io::Result<()> {
+    pub fn insert_char(&mut self, ch: char, rerender: bool) -> io::Result<()> {
         let insert_pos = self.cursor_pos()?;
         self.content.insert(insert_pos, ch);
 
@@ -296,11 +304,13 @@ impl<C: TextAreaContent> TextArea<C> {
         } else {
             Cursor::right(1)?;
         }
-        self.render()?;
+        if rerender {
+            self.render()?;
+        }
         return Ok(());
     }
 
-    pub fn delete_char(&mut self) -> io::Result<Option<char>> {
+    pub fn delete_char(&mut self, rerender: bool) -> io::Result<Option<char>> {
         if self.state_left()?.is_at_indent_start {
             return Ok(None);
         }
@@ -313,23 +323,27 @@ impl<C: TextAreaContent> TextArea<C> {
         } else {
             Cursor::left(1)?;
         }
-        self.render()?;
+        if rerender {
+            self.render()?;
+        }
         return Ok(Some(removed_ch));
     }
 
-    pub fn append_indent(&mut self) -> io::Result<()> {
+    pub fn append_indent(&mut self, rerender: bool) -> io::Result<()> {
         let current_indent = self.indent_count();
         let default_indent_size = unsafe { ENV.options.indent_size };
         let indent_size_to_append = default_indent_size - current_indent % default_indent_size;
 
         for _ in 0..indent_size_to_append {
             self.content.insert(0, ' ');
-            self.move_cursor_horizontal(Direction::Right)?;
+            self.move_cursor_horizontal(Direction::Right, false)?;
         }
-        self.render()?;
+        if rerender {
+            self.render()?;
+        }
         return Ok(());
     }
-    pub fn remove_indent(&mut self) -> io::Result<()> {
+    pub fn remove_indent(&mut self, rerender: bool) -> io::Result<()> {
         let current_indent = self.indent_count();
         if current_indent == 0 {
             // if no indent, directly return.
@@ -344,9 +358,12 @@ impl<C: TextAreaContent> TextArea<C> {
 
         for _ in 0..indent_size_to_remove {
             self.content.remove(0);
-            self.move_cursor_horizontal(Direction::Left)?;
+            self.move_cursor_horizontal(Direction::Left, false)?;
         }
-        self.render()?;
+
+        if rerender {
+            self.render()?;
+        }
         return Ok(());
     }
 
@@ -383,6 +400,10 @@ impl<C: TextAreaContent> TextArea<C> {
     #[inline]
     pub fn content(&self) -> &str {
         self.content.get()
+    }
+    #[inline]
+    pub fn tokens(&self) -> Option<&TokenVec> {
+        self.content.tokens()
     }
 
     pub fn clear(&mut self) {

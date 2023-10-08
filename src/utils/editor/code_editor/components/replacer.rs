@@ -86,11 +86,7 @@ impl Replacer {
     pub fn search_handler(&mut self, pos_list: Vec<EditorCursorPos>) -> io::Result<()> {
         self.search_history.append(self.search_text().to_owned());
         self.match_list.set_content(pos_list);
-
-        self.searcher.text_area.clear();
-        self.replacer.text_area.clear();
         self.replacer.open()?;
-
         self.state = ReplacerState::Replacing;
         return Ok(());
     }
@@ -108,9 +104,10 @@ impl Replacer {
         self.replace_history.append(current_content.to_owned());
     }
 
-    #[inline]
     pub fn reset(&mut self) {
         self.state = ReplacerState::Searching;
+        self.searcher.text_area.clear();
+        self.replacer.text_area.clear();
         self.match_list.clear();
     }
 
@@ -186,8 +183,8 @@ impl Component for Replacer {
                         ReplacerState::Replacing => &mut self.replacer.text_area,
                     };
                     text_area.set_content(str);
+                    text_area.move_cursor_to_end(false)?;
                     text_area.render()?;
-                    text_area.move_cursor_to_end()?;
                 }
             }
             k if TextArea::is_editing_key(k) => match self.state {

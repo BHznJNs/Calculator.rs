@@ -37,44 +37,44 @@ impl EditorLine {
     #[inline]
     pub fn move_cursor_to_start(&mut self, label_width: usize) -> io::Result<()> {
         self.update_label_width(label_width);
-        self.text_area.move_cursor_to_start()
+        self.text_area.move_cursor_to_start(true)
     }
     #[inline]
     pub fn move_cursor_after_indent(&mut self, label_width: usize) -> io::Result<()> {
         self.update_label_width(label_width);
-        self.text_area.move_cursor_after_indent()
+        self.text_area.move_cursor_after_indent(true)
     }
     #[inline]
     pub fn move_cursor_to_end(&mut self, label_width: usize) -> io::Result<()> {
         self.update_label_width(label_width);
-        self.text_area.move_cursor_to_end()
+        self.text_area.move_cursor_to_end(true)
     }
     #[inline]
     pub fn move_cursor_horizontal(&mut self, dir: Direction) -> io::Result<()> {
-        self.text_area.move_cursor_horizontal(dir)
+        self.text_area.move_cursor_horizontal(dir, true)
     }
 
     #[inline]
     pub fn jump_to_word_edge(&mut self, dir: Direction) -> io::Result<()> {
-        self.text_area.jump_to_word_edge(dir)
+        self.text_area.jump_to_word_edge(dir, true)
     }
 
     #[inline]
     pub fn insert_char(&mut self, ch: char) -> io::Result<()> {
-        self.text_area.insert_char(ch)
+        self.text_area.insert_char(ch, true)
     }
     #[inline]
     pub fn delete_char(&mut self) -> io::Result<Option<char>> {
-        self.text_area.delete_char()
+        self.text_area.delete_char(true)
     }
 
     #[inline]
     pub fn append_indent(&mut self) -> io::Result<()> {
-        self.text_area.append_indent()
+        self.text_area.append_indent(true)
     }
     #[inline]
     pub fn remove_indent(&mut self) -> io::Result<()> {
-        self.text_area.remove_indent()
+        self.text_area.remove_indent(true)
     }
 }
 

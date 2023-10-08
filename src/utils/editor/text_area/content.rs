@@ -1,8 +1,16 @@
+use crate::utils::editor::tokenizer::TokenVec;
+
 pub trait TextAreaContent {
     fn new() -> Self;
     fn get(&self) -> &String;
     fn get_mut(&mut self) -> &mut String;
-    fn change_handler(&mut self);
+
+    #[inline]
+    fn tokens(&self) -> Option<&TokenVec> {
+        None
+    }
+    #[inline]
+    fn change_handler(&mut self) {}
 
     fn rendered_content(&self, offset: usize, render_width: usize) -> String {
         if self.len() > render_width {
@@ -67,6 +75,4 @@ impl TextAreaContent for String {
     fn get_mut(&mut self) -> &mut String {
         self
     }
-    #[inline]
-    fn change_handler(&mut self) {}
 }
