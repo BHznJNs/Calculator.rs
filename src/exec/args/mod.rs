@@ -8,20 +8,51 @@ use crate::{
         error::{internal_error, InternalComponent},
         run_time::scope::Scope,
     },
+    utils::editor::CodeEditor,
     ProgramMode,
 };
 
 use super::headfile;
 use commands::CommandArg;
 
+#[inline]
+fn is_command_str(str: &str) -> bool {
+    str.starts_with('-') || str.starts_with("--")
+}
+
 pub fn args_resolve(mut args: VecDeque<String>, scope: &mut Scope) -> io::Result<ProgramMode> {
-    if args.is_empty() {
-        return Ok(ProgramMode::REPL);
-    }
+    // argument resolvers
+    let timer_arg_resolver = || unsafe { ENV.options.timer = true };
+    let headfile_arg_resolver = |args: VecDeque<String>, scope: &mut Scope| {
+        // regard remain arguments as headfile paths
+        let headfile_paths = args;
+        headfile::resolve(&headfile_paths, scope);
+        unsafe { ENV.headfiles = Some(Vec::from(headfile_paths)) };
+    };
+    let editor_arg_resolver = |mode: &mut ProgramMode| {
+        if *mode != ProgramMode::ToBeExited {
+            *mode = ProgramMode::Editor;
+        }
+    };
+    let accent_color_arg_resolver = |args: &mut VecDeque<String>| {
+        if let Some(color_value) = args.pop_front() {
+            CodeEditor::set_accent_color(&color_value);
+        }
+    };
+    let indent_size_arg_resolver = |args: &mut VecDeque<String>| {
+        if let Some(indent_size_str) = args.pop_front() {
+            if let Ok(indent_size) = indent_size_str.parse::<usize>() {
+                unsafe { ENV.options.indent_size = indent_size };
+            }
+        }
+    };
+
+    // --- --- --- --- --- ---
 
     let mut mode;
     let command_map = CommandArg::map();
-    if args[0].starts_with('-') || args[0].starts_with("--") {
+
+    if args.get(0).is_some_and(|arg| is_command_str(arg)) {
         mode = ProgramMode::REPL;
         unsafe { ENV.options.use_repl = true };
     } else {
@@ -32,8 +63,8 @@ pub fn args_resolve(mut args: VecDeque<String>, scope: &mut Scope) -> io::Result
         unsafe { ENV.script_path = Some(static_path) };
     }
 
-    for arg in args.iter() {
-        if let Some(command) = command_map.get::<str>(arg) {
+    while let Some(arg) = args.pop_front() {
+        if let Some(command) = command_map.get::<str>(&arg) {
             match command {
                 CommandArg::Help | CommandArg::Version => {
                     match command {
@@ -43,26 +74,20 @@ pub fn args_resolve(mut args: VecDeque<String>, scope: &mut Scope) -> io::Result
                     }
                     mode = ProgramMode::ToBeExited;
                 }
-                CommandArg::Timer => unsafe { ENV.options.timer = true },
+                CommandArg::Timer => timer_arg_resolver(),
                 CommandArg::Headfile => {
-                    // regard remain arguments as headfile path.
-                    let headfile_paths = args;
-                    headfile::resolve(&headfile_paths, scope);
-
-                    let temp = Vec::from(headfile_paths);
-                    unsafe { ENV.headfiles = Box::leak(Box::new(temp)) };
+                    headfile_arg_resolver(args, scope);
                     break;
                 }
-                CommandArg::Editor => {
-                    if mode != ProgramMode::ToBeExited {
-                        mode = ProgramMode::Editor;
-                    }
-                }
+                CommandArg::Editor => editor_arg_resolver(&mut mode),
+                CommandArg::AccentColor => accent_color_arg_resolver(&mut args),
+                CommandArg::IndentSize => indent_size_arg_resolver(&mut args),
             }
         } else {
-            let msg = format!("Invalid argument: {}.", arg);
+            let msg = format!("Invalid argument: {}", arg);
             internal_error(InternalComponent::InternalFn, &msg).unwrap_err();
             mode = ProgramMode::ToBeExited;
+            break;
         }
     }
     return Ok(mode);

@@ -27,7 +27,7 @@ pub enum ProgramMode {
 
 fn main() -> io::Result<()> {
     let mut args: VecDeque<String> = env::args().collect();
-    let mut scope = Scope::init();
+    let mut scope = Scope::new();
 
     let self_name = args.pop_front().unwrap();
     unsafe { ENV.self_name = Box::leak(Box::new(self_name)) };

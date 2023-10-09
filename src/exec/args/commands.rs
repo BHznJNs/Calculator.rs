@@ -1,43 +1,51 @@
 use std::collections::HashMap;
 
-#[derive(PartialEq, Clone, Copy)]
+#[repr(usize)]
+#[allow(dead_code)]
+#[derive(PartialEq, Clone)]
 pub enum CommandArg {
-    Version,
-    Help,
     Timer,
     Headfile,
     Editor,
+    AccentColor,
+    IndentSize,
+
+    Version,
+    Help,
 }
 
-pub const COMMAND_COUNT: usize = 5;
+pub const COMMAND_COUNT: usize = 7;
 pub const COMMANDS: [[&str; 2]; COMMAND_COUNT] = [
-    ["-v", "--version"],
-    ["-h", "--help"],
     ["-t", "--timer"],
     ["-hf", "--headfile"],
     ["-e", "--editor"],
+    ["-a", "--accent-color"],
+    ["-i", "--indent-size"],
+    ["-v", "--version"],
+    ["-h", "--help"],
 ];
 pub const COMMAND_DESCRIPTIONS: [&str; COMMAND_COUNT] = [
-    "print current executable file version and exit.",
-    "print this help message.",
     "print extra execute duration message code execution.",
     "directly import variables in head files, must with script paths following.",
     "open build-in code editor",
+    "editor accent color, options: [red, blue, dark_red, dark_blue, dark_grey, dark_cyan, dark_yellow, dark_magenta]",
+    "editor indent size, default: 2",
+
+    "print current executable file version and exit.",
+    "print this help message.",
 ];
 
 impl CommandArg {
-    pub fn map() -> HashMap<&'static str, CommandArg> {
-        HashMap::from([
-            (COMMANDS[0][0], CommandArg::Version),
-            (COMMANDS[0][1], CommandArg::Version),
-            (COMMANDS[1][0], CommandArg::Help),
-            (COMMANDS[1][1], CommandArg::Help),
-            (COMMANDS[2][0], CommandArg::Timer),
-            (COMMANDS[2][1], CommandArg::Timer),
-            (COMMANDS[3][0], CommandArg::Headfile),
-            (COMMANDS[3][1], CommandArg::Headfile),
-            (COMMANDS[4][0], CommandArg::Editor),
-            (COMMANDS[4][1], CommandArg::Editor),
-        ])
+    pub(super) fn map() -> HashMap<&'static str, CommandArg> {
+        use std::mem::transmute;
+        let into_arg = |num: usize| unsafe { transmute::<usize, CommandArg>(num) };
+
+        let mut result_map = HashMap::new();
+        for (index, command_str_pair) in COMMANDS.iter().enumerate() {
+            let target_arg = into_arg(index);
+            result_map.insert(command_str_pair[0], target_arg.clone());
+            result_map.insert(command_str_pair[1], target_arg);
+        }
+        return result_map;
     }
 }

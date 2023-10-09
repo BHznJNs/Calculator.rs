@@ -1,5 +1,4 @@
 use std::collections::{HashMap, HashSet};
-use std::rc::Rc;
 
 use crate::exec::script;
 use crate::public::error::{import_error, reference_error, ReferenceType};
@@ -51,10 +50,10 @@ pub struct Scope {
     pub completer: Option<Completer>,
     user_module_imported: HashSet<String>,
     std_module_imported: [bool; STD_MODULE_COUNT],
-    std_module_map: Rc<HashMap<&'static str, StdModules>>,
 }
+static mut STD_MODULE_MAP: Option<HashMap<&'static str, StdModules>> = None;
 impl Scope {
-    pub fn init() -> Self {
+    pub fn new() -> Self {
         Self {
             global: GlobalScope::init(),
             local: None,
@@ -62,19 +61,15 @@ impl Scope {
 
             user_module_imported: HashSet::<String>::new(),
             std_module_imported: [false; STD_MODULE_COUNT],
-            std_module_map: Rc::new(HashMap::from(STD_MODULE_DATA)),
         }
     }
-    // inherit self to create new scope
-    pub fn new_from(&self) -> Self {
-        Self {
-            global: GlobalScope::init(),
-            local: None,
-            completer: None,
 
-            user_module_imported: HashSet::<String>::new(),
-            std_module_imported: [false; STD_MODULE_COUNT],
-            std_module_map: self.std_module_map.clone(),
+    fn std_module_map() -> &'static HashMap<&'static str, StdModules> {
+        unsafe {
+            if STD_MODULE_MAP.is_none() {
+                STD_MODULE_MAP = Some(HashMap::from(STD_MODULE_DATA));
+            }
+            STD_MODULE_MAP.as_ref().unwrap()
         }
     }
 
@@ -110,7 +105,7 @@ impl Scope {
 
     // import standard module
     pub fn import_std(&mut self, module_name: &str) -> Result<(), ()> {
-        let std_module_map = self.std_module_map.clone();
+        let std_module_map = Scope::std_module_map();
         let Some(target_module) =
             std_module_map.get(module_name) else {
             let msg = format!("standard module '{}' does not exist", module_name);
@@ -125,7 +120,7 @@ impl Scope {
     }
     // import user defined module
     pub fn import_from_path(&mut self, module_path: &str) -> Result<Value, ()> {
-        let mut module_scope = self.new_from();
+        let mut module_scope = Scope::new();
 
         // if module has not been imported
         if self.user_module_imported.get(module_path).is_none() {

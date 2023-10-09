@@ -2,7 +2,7 @@ use std::io;
 
 use crossterm::style::Stylize;
 
-use crate::utils::{Cursor, Terminal};
+use crate::utils::{Cursor, Terminal, editor::code_editor::core::color::EditorColor};
 
 pub struct EditorInit;
 
@@ -22,7 +22,7 @@ impl EditorInit {
             padding_str1.on_white(),
             title_str.bold().black().on_white(),
             padding_str2.on_white(),
-            esc_button_str.white().on_dark_red(),
+            EditorColor::highlight_style(esc_button_str),
         );
     }
 

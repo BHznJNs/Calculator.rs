@@ -21,6 +21,8 @@ use crate::{
     utils::{editor::direction::Direction, number_bit_count, Cursor, Terminal},
 };
 
+use self::color::EditorColor;
+
 use super::{
     components::{Component, EditorComponentManager, FileSaver, Finder, Positioner},
     cursor_pos::EditorCursorPos,
@@ -633,6 +635,11 @@ impl CodeEditor {
         disable_raw_mode()?;
         execute!(io::stdout(), LeaveAlternateScreen)?;
         return Ok(());
+    }
+
+    #[inline]
+    pub fn set_accent_color(color: &str) {
+        EditorColor::set_accent_color(color);
     }
 
     pub fn read_file(&mut self, path: &str) -> io::Result<()> {

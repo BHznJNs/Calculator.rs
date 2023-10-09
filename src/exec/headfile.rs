@@ -5,7 +5,7 @@ use crate::public::run_time::{constants, scope::Scope};
 use super::script;
 
 pub fn resolve(headfiles: &VecDeque<String>, scope: &mut Scope) {
-    let mut headfile_scope = Scope::new_from(scope);
+    let mut headfile_scope = Scope::new();
 
     for path in headfiles {
         script::run_with_path(path, &mut headfile_scope);

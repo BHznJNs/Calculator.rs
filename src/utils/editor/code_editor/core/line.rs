@@ -1,9 +1,11 @@
 use std::io;
 
-
 use crate::utils::{
-    editor::{direction::Direction, text_area::TextArea, tokenizer::TokenSequence, code_editor::core::color::EditorColor},
-    number_bit_count, Cursor, Terminal,
+    editor::{
+        code_editor::core::color::EditorColor, direction::Direction, text_area::TextArea,
+        tokenizer::TokenSequence,
+    },
+    number_bit_count, Cursor,
 };
 
 pub struct EditorLine {

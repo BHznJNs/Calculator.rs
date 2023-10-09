@@ -4,7 +4,7 @@ pub struct Env {
     pub self_name: &'static str,
 
     pub script_path: Option<&'static str>,
-    pub headfiles: &'static[String],
+    pub headfiles: Option<Vec<String>>,
 
     pub options: EnvOption,
 }
@@ -20,7 +20,7 @@ pub struct EnvOption {
 pub static mut ENV: Env = Env {
     self_name: "",
     script_path: None,
-    headfiles: &[],
+    headfiles: None,
 
     options: EnvOption {
         timer: false,
