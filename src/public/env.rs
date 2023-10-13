@@ -1,5 +1,3 @@
-use crate::exec::args::commands;
-
 pub struct Env {
     pub self_name: &'static str,
 
@@ -39,12 +37,14 @@ impl Env {
     }
 
     pub fn help_output() {
+        use crate::exec::args::{ARGS, ARG_COUNT, ARG_DESCRIPTIONS};
+
         println!("Usage: calculator [SCRIPT_PATH] [OPTIONS]\n");
 
         println!("Options:");
-        for i in 0..commands::COMMAND_COUNT {
-            println!("{}, {}", commands::COMMANDS[i][0], commands::COMMANDS[i][1]);
-            println!("  {}", commands::COMMAND_DESCRIPTIONS[i]);
+        for i in 0..ARG_COUNT {
+            println!("{}, {}", ARGS[i][0], ARGS[i][1]);
+            println!("  {}", ARG_DESCRIPTIONS[i]);
         }
     }
 }

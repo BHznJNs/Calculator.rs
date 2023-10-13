@@ -9,7 +9,7 @@ mod utils;
 use std::collections::VecDeque;
 use std::{env, io};
 
-use exec::args::args_resolve;
+use exec::args::{args_resolve, load_config, ARG_COUNT};
 use exec::repl;
 use exec::script::{run_entry, run_with_path};
 use public::env::ENV;
@@ -32,7 +32,12 @@ fn main() -> io::Result<()> {
     let self_name = args.pop_front().unwrap();
     unsafe { ENV.self_name = Box::leak(Box::new(self_name)) };
 
-    let mode = args_resolve(args, &mut scope)?;
+    // records the command line args that is inputed
+    let mut used_args: Vec<bool> = vec![false; ARG_COUNT];
+
+    let mode = args_resolve(args, &mut used_args, &mut scope)?;
+    load_config(used_args, &mut scope)?;
+
     match mode {
         ProgramMode::REPL => repl::repl(&mut scope)?,
         ProgramMode::ToBeExited => {}

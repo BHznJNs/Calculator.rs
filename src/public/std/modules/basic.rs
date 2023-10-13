@@ -5,7 +5,7 @@ use std::rc::Rc;
 
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 
-use crate::public::error::{internal_error, type_error, InternalComponent, math_error};
+use crate::public::error::{internal_error, math_error, type_error, InternalComponent};
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::constants::{
     ARRAY_T, BOOL_T, CLASS_T, FUNCTION_T, LAZYEXPR_T, MAP_T, NUMBER_T, OBJECT_T, STRING_T,
@@ -20,8 +20,8 @@ use crate::public::value::function::{BuildInFnParam, BuildInFunction};
 use crate::public::value::map::RawMap;
 use crate::public::value::number::Number;
 use crate::public::value::unique::Unique;
-use crate::public::value::{Value, ValueType};
 use crate::public::value::GetAddr;
+use crate::public::value::{Value, ValueType};
 
 use super::super::utils::get_val::get_val;
 use super::array::ArrayModule;
@@ -192,7 +192,7 @@ impl BuildInFnCall for BasicModule {
                             let i = str_to_num::<i64>(refer)?;
                             Value::from(i)
                         }
-                        Value::Boolean(bool_val) => Value::from(bool_val as i64),
+                        Value::Boolean(bool_value) => Value::from(bool_value as i64),
                         _ => {
                             return Err(type_error(
                                 Some("Build-in function `int`"),
@@ -274,22 +274,22 @@ impl BuildInFnCall for BasicModule {
 
                                     match proto_addr {
                                         x if x == array_cls.get_addr() => {
-                                            let arr_val = get_self_prop(&input, "v")?;
-                                            let Value::Array(arr_ref) = arr_val else {
+                                            let arr_value = get_self_prop(&input, "v")?;
+                                            let Value::Array(arr_ref) = arr_value else {
                                                 unreachable!()
                                             };
                                             return Ok(array_length(&arr_ref));
                                         }
                                         x if x == string_cls.get_addr() => {
-                                            let str_val = get_self_prop(&input, "v")?;
-                                            let Value::String(str_ref) = str_val else {
+                                            let str_value = get_self_prop(&input, "v")?;
+                                            let Value::String(str_ref) = str_value else {
                                                 unreachable!()
                                             };
                                             return Ok(string_length(&str_ref));
                                         }
                                         x if x == map_cls.get_addr() => {
-                                            let map_val = get_self_prop(&input, "v")?;
-                                            let Value::Map(map_ref) = map_val else {
+                                            let map_value = get_self_prop(&input, "v")?;
+                                            let Value::Map(map_ref) = map_value else {
                                                 unreachable!()
                                             };
                                             return Ok(map_length(&map_ref));
