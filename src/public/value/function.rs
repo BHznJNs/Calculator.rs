@@ -5,7 +5,7 @@ use std::rc::Rc;
 
 use crate::public::compile_time::ast::ast_enum::ASTVec;
 use crate::public::compile_time::ast::types::ExpressionNode;
-use crate::public::error::{range_error, type_error};
+use crate::public::error::{range_error, type_error, CalcResult};
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::{LocalScope, Scope};
 use crate::public::Param;
@@ -65,15 +65,15 @@ impl Function {
         actual_params: &Vec<ExpressionNode>,
         whole_scope: &mut Scope,
         local_scope: &mut LocalScope,
-        expr_resolver: fn(&ExpressionNode, &mut Scope) -> Result<Value, ()>,
-    ) -> Result<(), ()> {
+        expr_resolver: fn(&ExpressionNode, &mut Scope) -> CalcResult<Value>,
+    ) -> CalcResult<()> {
         if actual_params.len() < formal_params.len() {
             // if param missing
             return Err(range_error(
                 "function invocation",
                 formal_params.len(),
                 actual_params.len(),
-            )?);
+            ));
         }
 
         let mut index = 0;
@@ -90,16 +90,16 @@ impl Function {
                     .variables
                     .insert(formal_param.identi().to_string(), actual_param_value);
             } else {
-                type_error(
+                return Err(type_error(
                     Some(formal_param.identi()),
                     vec![formal_param.type__()],
                     actual_param_value.get_type(),
-                )?
+                ));
             }
 
             index += 1;
         }
-        Ok(())
+        return Ok(());
     }
 }
 

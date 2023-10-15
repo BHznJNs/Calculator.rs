@@ -1,6 +1,7 @@
 mod cursor;
-mod loop_traverser;
 mod terminal;
+mod loop_traverser;
+mod output_buffer;
 
 pub mod ascii;
 pub mod completer;
@@ -12,6 +13,7 @@ use std::{
     io::{self, Write},
 };
 
+pub use output_buffer::OutputBuffer;
 use cursor::Cursor;
 use loop_traverser::LoopTraverser;
 use terminal::Terminal;
@@ -32,13 +34,13 @@ pub fn number_bit_count(mut num: usize) -> usize {
     return count;
 }
 
-// this function is used to replace Rust macro `println!`
-// since the println! macro can not normally
-// make new line in raw_mode.
-pub fn print_line<T: Display>(content: T) {
-    print!("{}\r\n", content);
-    Terminal::flush().expect("IO Error");
-}
+// // this function is used to replace Rust macro `println!`
+// // since the println! macro can not normally
+// // make new line in raw_mode.
+// pub fn print_line<T: Display>(content: T) {
+//     print!("{}\r\n", content);
+//     Terminal::flush().expect("IO Error");
+// }
 
 // output something into file
 // this function is used to debug.

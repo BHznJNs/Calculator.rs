@@ -53,18 +53,19 @@ pub fn load_config(used_args: Vec<bool>, scope: &mut Scope) -> io::Result<()> {
     run_with_path(config_path_str.unwrap(), &mut config_scope);
 
     for (arg_str, arg_target) in ARG_CONFIGURABLE {
-        if let Ok(arg_value) = config_scope.read_var(arg_str) {
-            if used_args[arg_target as usize] {
-                // skip the args that is set in the command line args.
-                continue;
-            }
-            match arg_target {
-                Arg::Timer => timer_arg_resolver(arg_value),
-                Arg::Headfile => headfile_arg_resolver(arg_value),
-                Arg::AccentColor => accent_color_arg_resolver(arg_value),
-                Arg::IndentSize => indent_size_arg_resolver(arg_value),
-                _ => unreachable!(),
-            }
+        let Ok(arg_value) = config_scope.read_var(arg_str) else {
+            continue;
+        };
+        if used_args[arg_target as usize] {
+            // skip the args that is set in the command line args.
+            continue;
+        }
+        match arg_target {
+            Arg::Timer => timer_arg_resolver(arg_value),
+            Arg::Headfile => headfile_arg_resolver(arg_value),
+            Arg::AccentColor => accent_color_arg_resolver(arg_value),
+            Arg::IndentSize => indent_size_arg_resolver(arg_value),
+            _ => unreachable!(),
         }
     }
     return Ok(());

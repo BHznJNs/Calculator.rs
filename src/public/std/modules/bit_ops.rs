@@ -1,4 +1,5 @@
 use super::super::utils::get_val::get_val;
+use crate::public::error::CalcResult;
 use crate::public::run_time::{build_in::BuildInFnIdenti, scope::Scope};
 use crate::public::value::function::{BuildInFnParam, BuildInFunction};
 use crate::public::value::{Value, ValueType};
@@ -51,7 +52,7 @@ impl FunctionModule for BitOpsModule {
 }
 
 impl BuildInFnCall for BitOpsModule {
-    fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
+    fn call(&self, scope: &mut Scope) -> CalcResult<Value> {
         let result = if *self != Self::NOT {
             // AND | OR | XOR | LShift | RShift
             let num_val1 = get_val("num1", scope)?;

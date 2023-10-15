@@ -2,11 +2,11 @@ use crate::compiler::tokenizer::token::{Token, TokenVec};
 use crate::public::compile_time::ast::types::{ExpressionNode, MapLiteralNode};
 use crate::public::compile_time::dividers::Divider;
 use crate::public::compile_time::parens::Paren;
-use crate::public::error::syntax_error;
+use crate::public::error::{syntax_error, CalcResult};
 
 use super::expression;
 
-pub fn resolve(tokens: &mut TokenVec) -> Result<MapLiteralNode, ()> {
+pub fn resolve(tokens: &mut TokenVec) -> CalcResult<MapLiteralNode> {
     let mut brace_count = 1;
     let mut key_stack = Vec::<String>::new();
     let mut expr_stack = Vec::<ExpressionNode>::new();
@@ -24,7 +24,7 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<MapLiteralNode, ()> {
                 Token::String(str) => key_stack.push(str),
                 _ => {
                     let msg = format!("invalid map key: {}", key);
-                    return Err(syntax_error(&msg)?);
+                    return Err(syntax_error(&msg));
                 }
             }
 
@@ -51,7 +51,7 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<MapLiteralNode, ()> {
             let value_expr = expression::resolve(&mut sub_tokens)?;
             expr_stack.push(value_expr);
         } else {
-            return Err(syntax_error("invalid map definition")?);
+            return Err(syntax_error("invalid map definition"));
         }
     }
 

@@ -13,7 +13,7 @@ use crossterm::{
 };
 
 use crate::public::run_time::scope::Scope;
-use crate::utils::{cursor::Cursor, print_line, terminal::Terminal};
+use crate::utils::{cursor::Cursor, terminal::Terminal};
 
 use super::{direction::Direction, text_area::TextArea};
 
@@ -90,7 +90,7 @@ impl LineEditor {
                     }
                 }
                 KeyCode::Enter => {
-                    print_line("");
+                    print!("\r\n");
 
                     let current_line_index = self.current_line.index;
                     let new_line = EditorLine::new(Self::PROMPT.len(), current_line_index + 1);

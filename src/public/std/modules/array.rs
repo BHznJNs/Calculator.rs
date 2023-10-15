@@ -1,5 +1,6 @@
 use std::rc::Rc;
 
+use crate::public::error::CalcResult;
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::std::{ModuleClass, EMPTY_MODULE_CLASS};
@@ -109,7 +110,7 @@ impl ClassModule for ArrayModule {
 }
 
 impl BuildInFnCall for ArrayModule {
-    fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
+    fn call(&self, scope: &mut Scope) -> CalcResult<Value> {
         let self_value = get_val("self", scope)?;
         let arr_value = get_self_prop(&self_value, "v")?;
         let Value::Array(arr) = arr_value else {

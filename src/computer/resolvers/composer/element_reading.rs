@@ -1,7 +1,7 @@
 use std::cell::RefMut;
 
 use crate::public::compile_time::ast::types::ExpressionNode;
-use crate::public::error::{assignment_error, range_error, syntax_error};
+use crate::public::error::{assignment_error, range_error, syntax_error, CalcResult};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::array::RawArray;
 use crate::public::value::map::RawMap;
@@ -9,13 +9,13 @@ use crate::public::value::Value;
 
 use super::super::expression;
 
-fn check_outof_range(index: usize, len: usize) -> Result<(), ()> {
+fn check_outof_range(index: usize, len: usize) -> CalcResult<()> {
     if index >= len {
         Err(range_error(
             "indexing reading",
             format!("index < {}", len),
             index,
-        )?)
+        ))
     } else {
         Ok(())
     }
@@ -24,10 +24,10 @@ fn check_outof_range(index: usize, len: usize) -> Result<(), ()> {
 fn middle_ware(
     target_value: Value,
     index_value: Value,
-    arr_callback: impl Fn(RefMut<RawArray>, usize) -> Result<Value, ()>,
-    str_callback: impl Fn(RefMut<String>, usize) -> Result<Value, ()>,
-    map_callback: impl Fn(RefMut<RawMap>, &str) -> Result<Value, ()>,
-) -> Result<Value, ()> {
+    arr_callback: impl Fn(RefMut<RawArray>, usize) -> CalcResult<Value>,
+    str_callback: impl Fn(RefMut<String>, usize) -> CalcResult<Value>,
+    map_callback: impl Fn(RefMut<RawMap>, &str) -> CalcResult<Value>,
+) -> CalcResult<Value> {
     match (&target_value, index_value) {
         (Value::Array(arr), Value::Number(num)) => {
             // array
@@ -51,10 +51,10 @@ fn middle_ware(
             map_callback(map_ref, key_str)
         }
         _ => match target_value {
-            Value::Array(_) => Err(syntax_error("Array indexing must be Number typed")?),
-            Value::String(_) => Err(syntax_error("String indexing must be Number typed")?),
-            Value::Map(_) => Err(syntax_error("Map key must be String typed")?),
-            _ => Err(syntax_error("invalid indexing")?),
+            Value::Array(_) => Err(syntax_error("Array indexing must be Number typed")),
+            Value::String(_) => Err(syntax_error("String indexing must be Number typed")),
+            Value::Map(_) => Err(syntax_error("Map key must be String typed")),
+            _ => Err(syntax_error("invalid indexing")),
         },
     }
 }
@@ -63,7 +63,7 @@ pub fn resolve(
     target_value: Value,
     index_node: &ExpressionNode,
     scope: &mut Scope,
-) -> Result<Value, ()> {
+) -> CalcResult<Value> {
     let index_value = expression::resolve(index_node, scope)?;
     let result = middle_ware(
         target_value,
@@ -89,7 +89,7 @@ pub fn assign(
     index_node: &ExpressionNode,
     value: Value, // right-hand value
     scope: &mut Scope,
-) -> Result<(), ()> {
+) -> CalcResult<()> {
     let index_value = expression::resolve(index_node, scope)?;
     middle_ware(
         target_value,
@@ -101,7 +101,7 @@ pub fn assign(
         |_, _| {
             return Err(assignment_error(
                 "Raw-String type does not support element assignment",
-            )?);
+            ));
         },
         |mut map_ref, key| {
             map_ref.set(String::from(key), value.clone());

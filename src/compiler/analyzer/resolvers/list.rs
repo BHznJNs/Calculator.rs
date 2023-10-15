@@ -3,9 +3,9 @@ use crate::compiler::tokenizer::token::{Token, TokenVec};
 use crate::public::compile_time::ast::types::ExpressionNode;
 use crate::public::compile_time::dividers::Divider;
 use crate::public::compile_time::parens::Paren;
-use crate::public::error::syntax_error;
+use crate::public::error::{syntax_error, CalcResult};
 
-pub fn resolve(tokens: &mut TokenVec, identi_paren: Paren) -> Result<Vec<ExpressionNode>, ()> {
+pub fn resolve(tokens: &mut TokenVec, identi_paren: Paren) -> CalcResult<Vec<ExpressionNode>> {
     // examples:
     // 1, 2)
     // a, 1)
@@ -21,7 +21,7 @@ pub fn resolve(tokens: &mut TokenVec, identi_paren: Paren) -> Result<Vec<Express
     fn element_resolve(
         sub_tokens: &mut TokenVec,
         elements: &mut Vec<ExpressionNode>,
-    ) -> Result<(), ()> {
+    ) -> CalcResult<()> {
         if !sub_tokens.is_empty() {
             let element = expression::resolve(sub_tokens)?;
             sub_tokens.clear();
@@ -37,7 +37,7 @@ pub fn resolve(tokens: &mut TokenVec, identi_paren: Paren) -> Result<Vec<Express
 
     loop {
         if tokens.is_empty() {
-            return Err(syntax_error("Unmatched parentheses")?);
+            return Err(syntax_error("Unmatched parentheses"));
         }
 
         let current = tokens.pop_front().unwrap();
@@ -73,6 +73,5 @@ pub fn resolve(tokens: &mut TokenVec, identi_paren: Paren) -> Result<Vec<Express
 
         sub_tokens.push_back(current);
     }
-
-    Ok(elements)
+    return Ok(elements);
 }

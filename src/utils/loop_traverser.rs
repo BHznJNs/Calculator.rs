@@ -6,6 +6,7 @@ pub struct LoopTraverser<T> {
     pub cycle: bool,
 }
 
+#[allow(dead_code)]
 impl<T> LoopTraverser<T> {
     pub fn new(is_cycle: bool) -> Self {
         Self {

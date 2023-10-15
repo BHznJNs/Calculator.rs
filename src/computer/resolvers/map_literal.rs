@@ -2,10 +2,10 @@ use super::expression;
 use crate::public::{
     compile_time::ast::types::MapLiteralNode,
     run_time::scope::Scope,
-    value::map::{InternalMap, RawMap},
+    value::map::{InternalMap, RawMap}, error::CalcResult,
 };
 
-pub fn resolve(node: &MapLiteralNode, scope: &mut Scope) -> Result<RawMap, ()> {
+pub fn resolve(node: &MapLiteralNode, scope: &mut Scope) -> CalcResult<RawMap> {
     let mut internal_map = InternalMap::new();
 
     let mut key_iter = node.keys.iter();

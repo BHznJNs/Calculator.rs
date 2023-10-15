@@ -1,6 +1,6 @@
 use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::compile_time::ast::types::{ExpressionNode, ModuleType};
-use crate::public::error::{internal_error, syntax_error, type_error, InternalComponent};
+use crate::public::error::{internal_error, syntax_error, type_error, InternalComponent, CalcResult};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::into_rc_refcell;
 use crate::public::value::symbols::Symbols;
@@ -10,7 +10,7 @@ use super::operate::operate;
 use super::{array_literal, assignment, composer::compose, function_definition, instantiation};
 use super::{class_definition, map_literal};
 
-pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> Result<Value, ()> {
+pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> CalcResult<Value> {
     let elements = &node.elements;
     if elements.is_empty(){
         return Ok(Value::EMPTY);
@@ -52,19 +52,19 @@ pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> Result<Value, ()> {
                                 Some("Not operator"),
                                 vec![ValueType::Number],
                                 val.get_type(),
-                            )?);
+                            ));
                         }
                     } else {
                         return Err(syntax_error(
                             "operating number is missing for Not operator",
-                        )?);
+                        ));
                     }
                 } else {
                     if value_stack.len() < 2 {
                         // no enough value for operating
                         return Err(syntax_error(
                             "invalid expression as operating number missing",
-                        )?);
+                        ));
                     }
 
                     let num2 = value_stack.pop().unwrap();
@@ -85,10 +85,10 @@ pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> Result<Value, ()> {
 
             _ => {
                 let msg = format!("unexpected AST node: '{}'", current_node);
-                return Err(internal_error(InternalComponent::Computer, &msg)?);
+                return Err(internal_error(InternalComponent::Computer, &msg));
             }
         };
         value_stack.push(current_value);
     }
-    Ok(value_stack.remove(0))
+    return Ok(value_stack.remove(0));
 }

@@ -1,10 +1,10 @@
 use crate::public::compile_time::ast::ast_enum::ASTNode;
-use crate::public::error::{internal_error, syntax_error, InternalComponent};
+use crate::public::error::{internal_error, syntax_error, InternalComponent, CalcResult};
 use crate::public::value::number::Number;
 use crate::public::value::symbols::Symbols;
 use crate::public::value::Value;
 
-pub fn operate(val1: Value, val2: Value, operator: Symbols) -> Result<Value, ()> {
+pub fn operate(val1: Value, val2: Value, operator: Symbols) -> CalcResult<Value> {
     let result = match (&val1, &val2, operator) {
         (Value::Number(num1_ref), Value::Number(num2_ref), _) => {
             // number computing and comparing
@@ -28,7 +28,7 @@ pub fn operate(val1: Value, val2: Value, operator: Symbols) -> Result<Value, ()>
                 Symbols::OrSign => Value::from(num1.int_value() != 0 || num2.int_value() != 0),
                 _ => {
                     let msg = format!("unexpected symbol `{}` for operating", operator);
-                    return Err(internal_error(InternalComponent::Computer, &msg)?);
+                    return Err(internal_error(InternalComponent::Computer, &msg));
                 }
             }
         }
@@ -90,9 +90,7 @@ pub fn operate(val1: Value, val2: Value, operator: Symbols) -> Result<Value, ()>
                 }
                 _ => unreachable!(),
             }
-            // expr_elements.push(ASTNode::NumberLiteral(*num));
             expr_elements.push(ASTNode::SymbolLiteral(operator));
-
             Value::from(new_lazy_expr)
         }
         (_, _, Symbols::NotEqual | Symbols::CompareEqual | Symbols::AndSign | Symbols::OrSign) =>
@@ -106,7 +104,7 @@ pub fn operate(val1: Value, val2: Value, operator: Symbols) -> Result<Value, ()>
                 _ => unreachable!(),
             }
         }
-        _ => return Err(syntax_error("invalid computing expression")?),
+        _ => return Err(syntax_error("invalid computing expression")),
     };
     return Ok(result);
 }

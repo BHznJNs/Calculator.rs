@@ -2,7 +2,8 @@ use std::cmp::{self, PartialEq};
 use std::fmt;
 use std::ops::{Add, Div, Mul, Sub};
 
-use crate::public::error::{internal_error, InternalComponent, math_error};
+use crate::public::error::math_error;
+use crate::utils::OutputBuffer;
 
 #[cfg_attr(debug_assertions, derive(Debug))]
 #[derive(Clone, Copy)]
@@ -16,14 +17,15 @@ pub enum Number {
 }
 
 impl Number {
-    pub fn modulo(dividend: Self, divisor: Self) -> Self{
+    pub fn modulo(dividend: Self, divisor: Self) -> Self {
         if let (Self::NotANumber, _) | (_, Self::NotANumber) = (dividend, divisor) {
             return Self::NotANumber;
         }
 
         // the divisor can not be ZERO
         if divisor.float_value() == 0.0 {
-            math_error("modulo by zero").unwrap_err();
+            let err = math_error("modulo by zero");
+            OutputBuffer::error_append(&err, true);
             return Self::NotANumber;
         }
 
@@ -35,7 +37,8 @@ impl Number {
 
         match (dividend, divisor) {
             (Self::Int(i1), Self::Int(i2)) => Number::Int(i1 % i2),
-            (Self::Int(i), Self::Fraction(upper, lower)) | (Self::Fraction(upper, lower), Self::Int(i)) => {
+            (Self::Int(i), Self::Fraction(upper, lower))
+            | (Self::Fraction(upper, lower), Self::Int(i)) => {
                 let temp1 = i * lower;
                 let temp2 = upper * lower;
                 Number::Fraction(temp1 % temp2, lower)
@@ -44,9 +47,9 @@ impl Number {
                 let lower_lcm = Self::lcm(lower1, lower2);
                 let multed_upper1 = upper1 * (lower_lcm / lower1);
                 let multed_upper2 = upper2 * (lower_lcm / lower2);
-                Number::Fraction(multed_upper1 % multed_upper2, lower_lcm).reduce().unwrap() 
+                Number::Fraction(multed_upper1 % multed_upper2, lower_lcm).reduce()
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -74,7 +77,7 @@ impl Number {
                 Self::Int(num2) => {
                     let upper_powed = upper.pow(num2 as u32);
                     let lower_powed = lower.pow(num2 as u32);
-                    Self::Fraction(upper_powed, lower_powed).reduce().unwrap()
+                    Self::Fraction(upper_powed, lower_powed).reduce()
                 }
                 Self::Float(num2) => {
                     let f_value = base.float_value();
@@ -151,18 +154,15 @@ impl Number {
         return diff_abs <= EPS;
     }
 
-    fn reduce(&self) -> Result<Self, ()> {
+    fn reduce(&self) -> Self {
         // this method is specially for Number::Fraction
         let Self::Fraction(mut upper, mut lower) = self else {
-            return Err(internal_error(
-                InternalComponent::InternalFn,
-                "invalid `Number::reduce` invocation"
-            )?);
+            unreachable!();
         };
         let gcd_result = Self::gcd(upper, lower);
         upper /= gcd_result;
         lower /= gcd_result;
-        return Ok(Self::Fraction(upper, lower));
+        return Self::Fraction(upper, lower);
     }
     // greatest common divisor
     fn gcd(n1: i64, n2: i64) -> i64 {
@@ -226,21 +226,19 @@ impl Add for Number {
         match self {
             Self::Int(num1) => match other {
                 Self::Int(num2) => Self::Int(num1 + num2),
-                Self::Fraction(upper, lower) => Self::Fraction(upper + num1 * lower, lower)
-                    .reduce()
-                    .unwrap(),
+                Self::Fraction(upper, lower) => {
+                    Self::Fraction(upper + num1 * lower, lower).reduce()
+                }
                 _ => unreachable!(),
             },
             Self::Fraction(upper, lower) => match other {
-                Self::Int(num2) => Self::Fraction(upper + num2 * lower, lower)
-                    .reduce()
-                    .unwrap(),
+                Self::Int(num2) => Self::Fraction(upper + num2 * lower, lower).reduce(),
                 Self::Fraction(other_upper, other_lower) => {
                     let lower_lcm = Self::lcm(lower, other_lower);
                     let self_factor = lower_lcm / lower;
                     let other_factor = lower_lcm / other_lower;
                     let res_upper = upper * self_factor + other_upper * other_factor;
-                    Self::Fraction(res_upper, lower_lcm).reduce().unwrap()
+                    Self::Fraction(res_upper, lower_lcm).reduce()
                 }
                 _ => unreachable!(),
             },
@@ -266,21 +264,19 @@ impl Sub for Number {
         match self {
             Self::Int(num1) => match other {
                 Self::Int(num2) => Self::Int(num1 - num2),
-                Self::Fraction(upper, lower) => Self::Fraction(num1 * lower - upper, lower)
-                    .reduce()
-                    .unwrap(),
+                Self::Fraction(upper, lower) => {
+                    Self::Fraction(num1 * lower - upper, lower).reduce()
+                }
                 _ => unreachable!(),
             },
             Self::Fraction(upper, lower) => match other {
-                Self::Int(num2) => Self::Fraction(upper - num2 * lower, lower)
-                    .reduce()
-                    .unwrap(),
+                Self::Int(num2) => Self::Fraction(upper - num2 * lower, lower).reduce(),
                 Self::Fraction(other_upper, other_lower) => {
                     let lower_lcm = Self::lcm(lower, other_lower);
                     let self_factor = lower_lcm / lower;
                     let other_factor = lower_lcm / other_lower;
                     let res_upper = upper * self_factor - other_upper * other_factor;
-                    Self::Fraction(res_upper, lower_lcm).reduce().unwrap()
+                    Self::Fraction(res_upper, lower_lcm).reduce()
                 }
                 _ => unreachable!(),
             },
@@ -306,17 +302,15 @@ impl Mul for Number {
         match self {
             Self::Int(num1) => match other {
                 Self::Int(num2) => Self::Int(num1 * num2),
-                Self::Fraction(upper, lower) => {
-                    Self::Fraction(num1 * upper, lower).reduce().unwrap()
-                }
+                Self::Fraction(upper, lower) => Self::Fraction(num1 * upper, lower).reduce(),
                 _ => unreachable!(),
             },
             Self::Fraction(upper, lower) => match other {
-                Self::Int(num2) => Self::Fraction(upper * num2, lower).reduce().unwrap(),
+                Self::Int(num2) => Self::Fraction(upper * num2, lower).reduce(),
                 Self::Fraction(other_upper, other_lower) => {
                     let muled_upper = upper * other_upper;
                     let muled_lower = lower * other_lower;
-                    Self::Fraction(muled_upper, muled_lower).reduce().unwrap()
+                    Self::Fraction(muled_upper, muled_lower).reduce()
                 }
                 _ => unreachable!(),
             },
@@ -334,7 +328,8 @@ impl Div for Number {
 
         // when the divisor is ZERO
         if other.float_value() == 0.0 {
-            math_error("the divisor should not to be ZERO").unwrap_err();
+            let err = math_error("the divisor should not to be ZERO");
+            OutputBuffer::error_append(&err, true);
             return Number::NotANumber;
         }
 
@@ -350,17 +345,13 @@ impl Div for Number {
         match self {
             Self::Int(num1) => match other {
                 Self::Int(num2) => Self::Int(num1 / num2),
-                Self::Fraction(upper, lower) => {
-                    Self::Fraction(num1 * lower, upper).reduce().unwrap()
-                }
+                Self::Fraction(upper, lower) => Self::Fraction(num1 * lower, upper).reduce(),
                 _ => unreachable!(),
             },
             Self::Fraction(upper, lower) => match other {
-                Self::Int(num2) => Self::Fraction(upper, lower * num2).reduce().unwrap(),
+                Self::Int(num2) => Self::Fraction(upper, lower * num2).reduce(),
                 Self::Fraction(other_upper, other_lower) => {
-                    Self::Fraction(upper * other_lower, lower * other_upper)
-                        .reduce()
-                        .unwrap()
+                    Self::Fraction(upper * other_lower, lower * other_upper).reduce()
                 }
                 _ => unreachable!(),
             },

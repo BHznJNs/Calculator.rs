@@ -1,4 +1,4 @@
-use crate::public::error::math_error;
+use crate::public::error::{math_error, CalcResult};
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::function::{BuildInFnParam, BuildInFunction};
@@ -116,7 +116,7 @@ impl ObjectModule for MathModule {
 }
 
 impl BuildInFnCall for MathModule {
-    fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
+    fn call(&self, scope: &mut Scope) -> CalcResult<Value> {
         let result = match self {
             Self::LOG => {
                 let base = get_val("base", scope)?;
@@ -155,7 +155,7 @@ impl BuildInFnCall for MathModule {
                             return Err(
                                 math_error(
                                     "the input for inverse trigonometric function should be less than 1 and greater than -1"
-                                )?
+                                )
                             );
                         }
                         match self {

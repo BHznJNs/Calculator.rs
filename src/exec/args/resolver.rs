@@ -7,16 +7,11 @@ use crate::{
         error::{internal_error, InternalComponent},
         run_time::scope::Scope,
     },
-    utils::editor::CodeEditor,
+    utils::{editor::CodeEditor, OutputBuffer},
     ProgramMode,
 };
 
 use super::Arg;
-
-#[inline]
-fn is_command_str(str: &str) -> bool {
-    str.starts_with('-') || str.starts_with("--")
-}
 
 pub fn args_resolve(
     mut args: VecDeque<String>,
@@ -51,10 +46,14 @@ pub fn args_resolve(
 
     // --- --- --- --- --- ---
 
+    if args.is_empty() {
+        return Ok(ProgramMode::REPL);
+    }
+
     let mut mode;
     let command_map = Arg::map();
 
-    if args.get(0).is_some_and(|arg| is_command_str(arg)) {
+    if args[0].starts_with('-') || args[0].starts_with("--") {
         mode = ProgramMode::REPL;
         unsafe { ENV.options.use_repl = true };
     } else {
@@ -89,7 +88,9 @@ pub fn args_resolve(
             }
         } else {
             let msg = format!("Invalid argument: {}", arg_str);
-            internal_error(InternalComponent::InternalFn, &msg).unwrap_err();
+            let err = internal_error(InternalComponent::InternalFn, &msg);
+            OutputBuffer::error_append(&err, true);
+
             mode = ProgramMode::ToBeExited;
             break;
         }

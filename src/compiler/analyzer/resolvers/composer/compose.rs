@@ -2,12 +2,12 @@ use crate::compiler::tokenizer::token::{Token, TokenVec};
 use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::compile_time::ast::types::ExpressionNode;
 use crate::public::compile_time::parens::Paren;
-use crate::public::error::syntax_error;
+use crate::public::error::{syntax_error, CalcResult};
 use crate::public::value::symbols::Symbols;
 
 use super::{assignment, element_reading, invocation, object_reading};
 
-pub fn resolve(var_node: ASTNode, tokens: &mut TokenVec) -> Result<ASTNode, ()> {
+pub fn resolve(var_node: ASTNode, tokens: &mut TokenVec) -> CalcResult<ASTNode> {
     let is_more_token = !tokens.is_empty();
 
     let result_node = if is_more_token {
@@ -63,13 +63,12 @@ pub fn resolve(var_node: ASTNode, tokens: &mut TokenVec) -> Result<ASTNode, ()> 
             }
             _ => {
                 let msg = format!("unexpected token `{}`", next_token);
-                return Err(syntax_error(&msg)?);
+                return Err(syntax_error(&msg));
             }
         };
         resolve(current_node, tokens)?
     } else {
         var_node
     };
-
-    Ok(result_node)
+    return Ok(result_node);
 }

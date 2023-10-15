@@ -1,17 +1,17 @@
 use crate::computer::resolvers::{assignment, expression};
 use crate::public::compile_time::ast::types::StatementNode;
-use crate::public::error::syntax_error;
+use crate::public::error::{syntax_error, CalcResult};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::{Value, VoidSign};
-use crate::utils::print_line;
+use crate::utils::OutputBuffer;
 
 use super::sequence;
 
-pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> Result<Value, ()> {
+pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> CalcResult<Value> {
     let result = match statement_node {
         StatementNode::Output(expression_node) => {
             let output_value = expression::resolve(expression_node, scope)?;
-            print_line(output_value);
+            OutputBuffer::print_append(&output_value.to_string(), true);
             Value::EMPTY
         }
         StatementNode::ForLoop(for_statement) => {
@@ -28,7 +28,7 @@ pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> Result<Valu
                     is_inf_loop = true;
                     loop_count = 0;
                 }
-                _ => return Err(syntax_error("invalid loop count for 'for' statement")?),
+                _ => return Err(syntax_error("invalid loop count for 'for' statement")),
             }
 
             let mut count = 0;

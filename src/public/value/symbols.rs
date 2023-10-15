@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::public::error::{internal_error, InternalComponent};
+use crate::public::error::{internal_error, InternalComponent, CalcResult};
 
 #[derive(PartialEq, Clone, Copy, Debug)]
 pub enum Symbols {
@@ -33,7 +33,7 @@ pub enum Symbols {
 }
 
 impl Symbols {
-    pub fn combine(&self, other: Symbols) -> Result<Self, ()> {
+    pub fn combine(&self, other: Symbols) -> CalcResult<Self> {
         // example:
         //    let equal_symbol = Symbols::Equal;
         //    equal_symbol.combine(Symbols::Plus);
@@ -44,7 +44,7 @@ impl Symbols {
             return Err(internal_error(
                 InternalComponent::InternalFn,
                 "invalid `Symbols::combine` invocation",
-            )?);
+            ));
         }
 
         let result_symbol = match other {
@@ -59,10 +59,10 @@ impl Symbols {
             Self::Equal => Self::CompareEqual,
             _ => {
                 let msg = format!("invalid symbol `{}` for symbol combination", other);
-                return Err(internal_error(InternalComponent::Tokenizer, &msg)?);
+                return Err(internal_error(InternalComponent::Tokenizer, &msg));
             }
         };
-        Ok(result_symbol)
+        return Ok(result_symbol);
     }
     pub fn separate(self) -> Self {
         match self {

@@ -15,6 +15,7 @@ use exec::script::{run_entry, run_with_path};
 use public::env::ENV;
 use public::run_time::scope::Scope;
 use utils::editor::CodeEditor;
+use utils::OutputBuffer;
 
 #[derive(PartialEq)]
 pub enum ProgramMode {
@@ -28,6 +29,7 @@ pub enum ProgramMode {
 fn main() -> io::Result<()> {
     let mut args: VecDeque<String> = env::args().collect();
     let mut scope = Scope::new();
+    OutputBuffer::init();
 
     let self_name = args.pop_front().unwrap();
     unsafe { ENV.self_name = Box::leak(Box::new(self_name)) };

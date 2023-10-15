@@ -4,7 +4,7 @@ use std::rc::Rc;
 use crossterm::style::Stylize;
 
 use crate::public::env::ENV;
-use crate::public::error::{reference_error, type_error, ReferenceType};
+use crate::public::error::{reference_error, type_error, ReferenceType, CalcResult};
 use crate::public::value::array::ArrayLiteral;
 use crate::public::value::function::Function;
 use crate::public::value::{Value, ValueType};
@@ -66,15 +66,15 @@ impl Class {
         };
     }
 
-    pub fn get_method(&self, method_name: &str) -> Result<Function, ()> {
+    pub fn get_method(&self, method_name: &str) -> CalcResult<Function> {
         let result_method = self.method_storage.getter(method_name);
         match result_method {
-            Ok(func) => Ok(func),
-            Err(_) => Err(reference_error(ReferenceType::Property, method_name)?),
+            Some(func) => Ok(func),
+            None => Err(reference_error(ReferenceType::Property, method_name)),
         }
     }
 
-    pub fn instantiate(class_self: Rc<Class>, mut values: ArrayLiteral) -> Result<Object, ()> {
+    pub fn instantiate(class_self: Rc<Class>, mut values: ArrayLiteral) -> CalcResult<Object> {
         let properties = &class_self.properties;
         let mut temp_list = data_storage::ListStorage::<Value>::new();
         let mut index = 0;
@@ -90,7 +90,7 @@ impl Class {
                             Some("class instantiation"),
                             vec![current_prop.type__()],
                             val.get_type(),
-                        )?);
+                        ));
                     }
                     val
                 }

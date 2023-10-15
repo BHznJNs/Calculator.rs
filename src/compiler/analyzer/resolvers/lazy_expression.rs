@@ -1,11 +1,11 @@
 use crate::compiler::tokenizer::token::{Token, TokenVec};
 use crate::public::compile_time::ast::types::LazyExpressionNode;
 use crate::public::compile_time::parens::Paren;
-use crate::public::error::syntax_error;
+use crate::public::error::{syntax_error, CalcResult};
 
 use super::sequence;
 
-pub fn resolve(tokens: &mut TokenVec) -> Result<LazyExpressionNode, ()> {
+pub fn resolve(tokens: &mut TokenVec) -> CalcResult<LazyExpressionNode> {
     let mut sub_tokens = TokenVec::new();
     let mut brace_count = 1;
 
@@ -22,7 +22,7 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<LazyExpressionNode, ()> {
         sub_tokens.push_back(token);
     }
     if brace_count > 0 {
-        return Err(syntax_error("unmatched brace")?);
+        return Err(syntax_error("unmatched brace"));
     }
 
     let sub_sequence = sequence::resolve(&mut sub_tokens)?;

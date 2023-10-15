@@ -3,7 +3,7 @@ use std::fmt;
 use std::rc::Rc;
 
 use crate::public::env::ENV;
-use crate::public::error::{assignment_error, reference_error, ReferenceType};
+use crate::public::error::{assignment_error, reference_error, ReferenceType, CalcResult};
 use crate::public::value::oop::class::Class;
 use crate::public::value::{self, ComplexStructure, GetAddr};
 use crate::utils::completer::Completer;
@@ -74,13 +74,13 @@ impl Object {
         }
     }
 
-    pub fn get(&self, prop_name: &str) -> Result<Value, ()> {
+    pub fn get(&self, prop_name: &str) -> CalcResult<Value> {
         let store = self.get_store();
         let target_value_result = store.getter(prop_name);
 
         match target_value_result {
-            Ok(target_ref) => Ok(target_ref.unwrap()),
-            Err(_) => {
+            Some(target_ref) => Ok(target_ref.unwrap()),
+            None => {
                 if let Some(prototype) = self.get_proto() {
                     let target_method = prototype.get_method(prop_name)?;
                     Ok(Value::Function(target_method.clone()))
@@ -90,14 +90,14 @@ impl Object {
             }
         }
     }
-    pub fn set(&mut self, prop_name: &str, value: Value) -> Result<(), ()> {
+    pub fn set(&mut self, prop_name: &str, value: Value) -> CalcResult<()> {
         let store = match self {
             Self::BuildIn(obj) => {
                 let target_value = obj.storage.getter(prop_name);
-                if let Ok(Value::Function(_)) = target_value {
+                if let Some(Value::Function(_)) = target_value {
                     return Err(assignment_error(
                         "invalid assignment to module object method",
-                    )?);
+                    ));
                 }
                 &mut obj.storage
             }
@@ -107,7 +107,7 @@ impl Object {
         let result = store.setter(prop_name, value);
         match result {
             Ok(_) => Ok(()),
-            Err(_) => Err(reference_error(ReferenceType::Property, prop_name)?),
+            Err(_) => Err(reference_error(ReferenceType::Property, prop_name)),
         }
     }
 }

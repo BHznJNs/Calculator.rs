@@ -3,8 +3,9 @@ use crate::compiler::tokenizer::token::{Token, TokenVec};
 use crate::public::compile_time::ast::ast_enum::ASTVec;
 use crate::public::compile_time::dividers::Divider;
 use crate::public::compile_time::parens::Paren;
+use crate::public::error::CalcResult;
 
-pub fn resolve(tokens: &mut TokenVec) -> Result<ASTVec, ()> {
+pub fn resolve(tokens: &mut TokenVec) -> CalcResult<ASTVec> {
     // statement body sequence resolve
     // without LeftBrace
     // template: `{ ...; ... }`
@@ -56,5 +57,5 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ASTVec, ()> {
 
         sub_tokens.push_back(token);
     }
-    Ok(result_params)
+    return Ok(result_params);
 }

@@ -5,11 +5,11 @@ use crate::public::compile_time::ast::types::{
 };
 use crate::public::compile_time::parens::Paren;
 use crate::public::compile_time::{ast::types::StatementNode, keywords::Keyword};
-use crate::public::error::{import_error, syntax_error};
+use crate::public::error::{import_error, syntax_error, CalcResult};
 
 use super::{expression, statement_block};
 
-fn statement_condition_resolve(tokens: &mut TokenVec) -> Result<ExpressionNode, ()> {
+fn statement_condition_resolve(tokens: &mut TokenVec) -> CalcResult<ExpressionNode> {
     let mut sub_tokens = TokenVec::new(); // sub condition tokens
 
     while let Some(token) = tokens.pop_front() {
@@ -22,7 +22,7 @@ fn statement_condition_resolve(tokens: &mut TokenVec) -> Result<ExpressionNode, 
     return Ok(expression_node);
 }
 
-pub fn resolve(keyword: Keyword, tokens: &mut TokenVec) -> Result<StatementNode, ()> {
+pub fn resolve(keyword: Keyword, tokens: &mut TokenVec) -> CalcResult<StatementNode> {
     // remove the keyword token
     tokens.pop_front();
 
@@ -42,10 +42,10 @@ pub fn resolve(keyword: Keyword, tokens: &mut TokenVec) -> Result<StatementNode,
 
         Keyword::Import => {
             let Some(next_token) = tokens.pop_front() else {
-                return Err(());
+                return Err(syntax_error("module name expected"));
             };
             let Token::Identi(module_name) = next_token else {
-                return Err(import_error("invalid module name")?);
+                return Err(import_error("invalid module name"));
             };
             let node = ImportNode {
                 type__: ModuleType::BuildIn,
@@ -62,7 +62,7 @@ pub fn resolve(keyword: Keyword, tokens: &mut TokenVec) -> Result<StatementNode,
             } else {
                 return Err(syntax_error(
                     "assignment expression is expected following the keyword `glo`",
-                )?);
+                ));
             }
         }
 
@@ -72,7 +72,7 @@ pub fn resolve(keyword: Keyword, tokens: &mut TokenVec) -> Result<StatementNode,
             // example:
             // if 1 {new}
             let msg = format!("unexpected keyword '{}' at start of statement", keyword);
-            return Err(syntax_error(&msg)?);
+            return Err(syntax_error(&msg));
         }
     };
     return Ok(result);

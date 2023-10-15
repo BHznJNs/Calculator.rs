@@ -1,12 +1,13 @@
 use crate::computer::resolvers::expression;
 use crate::public::compile_time::ast::types::ExpressionNode;
+use crate::public::error::CalcResult;
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::{LocalScope, Scope};
 use crate::public::std::modules::BuildInFnCall;
 use crate::public::value::function::{BuildInFunction, Function};
 use crate::public::value::Value;
 
-fn call(function: &BuildInFunction, scope: &mut Scope) -> Result<Value, ()> {
+fn call(function: &BuildInFunction, scope: &mut Scope) -> CalcResult<Value> {
     match &function.identi {
         BuildInFnIdenti::Basic(basic_fn) => basic_fn.call(scope),
         BuildInFnIdenti::Math(math_fn) => math_fn.call(scope),
@@ -22,7 +23,7 @@ pub fn invoke(
     function: &BuildInFunction,
     params: &Vec<ExpressionNode>,
     scope: &mut Scope,
-) -> Result<Value, ()> {
+) -> CalcResult<Value> {
     let mut local_scope = LocalScope::init();
 
     Function::param_check(

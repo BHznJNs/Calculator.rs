@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::exec::script;
-use crate::public::error::{import_error, reference_error, ReferenceType};
+use crate::public::error::{import_error, reference_error, ReferenceType, CalcResult};
 use crate::public::std::StdModules;
 use crate::public::value::oop::module::module_create;
 use crate::utils::completer::Completer;
@@ -89,7 +89,7 @@ impl Scope {
             }
         };
     }
-    pub fn read_var(&self, var_name: &str) -> Result<Value, ()> {
+    pub fn read_var(&self, var_name: &str) -> CalcResult<Value> {
         // use local-scope preferer
         if let Some(local_scope) = &self.local {
             if let Some(val) = local_scope.variables.get(var_name) {
@@ -99,17 +99,17 @@ impl Scope {
 
         match self.global.variables.get(var_name) {
             Some(val) => Ok(val.clone()),
-            None => Err(reference_error(ReferenceType::Variable, var_name)?),
+            None => Err(reference_error(ReferenceType::Variable, var_name)),
         }
     }
 
     // import standard module
-    pub fn import_std(&mut self, module_name: &str) -> Result<(), ()> {
+    pub fn import_std(&mut self, module_name: &str) -> CalcResult<()> {
         let std_module_map = Scope::std_module_map();
         let Some(target_module) =
             std_module_map.get(module_name) else {
             let msg = format!("standard module '{}' does not exist", module_name);
-            return Err(import_error(&msg)?)
+            return Err(import_error(&msg));
         };
 
         if !self.std_module_imported[*target_module as usize] {
@@ -119,7 +119,7 @@ impl Scope {
         return Ok(());
     }
     // import user defined module
-    pub fn import_from_path(&mut self, module_path: &str) -> Result<Value, ()> {
+    pub fn import_from_path(&mut self, module_path: &str) -> CalcResult<Value> {
         let mut module_scope = Scope::new();
 
         // if module has not been imported

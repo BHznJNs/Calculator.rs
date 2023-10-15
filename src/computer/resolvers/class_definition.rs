@@ -1,10 +1,11 @@
 use crate::public::compile_time::ast::types::ClassDefinitionNode;
+use crate::public::error::CalcResult;
 use crate::public::value::function::Function;
 use crate::public::value::oop::class::Class;
 
 use super::function_definition;
 
-pub fn resolve(node: &ClassDefinitionNode) -> Result<Class, ()> {
+pub fn resolve(node: &ClassDefinitionNode) -> CalcResult<Class> {
     let mut method_stack = Vec::<(String, Function)>::new();
     for function_node in &node.method_nodes {
         let function_def = function_definition::resolve(function_node)?;

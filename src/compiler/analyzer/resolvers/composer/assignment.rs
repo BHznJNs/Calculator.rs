@@ -1,7 +1,7 @@
 use crate::compiler::tokenizer::token::TokenVec;
 use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::compile_time::ast::types::{AssignmentNode, ExpressionNode};
-use crate::public::error::assignment_error;
+use crate::public::error::{assignment_error, CalcResult};
 use crate::public::value::symbols::Symbols;
 
 use super::super::expression;
@@ -10,7 +10,7 @@ pub fn resolve(
     tokens: &mut TokenVec,
     equal_symbol: Symbols,
     left_hand_node: ASTNode,
-) -> Result<AssignmentNode, ()> {
+) -> CalcResult<AssignmentNode> {
     // assignment
     // `symbol` may be: += | -= | *= | /= | ^=
 
@@ -19,7 +19,7 @@ pub fn resolve(
     if right_hand_node.elements.is_empty() {
         // example:
         // var =
-        return Err(assignment_error("missing right-hand value")?);
+        return Err(assignment_error("missing right-hand value"));
     }
 
     if equal_symbol != Symbols::Equal {
@@ -38,5 +38,5 @@ pub fn resolve(
         right_hand_node,
     };
 
-    Ok(current_node)
+    return Ok(current_node);
 }

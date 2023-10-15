@@ -53,7 +53,7 @@ impl<Item: Clone> ComposeStorage<Item> {
         };
     }
 
-    pub fn getter(&self, target_prop: &str) -> Result<Item, ()> {
+    pub fn getter(&self, target_prop: &str) -> Option<Item> {
         match self.storage_pattern {
             DataStoragePattern::List => {
                 let data_list = self.data_list.as_ref().unwrap();
@@ -61,22 +61,21 @@ impl<Item: Clone> ComposeStorage<Item> {
                 for data_tuple in data_list {
                     if target_prop.eq(&data_tuple.0) {
                         let target_value = &data_tuple.1;
-                        return Ok(target_value.clone());
+                        return Some(target_value.clone());
                     }
                 }
-                Err(())
+                None
             }
             DataStoragePattern::Map => {
                 let data_map = self.data_map.as_ref().unwrap();
-
-                match data_map.get(target_prop) {
-                    Some(target_value) => Ok(target_value.clone()),
-                    None => Err(()),
-                }
+                data_map.get(target_prop).cloned()
             }
         }
     }
     pub fn setter(&mut self, target_prop: &str, value: Item) -> Result<(), ()> {
+        // use common `Result` to let caller to throw error then
+        // `target_prop` does not exist.
+
         match self.storage_pattern {
             DataStoragePattern::List => {
                 let data_list = self.data_list.as_mut().unwrap();
@@ -87,19 +86,16 @@ impl<Item: Clone> ComposeStorage<Item> {
                         return Ok(());
                     }
                 }
-                Err(())
             }
             DataStoragePattern::Map => {
                 let data_map = self.data_map.as_mut().unwrap();
 
-                match data_map.get_mut(target_prop) {
-                    Some(target_value) => {
-                        *target_value = value;
-                        Ok(())
-                    }
-                    None => Err(()),
+                if let Some(target_value) = data_map.get_mut(target_prop) {
+                    *target_value = value;
+                    return Ok(());
                 }
             }
         }
+        return Err(());
     }
 }

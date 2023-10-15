@@ -7,7 +7,7 @@ use crate::compiler::tokenizer::char_converter::char_converter;
 use crate::public::compile_time::dividers::Divider;
 use crate::public::compile_time::keywords::Keyword;
 use crate::public::compile_time::parens::Paren;
-use crate::public::error::{assignment_error, syntax_error};
+use crate::public::error::{assignment_error, syntax_error, CalcResult};
 use crate::public::value::symbols::Symbols;
 use crate::public::value::{number::Number, ValueType};
 use crate::utils::ascii::{ascii_to_num, is_identi_ascii};
@@ -71,7 +71,7 @@ fn identi_resolver(chars: &mut Chars, first_ch: char, index: &mut usize) -> (cha
     return (cached_ch, value);
 }
 
-pub fn tokenize(source: &str) -> Result<TokenVec, ()> {
+pub fn tokenize(source: &str) -> CalcResult<TokenVec> {
     // is used for check is number minus OR
     // check is in annotation state.
     let mut last_type = TokenType::Unknown;
@@ -125,7 +125,7 @@ pub fn tokenize(source: &str) -> Result<TokenVec, ()> {
                     }
                     None => {
                         let msg = format!("Invalid type '{}'", value);
-                        return Err(syntax_error(&msg)?);
+                        return Err(syntax_error(&msg));
                     }
                 }
             } else {
@@ -182,7 +182,7 @@ pub fn tokenize(source: &str) -> Result<TokenVec, ()> {
             }
             '=' => {
                 if tokens.is_empty() {
-                    return Err(assignment_error("left-hand value missing")?);
+                    return Err(assignment_error("left-hand value missing"));
                 }
 
                 last_type = TokenType::Symbol;
@@ -217,7 +217,7 @@ pub fn tokenize(source: &str) -> Result<TokenVec, ()> {
                         // if last char is '\', current is escape character.
                         if is_escape_char {
                             is_escape_char = false;
-                            ch = char_converter(ch)?;
+                            ch = char_converter(ch);
                         } else if ch == '\\' {
                             // when meet '\'
                             is_escape_char = true;
@@ -257,7 +257,7 @@ pub fn tokenize(source: &str) -> Result<TokenVec, ()> {
             '#' => break,
             _ => {
                 let msg = format!("unknown character '{}' at index {}", ch, index);
-                return Err(syntax_error(&msg)?);
+                return Err(syntax_error(&msg));
             }
         }
     }

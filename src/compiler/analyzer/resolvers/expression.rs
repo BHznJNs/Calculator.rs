@@ -9,14 +9,14 @@ use crate::public::compile_time::dividers::Divider;
 use crate::public::compile_time::keywords::Keyword;
 use crate::public::compile_time::parens::Paren;
 use crate::public::error::{
-    assignment_error, import_error, internal_error, syntax_error, InternalComponent,
+    assignment_error, import_error, internal_error, syntax_error, InternalComponent, CalcResult,
 };
 use crate::public::value::symbols::Symbols;
 
 use super::symbol_priority::compare;
 use super::{array_literal, lazy_expression, map};
 
-pub fn resolve(tokens: &mut TokenVec) -> Result<ExpressionNode, ()> {
+pub fn resolve(tokens: &mut TokenVec) -> CalcResult<ExpressionNode> {
     let mut params = ASTVec::new();
 
     while let Some(token) = tokens.pop_front() {
@@ -25,7 +25,7 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ExpressionNode, ()> {
             Token::String(str) => params.push(ASTNode::StringLiteral(str)),
             Token::Symbol(sym) => {
                 if sym == Symbols::Equal {
-                    return Err(assignment_error("invalid left-hand value")?);
+                    return Err(assignment_error("invalid left-hand value"));
                 }
                 params.push(ASTNode::SymbolLiteral(sym))
             }
@@ -75,17 +75,17 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ExpressionNode, ()> {
 
             Token::Keyword(Keyword::Import) => {
                 let Some(next_token) = tokens.pop_front() else {
-                    return Err(import_error("module name missing")?);
+                    return Err(import_error("module name missing"));
                 };
 
                 let Token::String(module_path) = next_token else {
-                    return Err(import_error("invalid module name")?);
+                    return Err(import_error("invalid module name"));
                 };
                 let node = ImportNode {
                     type__: ModuleType::UserDefined,
                     target: module_path,
                 };
-                params.push(ASTNode::ImportStatement(node.into()))
+                params.push(ASTNode::ImportStatement(node.into()));
             }
             Token::Keyword(Keyword::Function) => {
                 // function definition
@@ -105,7 +105,7 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ExpressionNode, ()> {
 
             _ => {
                 let msg = format!("unexpected expression token {}", token);
-                return Err(syntax_error(&msg)?);
+                return Err(syntax_error(&msg));
             }
         }
     }
@@ -162,7 +162,7 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ExpressionNode, ()> {
             }
             _ => {
                 let msg = format!("invalid expression: unexpected ASTNodeType: {}", node);
-                return Err(internal_error(InternalComponent::Analyzer, &msg)?);
+                return Err(internal_error(InternalComponent::Analyzer, &msg));
             }
         }
     }

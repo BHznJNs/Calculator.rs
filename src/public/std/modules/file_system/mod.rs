@@ -4,6 +4,7 @@ mod fs_ops;
 use std::path::Path;
 use std::rc::Rc;
 
+use crate::public::error::CalcResult;
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::std::modules::file_system::file_ops::{file_read, file_write};
@@ -104,7 +105,7 @@ impl ObjectModule for FileSysModule {
 }
 
 impl BuildInFnCall for FileSysModule {
-    fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
+    fn call(&self, scope: &mut Scope) -> CalcResult<Value> {
         let result = match self {
             Self::Open | Self::Create | Self::Delete => {
                 let path_value = get_val("path", scope)?;

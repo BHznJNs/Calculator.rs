@@ -5,7 +5,7 @@ use std::rc::Rc;
 
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 
-use crate::public::error::{internal_error, math_error, type_error, InternalComponent};
+use crate::public::error::{internal_error, math_error, type_error, InternalComponent, CalcResult};
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::constants::{
     ARRAY_T, BOOL_T, CLASS_T, FUNCTION_T, LAZYEXPR_T, MAP_T, NUMBER_T, OBJECT_T, STRING_T,
@@ -115,7 +115,7 @@ impl FunctionModule for BasicModule {
 }
 
 impl BuildInFnCall for BasicModule {
-    fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
+    fn call(&self, scope: &mut Scope) -> CalcResult<Value> {
         let result = match self {
             Self::Input => {
                 let prompt_value = get_val("prompt", scope)?;
@@ -145,7 +145,7 @@ impl BuildInFnCall for BasicModule {
                 let lower_value = get_val("lower", scope)?;
 
                 if lower_value.get_f64() == Ok(0.0) {
-                    return Err(math_error("the divisor should not to be ZERO")?);
+                    return Err(math_error("the divisor should not to be ZERO"));
                 }
 
                 if let (Value::Number(Number::Int(upper)), Value::Number(Number::Int(lower))) =
@@ -156,7 +156,7 @@ impl BuildInFnCall for BasicModule {
                     return Err(internal_error(
                         InternalComponent::Std,
                         "two Int typed value is expected",
-                    )?);
+                    ));
                 }
             }
             Self::Exit => process::exit(0),
@@ -198,7 +198,7 @@ impl BuildInFnCall for BasicModule {
                                 Some("Build-in function `int`"),
                                 vec![ValueType::Boolean, ValueType::Number, ValueType::String],
                                 input.get_type(),
-                            )?)
+                            ));
                         }
                     },
                     Self::Float => match input {
@@ -214,7 +214,7 @@ impl BuildInFnCall for BasicModule {
                                 Some("Build-in function `float`"),
                                 vec![ValueType::Boolean, ValueType::Number, ValueType::String],
                                 input.get_type(),
-                            )?)
+                            ));
                         }
                     },
 
@@ -234,13 +234,7 @@ impl BuildInFnCall for BasicModule {
                         let Some(first_char) = input_ref.chars().next() else {
                             return Ok(Value::from(0));
                         };
-
-                        if first_char.is_ascii() {
-                            Value::from(first_char as i64)
-                        } else {
-                            println!("Invalid Ascii character");
-                            return Err(());
-                        }
+                        Value::from(first_char as i64)
                     }
                     Self::Len => {
                         #[inline]
@@ -304,7 +298,7 @@ impl BuildInFnCall for BasicModule {
                             Some("Build-in function `len`"),
                             vec![ValueType::Array, ValueType::String, ValueType::Map],
                             input.get_type(),
-                        )?);
+                        ));
                     }
                     _ => unreachable!(),
                 }

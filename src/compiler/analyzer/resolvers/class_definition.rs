@@ -4,7 +4,7 @@ use crate::compiler::tokenizer::token::{Token, TokenVec};
 use crate::public::compile_time::ast::types::{ClassDefinitionNode, FunctionDefinitionNode};
 use crate::public::compile_time::dividers::Divider;
 use crate::public::compile_time::parens::Paren;
-use crate::public::error::syntax_error;
+use crate::public::error::{syntax_error, CalcResult};
 use crate::public::value::function::UserDefinedFnParam;
 use crate::public::value::oop::class::Property;
 use crate::public::value::symbols::Symbols;
@@ -12,13 +12,13 @@ use crate::public::value::ValueType;
 
 use super::function_definition;
 
-pub fn resolve(tokens: &mut TokenVec) -> Result<ClassDefinitionNode, ()> {
+pub fn resolve(tokens: &mut TokenVec) -> CalcResult<ClassDefinitionNode> {
     // no `cl` keyword
     // example:
     // { prop $_, method=(self $_){do something...} }
 
     if tokens.is_empty() {
-        return Err(syntax_error("missing class body")?);
+        return Err(syntax_error("missing class body"));
     }
 
     let mut properties = Vec::<Property>::new();
@@ -29,7 +29,7 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ClassDefinitionNode, ()> {
     if first_token == Token::Paren(Paren::LeftBrace) {
         loop {
             if tokens.is_empty() {
-                return Err(syntax_error("unmatched brace")?);
+                return Err(syntax_error("unmatched brace"));
             }
 
             let current = tokens.pop_front().unwrap();
@@ -37,7 +37,7 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ClassDefinitionNode, ()> {
             if let Token::Identi(identi) = current {
                 let Some(next_token) = tokens.pop_front() else {
                     // if no token follows the property
-                    return Err(syntax_error("unmatched brace")?)
+                    return Err(syntax_error("unmatched brace"));
                 };
 
                 match next_token {
@@ -57,7 +57,7 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ClassDefinitionNode, ()> {
                     }
                     _ => {
                         let msg = format!("unexpected token {} in class body", next_token);
-                        return Err(syntax_error(&msg)?);
+                        return Err(syntax_error(&msg));
                     }
                 }
             } else if current == Token::Divider(Divider::Semicolon) {
@@ -66,14 +66,14 @@ pub fn resolve(tokens: &mut TokenVec) -> Result<ClassDefinitionNode, ()> {
                 break;
             } else {
                 let msg = format!("unexpected token {} in class body", current);
-                return Err(syntax_error(&msg)?);
+                return Err(syntax_error(&msg));
             }
         }
     } else {
-        return Err(syntax_error("expected class-definition body")?);
+        return Err(syntax_error("expected class-definition body"));
     }
-    Ok(ClassDefinitionNode {
+    return Ok(ClassDefinitionNode {
         properties,
         method_nodes,
-    })
+    });
 }

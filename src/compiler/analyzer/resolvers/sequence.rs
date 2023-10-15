@@ -1,9 +1,10 @@
 use crate::compiler::tokenizer::token::{Token, TokenVec};
 use crate::public::compile_time::ast::ast_enum::ASTNode;
+use crate::public::error::CalcResult;
 
 use super::{expression, statement};
 
-pub fn resolve(tokens: &mut TokenVec) -> Result<ASTNode, ()> {
+pub fn resolve(tokens: &mut TokenVec) -> CalcResult<ASTNode> {
     if tokens.is_empty() {
         // blank line || line comment
         Ok(ASTNode::Comment)

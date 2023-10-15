@@ -8,7 +8,7 @@ use crate::public::{
         function::{BuildInFnParam, BuildInFunction, Function},
         oop::class::{Class, Property},
         {Value, ValueType},
-    },
+    }, error::CalcResult,
 };
 
 use super::{BuildInFnCall, ClassModule};
@@ -62,7 +62,7 @@ impl ClassModule for MapModule {
 }
 
 impl BuildInFnCall for MapModule {
-    fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
+    fn call(&self, scope: &mut Scope) -> CalcResult<Value> {
         let self_value = get_val("self", scope)?;
         let map_value = get_self_prop(&self_value, "v")?;
         let Value::Map(map_temp) = map_value else {

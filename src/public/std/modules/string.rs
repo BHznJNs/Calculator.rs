@@ -1,6 +1,7 @@
 use std::collections::VecDeque;
 use std::rc::Rc;
 
+use crate::public::error::CalcResult;
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::std::{ModuleClass, EMPTY_MODULE_CLASS};
@@ -82,7 +83,7 @@ impl ClassModule for StringModule {
 
 impl BuildInFnCall for StringModule {
     #[allow(clippy::single_char_pattern)]
-    fn call(&self, scope: &mut Scope) -> Result<Value, ()> {
+    fn call(&self, scope: &mut Scope) -> CalcResult<Value> {
         let self_value = get_val("self", scope)?;
         let str_value = get_self_prop(&self_value, "v")?;
         let str_ref = str_value.get_str()?;

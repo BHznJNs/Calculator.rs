@@ -8,7 +8,7 @@ use std::rc::Rc;
 use crossterm::style::Stylize;
 
 use crate::public::env::ENV;
-use crate::public::error::{internal_error, InternalComponent};
+use crate::public::error::{internal_error, InternalComponent, CalcResult};
 
 use super::super::compile_time::ast::ast_enum::ASTNode;
 use super::array::{ArrayLiteral, RawArray};
@@ -48,7 +48,7 @@ impl Value {
     pub const EMPTY: Self = Self::Void(VoidSign::Empty);
 
     // formater for string typed value
-    pub fn str_format(&self) -> Result<String, ()> {
+    pub fn str_format(&self) -> CalcResult<String> {
         if let Self::String(str) = self {
             if unsafe { ENV.options.support_ansi } {
                 let temp = str.as_ref().borrow();
@@ -61,27 +61,27 @@ impl Value {
             Err(internal_error(
                 InternalComponent::InternalFn,
                 "invalid `Value::str_format` invocation",
-            )?)
+            ))
         }
     }
 
-    pub fn get_i64(&self) -> Result<i64, ()> {
+    pub fn get_i64(&self) -> CalcResult<i64> {
         // expected Number typed value to call this method
         let Self::Number(num) = self else {
             return Err(internal_error(
                 InternalComponent::InternalFn,
                 "invalid `Value::get_i64` invocation"
-            )?)
+            ));
         };
         return Ok(num.int_value());
     }
-    pub fn get_f64(&self) -> Result<f64, ()> {
+    pub fn get_f64(&self) -> CalcResult<f64> {
         // expected Number typed value to call this method
         let Self::Number(num) = self else {
             return Err(internal_error(
                 InternalComponent::InternalFn,
                 "invalid `Value::get_f64` invocation"
-            )?)
+            ));
         };
         return Ok(num.float_value());
     }
@@ -101,12 +101,12 @@ impl Value {
             | Self::Object(_) => true,
         }
     }
-    pub fn get_str(&self) -> Result<RefMut<String>, ()> {
+    pub fn get_str(&self) -> CalcResult<RefMut<String>> {
         let Self::String(str) = self else {
             return Err(internal_error(
                 InternalComponent::InternalFn,
                 "invalid `Value::get_str` invocation"
-            )?)
+            ));
         };
         let temp = str.borrow_mut();
         return Ok(temp);

@@ -7,14 +7,14 @@ use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 
 use super::attempt;
 use crate::public::env::{Env, ENV};
-use crate::public::error::{import_error, syntax_error};
+use crate::public::error::{import_error, CalcResult};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::Value;
 use crate::utils::completer::Completer;
 use crate::utils::editor::{LineEditor, Signal};
-use crate::utils::print_line;
+use crate::utils::OutputBuffer;
 
-fn import_all(scope: &mut Scope) -> Result<(), ()> {
+fn import_all(scope: &mut Scope) -> CalcResult<()> {
     scope.import_std("Basic")?;
     scope.import_std("Math")?;
     scope.import_std("String")?;
@@ -46,8 +46,8 @@ pub fn repl(scope: &mut Scope) -> io::Result<()> {
     is_ansi_supported_setter();
     // import stantard libraries
     if import_all(scope).is_err() {
-        import_error("standard module import error").unwrap_err();
-        panic!()
+        let err = import_error("standard module import error");
+        OutputBuffer::error_append(&err, true);
     }
 
     let mut editor = LineEditor::new()?;
@@ -60,11 +60,7 @@ pub fn repl(scope: &mut Scope) -> io::Result<()> {
         let line_content = match sig {
             Signal::NewLine(line) => line,
             Signal::Interrupt => break,
-            Signal::NonASCII => {
-                print_line("");
-                syntax_error("Non-ASCII character").unwrap_err();
-                continue;
-            }
+            Signal::NonASCII => continue,
         };
 
         let result;
@@ -73,21 +69,25 @@ pub fn repl(scope: &mut Scope) -> io::Result<()> {
             result = attempt(&line_content, scope);
             let elapsed_time = now.elapsed();
             let elapsed_second = elapsed_time.as_secs_f64();
-            print_line(format!("Executed in: {}s.", elapsed_second));
+            let timer_msg = format!("Executed in: {}s.", elapsed_second);
+            OutputBuffer::print_append(&timer_msg, true);
         } else {
             result = attempt(&line_content, scope);
         }
 
-        if let Ok(val) = result {
-            if let Value::Void(_) = val {
-                continue;
-            } else if let Value::String(_) = val {
-                print!("= ");
-                print_line(val.str_format().unwrap());
-            } else {
-                print!("= ");
-                print_line(val);
+        match result {
+            Ok(val) => match val {
+                Value::Void(_) => continue,
+                Value::String(_) => {
+                    OutputBuffer::print_append("= ", false);
+                    OutputBuffer::print_append(&val.str_format().unwrap(), true);
+                }
+                _ => {
+                    OutputBuffer::print_append("= ", false);
+                    OutputBuffer::print_append(&val.to_string(), true);
+                }
             }
+            Err(err) => OutputBuffer::error_append(&err, true),
         }
     }
     disable_raw_mode()?;

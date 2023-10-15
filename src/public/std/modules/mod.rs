@@ -8,6 +8,7 @@ pub mod string;
 
 use std::rc::Rc;
 
+use crate::public::error::CalcResult;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::oop::class::Class;
 use crate::public::value::oop::object::Object;
@@ -41,7 +42,7 @@ pub fn import_resolver(scope: &mut Scope, target_module: &StdModules, module_nam
 }
 
 pub trait BuildInFnCall {
-    fn call(&self, scope: &mut Scope) -> Result<Value, ()>;
+    fn call(&self, scope: &mut Scope) -> CalcResult<Value>;
 }
 
 pub trait FunctionModule: BuildInFnCall {
