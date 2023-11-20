@@ -16,7 +16,7 @@ use crossterm::{
 };
 
 use crate::{
-    exec::script::{run, run_entry},
+    exec::script::{RUN, run_entry},
     public::run_time::scope::Scope,
     utils::{editor::direction::Direction, number_bit_count, Cursor, Terminal},
 };
@@ -456,6 +456,7 @@ impl CodeEditor {
         match self.dashboard.state() {
             EditorState::Saving if FileSaver::is_save_callback_key(key) => {
                 self.dashboard.set_state(EditorState::Saved)?;
+                self.toggle_state(self.dashboard.state())?;
             }
             EditorState::Positioning if Positioner::is_positioning_key(key) => {
                 self.toggle_state(EditorState::Positioning)?;
@@ -669,6 +670,9 @@ impl CodeEditor {
                         new_line
                     })
                     .collect();
+                if let Some(first_line) = self.lines.get_mut(0) {
+                    first_line.active()?;
+                }
             }
             Err(_) => {
                 self.close()?;
@@ -751,12 +755,13 @@ impl CodeEditor {
                 // restore the covered line
                 let label_width = self.label_width();
                 let covered_pos = Cursor::pos_row()? + self.overflow_top - 1;
+
+                Cursor::move_to_col(0)?;
+                Terminal::clear_after_cursor()?;
                 match self.lines.get_mut(covered_pos) {
                     Some(covered_line) => covered_line.render(covered_pos + 1, label_width)?,
                     None => {
                         let label_width = self.label_width();
-                        Cursor::move_to_col(0)?;
-                        Terminal::clear_after_cursor()?;
                         print!("{}", " ".repeat(label_width).on_grey());
                     }
                 }
@@ -794,11 +799,11 @@ impl CodeEditor {
                         'e' => {
                             self.close()?;
                             let codes = self.content();
-                            run_entry(&codes, scope, run);
+                            run_entry(&codes, scope, RUN);
                             return Ok(());
                         }
                         _ => {}
-                    }
+                    },
 
                     // ignore other Ctrl shotcuts
                     _ => {}

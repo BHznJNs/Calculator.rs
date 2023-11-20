@@ -1,43 +1,83 @@
-enum State {
-    Indent,
-    Code,
+use crate::public::env::ENV;
+
+pub struct CodeLine {
+    pub indent: usize,
+    pub comment: String,
+    pub content: String,
 }
 
-// remove indents and comments in code line
-pub fn process(source: &str) -> String {
-    let mut result = String::new();
+// do pre-process jobs for inputted code line
+// and returns `CodeLine`
+pub fn process(source: &str) -> CodeLine {
+    enum State {
+        Indent,
+        Code,
+        Comment,
+    }
+
     let mut state = State::Indent;
+
+    let set_indent = unsafe { ENV.options.indent_size };
+    let mut temp_indent = 0;
+    let mut result_indent = 0;
+
+    let mut result_content = String::new();
+    let mut result_comment = String::new();
 
     for ch in source.chars() {
         if ch == '#' {
-            // avoid comments
-            break;
+            state = State::Comment;
+            continue;
         }
 
         match state {
             State::Indent => {
-                if !(ch == ' ' || ch == '\t') {
+                if ch == ' ' {
+                    temp_indent += 1;
+                    if temp_indent == set_indent {
+                        result_indent += 1;
+                        temp_indent = 0;
+                    }
+                } else if ch == '\t' {
+                    result_indent += 1;
+                    temp_indent = 0;
+                } else {
+                    result_content.push(ch);
                     state = State::Code;
-                    result.push(ch);
-                    continue;
                 }
-            }
-            State::Code => result.push(ch),
+            },
+            State::Code => result_content.push(ch),
+            State::Comment => result_comment.push(ch),
         }
     }
+    return CodeLine {
+        indent: result_indent,
+        comment: result_comment,
+        content: result_content,
+    };
+}
 
-    // remove the WhiteSpaces and Tabs at the peak of result
-    let mut white_space_count = 0;
-    for ch in result.chars().rev() {
-        if ch == ' ' || ch == '\t' {
-            white_space_count += 1;
-        } else {
-            break;
-        }
-    }
-    for _ in 0..white_space_count {
-        result.pop();
-    }
+#[test]
+fn pre_processor_test() {
+    let test_content = "  codes # comment";
+    let processed = self::process(test_content);
+    assert_eq!(processed.indent, 1);
+    assert_eq!(processed.comment, String::from(" comment"));
+    assert_eq!(processed.content, String::from("codes "));
 
-    return result;
+    // --- --- --- --- --- ---
+
+    let test_content = "codes #";
+    let processed = self::process(test_content);
+    assert_eq!(processed.indent, 0);
+    assert_eq!(processed.comment, String::from(""));
+    assert_eq!(processed.content, String::from("codes "));
+
+    // --- --- --- --- --- ---
+
+    let test_content = "     codes";
+    let processed = self::process(test_content);
+    assert_eq!(processed.indent, 2);
+    assert_eq!(processed.comment, String::from(""));
+    assert_eq!(processed.content, String::from("codes"));
 }

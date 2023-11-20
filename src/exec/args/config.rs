@@ -4,7 +4,7 @@ use crate::{
     exec::{
         args::{data::ARG_CONFIGURABLE, Arg},
         headfile,
-        script::run_with_path,
+        script,
     },
     public::{env::ENV, run_time::scope::Scope, value::Value},
     utils::editor::CodeEditor,
@@ -50,7 +50,7 @@ pub fn load_config(used_args: Vec<bool>, scope: &mut Scope) -> io::Result<()> {
     }
 
     let mut config_scope = Scope::new();
-    run_with_path(config_path_str.unwrap(), &mut config_scope);
+    script::RUN_PATH(config_path_str.unwrap(), &mut config_scope);
 
     for (arg_str, arg_target) in ARG_CONFIGURABLE {
         let Ok(arg_value) = config_scope.read_var(arg_str) else {

@@ -5,8 +5,8 @@ use std::fs::File;
 use std::io::{self, Read};
 
 pub use run::run_entry;
-pub use run::run;
-pub use run::run_with_path;
+pub use run::RUN;
+pub use run::RUN_PATH;
 
 pub fn read_file(path: &str) -> io::Result<String> {
     let mut file = File::open(path)?;

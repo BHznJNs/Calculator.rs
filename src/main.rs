@@ -11,7 +11,7 @@ use std::{env, io};
 
 use exec::args::{args_resolve, load_config, ARG_COUNT};
 use exec::repl;
-use exec::script::{run_entry, run_with_path};
+use exec::script::{run_entry, RUN_PATH};
 use public::env::ENV;
 use public::run_time::scope::Scope;
 use utils::editor::CodeEditor;
@@ -46,7 +46,7 @@ fn main() -> io::Result<()> {
 
         ProgramMode::Script => {
             let script_path = unsafe { ENV.script_path.unwrap() };
-            run_entry(script_path, &mut scope, run_with_path);
+            run_entry(script_path, &mut scope, RUN_PATH);
         }
         ProgramMode::Editor => {
             let mut editor = CodeEditor::new();

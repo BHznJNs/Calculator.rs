@@ -8,7 +8,7 @@ pub fn resolve(headfiles: &VecDeque<String>, scope: &mut Scope) {
     let mut headfile_scope = Scope::new();
 
     for path in headfiles {
-        script::run_with_path(path, &mut headfile_scope);
+        script::RUN_PATH(path, &mut headfile_scope);
         let headfile_vars = headfile_scope.global.variables;
 
         // init headfile_scope.global.variables

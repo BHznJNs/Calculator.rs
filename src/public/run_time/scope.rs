@@ -125,7 +125,7 @@ impl Scope {
         // if module has not been imported
         if self.user_module_imported.get(module_path).is_none() {
             // execute the module file
-            script::run_with_path(module_path, &mut module_scope);
+            script::RUN_PATH(module_path, &mut module_scope);
 
             // import modules that imported by module
             for module_name in module_scope.user_module_imported {
