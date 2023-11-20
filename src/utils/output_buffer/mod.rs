@@ -39,15 +39,15 @@ impl OutputBuffer {
     }
 
     // print contents in buffer to terminal
-    pub fn flush_to_terminal(buf: &mut String) {
+    fn flush_to_terminal(buf: &mut String) {
         print!("{}\r\n", buf);
         Terminal::flush().expect("IO Error!");
         buf.clear();
     }
 
-    pub fn clear() {
-        let static_buffer = Self::get();
-        static_buffer.print_buffer.clear();
-        static_buffer.error_buffer.clear();
-    }
+    // pub fn clear() {
+    //     let static_buffer = Self::get();
+    //     static_buffer.print_buffer.clear();
+    //     static_buffer.error_buffer.clear();
+    // }
 }

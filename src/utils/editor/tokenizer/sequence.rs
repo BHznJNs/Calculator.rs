@@ -43,8 +43,10 @@ impl TextAreaContent for TokenSequence {
 
             if hidden_width > 0 {
                 if hidden_width >= token.len() {
+                    // token that is hidden
                     hidden_width -= token.len()
                 } else {
+                    // token whose left part is hidden
                     let colored_token = token.get(hidden_width..);
                     let binding = colored_token.to_string();
                     let colored_chars = binding.chars();
@@ -56,12 +58,14 @@ impl TextAreaContent for TokenSequence {
             }
 
             if remain_width >= token.len() {
+                // token that can be fully displayed
                 let colored_token = token.get(..);
                 let binding = colored_token.to_string();
                 let colored_chars = binding.chars();
                 buffer.extend(colored_chars);
                 remain_width -= token.len();
             } else {
+                // token whose right part is hidden 
                 let colored_token = token.get(.. (token.len() - remain_width));
                 let binding = colored_token.to_string();
                 let colored_chars = binding.chars();

@@ -18,11 +18,11 @@ pub struct EditorLine {
 impl EditorLine {
     pub fn new(prompt_width: usize, line_index: usize) -> Self {
         let line_label_width = number_bit_count(line_index) + 1;
-        Self {
+        return Self {
             text_area: TextArea::new(prompt_width, line_label_width),
             candidates: Candidate::new(),
             index: line_index,
-        }
+        };
     }
 
     pub fn edit(&mut self, key: KeyCode, scope: &Scope) -> io::Result<()> {

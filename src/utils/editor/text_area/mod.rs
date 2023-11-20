@@ -6,7 +6,7 @@ use crossterm::{event::KeyCode, style::Stylize};
 
 use crate::{
     public::env::ENV,
-    utils::{Cursor, Terminal},
+    utils::{Cursor, Terminal, log},
 };
 
 use super::{direction::Direction, tokenizer::TokenVec};
@@ -100,7 +100,7 @@ impl<C: TextAreaContent> TextArea<C> {
     }
     #[inline]
     pub fn is_at_right_side(&self) -> io::Result<bool> {
-        Ok(Cursor::pos_col()? == Terminal::width() - 1)
+        Ok(Cursor::pos_col()? == Terminal::width() - self.margin_right)
     }
 
     pub fn state_left(&self) -> io::Result<TextAreaStateLeft> {
@@ -116,7 +116,6 @@ impl<C: TextAreaContent> TextArea<C> {
     pub fn state_right(&self) -> io::Result<TextAreaStateRight> {
         let cursor_pos_col = Cursor::pos_col()?;
         let is_at_right_side = self.is_at_right_side()?;
-        // let is_at_content_end = self.cursor_pos()? == self.len();
         let is_at_content_end = cursor_pos_col == (self.len() + self.margin_left)
             || cursor_pos_col == (self.len() - self.overflow_left + self.margin_left);
         return Ok(TextAreaStateRight {
@@ -278,19 +277,23 @@ impl<C: TextAreaContent> TextArea<C> {
 
     pub fn render(&self) -> io::Result<()> {
         let visible_area_width = self.visible_area_width();
-        let rendered_content = if self.len() == 0 && !self.placeholder.is_empty() {
-            self.placeholder
-                .rendered_content(0, visible_area_width)
-                .dim()
+        let use_placeholder = self.len() == 0 && !self.placeholder.is_empty();
+        let rendered_content = if use_placeholder {
+            self.placeholder.rendered_content(0, visible_area_width)
         } else {
             self.content
                 .rendered_content(self.overflow_left, visible_area_width)
-                .stylize()
         };
 
         let saved_cursor_pos = Cursor::pos_col()?;
         Cursor::move_to_col(self.margin_left)?;
-        print!("{}", rendered_content);
+
+        if use_placeholder {
+            print!("{}", rendered_content.dim());
+        } else {
+            print!("{}", rendered_content)
+        }
+        
         Cursor::move_to_col(saved_cursor_pos)?;
         return Ok(());
     }
@@ -401,10 +404,10 @@ impl<C: TextAreaContent> TextArea<C> {
     pub fn content(&self) -> &str {
         self.content.get()
     }
-    #[inline]
-    pub fn tokens(&self) -> Option<&TokenVec> {
-        self.content.tokens()
-    }
+    // #[inline]
+    // pub fn tokens(&self) -> Option<&TokenVec> {
+    //     self.content.tokens()
+    // }
 
     pub fn clear(&mut self) {
         self.overflow_left = 0;
