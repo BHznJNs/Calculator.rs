@@ -58,7 +58,6 @@ pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> CalcResult<
                     }
                 }
             }
-
             Value::EMPTY
         }
         StatementNode::Condition(if_statement) => {
@@ -66,14 +65,9 @@ pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> CalcResult<
 
             if condition_value.get_bool() {
                 for sequence in &if_statement.body {
-                    let sequence_result = sequence::resolve(sequence, scope)?;
-
-                    if let Value::Void(_) = sequence_result {
-                        return Ok(sequence_result);
-                    }
+                    sequence::resolve(sequence, scope)?;
                 }
             }
-
             Value::EMPTY
         }
         StatementNode::Import(import_node) => {
