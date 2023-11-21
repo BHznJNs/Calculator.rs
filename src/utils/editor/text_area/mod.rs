@@ -6,10 +6,10 @@ use crossterm::{event::KeyCode, style::Stylize};
 
 use crate::{
     public::env::ENV,
-    utils::{Cursor, Terminal, log},
+    utils::{Cursor, Terminal},
 };
 
-use super::{direction::Direction, tokenizer::TokenVec};
+use super::direction::Direction;
 
 pub use content::TextAreaContent;
 
@@ -88,8 +88,12 @@ impl<C: TextAreaContent> TextArea<C> {
     //   in : [' ', 'a', 'b']
     //   out: 1
     fn continuous_word_count(chars: impl Iterator<Item = char>) -> usize {
+        // defined what typed character can be skipped
+        let char_checker = |ch: char| {
+            ch.is_alphabetic() || ch == '_' || ch.is_ascii_digit()
+        };
         let counter = chars
-            .map_while(|ch| ch.is_alphabetic().then_some(()))
+            .map_while(|ch| char_checker(ch).then_some(()))
             .count();
         return counter;
     }
