@@ -12,7 +12,7 @@ pub mod unique;
 pub mod oop;
 mod core;
 
-pub use core::{Value, ValueType, VoidSign};
+pub use self::core::{Value, ValueType, VoidSign};
 
 pub(super) type Addr = usize;
 pub(super) trait GetAddr {
@@ -56,5 +56,5 @@ fn display_indent(level: usize) -> String {
 
 #[inline]
 pub fn into_rc_refcell<T>(value: T) -> Rc<RefCell<T>> {
-    return Rc::new(RefCell::new(value));
+    Rc::new(RefCell::new(value))
 }
