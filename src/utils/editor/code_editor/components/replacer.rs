@@ -63,7 +63,7 @@ impl Replacer {
     }
 
     #[inline]
-    pub fn current(&self) -> &EditorCursorPos {
+    pub fn current(&self) -> Option<&EditorCursorPos> {
         self.match_list.current()
     }
 

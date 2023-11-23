@@ -8,7 +8,7 @@ use crate::utils::completer::Completer;
 
 use super::super::std::modules;
 use super::super::value::Value;
-use super::constants;
+use super::constants::{self, CONSTANT_IDENTIFIERS};
 
 pub struct GlobalScope {
     pub variables: HashMap<String, Value>,
@@ -71,6 +71,14 @@ impl Scope {
             }
             STD_MODULE_MAP.as_ref().unwrap()
         }
+    }
+
+    pub fn init_completer(&mut self) {
+        let mut completer = Completer::new();
+        for constant in CONSTANT_IDENTIFIERS {
+            completer.insert(constant);
+        }
+        self.completer = Some(completer);
     }
 
     pub fn assign(&mut self, var_name: String, value: Value) {

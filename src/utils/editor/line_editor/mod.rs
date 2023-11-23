@@ -15,7 +15,7 @@ use crossterm::{
 use crate::public::run_time::scope::Scope;
 use crate::utils::{cursor::Cursor, terminal::Terminal};
 
-use super::{direction::Direction, text_area::TextArea};
+use super::direction::Direction;
 
 use history::EditorHistory;
 use line::EditorLine;
@@ -101,7 +101,7 @@ impl LineEditor {
 
                 // avoid Non-ASCII characters
                 KeyCode::Char(ch) if !ch.is_ascii() => break Signal::NonASCII,
-                k if TextArea::is_editing_key(k) => self.current_line.edit(k, scope)?,
+                k if EditorLine::is_editing_key(k) => self.current_line.edit(k, scope)?,
                 _ => {}
             }
             Terminal::flush()?;

@@ -5,11 +5,6 @@ use std::f64::consts::PI as STD_PI;
 use crate::public::value::unique::EMPTY_GLOBAL_UNIQUE;
 use crate::public::value::{number::Number, unique::GlobalUnique, Value};
 
-pub const PI: Value = Value::Number(Number::Float(STD_PI));
-pub const E: Value = Value::Number(Number::Float(STD_E));
-pub const TRUE: Value = Value::Boolean(true);
-pub const FALSE: Value = Value::Boolean(false);
-
 pub static mut IS_INITED: bool = false;
 pub static mut VOID_T: GlobalUnique = EMPTY_GLOBAL_UNIQUE;
 pub static mut BOOL_T: GlobalUnique = EMPTY_GLOBAL_UNIQUE;
@@ -38,6 +33,34 @@ unsafe fn static_init() {
     CLASS_T.init("Class-Type");
     OBJECT_T.init("Object-Type");
 }
+
+// --- --- --- --- --- ---
+
+pub const PI: Value = Value::Number(Number::Float(STD_PI));
+pub const E: Value = Value::Number(Number::Float(STD_E));
+pub const TRUE: Value = Value::Boolean(true);
+pub const FALSE: Value = Value::Boolean(false);
+
+// this identifier collections is used to more
+// conveniently insert constant identifiers into
+// completers.
+pub const CONSTANT_IDENTIFIERS: [&str; 15] = [
+    "VOID",
+    "BOOLEAN",
+    "NUMBER",
+    "UNIQUE",
+    "STRING",
+    "ARRAY",
+    "MAP",
+    "LAZYEXPR",
+    "FUNCION",
+    "CLASS",
+    "OBJECT",
+    "PI",
+    "E",
+    "true",
+    "false"
+];
 
 pub unsafe fn entry() -> HashMap<String, Value> {
     if !IS_INITED {

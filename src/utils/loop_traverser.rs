@@ -22,7 +22,7 @@ impl<T> LoopTraverser<T> {
         }
 
         self.index = (self.index + 1) % (self.vec.len() as isize);
-        return Some(self.current());
+        return self.current();
     }
     pub fn previous(&mut self) -> Option<&T> {
         if self.vec.is_empty() || (!self.cycle && (self.index == 0 || self.index == -1)) {
@@ -37,7 +37,7 @@ impl<T> LoopTraverser<T> {
         } else {
             (self.index - 1) % (self.vec.len() as isize)
         };
-        return Some(self.current());
+        return self.current();
     }
 
     #[inline]
@@ -45,13 +45,17 @@ impl<T> LoopTraverser<T> {
         self.vec.front()
     }
 
-    #[inline]
-    pub fn current(&self) -> &T {
-        if self.index == -1 {
+    pub fn current(&self) -> Option<&T> {
+        if self.is_empty() {
+            return None;
+        }
+
+        let result = if self.index == -1 {
             &self.vec[0]
         } else {
             &self.vec[self.index as usize]
-        }
+        };
+        return Some(result);
     }
 
     // --- --- --- --- --- ---
@@ -95,6 +99,9 @@ fn test() {
     let mut cycling_traverser = LoopTraverser::new(true);
     cycling_traverser.set_content(vec![1, 2, 3, 4]);
 
+    // after `set_content` called, the `current` method must
+    // returns the first value. 
+    assert_eq!(cycling_traverser.current(), Some(&1));
     assert_eq!(cycling_traverser.previous(), Some(&4));
     cycling_traverser.reset_index();
     assert_eq!(cycling_traverser.next(), Some(&1));
@@ -109,10 +116,12 @@ fn test() {
     uncycling_traverser.push_back(2);
     uncycling_traverser.push_back(3);
 
-    println!("previous: {:?}", uncycling_traverser.previous());
-    println!("previous: {:?}", uncycling_traverser.previous());
-    println!("previous: {:?}", uncycling_traverser.previous());
-    println!("next: {:?}", uncycling_traverser.next());
-    println!("next: {:?}", uncycling_traverser.next());
-    println!("next: {:?}", uncycling_traverser.next());
+    // after `push_back` called, the `current` method must
+    // returns the first value. 
+    assert_eq!(uncycling_traverser.current(), Some(&1));
+
+    assert_eq!(uncycling_traverser.previous(), None);
+    assert_eq!(uncycling_traverser.next(), Some(&1));
+    assert_eq!(uncycling_traverser.next(), Some(&2));
+    assert_eq!(uncycling_traverser.next(), Some(&3));
 }

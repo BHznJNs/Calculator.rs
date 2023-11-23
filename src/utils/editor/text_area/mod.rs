@@ -9,7 +9,7 @@ use crate::{
     utils::{Cursor, Terminal},
 };
 
-use super::direction::Direction;
+use super::{direction::Direction, tokenizer::TokenVec};
 
 pub use content::TextAreaContent;
 
@@ -40,7 +40,7 @@ pub struct TextArea<C: TextAreaContent> {
     pub margin_left: usize,
     pub margin_right: usize,
 
-    overflow_left: usize,
+    pub overflow_left: usize,
     overflow_right: usize,
 }
 
@@ -183,7 +183,7 @@ impl<C: TextAreaContent> TextArea<C> {
     }
     pub fn move_cursor_to_end(&mut self, rerender: bool) -> io::Result<()> {
         if self.len() >= self.visible_area_width() {
-            Cursor::move_to_col(Terminal::width() - 1)?;
+            Cursor::move_to_col(Terminal::width() - self.margin_right)?;
             self.overflow_left += self.overflow_right;
             self.overflow_right = 0;
 
@@ -288,16 +288,16 @@ impl<C: TextAreaContent> TextArea<C> {
             self.content
                 .rendered_content(self.overflow_left, visible_area_width)
         };
-
         let saved_cursor_pos = Cursor::pos_col()?;
         Cursor::move_to_col(self.margin_left)?;
 
+        // actual render operation
         if use_placeholder {
             print!("{}", rendered_content.dim());
         } else {
             print!("{}", rendered_content)
         }
-        
+
         Cursor::move_to_col(saved_cursor_pos)?;
         return Ok(());
     }
@@ -408,10 +408,10 @@ impl<C: TextAreaContent> TextArea<C> {
     pub fn content(&self) -> &str {
         self.content.get()
     }
-    // #[inline]
-    // pub fn tokens(&self) -> Option<&TokenVec> {
-    //     self.content.tokens()
-    // }
+    #[inline]
+    pub fn tokens(&self) -> Option<&TokenVec> {
+        self.content.tokens()
+    }
 
     pub fn clear(&mut self) {
         self.overflow_left = 0;

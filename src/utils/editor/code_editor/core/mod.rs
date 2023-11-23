@@ -533,7 +533,7 @@ impl CodeEditor {
                 } else if self.components.replacer.is_replace_one_key(key) {
                     self.component_exec(|e| {
                         let replacer = &mut e.components.replacer;
-                        let current_pos = *replacer.current();
+                        let current_pos = *replacer.current().unwrap();
 
                         if let Some(mut next_pos) = replacer.next().cloned() {
                             if let Some(ev) = e.history.previous_event() {
@@ -566,7 +566,7 @@ impl CodeEditor {
                     );
                     replacer.replace_handler();
 
-                    let mut current_pos = *replacer.current();
+                    let mut current_pos = *replacer.current().unwrap();
 
                     while let Some(mut next_pos) = self.components.replacer.next().cloned() {
                         if let Some(ev) = self.history.previous_event() {
@@ -578,7 +578,7 @@ impl CodeEditor {
                             e.replace(replace_count, replace_text)
                         })?;
 
-                        current_pos = *self.components.replacer.current();
+                        current_pos = *self.components.replacer.current().unwrap();
                     }
                 }
             }

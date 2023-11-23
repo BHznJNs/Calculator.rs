@@ -1,41 +1,35 @@
+use crate::utils::loop_traverser::LoopTraverser;
+
 pub struct Candidate {
-    list: Vec<String>,
-    index: isize,
+    list: LoopTraverser<String>,
 }
 
 impl Candidate {
     pub fn new() -> Self {
         Self {
-            list: vec![],
-            index: 0,
+            list: LoopTraverser::new(true),
         }
     }
 
     pub fn set(&mut self, candidates: Vec<String>) {
-        self.index = -1; // reset index
-        self.list = candidates;
+        self.list.set_content(candidates);
+        self.next();
+    }
+
+    #[inline]
+    pub fn current(&self) -> Option<&String> {
+        self.list.current()
+    }
+    #[inline]
+    pub fn next(&mut self) -> Option<&String> {
+        self.list.next()
+    }
+    #[inline]
+    pub fn previous(&mut self) -> Option<&String> {
+        self.list.previous()
     }
 
     pub fn clear(&mut self) {
-        self.list.clear();
-    }
-
-    pub fn current_hint(&self) -> Option<&str> {
-        if !self.list.is_empty() && self.index >= 0 {
-            Some(&self.list[self.index as usize])
-        } else {
-            None
-        }
-    }
-    pub fn next(&mut self) -> Option<&str> {
-        let index = self.index;
-        let len = self.list.len() as isize;
-
-        if len > 0 {
-            self.index = (index + 1) % len;
-            Some(&self.list[self.index as usize])
-        } else {
-            None
-        }
+        self.list.clear()
     }
 }

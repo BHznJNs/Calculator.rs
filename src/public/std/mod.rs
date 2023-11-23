@@ -26,6 +26,15 @@ pub enum StdModules {
 }
 
 impl StdModules {
+    pub const STD_MODULE_IDENTIFIERS: [&str; 7] = [
+        "Basic",
+        "Math",
+        "String",
+        "Array",
+        "Map",
+        "FS",
+        "BitOps",
+    ];
     pub fn get_fn_list(&self) -> Vec<(String, Value)> {
         match self {
             StdModules::Basic => BasicModule::function_list(),
