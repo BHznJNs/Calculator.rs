@@ -17,7 +17,7 @@ fn call(function: &UserDefinedFunction, scope: &mut Scope) -> CalcResult<Value> 
 
 pub fn invoke(
     function: &UserDefinedFunction,
-    params: &Vec<ExpressionNode>,
+    params: &[ExpressionNode],
     scope: &mut Scope,
 ) -> CalcResult<Value> {
     let mut local_scope = LocalScope::init();

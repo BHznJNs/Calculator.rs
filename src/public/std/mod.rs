@@ -26,7 +26,7 @@ pub enum StdModules {
 }
 
 impl StdModules {
-    pub const STD_MODULE_IDENTIFIERS: [&str; 7] = [
+    pub const STD_MODULE_IDENTIFIERS: [&'static str; 7] = [
         "Basic",
         "Math",
         "String",

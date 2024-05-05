@@ -49,9 +49,7 @@ fn get_end_part(tokens: &TokenVec) -> Option<Vec<String>> {
 }
 
 pub fn analyze(tokens: &TokenVec, scope: &Scope) -> Option<Vec<String>> {
-    let Some(mut end_part) = get_end_part(tokens) else {
-        return None;
-    };
+    let mut end_part = get_end_part(tokens)?;
 
     if end_part.len() == 1 {
         // variable complete

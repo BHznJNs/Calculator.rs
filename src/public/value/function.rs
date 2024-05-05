@@ -61,8 +61,8 @@ pub enum Function {
 
 impl Function {
     pub fn param_check(
-        formal_params: &Vec<impl Param>,
-        actual_params: &Vec<ExpressionNode>,
+        formal_params: &[impl Param],
+        actual_params: &[ExpressionNode],
         whole_scope: &mut Scope,
         local_scope: &mut LocalScope,
         expr_resolver: fn(&ExpressionNode, &mut Scope) -> CalcResult<Value>,

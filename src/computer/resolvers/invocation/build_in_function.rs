@@ -21,7 +21,7 @@ fn call(function: &BuildInFunction, scope: &mut Scope) -> CalcResult<Value> {
 
 pub fn invoke(
     function: &BuildInFunction,
-    params: &Vec<ExpressionNode>,
+    params: &[ExpressionNode],
     scope: &mut Scope,
 ) -> CalcResult<Value> {
     let mut local_scope = LocalScope::init();

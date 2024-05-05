@@ -1,6 +1,6 @@
 mod accent;
 
-use std::fmt::Display;
+use std::{fmt::Display, ptr::addr_of};
 
 use crossterm::style::{StyledContent, Stylize};
 
@@ -20,7 +20,7 @@ impl EditorColor {
         D: Display + Stylize<Styled = StyledContent<D>>,
     {
         let mut styled = content.white();
-        styled = match unsafe { &ACCENT_COLOR } {
+        styled = match unsafe { &*addr_of!(ACCENT_COLOR) } {
             AccentColor::Red => styled.on_red(),
             AccentColor::Blue => styled.on_blue(),
             AccentColor::DarkRed => styled.on_dark_red(),

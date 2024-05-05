@@ -81,7 +81,7 @@ impl ValueType {
         };
 
         let target_type = unsafe {
-            let Some(map) = &VALUE_TYPE_MAP else {
+            let Some(ref map) = VALUE_TYPE_MAP else {
                 unreachable!()
             };
             map.get(identi)

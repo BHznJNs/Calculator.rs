@@ -10,7 +10,7 @@ use super::{build_in_function, lazy_expression, user_defined_function};
 
 fn variable_invoke(
     fn_name: &str,
-    params: &Vec<ExpressionNode>,
+    params: &[ExpressionNode],
     scope: &mut Scope,
 ) -> CalcResult<Value> {
     let fn_value = scope.read_var(fn_name)?;
@@ -20,7 +20,7 @@ fn variable_invoke(
 
 fn function_invoke(
     function_value: Value,
-    params: &Vec<ExpressionNode>,
+    params: &[ExpressionNode],
     scope: &mut Scope,
 ) -> CalcResult<Value> {
     let invoke_result = match function_value {

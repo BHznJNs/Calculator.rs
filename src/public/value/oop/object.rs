@@ -66,9 +66,7 @@ impl Object {
         match self {
             Self::BuildIn(obj) => obj.completer.clone(),
             Self::UserDefined(_) => {
-                let Some(proto) = self.get_proto() else {
-                    return None;
-                };
+                let proto = self.get_proto()?;
                 proto.completer.clone()
             }
         }

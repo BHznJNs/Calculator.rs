@@ -1,6 +1,7 @@
 use std::cell::RefCell;
 use std::io::{self, Write};
 use std::process;
+use std::ptr::addr_of;
 use std::rc::Rc;
 
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
@@ -168,20 +169,22 @@ impl BuildInFnCall for BasicModule {
                     Self::Type => {
                         let type_uni = unsafe {
                             match input.get_type() {
-                                ValueType::Void => &VOID_T,
-                                ValueType::Boolean => &BOOL_T,
-                                ValueType::Number => &NUMBER_T,
-                                ValueType::Unique => &UNIQUE_T,
-                                ValueType::String => &STRING_T,
-                                ValueType::Array => &ARRAY_T,
-                                ValueType::Map => &MAP_T,
-                                ValueType::LazyExpression => &LAZYEXPR_T,
-                                ValueType::Function => &FUNCTION_T,
-                                ValueType::Class => &CLASS_T,
-                                ValueType::Object => &OBJECT_T,
+                                ValueType::Void => addr_of!(VOID_T),
+                                ValueType::Boolean => addr_of!(BOOL_T),
+                                ValueType::Number => addr_of!(NUMBER_T),
+                                ValueType::Unique => addr_of!(UNIQUE_T),
+                                ValueType::String => addr_of!(STRING_T),
+                                ValueType::Array => addr_of!(ARRAY_T),
+                                ValueType::Map => addr_of!(MAP_T),
+                                ValueType::LazyExpression => addr_of!(LAZYEXPR_T),
+                                ValueType::Function => addr_of!(FUNCTION_T),
+                                ValueType::Class => addr_of!(CLASS_T),
+                                ValueType::Object => addr_of!(OBJECT_T),
                             }
                         };
-                        Value::from(type_uni.unwrap())
+                        Value::from((unsafe {
+                            &*type_uni
+                        }).unwrap())
                     }
                     Self::Clone => input.deep_clone(),
 

@@ -1,5 +1,3 @@
-use std::borrow::Borrow;
-
 use super::expression;
 use crate::public::compile_time::ast::types::ArrayLiteralNode;
 use crate::public::error::CalcResult;
@@ -10,7 +8,7 @@ pub fn resolve(node: &ArrayLiteralNode, scope: &mut Scope) -> CalcResult<ArrayLi
     let mut elements = ArrayLiteral::new();
 
     for element in &node.elements {
-        let expression_value = expression::resolve(element.borrow(), scope)?;
+        let expression_value = expression::resolve(element, scope)?;
         elements.push_back(expression_value)
     }
 
