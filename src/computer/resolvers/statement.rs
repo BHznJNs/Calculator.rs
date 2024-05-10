@@ -46,15 +46,20 @@ pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> CalcResult<
                 'inner: for sequence in &for_statement.body {
                     let sequence_result = sequence::resolve(sequence, scope)?;
 
-                    if let Value::Void(sign) = sequence_result {
-                        if let VoidSign::Break(_) = sign {
-                            // encount `break` | `brk`
-                            break 'outer;
-                        }
-                        if sign == VoidSign::Continue {
-                            // encount `continue` | `ctn`
-                            break 'inner;
-                        }
+                    if !matches!(sequence_result, Value::Void(_)) {
+                        continue 'inner;
+                    }
+
+                    let Value::Void(sign) = sequence_result else {
+                        unreachable!()
+                    };
+                    if let VoidSign::Break(_) = sign {
+                        // encount `break` | `brk`
+                        break 'outer;
+                    }
+                    if sign == VoidSign::Continue {
+                        // encount `continue` | `ctn`
+                        break 'inner;
                     }
                 }
             }
@@ -83,7 +88,7 @@ pub fn resolve(statement_node: &StatementNode, scope: &mut Scope) -> CalcResult<
         StatementNode::Break(expression_node) => {
             let expression_value = expression::resolve(expression_node, scope)?;
             if let Value::Void(VoidSign::Empty) = expression_value {
-                Value::EMPTY
+                Value::Void(VoidSign::Break(Value::EMPTY.into()))
             } else {
                 Value::Void(VoidSign::Break(expression_value.into()))
             }
