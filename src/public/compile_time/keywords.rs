@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{fmt, collections::HashMap};
 
 #[derive(PartialEq, PartialOrd, Clone, Copy)]
 pub enum Keyword {
@@ -18,37 +18,50 @@ pub enum Keyword {
     Global,
 }
 
+static mut KEYWORD_PAIRS: Option<HashMap<&'static str, Keyword>> = None;
+
 impl Keyword {
     pub fn is_keyword(word: &str) -> Option<Self> {
-        // check is keyword
-        let keyword: Self;
+        if unsafe { KEYWORD_PAIRS.is_none() } {
+            // init global var
+            unsafe { KEYWORD_PAIRS = Some(HashMap::from([
+                ("out", Keyword::Out),
+                ("for", Keyword::For),
+                ("if", Keyword::If),
+                ("ctn", Keyword::Continue),
+                ("brk", Keyword::Break),
+                ("import", Keyword::Import),
+                ("fn", Keyword::Function),
+                ("cl", Keyword::Class),
+                ("class", Keyword::Class),
+                ("new", Keyword::New),
+                ("glo", Keyword::Global),
 
-        let mut index = 0;
-        while index < KEYWORD_PAIRS.len() {
-            let current = KEYWORD_PAIRS[index];
-
-            if word.eq(current.0) {
-                keyword = current.1;
-                return Some(keyword);
-            }
-            index += 1;
+                // full version of keywords
+                ("continue", Keyword::Continue),
+                ("break", Keyword::Break),
+                ("function", Keyword::Function),
+                ("global", Keyword::Global),
+            ])) };
         }
-        return None;
+        let pair_map = unsafe { KEYWORD_PAIRS.as_ref().unwrap() };
+        let keyword = pair_map.get(word)?;
+        return Some(*keyword);
     }
 }
 
-pub const KEYWORD_PAIRS: [(&str, Keyword); 10] = [
-    ("out", Keyword::Out),
-    ("for", Keyword::For),
-    ("if", Keyword::If),
-    ("ctn", Keyword::Continue),
-    ("brk", Keyword::Break),
-    ("import", Keyword::Import),
-    ("fn", Keyword::Function),
-    ("cl", Keyword::Class),
-    ("new", Keyword::New),
-    ("glo", Keyword::Global),
-];
+// pub const KEYWORD_PAIRS: [(&str, Keyword); 10] = [
+//     ("out", Keyword::Out),
+//     ("for", Keyword::For),
+//     ("if", Keyword::If),
+//     ("ctn", Keyword::Continue),
+//     ("brk", Keyword::Break),
+//     ("import", Keyword::Import),
+//     ("fn", Keyword::Function),
+//     ("cl", Keyword::Class),
+//     ("new", Keyword::New),
+//     ("glo", Keyword::Global),
+// ];
 
 impl fmt::Display for Keyword {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
