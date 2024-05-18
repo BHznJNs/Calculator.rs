@@ -90,6 +90,7 @@ impl LineEditor {
                     }
                 }
                 KeyCode::Enter => {
+                    self.current_line.hide_hint()?;
                     print!("\r\n");
 
                     let current_line_index = self.current_line.index;

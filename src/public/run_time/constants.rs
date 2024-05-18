@@ -38,13 +38,15 @@ unsafe fn static_init() {
 
 pub const PI: Value = Value::Number(Number::Float(STD_PI));
 pub const E: Value = Value::Number(Number::Float(STD_E));
+pub const I: Value = Value::Number(Number::Complex(0.0, 1.0));
+pub const J: Value = Value::Number(Number::Complex(0.0, 1.0));
 pub const TRUE: Value = Value::Boolean(true);
 pub const FALSE: Value = Value::Boolean(false);
 
 // this identifier collections is used to more
 // conveniently insert constant identifiers into
 // completers.
-pub const CONSTANT_IDENTIFIERS: [&str; 15] = [
+pub const CONSTANT_IDENTIFIERS: [&str; 17] = [
     "VOID",
     "BOOLEAN",
     "NUMBER",
@@ -58,6 +60,8 @@ pub const CONSTANT_IDENTIFIERS: [&str; 15] = [
     "OBJECT",
     "PI",
     "E",
+    "i",
+    "j",
     "true",
     "false"
 ];
@@ -82,6 +86,8 @@ pub unsafe fn entry() -> HashMap<String, Value> {
         // --- --- --- --- --- ---
         (String::from("PI"), PI),
         (String::from("E"), E),
+        (String::from("i"), I),
+        (String::from("j"), J),
         (String::from("true"), TRUE),
         (String::from("false"), FALSE),
     ])

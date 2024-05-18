@@ -120,7 +120,7 @@ impl EditorLine {
 
 // hint operations
 impl EditorLine {
-    fn show_hint(&mut self) -> io::Result<()> {
+    pub fn show_hint(&mut self) -> io::Result<()> {
         let visible_area_width = self.text_area.visible_area_width();
         let content_width = self.content().len();
         let Some(hint) = self.candidates.current() else {
@@ -140,7 +140,7 @@ impl EditorLine {
         Cursor::left(hint.len())?;
         return Ok(());
     }
-    fn hide_hint(&mut self) -> io::Result<()> {
+    pub fn hide_hint(&mut self) -> io::Result<()> {
         self.restore_overflow();
         self.candidates.clear();
         let text_area = &mut self.text_area;
