@@ -47,6 +47,7 @@ pub fn args_resolve(
     // --- --- --- --- --- ---
 
     if args.is_empty() {
+        unsafe { ENV.options.use_repl = true };
         return Ok(ProgramMode::REPL);
     }
 

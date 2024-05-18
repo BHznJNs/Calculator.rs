@@ -22,32 +22,28 @@ type Prototype = Rc<Class>;
 
 impl Object {
     pub fn new(params: ListStorage<Value>, prototype: Option<Prototype>) -> Self {
-        match prototype {
-            Some(proto) => {
-                let store = ComposeStorage::new(params);
-                Self::UserDefined(UserDefinedObject {
-                    prototype: proto,
-                    storage: store,
-                })
-            }
-            None => {
-                let completer = {
-                    if unsafe { ENV.options.use_repl } {
-                        let mut words = vec![];
-                        let mut temp = Completer::new();
-                        for (k, _) in &params {
-                            words.push(k.as_str())
-                        }
-                        temp.extend(words);
-                        Some(temp.into())
-                    } else {
-                        None
-                    }
-                };
-                let storage = ComposeStorage::new(params);
-                Self::BuildIn(BuildInObject { completer, storage })
-            }
+        if let Some(proto) = prototype {
+            // user-defined object has prototype
+            let store = ComposeStorage::new(params);
+            return Self::UserDefined(UserDefinedObject {
+                prototype: proto,
+                storage: store,
+            });
         }
+
+        let completer = if unsafe { ENV.options.use_repl } {
+            let mut words = vec![];
+            let mut temp = Completer::new();
+            for (k, _) in &params {
+                words.push(k.as_str())
+            }
+            temp.extend(words);
+            Some(temp.into())
+        } else {
+            None
+        };
+        let storage = ComposeStorage::new(params);
+        return Self::BuildIn(BuildInObject { completer, storage });
     }
 
     fn get_store(&self) -> &ComposeStorage<Value> {

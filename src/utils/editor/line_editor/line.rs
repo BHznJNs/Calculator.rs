@@ -45,8 +45,6 @@ impl EditorLine {
         self.extra_overflow = 0;
     }
 
-    
-
     pub fn edit(&mut self, key: KeyCode, scope: &Scope) -> io::Result<()> {
         let text_area = &mut self.text_area;
         match key {
@@ -55,7 +53,10 @@ impl EditorLine {
                 self.restore_overflow();
                 self.text_area.render()?;
             }
-            KeyCode::Tab | KeyCode::BackTab if self.candidates.current().is_some() => {
+            KeyCode::Tab | KeyCode::BackTab => {
+                if self.candidates.current().is_none() {
+                    return Ok(());
+                }
                 match key {
                     KeyCode::Tab => self.candidates.next(),
                     KeyCode::BackTab => self.candidates.previous(),

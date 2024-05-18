@@ -35,7 +35,6 @@ fn is_ansi_supported_setter() {
 
 pub fn repl(scope: &mut Scope) -> io::Result<()> {
     scope.init_completer();
-    // scope.completer = Some(Completer::new());
 
     // print program name and version
     println!("Calculator.rs v{}", Env::VERSION);
