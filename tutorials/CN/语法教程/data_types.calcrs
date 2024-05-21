@@ -5,6 +5,8 @@ import Array
 # 数字类型
 number_int_var = 1 # 整型数字
 number_float_var = 1.2 # 浮点型数字
+number_complex_var = 1 + i # 复数
+number_complex_var = 1 + 1 * j # 同样是复数
 
 # 布尔类型
 bool_true_var = true

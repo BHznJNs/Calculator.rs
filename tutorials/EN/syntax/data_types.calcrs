@@ -5,6 +5,8 @@ import Array
 # Number type
 number_int_var = 1 # int number
 number_float_var = 1.2 # float number
+number_complex_var = 1 + i # complex number
+number_complex_var = 1 + 1 * j # also complex number
 
 # Boolean type
 bool_true_var = true
