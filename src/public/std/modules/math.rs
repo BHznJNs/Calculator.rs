@@ -2,6 +2,7 @@ use crate::public::error::{math_error, CalcResult};
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::Scope;
 use crate::public::value::function::{BuildInFnParam, BuildInFunction};
+use crate::public::value::number::{complex, Number};
 use crate::public::value::oop::object::Object;
 use crate::public::value::{Value, ValueType};
 
@@ -31,6 +32,8 @@ pub enum MathModule {
     SQRT,
     FLOOR,
     ROUND,
+    REAL,
+    IMAGINARY,
 }
 
 impl ObjectModule for MathModule {
@@ -60,6 +63,8 @@ impl ObjectModule for MathModule {
         let mut sqrt = sin.clone();
         let mut floor = sin.clone();
         let mut round = sin.clone();
+        let mut real = sin.clone();
+        let mut imaginary = sin.clone();
 
         cos.identi = BuildInFnIdenti::Math(Self::COS);
         tan.identi = BuildInFnIdenti::Math(Self::TAN);
@@ -79,6 +84,8 @@ impl ObjectModule for MathModule {
         sqrt.identi = BuildInFnIdenti::Math(Self::SQRT);
         floor.identi = BuildInFnIdenti::Math(Self::FLOOR);
         round.identi = BuildInFnIdenti::Math(Self::ROUND);
+        real.identi = BuildInFnIdenti::Math(Self::REAL);
+        imaginary.identi = BuildInFnIdenti::Math(Self::IMAGINARY);
 
         let log = BuildInFunction {
             params: vec![
@@ -110,6 +117,8 @@ impl ObjectModule for MathModule {
             (String::from("sqrt"), Value::from(sqrt)),
             (String::from("floor"), Value::from(floor)),
             (String::from("round"), Value::from(round)),
+            (String::from("real"), Value::from(real)),
+            (String::from("imag"), Value::from(imaginary)),
         ];
         return Object::new(module_obj_props, None);
     }
@@ -117,57 +126,138 @@ impl ObjectModule for MathModule {
 
 impl BuildInFnCall for MathModule {
     fn call(&self, scope: &mut Scope) -> CalcResult<Value> {
-        let result = match self {
-            Self::LOG => {
-                let base = get_val("base", scope)?;
-                let natural = get_val("natural", scope)?;
+        fn log_resolver(scope: &mut Scope) -> CalcResult<Value> {
+            let is_valid_base = |base: f64| base > 0.0 || base != 1.0;
+            let is_valid_natural = |natural: f64| natural > 0.0;
+            let Value::Number(base) = get_val("base", scope)? else {
+                unreachable!()
+            };
+            let Value::Number(natural) = get_val("natural", scope)? else {
+                unreachable!()
+            };
 
-                let base_f = base.get_f64()?;
-                let nature_f = natural.get_f64()?;
-                nature_f.log(base_f)
+            if !base.is_real() || !natural.is_real() {
+                // for complex logarithm
+                let ((real_b, imaginary_b), (real_n, imaginary_n)) =
+                    complex::pre_process(base, natural);
+                let (real, imaginary) = complex::log(real_b, imaginary_b, real_n, imaginary_n);
+                return Ok(Value::Number(Number::Complex(real, imaginary)));
             }
-            _ => {
-                let input = get_val("input", scope)?;
-                let f = input.get_f64()?;
 
+            let base_f = base.float_value();
+            let nature_f = natural.float_value();
+
+            if !is_valid_base(base_f) || !is_valid_natural(nature_f) {
+                return Err(math_error("invalid logarithm operation"));
+            }
+            let result = nature_f.log(base_f);
+            return Ok(Value::from(result));
+        }
+
+        fn complex_math_resolver(
+            math_op: &MathModule,
+            real: f64,
+            imaginary: f64,
+        ) -> CalcResult<Number> {
+            let result = match math_op {
+                MathModule::SIN => Number::complex(complex::sine(real, imaginary)),
+                MathModule::COS => Number::complex(complex::cosine(real, imaginary)),
+                MathModule::TAN => {
+                    Number::complex(complex::sine(real, imaginary))
+                        / Number::complex(complex::cosine(real, imaginary))
+                }
+                MathModule::ASIN => Number::complex(complex::arcsine(real, imaginary)),
+                MathModule::ACOS => Number::complex(complex::arccosine(real, imaginary)),
+                MathModule::ATAN => Number::complex(complex::arctangent(real, imaginary)),
+                MathModule::SINH => Number::complex(complex::sine_hyperbolic(real, imaginary)),
+                MathModule::COSH => Number::complex(complex::cosine_hyperbolic(real, imaginary)),
+                MathModule::TANH => {
+                    Number::complex(complex::sine_hyperbolic(real, imaginary))
+                        / Number::complex(complex::cosine_hyperbolic(real, imaginary))
+                }
+
+                MathModule::RAD => {
+                    return Err(math_error(
+                        "math function \"rag\" is invalid for complex input",
+                    ))
+                }
+                MathModule::DEG => {
+                    return Err(math_error(
+                        "math function \"deg\" is invalid for complex input",
+                    ))
+                }
+                MathModule::LOG10 => Number::complex(complex::pow(10.0, 0.0, real, imaginary)),
+                MathModule::LOG2 => Number::complex(complex::pow(2.0, 0.0, real, imaginary)),
+                MathModule::LN => Number::complex(complex::ln(real, imaginary)),
+                MathModule::EXP => Number::complex(complex::exp(real, imaginary)),
+                MathModule::SQRT => Number::complex(complex::sqrt(real, imaginary)),
+                MathModule::ABS => Number::Complex(real.abs(), imaginary.abs()),
+                MathModule::FLOOR => Number::Complex(real.floor(), imaginary.floor()),
+                MathModule::ROUND => Number::Complex(real.round(), imaginary.round()),
+                _ => unreachable!(),
+            };
+            return Ok(result);
+        }
+
+        // the `log` is a special case with two params
+        if matches!(self, Self::LOG) {
+            return log_resolver(scope);
+        }
+
+        let input = get_val("input", scope)?;
+        let Value::Number(number) = input else {
+            unreachable!()
+        };
+
+        match self {
+            Self::REAL => return Ok(Value::from(number.real())),
+            Self::IMAGINARY => return Ok(Value::from(number.imaginary())),
+            _ => {}
+        }
+
+        if let Number::Complex(real, imaginary) = number {
+            let calc_result = complex_math_resolver(self, real, imaginary)?;
+            return Ok(Value::Number(calc_result));
+        }
+
+        // for non-complex input calculation
+        let f = number.float_value();
+        let result = match self {
+            Self::SIN => f.sin(),
+            Self::COS => f.cos(),
+            Self::TAN => f.tan(),
+            Self::SINH => f.sinh(),
+            Self::COSH => f.cosh(),
+            Self::TANH => f.tanh(),
+            Self::RAD => f.to_radians(),
+            Self::DEG => f.to_degrees(),
+            Self::LOG10 => f.log10(),
+            Self::LOG2 => f.log2(),
+            Self::LN => f.ln(),
+            Self::EXP => f.exp(),
+            Self::ABS => f.abs(),
+            Self::SQRT => f.sqrt(),
+            Self::FLOOR => f.floor(),
+            Self::ROUND => f.round(),
+
+            Self::ASIN | Self::ACOS | Self::ATAN => {
+                // `f` less than -1 and greater than 1
+                if !(-1.0..=1.0).contains(&f) {
+                    // inverse trigonometric function error.
+                    return Err(
+                        math_error(
+                            "the input for inverse trigonometric function should be less than 1 and greater than -1"
+                        )
+                    );
+                }
                 match self {
-                    Self::SIN => f.sin(),
-                    Self::COS => f.cos(),
-                    Self::TAN => f.tan(),
-                    Self::SINH => f.sinh(),
-                    Self::COSH => f.cosh(),
-                    Self::TANH => f.tanh(),
-                    Self::RAD => f.to_radians(),
-                    Self::DEG => f.to_degrees(),
-                    Self::LOG10 => f.log10(),
-                    Self::LOG2 => f.log2(),
-                    Self::LN => f.ln(),
-                    Self::EXP => f.exp(),
-                    Self::ABS => f.abs(),
-                    Self::SQRT => f.sqrt(),
-                    Self::FLOOR => f.floor(),
-                    Self::ROUND => f.round(),
-
-                    Self::ASIN | Self::ACOS | Self::ATAN => {
-                        // `f` less than -1 and greater than 1
-                        if !(-1.0..=1.0).contains(&f) {
-                            // inverse trigonometric function error.
-                            return Err(
-                                math_error(
-                                    "the input for inverse trigonometric function should be less than 1 and greater than -1"
-                                )
-                            );
-                        }
-                        match self {
-                            Self::ASIN => f.asin(),
-                            Self::ACOS => f.acos(),
-                            Self::ATAN => f.atan(),
-                            _ => unreachable!(),
-                        }
-                    }
+                    Self::ASIN => f.asin(),
+                    Self::ACOS => f.acos(),
+                    Self::ATAN => f.atan(),
                     _ => unreachable!(),
                 }
             }
+            _ => unreachable!(),
         };
         return Ok(Value::from(result));
     }

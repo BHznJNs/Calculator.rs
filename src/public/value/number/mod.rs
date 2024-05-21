@@ -1,4 +1,4 @@
-mod complex;
+pub mod complex;
 mod fraction;
 mod matrix;
 
@@ -68,7 +68,8 @@ impl Number {
 
         if let (Self::Complex(_, _), _) | (_, Self::Complex(_, _)) = (base, target) {
             let ((real_b, imaginary_b), (real_p, imaginary_p)) = complex::pre_process(base, target);
-            return complex::pow(real_b, imaginary_b, real_p, imaginary_p);
+            let (real, imaginary) = complex::pow(real_b, imaginary_b, real_p, imaginary_p);
+            return Self::Complex(real, imaginary);
         }
 
         match base {
@@ -112,7 +113,7 @@ impl Number {
     }
 
     pub fn not(&self) -> Self {
-        let bool_val = match self {
+        let bool_value = match self {
             Self::Int(i) => *i > 0,
             Self::Float(f) => *f > 0.0,
             Self::Fraction(upper, _) if *upper > 0 => true,
@@ -120,7 +121,7 @@ impl Number {
                 *real > 0.0 && *imaginary > 0.0,
             _ => false,
         };
-        if !bool_val {
+        if !bool_value {
             Self::Int(1)
         } else {
             Self::Int(0)
@@ -134,6 +135,7 @@ impl Number {
             _ => *self,
         }
     }
+
     pub fn float(&self) -> Self {
         match self {
             Self::Int(i) => Self::Float(*i as f64),
@@ -166,6 +168,32 @@ impl Number {
             Self::Complex(real, imaginary) => Polar::modulus(real, imaginary),
             Self::NotANumber => 0_f64,
         }
+    }
+
+    pub fn complex(raw: complex::Complex) -> Self {
+        let (real, imaginary) = raw;
+        return Self::Complex(real, imaginary);
+    }
+
+    pub fn is_real(&self) -> bool {
+        if let Self::Complex(_, imaginary) = self {
+            return *imaginary == 0.0;
+        }
+        return true;
+    }
+
+    pub fn real(&self) -> f64 {
+        if let Self::Complex(real, _) = self {
+            return *real;
+        }
+        return self.float_value();
+    }
+
+    pub fn imaginary(&self) -> f64 {
+        if let Self::Complex(_, imaginary) = self {
+            return *imaginary;
+        }
+        return 0.0;
     }
 
     fn float_cmp(num1: f64, num2: f64) -> bool {
@@ -232,8 +260,8 @@ impl Add for Number {
         }
 
         if let (Self::Complex(_, _), _) | (_, Self::Complex(_, _)) = (self, other) {
-            let ((real_b, imaginary_b), (real_p, imaginary_p)) = complex::pre_process(self, other);
-            return Self::Complex(real_b + real_p, imaginary_b + imaginary_p);
+            let ((real_s, imaginary_s), (real_o, imaginary_o)) = complex::pre_process(self, other);
+            return Self::Complex(real_s + real_o, imaginary_s + imaginary_o);
         }
 
         if let (Self::Float(_), _) | (_, Self::Float(_)) = (self, other) {
@@ -273,8 +301,8 @@ impl Sub for Number {
         }
 
         if let (Self::Complex(_, _), _) | (_, Self::Complex(_, _)) = (self, other) {
-            let ((real_b, imaginary_b), (real_p, imaginary_p)) = complex::pre_process(self, other);
-            return Self::Complex(real_b - real_p, imaginary_b - imaginary_p);
+            let ((real_s, imaginary_s), (real_o, imaginary_o)) = complex::pre_process(self, other);
+            return Self::Complex(real_s - real_o, imaginary_s - imaginary_o);
         }
 
         if let (Self::Float(_), _) | (_, Self::Float(_)) = (self, other) {
@@ -315,8 +343,9 @@ impl Mul for Number {
         }
 
         if let (Self::Complex(_, _), _) | (_, Self::Complex(_, _)) = (self, other) {
-            let ((real_b, imaginary_b), (real_p, imaginary_p)) = complex::pre_process(self, other);
-            return complex::multiply(real_b, imaginary_b, real_p, imaginary_p);
+            let ((real_s, imaginary_s), (real_o, imaginary_o)) = complex::pre_process(self, other);
+            let (real, imaginary) = complex::multiply(real_s, imaginary_s, real_o, imaginary_o);
+            return Self::Complex(real, imaginary);
         }
 
         if let (Self::Float(_), _) | (_, Self::Float(_)) = (self, other) {
@@ -362,11 +391,9 @@ impl Div for Number {
         }
 
         if let (Self::Complex(_, _), _) | (_, Self::Complex(_, _)) = (self, other) {
-            let ((real_b, imaginary_b), (real_p, imaginary_p)) = complex::pre_process(self, other);
-            let Number::Complex(real, imaginary) = complex::multiply(real_b, imaginary_b, real_p, imaginary_p) else {
-                unreachable!()
-            };
-            let denominator = real_p.powi(2) + imaginary_p.powi(2);
+            let ((real_s, imaginary_s), (real_o, imaginary_o)) = complex::pre_process(self, other);
+            let (real, imaginary) = complex::multiply(real_s, imaginary_s, real_o, -imaginary_o);
+            let denominator = real_o.powi(2) + imaginary_o.powi(2);
             return Number::Complex(real / denominator, imaginary / denominator);
         }
 

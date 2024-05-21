@@ -211,7 +211,7 @@ impl BuildInFnCall for BasicModule {
                             let f = str_to_num::<f64>(refer)?;
                             Value::from(f)
                         }
-                        Value::Boolean(bool_val) => Value::from(bool_val as i64 as f64),
+                        Value::Boolean(bool_value) => Value::from(bool_value as i64 as f64),
                         _ => {
                             return Err(type_error(
                                 Some("Build-in function `float`"),

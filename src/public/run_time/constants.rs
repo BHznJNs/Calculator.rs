@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::f64::consts::E as STD_E;
 use std::f64::consts::PI as STD_PI;
 
+use crate::public::value::number::complex;
 use crate::public::value::unique::EMPTY_GLOBAL_UNIQUE;
 use crate::public::value::{number::Number, unique::GlobalUnique, Value};
 
@@ -38,8 +39,8 @@ unsafe fn static_init() {
 
 pub const PI: Value = Value::Number(Number::Float(STD_PI));
 pub const E: Value = Value::Number(Number::Float(STD_E));
-pub const I: Value = Value::Number(Number::Complex(0.0, 1.0));
-pub const J: Value = Value::Number(Number::Complex(0.0, 1.0));
+pub const I: Value = Value::Number(complex::I);
+pub const J: Value = Value::Number(complex::I);
 pub const TRUE: Value = Value::Boolean(true);
 pub const FALSE: Value = Value::Boolean(false);
 
