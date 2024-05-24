@@ -5,6 +5,7 @@ use std::fs::File;
 use std::io::{self, Read};
 
 pub use run::run_entry;
+pub use run::script_analyze;
 pub use run::RUN;
 pub use run::RUN_PATH;
 

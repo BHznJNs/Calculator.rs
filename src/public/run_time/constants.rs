@@ -91,5 +91,6 @@ pub unsafe fn entry() -> HashMap<String, Value> {
         (String::from("j"), J),
         (String::from("true"), TRUE),
         (String::from("false"), FALSE),
+        (String::from("null"), Value::null()),
     ])
 }

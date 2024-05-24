@@ -1,4 +1,3 @@
-mod analyzer;
 mod line;
 mod signal;
 

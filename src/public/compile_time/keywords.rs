@@ -1,4 +1,4 @@
-use std::{fmt, collections::HashMap};
+use std::{collections::HashMap, fmt};
 
 #[derive(PartialEq, PartialOrd, Clone, Copy)]
 pub enum Keyword {
@@ -21,10 +21,9 @@ pub enum Keyword {
 static mut KEYWORD_PAIRS: Option<HashMap<&'static str, Keyword>> = None;
 
 impl Keyword {
-    pub fn is_keyword(word: &str) -> Option<Self> {
-        if unsafe { KEYWORD_PAIRS.is_none() } {
-            // init global var
-            unsafe { KEYWORD_PAIRS = Some(HashMap::from([
+    fn init_keyword_pairs() {
+        unsafe {
+            KEYWORD_PAIRS = Some(HashMap::from([
                 ("out", Keyword::Out),
                 ("for", Keyword::For),
                 ("if", Keyword::If),
@@ -36,32 +35,33 @@ impl Keyword {
                 ("class", Keyword::Class),
                 ("new", Keyword::New),
                 ("glo", Keyword::Global),
-
                 // full version of keywords
                 ("continue", Keyword::Continue),
                 ("break", Keyword::Break),
                 ("function", Keyword::Function),
                 ("global", Keyword::Global),
-            ])) };
+            ]))
+        };
+    }
+    pub fn is_keyword(word: &str) -> Option<Self> {
+        if unsafe { KEYWORD_PAIRS.is_none() } {
+            Self::init_keyword_pairs();
         }
         let pair_map = unsafe { KEYWORD_PAIRS.as_ref().unwrap() };
         let keyword = pair_map.get(word)?;
         return Some(*keyword);
     }
-}
 
-// pub const KEYWORD_PAIRS: [(&str, Keyword); 10] = [
-//     ("out", Keyword::Out),
-//     ("for", Keyword::For),
-//     ("if", Keyword::If),
-//     ("ctn", Keyword::Continue),
-//     ("brk", Keyword::Break),
-//     ("import", Keyword::Import),
-//     ("fn", Keyword::Function),
-//     ("cl", Keyword::Class),
-//     ("new", Keyword::New),
-//     ("glo", Keyword::Global),
-// ];
+    pub fn keyword_list() -> Vec<&'static str> {
+        if unsafe { KEYWORD_PAIRS.is_none() } {
+            Self::init_keyword_pairs();
+        }
+
+        let map_ref = unsafe { KEYWORD_PAIRS.as_ref().unwrap() };
+        let key_list = map_ref.keys().copied().collect::<Vec<&str>>();
+        return key_list;
+    }
+}
 
 impl fmt::Display for Keyword {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

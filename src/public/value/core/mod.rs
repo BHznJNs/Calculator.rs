@@ -16,7 +16,7 @@ use super::function::{BuildInFunction, Function, UserDefinedFunction};
 use super::map::RawMap;
 use super::number::Number;
 use super::oop::class::Class;
-use super::oop::object::Object;
+use super::oop::object::{Object, BuildInObject};
 use super::unique::Unique;
 use super::{into_rc_refcell, ComplexStructure, GetAddr};
 
@@ -46,6 +46,12 @@ pub enum Value {
 
 impl Value {
     pub const EMPTY: Self = Self::Void(VoidSign::Empty);
+
+    pub fn null() -> Self {
+        Value::from(
+            Object::BuildIn(BuildInObject::null())
+        )
+    }
 
     // formater for string typed value
     pub fn str_format(&self) -> CalcResult<String> {
@@ -136,6 +142,7 @@ impl Value {
         // Ref<Value> -> Value
         self.clone()
     }
+
     pub fn deep_clone(&self) -> Self {
         let result = match self {
             // Boolean and Number is primitive type,

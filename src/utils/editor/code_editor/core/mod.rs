@@ -16,14 +16,19 @@ use crossterm::{
 };
 
 use crate::{
-    exec::script::{RUN, run_entry},
-    public::run_time::scope::Scope,
-    utils::{editor::direction::Direction, number_bit_count, Cursor, Terminal},
+    exec::script::{run_entry, RUN},
+    public::{env::ENV, run_time::scope::Scope},
+    utils::{
+        editor::{direction::Direction, tokenizer, word_completion},
+        number_bit_count, Cursor, Terminal,
+    },
 };
 
 use self::color::EditorColor;
 
 use super::{
+    analyzer,
+    candidate::Candidate,
     components::{Component, EditorComponentManager, FileSaver, Finder, Positioner},
     cursor_pos::EditorCursorPos,
 };
@@ -39,6 +44,7 @@ use line::EditorLine;
 pub struct CodeEditor {
     lines: Vec<EditorLine>,
     index: usize, // current editing line index
+    candidates: Candidate,
 
     overflow_top: usize,
     overflow_bottom: usize,
@@ -60,6 +66,13 @@ impl CodeEditor {
     fn label_width_with(&self, value: usize) -> usize {
         // calculate label_width with inputed value
         return number_bit_count(value) + 1;
+    }
+
+    #[inline]
+    fn visible_area_width(&self) -> usize {
+        let term_width = Terminal::width();
+        let label_width = self.label_width();
+        return term_width - label_width;
     }
 
     #[inline]
@@ -594,6 +607,7 @@ impl CodeEditor {
         Self {
             lines: vec![],
             index: 1,
+            candidates: Candidate::new(),
 
             overflow_top: 0,
             overflow_bottom: 0,
@@ -760,10 +774,7 @@ impl CodeEditor {
                 Terminal::clear_after_cursor()?;
                 match self.lines.get_mut(covered_pos) {
                     Some(covered_line) => covered_line.render(covered_pos + 1, label_width)?,
-                    None => {
-                        let label_width = self.label_width();
-                        print!("{}", " ".repeat(label_width).on_grey());
-                    }
+                    None => print!("{}", " ".repeat(label_width).on_grey()),
                 }
                 Cursor::restore_pos()?;
                 self.dashboard.restore_state()?;
@@ -838,6 +849,9 @@ impl CodeEditor {
                     self.render_all()?;
                 }
                 KeyCode::Left | KeyCode::Right => {
+                    if self.candidates.current().is_some() {
+                        self.hide_hint()?;
+                    }
                     self.move_cursor_horizontal(Direction::from(key.code))?;
                 }
 
@@ -848,8 +862,16 @@ impl CodeEditor {
                 | KeyCode::Char(_) => {
                     self.dashboard.set_state(EditorState::Modified)?;
                     match key.code {
-                        KeyCode::Backspace => self.delete()?,
+                        KeyCode::Backspace => {
+                            self.delete()?;
+                            self.hide_hint()?;
+                        },
                         KeyCode::Enter => {
+                            if self.candidates.current().is_some() {
+                                self.complete_hint()?;
+                                self.hide_hint()?;
+                                continue;
+                            }
                             self.append_event(EditorOperation::InsertLine, |e| e.insert_line())?
                         }
                         KeyCode::Tab => {
@@ -859,9 +881,17 @@ impl CodeEditor {
                                     e.append_indent()
                                 })?
                             }
+                            if self.candidates.current().is_some() {
+                                self.candidates.next();
+                                self.show_hint()?;
+                            }
                         }
                         KeyCode::BackTab => {
-                            self.append_event(EditorOperation::RemoveIndent, |e| e.remove_indent())?
+                            self.append_event(EditorOperation::RemoveIndent, |e| e.remove_indent())?;
+                            if self.candidates.current().is_some() {
+                                self.candidates.previous();
+                                self.show_hint()?;
+                            }
                         }
 
                         KeyCode::Char(ch) => {
@@ -872,6 +902,26 @@ impl CodeEditor {
                             self.append_event(EditorOperation::InsertChar(ch), |e| {
                                 e.insert_char(ch)
                             })?;
+
+                            let current_line = &self.lines[self.index - 1];
+                            if current_line.is_at_line_end()? {
+                                let hint_context = self.get_hint_context();
+                                let current_indent = current_line.indent_count()
+                                    / unsafe { ENV.options.indent_size };
+
+                                let tokens = tokenizer::tokenize(current_line.content());
+                                let analyzed_scope =
+                                    analyzer::analyze(hint_context, current_indent);
+                                let Some(new_candidates) =
+                                    word_completion::analyze(&tokens, &analyzed_scope)
+                                else {
+                                    self.hide_hint()?;
+                                    continue;
+                                };
+                                let word = &tokens.last().unwrap().content;
+                                self.candidates.set(word, new_candidates);
+                                self.show_hint()?;
+                            }
                         }
                         _ => unreachable!(),
                     }
@@ -881,6 +931,100 @@ impl CodeEditor {
             self.dashboard_cursor_pos_refresh()?;
         }
         self.close()?;
+        return Ok(());
+    }
+}
+
+impl CodeEditor {
+    fn get_hint_context(&self) -> Vec<String> {
+        let mut result_context = vec![];
+        for line in &self.lines[..self.index - 1] {
+            result_context.push(line.content().to_string());
+        }
+        return result_context;
+    }
+
+    fn hint_renderer_cursor_mover(
+        &self,
+    ) -> io::Result<(impl Fn() -> io::Result<()>, impl Fn() -> io::Result<()>)> {
+        let cursor_pos = Cursor::pos_row()?;
+        // is cursor at the bottom line of editor
+        // or the penultimate line of terminal.
+        let is_at_bottom_line = cursor_pos == self.visible_area_height();
+        let up = || Cursor::up(1);
+        let down = || Cursor::down(1);
+
+        type CursorOperation = dyn Fn() -> io::Result<()>;
+        let (move_to_hint_line, restore_to_edit_line): (
+            Box<CursorOperation>,
+            Box<CursorOperation>,
+        ) = if is_at_bottom_line {
+            (Box::new(up), Box::new(down))
+        } else {
+            (Box::new(down), Box::new(up))
+        };
+
+        let label_width = self.label_width();
+        let cached_cursor_col = Cursor::pos_col()?;
+        let temp1 = move || -> io::Result<()> {
+            move_to_hint_line()?;
+            // move to line start
+            Cursor::move_to_col(label_width)?;
+            Ok(())
+        };
+        let temp2 = move || -> io::Result<()> {
+            restore_to_edit_line()?;
+            // return to editing position
+            Cursor::move_to_col(cached_cursor_col)?;
+            Ok(())
+        };
+        return Ok((temp1, temp2));
+    }
+
+    fn show_hint(&self) -> io::Result<()> {
+        let (move_to_hint_pos, restore_to_edit_pos) = self.hint_renderer_cursor_mover()?;
+        let visible_width = self.visible_area_width();
+        let Some(rendered_content) = self.candidates.rendered_content(visible_width) else {
+            return Ok(());
+        };
+
+        move_to_hint_pos()?;
+        print!("{}", rendered_content);
+        restore_to_edit_pos()?;
+        return Ok(());
+    }
+    fn hide_hint(&mut self) -> io::Result<()> {
+        self.candidates.clear();
+
+        let cursor_pos = Cursor::pos_row()?;
+        let is_at_bottom_line = cursor_pos == self.visible_area_height();
+        let covered_index = if is_at_bottom_line {
+            self.index - 2 // previous line
+        } else {
+            self.index // next line
+        };
+        let label_width = self.label_width();
+        
+        let (move_to_hint_pos, restore_to_edit_pos) = self.hint_renderer_cursor_mover()?;
+        move_to_hint_pos()?;
+        match self.lines.get_mut(covered_index) {
+            Some(covered_line) => covered_line.render(covered_index + 1, label_width)?,
+            None => {
+                let term_width = Terminal::width();
+                print!("{}", " ".repeat(term_width - label_width))
+            }
+        };
+        restore_to_edit_pos()?;
+        return Ok(());
+    }
+    fn complete_hint(&mut self) -> io::Result<()> {
+        let Some(hint) = self.candidates.current() else {
+            return Ok(());
+        };
+        for ch in hint.chars() {
+            self.append_event(EditorOperation::InsertChar(ch), |e| e.insert_char(ch))?;
+        }
+        self.candidates.clear();
         return Ok(());
     }
 }

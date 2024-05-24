@@ -2,8 +2,8 @@ use std::collections::VecDeque;
 
 pub struct LoopTraverser<T> {
     vec: VecDeque<T>,
-    pub index: isize,
-    pub cycle: bool,
+    index: isize,
+    cycle: bool,
 }
 
 #[allow(dead_code)]
@@ -45,6 +45,18 @@ impl<T> LoopTraverser<T> {
         self.vec.front()
     }
 
+    pub fn current_index(&self) -> Option<usize> {
+        if self.is_empty() {
+            return None;
+        }
+
+        let result = if self.index == -1 {
+            0
+        } else {
+            self.index as usize
+        };
+        return Some(result);
+    }
     pub fn current(&self) -> Option<&T> {
         if self.is_empty() {
             return None;
@@ -89,8 +101,29 @@ impl<T> LoopTraverser<T> {
     }
 
     #[inline]
+    pub fn len(&self) -> usize {
+        self.vec.len()
+    }
+
+    pub fn iter(&self) -> LoopTraverserIter<'_, T> {
+        LoopTraverserIter { iter: self.vec.iter() }
+    }
+
+    #[inline]
     pub fn is_empty(&self) -> bool {
         self.vec.is_empty()
+    }
+}
+
+pub struct LoopTraverserIter<'a, T> {
+    iter: std::collections::vec_deque::Iter<'a, T>,
+}
+
+impl<'a, T> Iterator for LoopTraverserIter<'a, T> {
+    type Item = &'a T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next()
     }
 }
 

@@ -1,6 +1,5 @@
 pub mod complex;
 mod fraction;
-mod matrix;
 
 use std::cmp::{self, PartialEq};
 use std::fmt;

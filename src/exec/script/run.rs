@@ -2,8 +2,8 @@ use std::time::Instant;
 
 use crate::{
     exec::{attempt, script::pre_processer::CodeLine},
-    public::{env::ENV, run_time::scope::Scope},
-    utils::OutputBuffer,
+    public::{env::ENV, run_time::scope::Scope, compile_time::ast::ast_enum::RootNode},
+    utils::OutputBuffer, compiler,
 };
 
 use super::{pre_processer, read_file};
@@ -103,6 +103,40 @@ fn run(codes: &str, scope: &mut Scope) {
             script_run_error(err, line_count, &last_line_content);
         }
     }
+}
+
+// get AST for script
+pub fn script_analyze(code_lines: Vec<String>) -> Vec<RootNode> {
+    if code_lines.is_empty() {
+        return vec![];
+    }
+
+    let mut result_list = vec![];
+    let mut cached_multiline = MultiLine::default();
+    for l in code_lines {
+        // skip blank line
+        if l.trim().is_empty() {
+            continue;
+        }
+        let current_line = pre_processer::process(&l);
+        cached_multiline.append_line(&current_line);
+
+        let Some(line_to_execute) = cached_multiline.take() else {
+            continue;
+        };
+
+        // execute code
+        if let Ok(ast) = compiler::compile(&line_to_execute) {
+            result_list.push(ast);
+        }
+    }
+    if !cached_multiline.content.is_empty() {
+        let last_line_content = cached_multiline.content;
+        if let Ok(ast) = compiler::compile(&last_line_content) {
+            result_list.push(ast);
+        }
+    }
+    return result_list;
 }
 
 // --- --- --- --- --- ---

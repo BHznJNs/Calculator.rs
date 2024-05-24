@@ -28,6 +28,7 @@ pub fn args_resolve(
     };
     let editor_arg_resolver = |mode: &mut ProgramMode| {
         if *mode != ProgramMode::ToBeExited {
+            unsafe { ENV.options.use_editor = true };
             *mode = ProgramMode::Editor;
         }
     };
@@ -62,7 +63,10 @@ pub fn args_resolve(
         mode = ProgramMode::Script;
         let script_path = args.pop_front().unwrap();
         let static_path = Box::leak(Box::new(script_path));
-        unsafe { ENV.script_path = Some(static_path) };
+        unsafe {
+            ENV.options.use_script = true;
+            ENV.script_path = Some(static_path);
+        };
     }
 
     while let Some(arg_str) = args.pop_front() {

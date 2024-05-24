@@ -1,14 +1,14 @@
-mod token;
 mod sequence;
+mod token;
 
 use crate::{public::compile_time::keywords::Keyword, utils::ascii::is_identi_ascii};
 
 pub use sequence::TokenSequence;
-pub use token::{TokenVec, TokenType};
 #[cfg(not(test))]
 use token::Token;
 #[cfg(test)]
 pub use token::Token;
+pub use token::{TokenType, TokenVec};
 
 pub fn tokenize(source: &str) -> TokenVec {
     // is used for check is number minus OR
@@ -80,7 +80,11 @@ pub fn tokenize(source: &str) -> TokenVec {
                 tokens.push(Token::new(TokenType::Annotation, value));
             } else {
                 let option_keyword = Keyword::is_keyword(&value);
-                let is_keyword = option_keyword.is_some() || value.eq("true") || value.eq("false");
+                let is_keyword = option_keyword.is_some()
+                    // extra keyword styled identifier
+                    || value.eq("true")
+                    || value.eq("false")
+                    || value.eq("null");
 
                 if is_keyword {
                     last_type = TokenType::Keyword;

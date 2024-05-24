@@ -31,7 +31,9 @@ impl Object {
             });
         }
 
-        let completer = if unsafe { ENV.options.use_repl } {
+        let completer = if unsafe {
+            ENV.options.use_repl || ENV.options.auto_complete
+        } {
             let mut words = vec![];
             let mut temp = Completer::new();
             for (k, _) in &params {
@@ -123,6 +125,15 @@ pub struct UserDefinedObject {
 pub struct BuildInObject {
     completer: Option<Rc<Completer>>,
     pub(self) storage: ComposeStorage<Value>,
+}
+
+impl BuildInObject {
+    pub fn null() -> Self {
+        Self {
+            completer: None,
+            storage: ComposeStorage::new(vec![]),
+        }
+    }
 }
 
 impl ComplexStructure for Object {

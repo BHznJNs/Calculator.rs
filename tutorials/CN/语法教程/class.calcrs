@@ -6,7 +6,8 @@ Person = cl {
 
     # 类方法
     greet = () {
-        out self.name;
+        out self.name
+        out "name: " + self.name
     }
 }
 

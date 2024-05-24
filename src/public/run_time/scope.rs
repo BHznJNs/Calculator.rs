@@ -1,6 +1,7 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::exec::script;
+use crate::public::compile_time::keywords::Keyword;
 use crate::public::error::{import_error, reference_error, ReferenceType, CalcResult};
 use crate::public::std::StdModules;
 use crate::public::value::oop::module::module_create;
@@ -73,10 +74,15 @@ impl Scope {
         }
     }
 
-    pub fn init_completer(&mut self) {
+    pub fn init_completer(&mut self, insert_keywords: bool) {
         let mut completer = Completer::new();
         for constant in CONSTANT_IDENTIFIERS {
             completer.insert(constant);
+        }
+        if insert_keywords {
+            for keyword in Keyword::keyword_list() {
+                completer.insert(keyword);
+            }
         }
         self.completer = Some(completer);
     }

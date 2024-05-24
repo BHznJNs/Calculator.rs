@@ -6,12 +6,12 @@ use crate::{
     public::run_time::scope::Scope,
     utils::{
         cursor::Cursor,
-        editor::{direction::Direction, text_area::TextArea, tokenizer::TokenSequence},
+        editor::{direction::Direction, text_area::TextArea, tokenizer::TokenSequence, word_completion},
         number_bit_count,
     },
 };
 
-use super::{analyzer::analyze, candidate::Candidate};
+use super::candidate::Candidate;
 
 pub struct EditorLine {
     pub index: usize,
@@ -85,7 +85,7 @@ impl EditorLine {
                 text_area.insert_char(ch, false)?;
                 if text_area.state_right()?.is_at_content_end {
                     let tokens = text_area.tokens().unwrap();
-                    let Some(candidates) = analyze(tokens, scope) else {
+                    let Some(candidates) = word_completion::analyze(tokens, scope) else {
                         text_area.render()?;
                         return Ok(());
                     };

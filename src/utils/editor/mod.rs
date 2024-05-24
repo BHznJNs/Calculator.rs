@@ -2,6 +2,7 @@ mod line_editor;
 mod code_editor;
 mod tokenizer;
 
+mod word_completion;
 mod direction;
 mod text_area;
 

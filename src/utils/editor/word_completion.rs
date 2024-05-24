@@ -18,7 +18,7 @@ fn get_end_token(tokens: &TokenVec) -> Option<Vec<String>> {
         }
 
         match token.type__ {
-            TokenType::Identifier if cached_identi.is_none() =>
+            TokenType::Identifier | TokenType::Keyword if cached_identi.is_none() =>
                 cached_identi = Some(&token.content),
             TokenType::Symbol if cached_identi.is_some() && token.content.eq(".") => {
                 let identi = cached_identi.unwrap().to_owned();

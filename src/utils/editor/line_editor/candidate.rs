@@ -29,6 +29,7 @@ impl Candidate {
         self.list.previous()
     }
 
+    #[inline]
     pub fn clear(&mut self) {
         self.list.clear()
     }
