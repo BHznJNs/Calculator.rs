@@ -2,7 +2,7 @@ mod node;
 
 use node::CompleterNode;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Completer {
     root: CompleterNode,
 }
@@ -23,10 +23,21 @@ impl Completer {
         self.root.complete(word.chars(), &mut result);
         return result;
     }
+
+    pub fn elements(&self) -> Vec<String> {
+        self.complete("")
+    }
 }
 
 impl<'a> Extend<&'a str> for Completer {
     fn extend<T: IntoIterator<Item = &'a str>>(&mut self, iter: T) {
+        for item in iter {
+            self.insert(item);
+        }
+    }
+}
+impl<'a> Extend<&'a String> for Completer {
+    fn extend<T: IntoIterator<Item = &'a String>>(&mut self, iter: T) {
         for item in iter {
             self.insert(item);
         }

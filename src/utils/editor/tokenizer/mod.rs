@@ -4,11 +4,7 @@ mod token;
 use crate::{public::compile_time::keywords::Keyword, utils::ascii::is_identi_ascii};
 
 pub use sequence::TokenSequence;
-#[cfg(not(test))]
-use token::Token;
-#[cfg(test)]
-pub use token::Token;
-pub use token::{TokenType, TokenVec};
+pub use token::{Token, TokenType, TokenVec};
 
 pub fn tokenize(source: &str) -> TokenVec {
     // is used for check is number minus OR

@@ -17,17 +17,20 @@ use crossterm::{
 
 use crate::{
     exec::script::{run_entry, RUN},
-    public::{env::ENV, run_time::scope::Scope},
+    public::{env::ENV, run_time::scope::Scope, value::ValueType, Param},
     utils::{
-        editor::{direction::Direction, tokenizer, word_completion},
-        number_bit_count, Cursor, Terminal,
+        editor::{
+            direction::Direction,
+            tokenizer::{self, Token, TokenType, TokenVec},
+            word_completion,
+        }, number_bit_count, Cursor, Terminal
     },
 };
 
 use self::color::EditorColor;
 
 use super::{
-    analyzer,
+    analyzer::{self, EditorScope},
     candidate::Candidate,
     components::{Component, EditorComponentManager, FileSaver, Finder, Positioner},
     cursor_pos::EditorCursorPos,
@@ -865,7 +868,7 @@ impl CodeEditor {
                         KeyCode::Backspace => {
                             self.delete()?;
                             self.hide_hint()?;
-                        },
+                        }
                         KeyCode::Enter => {
                             if self.candidates.current().is_some() {
                                 self.complete_hint()?;
@@ -887,7 +890,9 @@ impl CodeEditor {
                             }
                         }
                         KeyCode::BackTab => {
-                            self.append_event(EditorOperation::RemoveIndent, |e| e.remove_indent())?;
+                            self.append_event(EditorOperation::RemoveIndent, |e| {
+                                e.remove_indent()
+                            })?;
                             if self.candidates.current().is_some() {
                                 self.candidates.previous();
                                 self.show_hint()?;
@@ -904,24 +909,32 @@ impl CodeEditor {
                             })?;
 
                             let current_line = &self.lines[self.index - 1];
-                            if current_line.is_at_line_end()? {
-                                let hint_context = self.get_hint_context();
-                                let current_indent = current_line.indent_count()
-                                    / unsafe { ENV.options.indent_size };
+                            if !current_line.is_at_line_end()? { continue }
+                            
+                            // --- --- --- --- --- ---
 
-                                let tokens = tokenizer::tokenize(current_line.content());
-                                let analyzed_scope =
-                                    analyzer::analyze(hint_context, current_indent);
-                                let Some(new_candidates) =
-                                    word_completion::analyze(&tokens, &analyzed_scope)
-                                else {
-                                    self.hide_hint()?;
-                                    continue;
-                                };
-                                let word = &tokens.last().unwrap().content;
-                                self.candidates.set(word, new_candidates);
-                                self.show_hint()?;
-                            }
+                            // auto complete
+                            let hint_context = self.get_hint_context();
+                            let current_indent = current_line.indent_count()
+                                / unsafe { ENV.options.indent_size };
+
+                            let tokens = tokenizer::tokenize(current_line.content());
+                            let analyzed_scope =
+                                analyzer::analyze(hint_context, current_indent);
+                            let optional_candidates = if let Some(Token {type__: TokenType::Annotation, content}) = tokens.last() {
+                                // type annotation complete
+                                analyzed_scope.complete_type(&content)
+                            } else {
+                                // variable name & object properties complete
+                                Self::get_candidates(&tokens, &analyzed_scope)
+                            };
+                            let Some(new_candidates) = optional_candidates else {
+                                self.hide_hint()?;
+                                continue;
+                            };
+                            let word = &tokens.last().unwrap().content;
+                            self.candidates.set(word, new_candidates);
+                            self.show_hint()?;
                         }
                         _ => unreachable!(),
                     }
@@ -936,6 +949,36 @@ impl CodeEditor {
 }
 
 impl CodeEditor {
+    fn get_candidates(tokens: &TokenVec, scope: &EditorScope) -> Option<Vec<String>> {
+        let mut end_part = word_completion::get_end_token(tokens)?;
+
+        if end_part.len() == 1 {
+            // variable complete
+            let word_to_complete = &end_part[0];
+            let candidates = scope.complete_var(word_to_complete);
+            return candidates;
+        }
+
+        // object property complete
+        let editing_word = end_part.remove(0);
+        let mut var_class = {
+            let obj_name = end_part.pop().unwrap();
+            scope.get_class_by_obj(&obj_name)?
+        };
+
+        while let Some(prop_name) = end_part.pop() {
+            let target_prop = var_class.get_prop(&prop_name)?;
+            let ValueType::Instance(class_name) = &target_prop.type__() else {
+                return None;
+            };
+            var_class = scope.get_class_by_name(class_name)?;
+        }
+
+        let completer = var_class.completer.as_ref().unwrap();
+        let candidates = completer.complete(&editing_word);
+        return (!candidates.is_empty()).then_some(candidates);
+    }
+
     fn get_hint_context(&self) -> Vec<String> {
         let mut result_context = vec![];
         for line in &self.lines[..self.index - 1] {
@@ -1004,7 +1047,7 @@ impl CodeEditor {
             self.index // next line
         };
         let label_width = self.label_width();
-        
+
         let (move_to_hint_pos, restore_to_edit_pos) = self.hint_renderer_cursor_mover()?;
         move_to_hint_pos()?;
         match self.lines.get_mut(covered_index) {

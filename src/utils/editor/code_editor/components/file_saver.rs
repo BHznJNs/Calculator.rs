@@ -16,7 +16,7 @@ pub struct FileSaver {
 }
 
 impl FileSaver {
-    const DEFAULT_FILE_NAME: &'static str = "temp.txt";
+    const DEFAULT_FILE_NAME: &'static str = "temp.ice";
 
     pub fn new() -> Self {
         let mut controller = Self::init_controller();

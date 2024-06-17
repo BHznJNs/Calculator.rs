@@ -22,15 +22,10 @@ impl From<&str> for Unique {
         return Self(String::from(value).into());
     }
 }
-impl From<String> for Unique {
-    fn from(value: String) -> Self {
-        return Self(value.into());
-    }
-}
 
 impl GetAddr for Unique {
     fn get_addr(&self) -> super::Addr {
-        let ptr = self as *const Unique;
+        let ptr = self.0.as_ptr();
         return ptr as super::Addr;
     }
 }
@@ -52,4 +47,15 @@ impl GlobalUnique {
         };
         return wraped.clone();
     }
+}
+
+#[test]
+fn unique_eq_test() {
+    use std::ptr::addr_of;
+    use super::Value;
+
+    let uniq = GlobalUnique(Some(Unique::from("value")));
+    let val1 = Value::from(uniq.unwrap());
+    let val2 = Value::from(unsafe { &*addr_of!(uniq) }.unwrap());
+    assert!(val1 == val2);
 }

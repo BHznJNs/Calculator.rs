@@ -13,7 +13,7 @@ use crate::public::{
 
 use super::{BuildInFnCall, ClassModule};
 
-#[derive(PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum MapModule {
     Clear,
     Keys,

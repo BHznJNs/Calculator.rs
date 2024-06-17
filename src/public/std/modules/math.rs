@@ -9,7 +9,7 @@ use crate::public::value::{Value, ValueType};
 use super::super::utils::get_val::get_val;
 use super::{BuildInFnCall, ObjectModule};
 
-#[derive(PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum MathModule {
     SIN,

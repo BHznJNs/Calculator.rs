@@ -7,6 +7,7 @@ use crate::public::value::Value;
 
 use resolvers::sequence;
 
+// todo: rename to `executor`
 pub fn compute(root_node: RootNode, scope: &mut Scope) -> CalcResult<Value> {
     /*
      Root {

@@ -3,10 +3,10 @@ use std::io;
 use crossterm::{event::KeyCode, style::Stylize};
 
 use crate::{
-    public::run_time::scope::Scope,
+    public::{run_time::scope::Scope, value::Value},
     utils::{
         cursor::Cursor,
-        editor::{direction::Direction, text_area::TextArea, tokenizer::TokenSequence, word_completion},
+        editor::{direction::Direction, text_area::TextArea, tokenizer::{TokenSequence, TokenVec}, word_completion},
         number_bit_count,
     },
 };
@@ -85,7 +85,7 @@ impl EditorLine {
                 text_area.insert_char(ch, false)?;
                 if text_area.state_right()?.is_at_content_end {
                     let tokens = text_area.tokens().unwrap();
-                    let Some(candidates) = word_completion::analyze(tokens, scope) else {
+                    let Some(candidates) = Self::get_candidates(tokens, scope) else {
                         text_area.render()?;
                         return Ok(());
                     };
@@ -120,6 +120,43 @@ impl EditorLine {
 
 // hint operations
 impl EditorLine {
+    fn get_candidates(tokens: &TokenVec, scope: &Scope) -> Option<Vec<String>> {
+        let mut end_part = word_completion::get_end_token(tokens)?;
+
+        if end_part.len() == 1 {
+            // variable complete
+            let global_completer = scope.completer.as_ref().unwrap();
+            let word_to_complete = &end_part[0];
+            let candidates = global_completer.complete(word_to_complete);
+            return Some(candidates);
+        }
+
+        // object property complete
+        let root_object = {
+            let obj_name = end_part.pop().unwrap();
+            let value = scope.read_var(&obj_name);
+            if let Ok(Value::Object(obj_value)) = value {
+                obj_value.clone()
+            } else {
+                return None;
+            }
+        };
+
+        let mut var_object = root_object;
+        let editing_word = end_part.remove(0);
+        while let Some(prop_name) = end_part.pop() {
+            let sub_value = var_object.as_ref().borrow().get(&prop_name);
+            if let Ok(Value::Object(sub_obj)) = sub_value {
+                var_object = sub_obj
+            } else {
+                return None;
+            }
+        }
+
+        let completer = var_object.as_ref().borrow().get_completer()?;
+        let candidates = completer.complete(&editing_word);
+        return Some(candidates);
+    }
     pub fn show_hint(&mut self) -> io::Result<()> {
         let visible_area_width = self.text_area.visible_area_width();
         let content_width = self.content().len();

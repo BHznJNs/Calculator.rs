@@ -1,14 +1,16 @@
+use std::cell::RefCell;
 use std::fmt;
 use std::rc::Rc;
 
 use crossterm::style::Stylize;
 
+use crate::public::compile_time::ast::types::ClassDefinitionNode;
 use crate::public::env::ENV;
-use crate::public::error::{reference_error, type_error, ReferenceType, CalcResult};
+use crate::public::error::{reference_error, type_error, CalcResult, ReferenceType};
 use crate::public::value::array::ArrayLiteral;
-use crate::public::value::function::Function;
-use crate::public::value::{Value, ValueType};
+use crate::public::value::function::{Function, UserDefinedFunction};
 use crate::public::value::{self, display_indent, GetAddr};
+use crate::public::value::{Value, ValueType};
 use crate::public::Param;
 use crate::utils::completer::Completer;
 
@@ -17,6 +19,7 @@ use super::object::Object;
 
 #[derive(PartialEq)]
 pub struct Class {
+    pub name: RefCell<Option<String>>,
     properties: Vec<Property>,
     method_storage: ComposeStorage<Function>,
 
@@ -28,7 +31,7 @@ pub struct Class {
 pub struct Property(pub ValueType, pub String);
 impl Param for Property {
     fn type__(&self) -> ValueType {
-        self.0
+        self.0.clone()
     }
     fn identi(&self) -> &str {
         &self.1
@@ -50,7 +53,7 @@ impl Class {
 
         // init completer
         let mut completer = None;
-        if unsafe { ENV.options.use_repl } {
+        if unsafe { ENV.options.use_repl || ENV.options.use_editor } {
             let mut temp = Completer::new();
             temp.extend(prop_name_vec);
             completer = Some(temp.into())
@@ -60,12 +63,18 @@ impl Class {
         let method_storage = ComposeStorage::new(methods);
 
         return Self {
+            name: None.into(),
             properties,
             method_storage,
             completer,
         };
     }
 
+    pub fn get_prop(&self, prop_name: &str) -> Option<&Property> {
+        self.properties
+            .iter()
+            .find(|Property(_, identi)| identi == prop_name)
+    }
     pub fn get_method(&self, method_name: &str) -> CalcResult<Function> {
         let result_method = self.method_storage.getter(method_name);
         match result_method {
@@ -145,6 +154,20 @@ impl Class {
             }
         }
         return Ok(());
+    }
+}
+
+impl From<&ClassDefinitionNode> for Class {
+    fn from(node: &ClassDefinitionNode) -> Self {
+        let methods = node
+            .method_nodes
+            .iter()
+            .map(|node| {
+                let user_func = UserDefinedFunction::from(node.as_ref());
+                (node.name.clone().unwrap(), Function::from(user_func))
+            })
+            .collect();
+        return Class::new(node.properties.clone(), methods);
     }
 }
 

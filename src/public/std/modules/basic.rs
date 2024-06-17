@@ -29,7 +29,7 @@ use super::array::ArrayModule;
 use super::string::StringModule;
 use super::{BuildInFnCall, ClassModule, FunctionModule};
 
-#[derive(PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum BasicModule {
     Input,
     Type,
@@ -180,6 +180,7 @@ impl BuildInFnCall for BasicModule {
                                 ValueType::Function => addr_of!(FUNCTION_T),
                                 ValueType::Class => addr_of!(CLASS_T),
                                 ValueType::Object => addr_of!(OBJECT_T),
+                                _ => unreachable!(),
                             }
                         };
                         Value::from((unsafe {
@@ -223,7 +224,7 @@ impl BuildInFnCall for BasicModule {
 
                     Self::Boolean => Value::Boolean(input.get_bool()),
                     Self::String => Value::from(input.to_raw_string()),
-                    Self::Unique => Value::from(Unique::from(input.to_raw_string())),
+                    Self::Unique => Value::from(Unique::from(input.to_raw_string().as_str())),
                     Self::Array => {
                         let Value::Number(num) = input else {
                             unreachable!()

@@ -2,6 +2,7 @@ use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::compile_time::ast::types::AssignmentNode;
 use crate::public::error::{assignment_error, CalcResult};
 use crate::public::run_time::scope::Scope;
+use crate::public::value::function::Function;
 use crate::public::value::Value;
 
 use super::composer::{compose, element_reading, object_reading};
@@ -14,13 +15,24 @@ pub fn resolve(node: &AssignmentNode, scope: &mut Scope, is_global: bool) -> Cal
 
     match left_hand_node {
         ASTNode::Variable(sub_node) => {
+            let var_name = sub_node.name.clone();
+            let rh_cloned = right_hand_value.clone();
+            // name assignment for `user-defined-function` and `class`
+            if let Value::Function(Function::UserDefined(user_defined_fn)) = rh_cloned {
+                let mut temp = user_defined_fn.as_ref().borrow_mut();
+                temp.name = Some(var_name.clone());
+            } else if let Value::Class(class) = rh_cloned {
+                let mut temp = class.name.borrow_mut();
+                *temp = Some(var_name.clone());
+            }
+
             if is_global {
                 scope
                     .global
                     .variables
-                    .insert(sub_node.name.clone(), right_hand_value.clone());
+                    .insert(var_name, right_hand_value.clone());
             } else {
-                scope.assign(sub_node.name.clone(), right_hand_value.clone());
+                scope.assign(var_name, right_hand_value.clone());
             }
         }
 

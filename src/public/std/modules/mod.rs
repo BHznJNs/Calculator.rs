@@ -14,11 +14,11 @@ use crate::public::value::oop::class::Class;
 use crate::public::value::oop::object::Object;
 use crate::public::value::Value;
 
-use super::StdModules;
+use super::StdModule;
 
-pub fn import_resolver(scope: &mut Scope, target_module: &StdModules, module_name: &str) {
+pub fn import_resolver(scope: &mut Scope, target_module: &StdModule, module_name: &str) {
     match target_module {
-        StdModules::Basic | StdModules::BitOps => {
+        StdModule::Basic | StdModule::BitOps => {
             let fn_list = target_module.get_fn_list();
             if let Some(completer) = &mut scope.completer {
                 for (k, _) in &fn_list {
@@ -29,12 +29,12 @@ pub fn import_resolver(scope: &mut Scope, target_module: &StdModules, module_nam
             scope.global.variables.extend(fn_list);
         }
 
-        StdModules::FileSystem | StdModules::Math => {
+        StdModule::FileSystem | StdModule::Math => {
             let module_obj = target_module.get_obj_entry();
             scope.assign(String::from(module_name), Value::from(module_obj));
         }
 
-        StdModules::String | StdModules::Array | StdModules::Map => {
+        StdModule::String | StdModule::Array | StdModule::Map => {
             let module_cls = target_module.get_cls_entry();
             scope.assign(String::from(module_name), Value::Class(module_cls));
         }

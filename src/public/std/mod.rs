@@ -15,7 +15,7 @@ pub mod modules;
 mod utils;
 
 #[derive(PartialEq, Clone, Copy)]
-pub enum StdModules {
+pub enum StdModule {
     Basic,
     Math,
     Array,
@@ -25,7 +25,7 @@ pub enum StdModules {
     BitOps,
 }
 
-impl StdModules {
+impl StdModule {
     pub const STD_MODULE_IDENTIFIERS: [&'static str; 7] = [
         "Basic",
         "Math",
@@ -37,25 +37,25 @@ impl StdModules {
     ];
     pub fn get_fn_list(&self) -> Vec<(String, Value)> {
         match self {
-            StdModules::Basic => BasicModule::function_list(),
-            StdModules::BitOps => BitOpsModule::function_list(),
+            Self::Basic => BasicModule::function_list(),
+            Self::BitOps => BitOpsModule::function_list(),
             _ => unreachable!(),
         }
     }
 
     pub fn get_obj_entry(&self) -> Object {
         match self {
-            StdModules::Math => MathModule::module_object(),
-            StdModules::FileSystem => FileSysModule::module_object(),
+            Self::Math => MathModule::module_object(),
+            Self::FileSystem => FileSysModule::module_object(),
             _ => unreachable!(),
         }
     }
 
     pub fn get_cls_entry(&self) -> Rc<Class> {
         match self {
-            StdModules::Array => ArrayModule::module_class(),
-            StdModules::String => StringModule::module_class(),
-            StdModules::Map => MapModule::module_class(),
+            Self::Array => ArrayModule::module_class(),
+            Self::String => StringModule::module_class(),
+            Self::Map => MapModule::module_class(),
             _ => unreachable!(),
         }
     }

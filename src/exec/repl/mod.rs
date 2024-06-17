@@ -9,13 +9,13 @@ use super::attempt;
 use crate::public::env::{Env, ENV};
 use crate::public::error::{import_error, CalcResult};
 use crate::public::run_time::scope::Scope;
-use crate::public::std::StdModules;
+use crate::public::std::StdModule;
 use crate::public::value::Value;
 use crate::utils::editor::{LineEditor, Signal};
 use crate::utils::OutputBuffer;
 
 fn import_all(scope: &mut Scope) -> CalcResult<()> {
-    for module_name in StdModules::STD_MODULE_IDENTIFIERS {
+    for module_name in StdModule::STD_MODULE_IDENTIFIERS {
         scope.import_std(module_name)?;
     }
     return Ok(());
@@ -34,7 +34,7 @@ fn is_ansi_supported_setter() {
 }
 
 pub fn repl(scope: &mut Scope) -> io::Result<()> {
-    scope.init_completer(false);
+    scope.init_completer();
 
     // print program name and version
     println!("Calculator.rs v{}", Env::VERSION);

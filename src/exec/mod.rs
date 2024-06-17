@@ -5,4 +5,5 @@ pub mod script;
 mod attempt;
 mod headfile;
 
+// todo: rename to `entry`
 use attempt::attempt;

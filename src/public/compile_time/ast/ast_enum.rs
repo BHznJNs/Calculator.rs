@@ -33,7 +33,7 @@ pub enum ASTNode {
     Invocation(Box<InvocationNode>),
     Statement(Box<StatementNode>),
 
-    ImportStatement(Box<ImportNode>),
+    ImportStatement(Box<ImportNode>), // todo: change enum field name
     FunctionDefinition(Box<FunctionDefinitionNode>),
     ClassDefinition(Box<ClassDefinitionNode>),
     Instantiation(Box<InstantiationNode>),

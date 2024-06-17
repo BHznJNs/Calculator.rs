@@ -3,13 +3,13 @@ use std::fmt;
 use std::rc::Rc;
 
 use crate::public::env::ENV;
-use crate::public::error::{assignment_error, reference_error, ReferenceType, CalcResult};
+use crate::public::error::{assignment_error, reference_error, CalcResult, ReferenceType};
 use crate::public::value::oop::class::Class;
 use crate::public::value::{self, ComplexStructure, GetAddr};
 use crate::utils::completer::Completer;
 
-use super::super::display_indent;
 use super::super::core::Value;
+use super::super::display_indent;
 use super::data_storage::{ComposeStorage, DataStoragePattern, ListStorage};
 
 #[derive(PartialEq, Clone)]
@@ -31,9 +31,7 @@ impl Object {
             });
         }
 
-        let completer = if unsafe {
-            ENV.options.use_repl || ENV.options.auto_complete
-        } {
+        let completer = if unsafe { ENV.options.use_repl || ENV.options.use_editor } {
             let mut words = vec![];
             let mut temp = Completer::new();
             for (k, _) in &params {
@@ -132,6 +130,26 @@ impl BuildInObject {
         Self {
             completer: None,
             storage: ComposeStorage::new(vec![]),
+        }
+    }
+    pub fn get_method_list(&self) -> Vec<&str> {
+        match self.storage.storage_pattern {
+            DataStoragePattern::List => self
+                .storage
+                .data_list
+                .as_ref()
+                .unwrap()
+                .iter()
+                .map(|item| item.0.as_str())
+                .collect::<Vec<&str>>(),
+            DataStoragePattern::Map => self
+                .storage
+                .data_map
+                .as_ref()
+                .unwrap()
+                .keys()
+                .map(|key| key.as_str())
+                .collect(),
         }
     }
 }

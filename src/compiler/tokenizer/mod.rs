@@ -118,16 +118,13 @@ pub fn tokenize(source: &str) -> CalcResult<TokenVec> {
 
             if last_type == TokenType::Annotation {
                 // Type annotation
-                match ValueType::is_valid_type(&value) {
-                    Some(type__) => {
-                        last_type = TokenType::Annotation;
-                        tokens.push_back(Token::Annotation(type__));
-                    }
-                    None => {
-                        let msg = format!("Invalid type '{}'", value);
-                        return Err(syntax_error(&msg));
-                    }
-                }
+                last_type = TokenType::Annotation;
+                let annotation_token = if let Some(type__) = ValueType::is_valid_type(&value) {
+                    Token::Annotation(type__)
+                } else {
+                    Token::Annotation(ValueType::Instance(value))
+                };
+                tokens.push_back(annotation_token);
             } else {
                 // check is keyword
                 match Keyword::is_keyword(&value) {

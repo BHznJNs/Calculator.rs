@@ -21,7 +21,7 @@ use self::fs_ops::{dir_create, dir_delete, file_create, file_delete};
 
 use super::{BuildInFnCall, ObjectModule};
 
-#[derive(PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum FileSysModule {
     Open,
     Create,

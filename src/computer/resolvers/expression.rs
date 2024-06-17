@@ -1,18 +1,21 @@
 use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::compile_time::ast::types::{ExpressionNode, ModuleType};
-use crate::public::error::{internal_error, syntax_error, type_error, InternalComponent, CalcResult};
+use crate::public::error::{
+    internal_error, syntax_error, type_error, CalcResult, InternalComponent,
+};
 use crate::public::run_time::scope::Scope;
+use crate::public::value::function::{Function, UserDefinedFunction};
 use crate::public::value::into_rc_refcell;
+use crate::public::value::oop::class::Class;
 use crate::public::value::symbols::Symbols;
 use crate::public::value::{Value, ValueType};
 
 use super::operate::operate;
-use super::{array_literal, assignment, composer::compose, function_definition, instantiation};
-use super::{class_definition, map_literal};
+use super::{array_literal, assignment, composer::compose, instantiation, map_literal};
 
 pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> CalcResult<Value> {
     let elements = &node.elements;
-    if elements.is_empty(){
+    if elements.is_empty() {
         return Ok(Value::EMPTY);
     }
 
@@ -36,8 +39,10 @@ pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> CalcResult<Value> {
                     unreachable!()
                 }
             }
-            ASTNode::FunctionDefinition(node) => Value::from(function_definition::resolve(node)?),
-            ASTNode::ClassDefinition(node) => Value::from(class_definition::resolve(node)?),
+            ASTNode::FunctionDefinition(node) => {
+                Value::Function(Function::from(UserDefinedFunction::from(node.as_ref())))
+            }
+            ASTNode::ClassDefinition(node) => Value::from(Class::from(node.as_ref())),
 
             ASTNode::SymbolLiteral(sym) => {
                 if *sym == Symbols::Not {
@@ -55,9 +60,7 @@ pub fn resolve(node: &ExpressionNode, scope: &mut Scope) -> CalcResult<Value> {
                             ));
                         }
                     } else {
-                        return Err(syntax_error(
-                            "operating number is missing for Not operator",
-                        ));
+                        return Err(syntax_error("operating number is missing for Not operator"));
                     }
                 } else {
                     if value_stack.len() < 2 {

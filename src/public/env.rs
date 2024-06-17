@@ -12,7 +12,6 @@ pub struct EnvOption {
     pub use_repl: bool,
     pub use_script: bool,
     pub use_editor: bool,
-    pub auto_complete: bool,
     pub support_ansi: bool,
     pub indent_size: usize, // the count of space for indent
 }
@@ -27,7 +26,6 @@ pub static mut ENV: Env = Env {
         use_repl: false,
         use_script: false,
         use_editor: false,
-        auto_complete: false,
         support_ansi: false,
         indent_size: 2,
     },

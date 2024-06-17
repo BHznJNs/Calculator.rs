@@ -1,9 +1,8 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::exec::script;
-use crate::public::compile_time::keywords::Keyword;
 use crate::public::error::{import_error, reference_error, ReferenceType, CalcResult};
-use crate::public::std::StdModules;
+use crate::public::std::StdModule;
 use crate::public::value::oop::module::module_create;
 use crate::utils::completer::Completer;
 
@@ -35,15 +34,15 @@ impl LocalScope {
 
 // --- --- --- --- --- ---
 
-const STD_MODULE_COUNT: usize = 7;
-const STD_MODULE_DATA: [(&str, StdModules); STD_MODULE_COUNT] = [
-    ("Basic", StdModules::Basic),
-    ("Math", StdModules::Math),
-    ("Array", StdModules::Array),
-    ("String", StdModules::String),
-    ("Map", StdModules::Map),
-    ("FS", StdModules::FileSystem),
-    ("BitOps", StdModules::BitOps),
+pub const STD_MODULE_COUNT: usize = 7;
+const STD_MODULE_DATA: [(&str, StdModule); STD_MODULE_COUNT] = [
+    ("Basic", StdModule::Basic),
+    ("Math", StdModule::Math),
+    ("Array", StdModule::Array),
+    ("String", StdModule::String),
+    ("Map", StdModule::Map),
+    ("FS", StdModule::FileSystem),
+    ("BitOps", StdModule::BitOps),
 ];
 pub struct Scope {
     pub global: GlobalScope,
@@ -52,7 +51,7 @@ pub struct Scope {
     user_module_imported: HashSet<String>,
     std_module_imported: [bool; STD_MODULE_COUNT],
 }
-static mut STD_MODULE_MAP: Option<HashMap<&'static str, StdModules>> = None;
+static mut STD_MODULE_MAP: Option<HashMap<&'static str, StdModule>> = None;
 impl Scope {
     pub fn new() -> Self {
         Self {
@@ -60,12 +59,12 @@ impl Scope {
             local: None,
             completer: None,
 
-            user_module_imported: HashSet::<String>::new(),
+            user_module_imported: HashSet::new(),
             std_module_imported: [false; STD_MODULE_COUNT],
         }
     }
 
-    fn std_module_map() -> &'static HashMap<&'static str, StdModules> {
+    pub fn std_module_map() -> &'static HashMap<&'static str, StdModule> {
         unsafe {
             if STD_MODULE_MAP.is_none() {
                 STD_MODULE_MAP = Some(HashMap::from(STD_MODULE_DATA));
@@ -74,15 +73,10 @@ impl Scope {
         }
     }
 
-    pub fn init_completer(&mut self, insert_keywords: bool) {
+    pub fn init_completer(&mut self) {
         let mut completer = Completer::new();
         for constant in CONSTANT_IDENTIFIERS {
             completer.insert(constant);
-        }
-        if insert_keywords {
-            for keyword in Keyword::keyword_list() {
-                completer.insert(keyword);
-            }
         }
         self.completer = Some(completer);
     }

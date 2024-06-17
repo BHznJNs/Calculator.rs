@@ -12,7 +12,7 @@ use crate::public::value::{Value, ValueType};
 use super::super::utils::get_val::get_val;
 use super::{BuildInFnCall, ClassModule};
 
-#[derive(PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum ArrayModule {
     Push,
     Pop,

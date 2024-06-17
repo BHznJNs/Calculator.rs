@@ -4,7 +4,7 @@ use std::fmt;
 use std::rc::Rc;
 
 use crate::public::compile_time::ast::ast_enum::ASTVec;
-use crate::public::compile_time::ast::types::ExpressionNode;
+use crate::public::compile_time::ast::types::{ExpressionNode, FunctionDefinitionNode};
 use crate::public::error::{range_error, type_error, CalcResult};
 use crate::public::run_time::build_in::BuildInFnIdenti;
 use crate::public::run_time::scope::{LocalScope, Scope};
@@ -18,7 +18,7 @@ pub struct BuildInFnParam(pub ValueType, pub &'static str);
 
 impl Param for BuildInFnParam {
     fn type__(&self) -> ValueType {
-        self.0
+        self.0.clone()
     }
     fn identi(&self) -> &str {
         self.1
@@ -39,7 +39,7 @@ pub struct UserDefinedFnParam {
 }
 impl Param for UserDefinedFnParam {
     fn type__(&self) -> ValueType {
-        self.type__
+        self.type__.clone()
     }
     fn identi(&self) -> &str {
         &self.identi
@@ -47,8 +47,19 @@ impl Param for UserDefinedFnParam {
 }
 #[derive(PartialEq)]
 pub struct UserDefinedFunction {
+    pub name: Option<String>,
     pub params: Vec<UserDefinedFnParam>,
     pub body: ASTVec,
+}
+
+impl From<&FunctionDefinitionNode> for UserDefinedFunction {
+    fn from(node: &FunctionDefinitionNode) -> Self {
+        UserDefinedFunction {
+            name: None,
+            params: node.params.clone(),
+            body: node.body.clone(),
+        }
+    }
 }
 
 // --- --- --- --- --- ---
@@ -106,8 +117,18 @@ impl Function {
 impl fmt::Display for Function {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::BuildIn(_) => write!(f, "<Build-in-Function>"),
-            Self::UserDefined(_) => write!(f, "<User-Defined-Function>"),
+            Self::BuildIn(func) => {
+                write!(f, "<Build-in-Function: {}>", func.as_ref().borrow().identi)
+            }
+            Self::UserDefined(func) => {
+                let borrowed = func.as_ref().borrow();
+                let func_name = if let Some(name) = &borrowed.name {
+                    name
+                } else {
+                    "Anonymous"
+                };
+                write!(f, "<User-Defined-Function: {}>", func_name)
+            },
         }
     }
 }

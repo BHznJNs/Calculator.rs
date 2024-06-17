@@ -8,7 +8,7 @@ use std::rc::Rc;
 use crossterm::style::Stylize;
 
 use crate::public::env::ENV;
-use crate::public::error::{internal_error, InternalComponent, CalcResult};
+use crate::public::error::{internal_error, CalcResult, InternalComponent};
 
 use super::super::compile_time::ast::ast_enum::ASTNode;
 use super::array::{ArrayLiteral, RawArray};
@@ -16,7 +16,7 @@ use super::function::{BuildInFunction, Function, UserDefinedFunction};
 use super::map::RawMap;
 use super::number::Number;
 use super::oop::class::Class;
-use super::oop::object::{Object, BuildInObject};
+use super::oop::object::{BuildInObject, Object};
 use super::unique::Unique;
 use super::{into_rc_refcell, ComplexStructure, GetAddr};
 
@@ -48,9 +48,7 @@ impl Value {
     pub const EMPTY: Self = Self::Void(VoidSign::Empty);
 
     pub fn null() -> Self {
-        Value::from(
-            Object::BuildIn(BuildInObject::null())
-        )
+        Value::from(Object::BuildIn(BuildInObject::null()))
     }
 
     // formater for string typed value
@@ -76,7 +74,7 @@ impl Value {
         let Self::Number(num) = self else {
             return Err(internal_error(
                 InternalComponent::InternalFn,
-                "invalid `Value::get_i64` invocation"
+                "invalid `Value::get_i64` invocation",
             ));
         };
         return Ok(num.int_value());
@@ -86,7 +84,7 @@ impl Value {
         let Self::Number(num) = self else {
             return Err(internal_error(
                 InternalComponent::InternalFn,
-                "invalid `Value::get_f64` invocation"
+                "invalid `Value::get_f64` invocation",
             ));
         };
         return Ok(num.float_value());
@@ -111,7 +109,7 @@ impl Value {
         let Self::String(str) = self else {
             return Err(internal_error(
                 InternalComponent::InternalFn,
-                "invalid `Value::get_str` invocation"
+                "invalid `Value::get_str` invocation",
             ));
         };
         let temp = str.borrow_mut();
@@ -204,6 +202,18 @@ impl Value {
             // `void` type can be any type
             return true;
         }
+        if let (Value::Object(obj), ValueType::Instance(target_proto_name)) =
+            (self, target_type.clone())
+        {
+            // check for Typed Object ValueType::Instance(_)
+            let Some(proto) = obj.as_ref().borrow().get_proto() else {
+                return false;
+            };
+            let borrowed = proto.name.borrow();
+            return borrowed
+                .as_ref()
+                .is_some_and(|name| name.eq(&target_proto_name));
+        }
         return self.get_type() == target_type;
     }
 }
@@ -254,7 +264,7 @@ impl GetAddr for Value {
         match self {
             Self::Unique(uni) => uni.get_addr(),
             Self::Array(arr) => arr.borrow().get_addr(),
-            Self::LazyExpression(lexpr) => lexpr.as_ptr() as usize,
+            Self::LazyExpression(lexpr) => lexpr.as_ptr() as super::Addr,
             Self::Function(func) => func.get_addr(),
             Self::Class(cls) => cls.get_addr(),
             Self::Object(obj) => obj.borrow().get_addr(),

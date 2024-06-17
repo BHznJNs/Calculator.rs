@@ -6,7 +6,7 @@ use crate::public::value::{Value, ValueType};
 
 use super::{BuildInFnCall, FunctionModule};
 
-#[derive(PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum BitOpsModule {
     AND,
