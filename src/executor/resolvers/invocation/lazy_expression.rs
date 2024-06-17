@@ -1,4 +1,4 @@
-use crate::computer::resolvers::sequence;
+use crate::executor::resolvers::sequence;
 use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::error::CalcResult;
 use crate::public::run_time::scope::Scope;

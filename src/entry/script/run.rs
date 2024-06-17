@@ -1,7 +1,7 @@
 use std::time::Instant;
 
 use crate::{
-    exec::{attempt, script::pre_processer::CodeLine},
+    entry::{attempt, script::pre_processer::CodeLine},
     public::{env::ENV, run_time::scope::Scope, compile_time::ast::ast_enum::RootNode},
     utils::OutputBuffer, compiler,
 };

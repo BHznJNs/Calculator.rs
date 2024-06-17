@@ -4,7 +4,7 @@ use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::error::{InternalComponent, CalcResult};
 use crate::public::run_time::scope::Scope;
 use crate::public::value::Value;
-use crate::{computer::resolvers::invocation::invocation_resolve, public::error::internal_error};
+use crate::{executor::resolvers::invocation::invocation_resolve, public::error::internal_error};
 
 use super::{element_reading, object_reading};
 

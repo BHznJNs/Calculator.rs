@@ -16,7 +16,7 @@ use crossterm::{
 };
 
 use crate::{
-    exec::script::{run_entry, RUN},
+    entry::script::{run_entry, RUN},
     public::{env::ENV, run_time::scope::Scope, value::ValueType, Param},
     utils::{
         editor::{

@@ -1,4 +1,4 @@
-use crate::computer::resolvers::{assignment, expression};
+use crate::executor::resolvers::{assignment, expression};
 use crate::public::compile_time::ast::types::StatementNode;
 use crate::public::error::{syntax_error, CalcResult};
 use crate::public::run_time::scope::Scope;

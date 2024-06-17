@@ -1,7 +1,7 @@
 use std::{collections::VecDeque, io};
 
 use crate::{
-    exec::headfile,
+    entry::headfile,
     public::{
         env::{Env, ENV},
         error::{internal_error, InternalComponent},

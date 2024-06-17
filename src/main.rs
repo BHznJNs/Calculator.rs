@@ -1,17 +1,17 @@
 #![allow(clippy::needless_return)]
 
 mod compiler;
-mod computer;
-mod exec;
+mod executor;
+mod entry;
 mod public;
 mod utils;
 
 use std::collections::VecDeque;
 use std::{env, io};
 
-use exec::args::{args_resolve, load_config, ARG_COUNT};
-use exec::repl;
-use exec::script::{run_entry, RUN_PATH};
+use entry::args::{args_resolve, load_config, ARG_COUNT};
+use entry::repl;
+use entry::script::{run_entry, RUN_PATH};
 use public::env::ENV;
 use public::run_time::scope::Scope;
 use utils::editor::CodeEditor;

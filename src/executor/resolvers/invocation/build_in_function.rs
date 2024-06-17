@@ -1,4 +1,4 @@
-use crate::computer::resolvers::expression;
+use crate::executor::resolvers::expression;
 use crate::public::compile_time::ast::types::ExpressionNode;
 use crate::public::error::CalcResult;
 use crate::public::run_time::build_in::BuildInFnIdenti;

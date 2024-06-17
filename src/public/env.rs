@@ -39,7 +39,7 @@ impl Env {
     }
 
     pub fn help_output() {
-        use crate::exec::args::{ARGS, ARG_COUNT, ARG_DESCRIPTIONS};
+        use crate::entry::args::{ARGS, ARG_COUNT, ARG_DESCRIPTIONS};
 
         println!("Usage: calculator [SCRIPT_PATH] [OPTIONS]\n");
 

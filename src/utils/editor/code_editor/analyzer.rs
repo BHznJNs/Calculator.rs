@@ -1,7 +1,7 @@
 use std::{collections::{HashMap, HashSet}, rc::Rc};
 
 use crate::{
-    exec::script::{read_file, script_analyze},
+    entry::script::{read_file, script_analyze},
     public::{
         compile_time::{
             ast::{
@@ -24,7 +24,7 @@ use crate::{
             ValueType,
         },
     },
-    utils::{completer::Completer, log},
+    utils::completer::Completer,
 };
 
 #[derive(Clone)]

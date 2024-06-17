@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-use crate::exec::script;
+use crate::entry::script;
 use crate::public::error::{import_error, reference_error, ReferenceType, CalcResult};
 use crate::public::std::StdModule;
 use crate::public::value::oop::module::module_create;

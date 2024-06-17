@@ -1,4 +1,4 @@
-use crate::computer::resolvers::composer::compose;
+use crate::executor::resolvers::composer::compose;
 use crate::public::compile_time::ast::ast_enum::ASTNode;
 use crate::public::compile_time::ast::types::{ExpressionNode, InvocationNode};
 use crate::public::error::{syntax_error, type_error, CalcResult};

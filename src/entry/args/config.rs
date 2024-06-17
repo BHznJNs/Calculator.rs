@@ -1,7 +1,7 @@
 use std::{collections::VecDeque, env::current_exe, io};
 
 use crate::{
-    exec::{
+    entry::{
         args::{data::ARG_CONFIGURABLE, Arg},
         headfile,
         script,
