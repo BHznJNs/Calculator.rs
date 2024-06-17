@@ -8,13 +8,13 @@ use super::list;
 pub fn resolve(tokens: &mut TokenVec) -> CalcResult<InstantiationNode> {
     // no `new` keyword
     // example:
-    // Person["test", 99] | from `new Person["test", 99]`
+    // Person("test", 99) | from `new Person("test", 99)`
 
     let Some(Token::Identi(target_class)) = tokens.pop_front() else {
         return Err(syntax_error("missing class name"));
     };
 
-    // expect: `[`
+    // expect: `(`
     if tokens.pop_front() != Some(Token::Paren(Paren::LeftParen)) {
         return Err(syntax_error(
             "missing params for object instantiation, expected '['",
